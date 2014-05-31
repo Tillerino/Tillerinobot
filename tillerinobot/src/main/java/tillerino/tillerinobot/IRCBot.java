@@ -133,7 +133,7 @@ public class IRCBot extends CoreHooks {
 
 				BeatmapMeta beatmap = backend.loadBeatmap(beatmapid);
 
-				if (beatmap != null) {
+				if (beatmap == null) {
 					user.message("I'm sorry, I don't know that map. It might be very new, very hard or simply unranked.");
 					return;
 				}
