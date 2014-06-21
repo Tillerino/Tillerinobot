@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static org.apache.commons.lang3.StringUtils.*;
 import org.apache.log4j.MDC;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
@@ -245,15 +246,26 @@ public class IRCBot extends CoreHooks {
 		}
 
 		try {
-			message = message.substring(1);
+			message = message.substring(1).trim().toLowerCase();
+			
+			if(getLevenshteinDistance(message, "recommend") <= 2 || message.equals("r")) {
+				message = "recommend";
+			}
+			if(getLevenshteinDistance(message, "recommend beta") <= 2 || message.equals("r beta")) {
+				message = "recommend beta";
+			}
+			if(getLevenshteinDistance(message, "recommend nomod") <= 2 || message.equals("r nomod")) {
+				message = "recommend nomod";
+			}
 
-			if(message.equalsIgnoreCase("help")) {
+
+			if(getLevenshteinDistance(message, "help") <= 1) {
 				user.message("Hi! I'm the robot who killed Tillerino and took over his account."
 						+ " Check https://twitter.com/Tillerinobot for status and updates!"
 						+ " See https://github.com/Tillerino/Tillerinobot/wiki for commands!");
-			} else if(message.equalsIgnoreCase("faq")) {
+			} else if(getLevenshteinDistance(message, "faq") <= 1) {
 				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!");
-			} else if(message.startsWith("complain")) {
+			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
 				Recommendation lastRecommendation = backend.getLastRecommendation(user.getNick());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
 					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmapid() + (lastRecommendation.mods ? " with mods" : "") + ". Recommendation source: " + backend.getCause(user.getNick(), lastRecommendation.beatmap.getBeatmapid()));
