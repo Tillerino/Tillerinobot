@@ -2,27 +2,32 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TransferQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.log4j.MDC;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.Utils;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.CoreHooks;
+import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
+import org.pircbotx.hooks.events.UnknownEvent;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -31,39 +36,15 @@ import com.google.common.cache.LoadingCache;
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
-	static class MessageRateLimiter implements Runnable {
-		TransferQueue<Object> queue = new LinkedTransferQueue<>();
-		Semaphore semaphore = new Semaphore(1, true);
-		
-		@Override
-		public void run() {
-			for(;;) {
-				try {
-					queue.transfer(new Object());
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					return;
-				}
-			}
-		}
-		
-		void ensureMessageRateLimit() throws InterruptedException {
-			semaphore.acquire();
-			try {
-				queue.take();
-			} finally {
-				semaphore.release();
-			}
-		}
-	}
-	
 	final PircBotX bot;
-
-	BotBackend backend;
+	final BotBackend backend;
+	final private String server;
+	final private boolean rememberRecommendations;
 	
-	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel) {
+	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel, boolean rememberRecommendations) {
+		this.server = server;
 		Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-				.setServer(server, port).setName(nickname).addListener(this);
+				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this);
 		if(password != null) {
 				configurationBuilder.setServerPassword(password);
 		}
@@ -72,12 +53,10 @@ public class IRCBot extends CoreHooks {
 		}
 		bot = new PircBotX(configurationBuilder.buildConfiguration());
 		this.backend = backend;
+		this.rememberRecommendations = rememberRecommendations;
 	}
 
 	public void run() throws IOException, IrcException {
-		Thread messageRateLimiterPushThread = new Thread(messageRateLimiter);
-		messageRateLimiterPushThread.setDaemon(true);
-		messageRateLimiterPushThread.start();
 		bot.startBot();
 	}
 
@@ -111,23 +90,23 @@ public class IRCBot extends CoreHooks {
 	});
 
 	void processPrivateAction(IRCBotUser user, String message) {
-		log.info(user.getNick() + " action: " + message);
+		MDC.put("user", user.getNick());
+		log.info("action: " + message);
 
 		try {
-			Matcher m = npPattern.matcher(message);
-
-			if (!m.matches()) {
-				log.error("no match: " + message);
-				return;
-			}
-			
 			Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
 			if(!semaphore.tryAcquire()) {
-				log.warn("concurrent action from " + user.getNick() + ": " + message);
+				log.warn("concurrent action");
 				return;
 			}
 
 			try {
+				Matcher m = npPattern.matcher(message);
+
+				if (!m.matches()) {
+					log.error("no match: " + message);
+					return;
+				}
 
 				int beatmapid = Integer.valueOf(m.group(1));
 
@@ -159,12 +138,13 @@ public class IRCBot extends CoreHooks {
 
 			user.message("Something went wrong. If this keeps happening, tell Tillerino to look after incident "
 					+ string + ", please.");
-			log.error(string + ": fucked up responding to " + user.getNick() + message,
-					e);
+			log.error(string + ": fucked up", e);
 		}
 	}
+	
+	static DecimalFormat format = new DecimalFormat("#.##");
 
-	private static void sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition) {
+	private static boolean sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition) {
 		String beatmapName = beatmap.getArtist() + " - " + beatmap.getTitle()
 				+ " [" + beatmap.getVersion() + "]";
 		if(formLink) {
@@ -173,7 +153,7 @@ public class IRCBot extends CoreHooks {
 
 		double community = beatmap.getCommunityPP();
 		community = Math.round(community * 2) / 2;
-		String ppestimate = community % 1 == 0 ? "" + (int) community : "" + community;
+		String ppestimate = community % 1 == 0 ? "" + (int) community : "" + format.format(community);
 
 		String cQ = beatmap.isTrustCommunity() ? "" : "??";
 		String bQ = beatmap.isTrustMax() ? "" : "??";
@@ -182,10 +162,10 @@ public class IRCBot extends CoreHooks {
 				+ ppestimate
 				+ cQ + " pp"
 				+ (beatmap.getMaxPP() != null ? (" | best: " + beatmap.getMaxPP() + bQ + " pp")
-						: "") + " | star difficulty: " + beatmap.getStarDifficulty();
+						: "") + " | star difficulty: " + format.format(beatmap.getStarDifficulty());
 
 
-		user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : ""));
+		return user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : ""));
 	}
 
 	public static String getRandomString(int length) {
@@ -210,20 +190,33 @@ public class IRCBot extends CoreHooks {
 		processPrivateMessage(fromIRC(event.getUser()), event.getMessage());
 	}
 	
-	MessageRateLimiter messageRateLimiter = new MessageRateLimiter();
+	Semaphore senderSemaphore = new Semaphore(1, true);
+	
+	Pinger pinger = new Pinger();
 	
 	IRCBotUser fromIRC(final User user) {
 		return new IRCBotUser() {
 			
 			@Override
-			public void message(String msg) {
+			public boolean message(String msg) {
 				try {
-					messageRateLimiter.ensureMessageRateLimit();
+					senderSemaphore.acquire();
 				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
+					e.printStackTrace();
+					return false;
 				}
-				user.send().message(msg);
-				log.info("to " + user.getNick() + ": " + msg);
+				try {
+					pinger.ping();
+					
+					user.send().message(msg);
+					log.info("sent: " + msg);
+					return true;
+				} catch (IOException | InterruptedException e) {
+					log.error("not sent: " + e.getMessage());
+					return false;
+				} finally {
+					senderSemaphore.release();
+				}
 			}
 			
 			@Override
@@ -234,7 +227,8 @@ public class IRCBot extends CoreHooks {
 	}
 	
 	void processPrivateMessage(final IRCBotUser user, String message) throws IOException {
-		log.info(user.getNick() + ": " + message);
+		MDC.put("user", user.getNick());
+		log.info("received: " + message);
 
 		String commandChar = "!";
 		if(user.getNick().equals("Tillerino"))
@@ -246,22 +240,26 @@ public class IRCBot extends CoreHooks {
 
 		Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
-			log.warn("concurrent message from " + user.getNick() + ": " + message);
+			log.warn("concurrent message");
 			return;
 		}
 
 		try {
 			message = message.substring(1);
 
-			if(message.startsWith("help")) {
-				user.message("Hi! I'm the robot who killed Tillerino and took over his account. check for status and updates at https://twitter.com/Tillerinobot");
-				user.message("I respond to the following commands.");
-				user.message(" /np: I tell you community/best pp for the map you're listening to.");
-				user.message("!recommend: I will suggest a map that you might like.");
-				user.message("!recommend nomod: I will suggest a map that you might like. I'll avoid mods.");
-				user.message("!recommend beta: Preview a new version of the recommendation algorithm.");
-				user.message("!complain: Complain about the last recommendation that you got.");
-			} else if(message.startsWith("recommend")) {
+			if(message.equalsIgnoreCase("help")) {
+				user.message("Hi! I'm the robot who killed Tillerino and took over his account."
+						+ " Check https://twitter.com/Tillerinobot for status and updates!"
+						+ " See https://github.com/Tillerino/Tillerinobot/wiki for commands!");
+			} else if(message.equalsIgnoreCase("faq")) {
+				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!");
+			} else if(message.startsWith("complain")) {
+				Recommendation lastRecommendation = backend.getLastRecommendation(user.getNick());
+				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
+					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmapid() + (lastRecommendation.mods ? " with mods" : "") + ". Recommendation source: " + backend.getCause(user.getNick(), lastRecommendation.beatmap.getBeatmapid()));
+					user.message("Your complaint has been filed. Tillerino will look into it when he can.");
+				}
+			} else if(message.equals("recommend") || message.equals("recommend beta") || message.equals("recommend nomod")) {
 				try {
 					Recommendation result = backend.loadRecommendation(user.getNick(), message);
 
@@ -274,15 +272,13 @@ public class IRCBot extends CoreHooks {
 					if(result.mods) {
 						addition = "Try this map with some mods! " + (result.beatmap.getMaxPP() != null && result.beatmap.getMaxPP() < 75 ? "Maybe DT?" : "I think you're better at finding the right ones than me.");
 					}
-					sendSongInfo(user, result.beatmap, true, addition);
+					if(sendSongInfo(user, result.beatmap, true, addition)) {
+						if(rememberRecommendations) {
+							backend.saveGivenRecommendation(user.getNick(), result.beatmap.getBeatmapid());
+						}
+					}
 				} catch (Exception e) {
 					handleException(user, message, e);
-				}
-			} else if(message.startsWith("complain")) {
-				Recommendation lastRecommendation = backend.getLastRecommendation(user.getNick());
-				if(lastRecommendation != null) {
-					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmapid() + (lastRecommendation.mods ? " with mods" : "") + ". Recommendation source: " + backend.getCause(user.getNick(), lastRecommendation.beatmap.getBeatmapid()));
-					user.message("You complaint has been filed. Tillerino will look into it when he can.");
 				}
 			} else {
 				user.message("unknown command " + message
@@ -295,5 +291,72 @@ public class IRCBot extends CoreHooks {
 	
 	void shutDown() {
 		bot.sendIRC().quitServer();
+	}
+	
+	class Pinger {
+		volatile String pingMessage = null;
+		volatile CountDownLatch pingLatch = null;
+		final AtomicLong pingGate = new AtomicLong();
+		
+		void ping() throws IOException, InterruptedException {
+			long time = System.currentTimeMillis();
+			
+			if(pingGate.get() > System.currentTimeMillis()) {
+				throw new IOException("ping gate closed");
+			}
+			
+			synchronized (this) {
+				pingLatch = new CountDownLatch(1);
+				pingMessage = getRandomString(16);
+			}
+
+			Utils.sendRawLineToServer(bot, "PING " + pingMessage);
+			
+			if(!pingLatch.await(10, TimeUnit.SECONDS)) {
+				pingGate.set(System.currentTimeMillis() + 60000);
+				throw new IOException("ping timed out");
+			}
+			
+			long ping = System.currentTimeMillis() - time;
+			
+			log.info("ping: " + ping);
+			
+			if(ping > 1000) {
+				pingGate.set(System.currentTimeMillis() + 60000);
+				throw new IOException("death ping: " + ping);
+			}
+		}
+		
+		void handleUnknownEvent(UnknownEvent event) {
+			synchronized(this) {
+				if (pingMessage == null)
+					return;
+
+				boolean contains = event.getLine().contains(" PONG ");
+				boolean endsWith = event.getLine().endsWith(pingMessage);
+				if (contains
+						&& endsWith) {
+					pingLatch.countDown();
+				}
+			}
+		}
+	}
+	
+	
+	AtomicLong lastSerial = new AtomicLong(System.currentTimeMillis());
+	
+	@Override
+	public void onEvent(Event event) throws Exception {
+		MDC.put("server", server);
+		MDC.put("event", lastSerial.incrementAndGet());
+		MDC.put("permanent", rememberRecommendations ? 1 : 0);
+		super.onEvent(event);
+	}
+	
+	@Override
+	public void onUnknown(UnknownEvent event) throws Exception {
+		System.out.println(event.getLine());
+		
+		pinger.handleUnknownEvent(event);
 	}
 }
