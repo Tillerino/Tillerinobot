@@ -2,6 +2,7 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -13,8 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
-
 import static org.apache.commons.lang3.StringUtils.*;
+
 import org.apache.log4j.MDC;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
@@ -123,12 +124,12 @@ public class IRCBot extends CoreHooks {
 				semaphore.release();
 			}
 		} catch (Exception e) {
-			handleException(user, message, e);
+			handleException(user, e);
 			return;
 		}
 	}
 
-	private void handleException(IRCBotUser user, String message, Throwable e) {
+	private void handleException(IRCBotUser user, Throwable e) {
 		if(e instanceof ExecutionException) {
 			e = e.getCause();
 		}
@@ -246,16 +247,26 @@ public class IRCBot extends CoreHooks {
 		}
 
 		try {
+			try {
+				int userVersion = backend.getLastVisitedVersion(user.getNick());
+				if(userVersion < currentVersion) {
+					user.message(versionMessage);
+					backend.setLastVisitedVersion(user.getNick(), currentVersion);
+				}
+			} catch (Exception e) {
+				handleException(user, e);
+			}
+			
 			message = message.substring(1).trim().toLowerCase();
 			
 			if(getLevenshteinDistance(message, "recommend") <= 2 || message.equals("r")) {
 				message = "recommend";
 			}
-			if(getLevenshteinDistance(message, "recommend beta") <= 2 || message.equals("r beta")) {
-				message = "recommend beta";
+			if(getLevenshteinDistance(message, "recommend relax") <= 2 || message.equals("r relax")) {
+				message = "recommend relax";
 			}
-			if(getLevenshteinDistance(message, "recommend nomod") <= 2 || message.equals("r nomod")) {
-				message = "recommend nomod";
+			if(getLevenshteinDistance(message, "recommend relax nomod") <= 2 || getLevenshteinDistance(message, "recommend nomod relax") <= 2 || message.equals("r relax nomod") || message.equals("r nomod relax")) {
+				message = "recommend relax nomod";
 			}
 
 
@@ -271,7 +282,7 @@ public class IRCBot extends CoreHooks {
 					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + (lastRecommendation.mods ? " with mods" : "") + ". Recommendation source: " + backend.getCause(user.getNick(), lastRecommendation.beatmap.getBeatmap().getId()));
 					user.message("Your complaint has been filed. Tillerino will look into it when he can.");
 				}
-			} else if(message.equals("recommend") || message.equals("recommend beta") || message.equals("recommend nomod")) {
+			} else if(message.equals("recommend") || message.equals("recommend relax") || message.equals("recommend relax nomod")) {
 				try {
 					Recommendation result = backend.loadRecommendation(user.getNick(), message);
 
@@ -290,7 +301,7 @@ public class IRCBot extends CoreHooks {
 						}
 					}
 				} catch (Exception e) {
-					handleException(user, message, e);
+					handleException(user, e);
 				}
 			} else {
 				user.message("unknown command " + message
@@ -371,4 +382,7 @@ public class IRCBot extends CoreHooks {
 		
 		pinger.handleUnknownEvent(event);
 	}
+	
+	static final int currentVersion = 1;
+	static final String versionMessage = "FYI: '!recommend beta' is now '!recommend'. If you want to keep using the old '!recommend', you can do so with the command '!recommend relax'.";
 }

@@ -19,4 +19,10 @@ public interface BotBackend {
 
 	public void saveGivenRecommendation(String nick, int beatmapid) throws SQLException;
 
+	/**
+	 * @return the last version of the bot that was visited by this user. -1 if no information available.
+	 */
+	public int getLastVisitedVersion(String nick) throws SQLException;
+	
+	public void setLastVisitedVersion(String nick, int version) throws SQLException;
 }
