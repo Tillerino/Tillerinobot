@@ -344,7 +344,7 @@ public class IRCBot extends CoreHooks {
 			
 			log.info("ping: " + ping);
 			
-			if(ping > 1000) {
+			if(ping > 1500) {
 				pingGate.set(System.currentTimeMillis() + 60000);
 				throw new IOException("death ping: " + ping);
 			}
