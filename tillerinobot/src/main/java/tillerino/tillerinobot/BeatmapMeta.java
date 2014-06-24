@@ -1,15 +1,11 @@
 package tillerino.tillerinobot;
 
+import org.tillerino.osuApiModel.OsuApiBeatmap;
+
 
 public interface BeatmapMeta {
-	String getArtist();
-
-	String getTitle();
-
-	String getVersion();
-
-	int getBeatmapid();
-
+	OsuApiBeatmap getBeatmap();
+	
 	double getCommunityPP();
 
 	boolean isTrustCommunity();
@@ -17,6 +13,4 @@ public interface BeatmapMeta {
 	boolean isTrustMax();
 
 	Integer getMaxPP();
-
-	double getStarDifficulty();
 }

@@ -4,7 +4,9 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import org.junit.Test;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 public class IRCBotTest {
 	public static final class DummyUser implements IRCBotUser {
@@ -23,7 +25,20 @@ public class IRCBotTest {
 	}
 
 	static class TestBackend implements BotBackend {
-		public abstract class Derpommendation implements BeatmapMeta {
+		public class Derpommendation implements BeatmapMeta {
+			OsuApiBeatmap beatmap = new OsuApiBeatmap();
+			public Derpommendation() {
+				beatmap.id = 411134170;
+				beatmap.artist = "artist";
+				beatmap.starDifficulty = 3.3;
+				beatmap.version = "version";
+			}
+			
+			@Override
+			public OsuApiBeatmap getBeatmap() {
+				return beatmap;
+			}
+			
 			@Override
 			public boolean isTrustMax() {
 				return true;
@@ -35,16 +50,6 @@ public class IRCBotTest {
 			}
 
 			@Override
-			public String getVersion() {
-				return "version";
-			}
-
-			@Override
-			public double getStarDifficulty() {
-				return 3.3;
-			}
-
-			@Override
 			public Integer getMaxPP() {
 				return 200;
 			}
@@ -52,16 +57,6 @@ public class IRCBotTest {
 			@Override
 			public double getCommunityPP() {
 				return 100;
-			}
-
-			@Override
-			public int getBeatmapid() {
-				return 411134170;
-			}
-
-			@Override
-			public String getArtist() {
-				return "artist";
 			}
 		}
 
@@ -75,28 +70,16 @@ public class IRCBotTest {
 		Recommendation betaRecommendation = new Recommendation();
 
 		public TestBackend() {
-			normalRecommendation.beatmap = new Derpommendation() {
-				@Override
-				public String getTitle() {
-					return "title";
-				}
-			};
+			normalRecommendation.beatmap = new Derpommendation();
+			normalRecommendation.beatmap.getBeatmap().title = "title";
 			normalRecommendation.mods = true;
 			
-			nomodRecommendation.beatmap = new Derpommendation() {
-				@Override
-				public String getTitle() {
-					return "nomod";
-				}
-			};
+			nomodRecommendation.beatmap = new Derpommendation();
+			nomodRecommendation.beatmap.getBeatmap().title = "nomod";
 			nomodRecommendation.mods = false;
 			
-			betaRecommendation.beatmap = new Derpommendation() {
-				@Override
-				public String getTitle() {
-					return "beta";
-				}
-			};
+			betaRecommendation.beatmap = new Derpommendation();
+			betaRecommendation.beatmap.getBeatmap().title = "beta";
 			betaRecommendation.mods = false;
 		}
 

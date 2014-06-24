@@ -146,10 +146,10 @@ public class IRCBot extends CoreHooks {
 	static DecimalFormat format = new DecimalFormat("#.##");
 
 	private static boolean sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition) {
-		String beatmapName = beatmap.getArtist() + " - " + beatmap.getTitle()
-				+ " [" + beatmap.getVersion() + "]";
+		String beatmapName = beatmap.getBeatmap().getArtist() + " - " + beatmap.getBeatmap().getTitle()
+				+ " [" + beatmap.getBeatmap().getVersion() + "]";
 		if(formLink) {
-			beatmapName = "[http://osu.ppy.sh/b/" + beatmap.getBeatmapid() + " " + beatmapName + "]";
+			beatmapName = "[http://osu.ppy.sh/b/" + beatmap.getBeatmap().getId() + " " + beatmapName + "]";
 		}
 
 		double community = beatmap.getCommunityPP();
@@ -163,7 +163,7 @@ public class IRCBot extends CoreHooks {
 				+ ppestimate
 				+ cQ + " pp"
 				+ (beatmap.getMaxPP() != null ? (" | best: " + beatmap.getMaxPP() + bQ + " pp")
-						: "") + " | star difficulty: " + format.format(beatmap.getStarDifficulty());
+						: "") + " | star difficulty: " + format.format(beatmap.getBeatmap().getStarDifficulty());
 
 
 		return user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : ""));
@@ -268,7 +268,7 @@ public class IRCBot extends CoreHooks {
 			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
 				Recommendation lastRecommendation = backend.getLastRecommendation(user.getNick());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
-					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmapid() + (lastRecommendation.mods ? " with mods" : "") + ". Recommendation source: " + backend.getCause(user.getNick(), lastRecommendation.beatmap.getBeatmapid()));
+					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + (lastRecommendation.mods ? " with mods" : "") + ". Recommendation source: " + backend.getCause(user.getNick(), lastRecommendation.beatmap.getBeatmap().getId()));
 					user.message("Your complaint has been filed. Tillerino will look into it when he can.");
 				}
 			} else if(message.equals("recommend") || message.equals("recommend beta") || message.equals("recommend nomod")) {
@@ -286,7 +286,7 @@ public class IRCBot extends CoreHooks {
 					}
 					if(sendSongInfo(user, result.beatmap, true, addition)) {
 						if(rememberRecommendations) {
-							backend.saveGivenRecommendation(user.getNick(), result.beatmap.getBeatmapid());
+							backend.saveGivenRecommendation(user.getNick(), result.beatmap.getBeatmap().getId());
 						}
 					}
 				} catch (Exception e) {
