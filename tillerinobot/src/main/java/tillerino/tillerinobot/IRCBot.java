@@ -2,7 +2,6 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -146,7 +145,7 @@ public class IRCBot extends CoreHooks {
 	
 	static DecimalFormat format = new DecimalFormat("#.##");
 
-	private static boolean sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition) {
+	public static boolean sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition) {
 		String beatmapName = beatmap.getBeatmap().getArtist() + " - " + beatmap.getBeatmap().getTitle()
 				+ " [" + beatmap.getBeatmap().getVersion() + "]";
 		if(formLink) {
@@ -160,11 +159,14 @@ public class IRCBot extends CoreHooks {
 		String cQ = beatmap.isTrustCommunity() ? "" : "??";
 		String bQ = beatmap.isTrustMax() ? "" : "??";
 		
-		String estimateMessage = "community: "
-				+ ppestimate
-				+ cQ + " pp"
-				+ (beatmap.getMaxPP() != null ? (" | best: " + beatmap.getMaxPP() + bQ + " pp")
-						: "") + " | star difficulty: " + format.format(beatmap.getBeatmap().getStarDifficulty());
+		String estimateMessage = "";
+		if(beatmap.getPersonalPP() != null) {
+			estimateMessage += "future you: " + beatmap.getPersonalPP() + " pp | ";
+		}
+		estimateMessage += "community: " + ppestimate + cQ + " pp";
+		if(beatmap.getMaxPP() != null)
+			estimateMessage += " | best: " + beatmap.getMaxPP() + bQ + " pp";
+		estimateMessage += " | star difficulty: " + format.format(beatmap.getBeatmap().getStarDifficulty());
 
 
 		return user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : ""));
@@ -383,6 +385,6 @@ public class IRCBot extends CoreHooks {
 		pinger.handleUnknownEvent(event);
 	}
 	
-	static final int currentVersion = 1;
-	static final String versionMessage = "FYI: '!recommend beta' is now '!recommend'. If you want to keep using the old '!recommend', you can do so with the command '!recommend relax'.";
+	static final int currentVersion = 2;
+	static final String versionMessage = "New: I'll tell you how much pp I expect you to get from a recommended beatmap (not for /np or !recommend relax). This might look weird on mod recommendations because the community and best values don't include mods. Remember: this number might be based on very thin data, so don't take it too seriously!";
 }

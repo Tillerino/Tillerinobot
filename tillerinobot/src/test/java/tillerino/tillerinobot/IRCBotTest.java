@@ -74,6 +74,13 @@ public class IRCBotTest {
 			public double getCommunityPP() {
 				return 100;
 			}
+
+			@Override
+			public Integer getPersonalPP() {
+				if(getBeatmap().getTitle().equals("title"))
+					return 100;
+				return null;
+			}
 		}
 
 		@Override
@@ -140,10 +147,11 @@ public class IRCBotTest {
 			versionVisited = version;
 		}
 	}
-
+	
+	IRCBot bot = new IRCBot(new TestBackend(), "nothing", 456, "nobody", null, null, false);
+	
 	@Test
 	public void testWrongStrings() throws IOException {
-		IRCBot bot = new IRCBot(new TestBackend(), "nothing", 456, "nobody", null, null, false);
 		
 		assertEquals(getResponse(bot, "!recommend", false), IRCBot.versionMessage);
 		
@@ -170,6 +178,12 @@ public class IRCBotTest {
 		assertTrue(getResponse(bot, "!feq", true).contains("FAQ"));
 	}
 	
+	@Test
+	public void testPersonalPP() throws IOException {
+		assertTrue(getResponse(bot, "!recommend", true).contains("future you: 100 pp"));
+		assertFalse(getResponse(bot, "!recommend relax", true).contains("future you"));
+	}
+
 	public static String getResponse(IRCBot bot, String command, boolean lastResponse) throws IOException {
 		if(lastResponse) {
 			LastResponseUser user = new LastResponseUser();

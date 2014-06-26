@@ -13,4 +13,6 @@ public interface BeatmapMeta {
 	boolean isTrustMax();
 
 	Integer getMaxPP();
+	
+	Integer getPersonalPP();
 }
