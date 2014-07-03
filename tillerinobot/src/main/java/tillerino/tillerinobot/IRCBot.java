@@ -2,6 +2,7 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.MDC;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
@@ -45,7 +47,7 @@ public class IRCBot extends CoreHooks {
 	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel, boolean rememberRecommendations) {
 		this.server = server;
 		Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this);
+				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this).setEncoding(Charset.forName("UTF-8"));
 		if(password != null) {
 				configurationBuilder.setServerPassword(password);
 		}
@@ -161,17 +163,24 @@ public class IRCBot extends CoreHooks {
 		
 		String estimateMessage = "";
 		if(beatmap.getPersonalPP() != null) {
-			estimateMessage += "future you: " + beatmap.getPersonalPP() + " pp | ";
+			estimateMessage += "future you: " + beatmap.getPersonalPP() + "pp | ";
 		}
-		estimateMessage += "community: " + ppestimate + cQ + " pp";
+		estimateMessage += "community: " + ppestimate + cQ + "pp";
 		if(beatmap.getMaxPP() != null)
-			estimateMessage += " | best: " + beatmap.getMaxPP() + bQ + " pp";
-		estimateMessage += " | star difficulty: " + format.format(beatmap.getBeatmap().getStarDifficulty());
+			estimateMessage += " | best: " + beatmap.getMaxPP() + bQ + "pp";
+		estimateMessage += " | " + secondsToMinuteColonSecond(beatmap.getBeatmap().getTotalLength());
+		estimateMessage += " ★ " + format.format(beatmap.getBeatmap().getStarDifficulty());
+		estimateMessage += " ♫ " + format.format(beatmap.getBeatmap().getBpm());
+		estimateMessage += " AR" + format.format(beatmap.getBeatmap().getApproachRate());
 
 
 		return user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : ""));
 	}
 
+	public static String secondsToMinuteColonSecond(int length) {
+		return length / 60 + ":" + StringUtils.leftPad(String.valueOf(length % 60), 2, '0');
+	}
+	
 	public static String getRandomString(int length) {
 		Random r = new Random();
 		char[] chars = new char[length];

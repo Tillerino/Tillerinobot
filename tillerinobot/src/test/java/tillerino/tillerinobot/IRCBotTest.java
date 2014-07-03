@@ -48,6 +48,9 @@ public class IRCBotTest {
 				beatmap.artist = "artist";
 				beatmap.starDifficulty = 3.3;
 				beatmap.version = "version";
+				beatmap.bpm = 175;
+				beatmap.approachRate = 8.5;
+				beatmap.totalLength = 143;
 			}
 			
 			@Override
@@ -180,8 +183,10 @@ public class IRCBotTest {
 	
 	@Test
 	public void testPersonalPP() throws IOException {
-		assertTrue(getResponse(bot, "!recommend", true).contains("future you: 100 pp"));
+		assertTrue(getResponse(bot, "!recommend", true).contains("future you: 100pp"));
 		assertFalse(getResponse(bot, "!recommend relax", true).contains("future you"));
+		
+		System.out.println(getResponse(bot, "!r", true));
 	}
 
 	public static String getResponse(IRCBot bot, String command, boolean lastResponse) throws IOException {

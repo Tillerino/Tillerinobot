@@ -9,7 +9,7 @@ public interface BotBackend {
 	 * @param beatmapid
 	 * @return null if not found
 	 */
-	public BeatmapMeta loadBeatmap(int beatmapid);
+	public BeatmapMeta loadBeatmap(int beatmapid) throws SQLException;
 
 	public Recommendation loadRecommendation(String userNick, String message) throws SQLException, IOException, UserException;
 
