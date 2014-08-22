@@ -51,6 +51,7 @@ public class IRCBotTest {
 				beatmap.bpm = 175;
 				beatmap.approachRate = 8.5;
 				beatmap.totalLength = 143;
+				beatmap.approved = 2;
 			}
 			
 			@Override
@@ -58,24 +59,31 @@ public class IRCBotTest {
 				return beatmap;
 			}
 			
+			
+			
 			@Override
-			public boolean isTrustMax() {
-				return true;
-			}
+			public Estimates getEstimates() {
+				return new OldEstimates() {
+					@Override
+					public boolean isTrustMax() {
+						return true;
+					}
 
-			@Override
-			public boolean isTrustCommunity() {
-				return true;
-			}
+					@Override
+					public boolean isTrustCommunity() {
+						return true;
+					}
 
-			@Override
-			public Integer getMaxPP() {
-				return 200;
-			}
+					@Override
+					public Integer getMaxPP() {
+						return 200;
+					}
 
-			@Override
-			public double getCommunityPP() {
-				return 100;
+					@Override
+					public double getCommunityPP() {
+						return 100;
+					}
+				};
 			}
 
 			@Override
@@ -83,6 +91,11 @@ public class IRCBotTest {
 				if(getBeatmap().getTitle().equals("title"))
 					return 100;
 				return null;
+			}
+
+			@Override
+			public long getMods() {
+				return 0;
 			}
 		}
 
@@ -98,15 +111,15 @@ public class IRCBotTest {
 		public TestBackend() {
 			normalRecommendation.beatmap = new Derpommendation();
 			normalRecommendation.beatmap.getBeatmap().title = "title";
-			normalRecommendation.mods = true;
+			normalRecommendation.mods = -1;
 			
 			nomodRecommendation.beatmap = new Derpommendation();
 			nomodRecommendation.beatmap.getBeatmap().title = "nomod";
-			nomodRecommendation.mods = false;
+			nomodRecommendation.mods = 0;
 			
 			relaxRecommendation.beatmap = new Derpommendation();
 			relaxRecommendation.beatmap.getBeatmap().title = "relax";
-			relaxRecommendation.mods = false;
+			relaxRecommendation.mods = 0;
 		}
 
 		@Override
@@ -115,18 +128,18 @@ public class IRCBotTest {
 		}
 
 		@Override
-		public BeatmapMeta loadBeatmap(int beatmapid) {
+		public BeatmapMeta loadBeatmap(int beatmapid, long mods) {
 			return normalRecommendation.beatmap;
 		}
 
 		@Override
 		public Recommendation loadRecommendation(String userNick, String message)
 				throws SQLException, IOException, UserException {
-			if(message.equals("recommend"))
+			if(message.equals(""))
 				return normalRecommendation;
-			if(message.equals("recommend relax nomod"))
+			if(message.equals("relax nomod"))
 				return nomodRecommendation;
-			if(message.equals("recommend relax"))
+			if(message.equals("relax"))
 				return relaxRecommendation;
 			throw new IllegalArgumentException();
 		}
@@ -149,9 +162,19 @@ public class IRCBotTest {
 				throws SQLException {
 			versionVisited = version;
 		}
+
+		@Override
+		public void registerActivity(String nick) {
+			// no
+		}
 	}
 	
-	IRCBot bot = new IRCBot(new TestBackend(), "nothing", 456, "nobody", null, null, false);
+	IRCBot bot = new IRCBot(new TestBackend(), "nothing", 456, "nobody", null, null, false, false);
+	
+	public static String syso(String s) {
+		System.out.println(s);
+		return s;
+	}
 	
 	@Test
 	public void testWrongStrings() throws IOException {
@@ -160,7 +183,7 @@ public class IRCBotTest {
 		
 		assertNotEquals(getResponse(bot, "!recommend", false), IRCBot.versionMessage);
 		
-		assertTrue(getResponse(bot, "!recommend", true).contains("artist - title [version]"));
+		assertTrue(syso(getResponse(bot, "!recommend", true)).contains("artist - title [version]"));
 		
 		assertTrue(getResponse(bot, "!r", true).contains("artist - title [version]"));
 		
