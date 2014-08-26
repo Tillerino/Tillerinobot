@@ -1,12 +1,17 @@
 package tillerino.tillerinobot;
-
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 import org.junit.Test;
+import org.pircbotx.User;
+import org.pircbotx.output.OutputUser;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiUser;
+
+import tillerino.tillerinobot.IRCBot.Pinger;
 
 public class IRCBotTest {
 	public static final class LastResponseUser implements IRCBotUser {
@@ -167,6 +172,23 @@ public class IRCBotTest {
 		public void registerActivity(String nick) {
 			// no
 		}
+
+		@Override
+		public OsuApiUser getUser(String ircNick) throws SQLException,
+				IOException {
+			return new OsuApiUser();
+		}
+
+		@Override
+		public long getLastActivity(OsuApiUser user) throws SQLException {
+			return 0;
+		}
+
+		@Override
+		public int getDonator(OsuApiUser user) throws SQLException,
+				IOException {
+			return 0;
+		}
 	}
 	
 	IRCBot bot = new IRCBot(new TestBackend(), "nothing", 456, "nobody", null, null, false, false);
@@ -221,5 +243,36 @@ public class IRCBotTest {
 		FirstResponseUser user = new FirstResponseUser();
 		bot.processPrivateMessage(user, command);
 		return user.response;
+	}
+
+	@Test
+	public void testWelcomeIfDonator() throws Exception {
+		BotBackend backend = mock(BotBackend.class);
+		
+		OsuApiUser osuApiUser = mock(OsuApiUser.class);
+		when(osuApiUser.getUsername()).thenReturn("TheDonator");
+		
+		when(backend.getUser(anyString())).thenReturn(osuApiUser);
+		when(backend.getDonator(any(OsuApiUser.class))).thenReturn(1);
+		
+		OutputUser outputUser = mock(OutputUser.class);
+		User user = mock(User.class);
+		when(user.send()).thenReturn(outputUser);
+		
+		IRCBot bot = getTestBot(backend);
+		
+		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 1000);
+		bot.welcomeIfDonator(user);
+		verify(outputUser).message("beep boop");
+
+		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 100000);
+		bot.welcomeIfDonator(user);
+		verify(outputUser).message("Welcome back, TheDonator.");
+	}
+	
+	IRCBot getTestBot(BotBackend backend) {
+		IRCBot ircBot = new IRCBot(backend, "server", 1, "botuser", null, null, false, false);
+		ircBot.pinger = mock(Pinger.class);
+		return ircBot;
 	}
 }

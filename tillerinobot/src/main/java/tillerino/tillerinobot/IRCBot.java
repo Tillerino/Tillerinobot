@@ -40,7 +40,7 @@ import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.tillerino.osuApiModel.Mods;
-import org.w3c.dom.ls.LSOutput;
+import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta.Estimates;
 import tillerino.tillerinobot.BeatmapMeta.OldEstimates;
@@ -155,7 +155,13 @@ public class IRCBot extends CoreHooks {
 				return;
 			}
 
-			if(sendSongInfo(user, beatmap, false, null)) {
+			OsuApiUser apiUser = backend.getUser(user.getNick());
+			if(apiUser == null) {
+				throw new NullPointerException("osu api user was null, but name was already resolved?");
+			}
+			int hearts = backend.getDonator(apiUser);
+			
+			if(sendSongInfo(user, beatmap, false, null, hearts)) {
 				songInfoCache.put(user.getNick(), beatmapid);
 			}
 
@@ -191,7 +197,7 @@ public class IRCBot extends CoreHooks {
 	static DecimalFormat format = new DecimalFormat("#.##");
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#");
 	
-	public static boolean sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition) {
+	public static boolean sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition, int hearts) {
 		String beatmapName = beatmap.getBeatmap().getArtist() + " - " + beatmap.getBeatmap().getTitle()
 				+ " [" + beatmap.getBeatmap().getVersion() + "]";
 		if(formLink) {
@@ -242,8 +248,9 @@ public class IRCBot extends CoreHooks {
 		estimateMessage += " ♫ " + format.format(beatmap.getBeatmap().getBpm());
 		estimateMessage += " AR" + format.format(beatmap.getBeatmap().getApproachRate());
 
+		String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
 
-		return user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : ""));
+		return user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : "") + heartString);
 	}
 
 	public static String secondsToMinuteColonSecond(int length) {
@@ -414,7 +421,14 @@ public class IRCBot extends CoreHooks {
 				if(recommendation.mods > 0 && recommendation.beatmap.getMods() == 0) {
 					addition = "Try this map with " + Mods.getShortNames(Mods.getMods(recommendation.mods));
 				}
-				if(sendSongInfo(user, recommendation.beatmap, true, addition)) {
+				
+				OsuApiUser apiUser = backend.getUser(user.getNick());
+				if(apiUser == null) {
+					throw new NullPointerException("osu api user was null, but name was already resolved?");
+				}
+				int hearts = backend.getDonator(apiUser);
+				
+				if(sendSongInfo(user, recommendation.beatmap, true, addition, hearts)) {
 					songInfoCache.put(user.getNick(), recommendation.beatmap.getBeatmap().getId());
 					if(rememberRecommendations) {
 						backend.saveGivenRecommendation(user.getNick(), recommendation.beatmap.getBeatmap().getId());
@@ -438,7 +452,14 @@ public class IRCBot extends CoreHooks {
 				if(beatmap.getMods() == 0) {
 					throw new UserException("Sorry, I can't provide information for those mods at this time.");
 				}
-				sendSongInfo(user, beatmap, false, null);
+				
+				int hearts = 0;
+				OsuApiUser apiUser = backend.getUser(user.getNick());
+				if(apiUser != null) {
+					hearts = backend.getDonator(apiUser);
+				}
+				
+				sendSongInfo(user, beatmap, false, null, hearts);
 			} else {
 				throw new UserException("unknown command " + message
 						+ ". type !help if you need help!");
@@ -569,6 +590,8 @@ public class IRCBot extends CoreHooks {
 	public void onJoin(JoinEvent event) throws Exception {
 		final String fNick = event.getUser().getNick();
 		
+		welcomeIfDonator(event.getUser());
+		
 		exec.submit(new Runnable() {
 			public void run() {
 				backend.registerActivity(fNick);
@@ -576,6 +599,53 @@ public class IRCBot extends CoreHooks {
 		});
 	}
 	
+	void welcomeIfDonator(User user) {
+		try {
+			OsuApiUser apiUser = backend.getUser(user.getNick());
+			
+			if(apiUser == null)
+				return;
+			
+			if(backend.getDonator(apiUser) > 0) {
+				// this is a donator, let's welcome them!
+				
+				IRCBotUser botUser = fromIRC(user);
+				
+				long lastActivity = backend.getLastActivity(apiUser);
+				
+				if(lastActivity > System.currentTimeMillis() - 60 * 1000) {
+					botUser.message("beep boop");
+				} else if(lastActivity > System.currentTimeMillis() - 60 * 60 * 1000) {
+					botUser.message("Welcome back, " + apiUser.getUsername() + ".");
+					checkVersionInfo(botUser);
+				} else if(lastActivity > System.currentTimeMillis() - 24 * 60 * 60 * 1000) {
+					String[] messages = {
+							"you look like you want a recommendation.",
+							"how nice to see you! :)",
+							"my favourite human. (Don't tell the other humans!)",
+							"what a pleasant surprise! ^.^",
+							"I was hoping you'd show up. All the other humans are lame, but don't tell them I said that! :3",
+							"what do you feel like doing today?",
+					};
+					
+					Random random = new Random();
+					
+					String message = messages[random.nextInt(messages.length)];
+					
+					botUser.message(apiUser.getUsername() + ", " + message);
+					checkVersionInfo(botUser);
+				} else if(lastActivity < System.currentTimeMillis() - 7l * 24 * 60 * 60 * 1000) {
+					botUser.message(apiUser.getUsername() + "...");
+					botUser.message("...is that you? It's been so long!");
+					checkVersionInfo(botUser);
+					botUser.message("It's good to have you back. Can I interest you in a recommendation?");
+				}
+			}
+		} catch (Exception e) {
+			log.error("error welcoming potential donator", e);
+		}
+	}
+
 	@Override
 	public void onPart(PartEvent event) throws Exception {
 		final String fNick = event.getUser().getNick();

@@ -4,6 +4,11 @@ package tillerino.tillerinobot;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
+import org.tillerino.osuApiModel.OsuApiUser;
+
 public interface BotBackend {
 	/**
 	 * @param beatmapid
@@ -14,20 +19,27 @@ public interface BotBackend {
 	 */
 	public BeatmapMeta loadBeatmap(int beatmapid, long mods) throws SQLException, IOException, UserException;
 
-	public Recommendation loadRecommendation(String userNick, String message) throws SQLException, IOException, UserException;
+	public Recommendation loadRecommendation(@Nonnull String userNick, @Nonnull String message) throws SQLException, IOException, UserException;
 
-	public Recommendation getLastRecommendation(String nick);
+	public Recommendation getLastRecommendation(@Nonnull String nick);
 
-	public String getCause(String nick, int beatmapid) throws IOException;
+	public String getCause(@Nonnull String nick, int beatmapid) throws IOException;
 
-	public void saveGivenRecommendation(String nick, int beatmapid) throws SQLException;
+	public void saveGivenRecommendation(@Nonnull String nick, int beatmapid) throws SQLException;
 
 	/**
 	 * @return the last version of the bot that was visited by this user. -1 if no information available.
 	 */
-	public int getLastVisitedVersion(String nick) throws SQLException, UserException;
+	public int getLastVisitedVersion(@Nonnull String nick) throws SQLException, UserException;
 	
-	public void setLastVisitedVersion(String nick, int version) throws SQLException;
+	public void setLastVisitedVersion(@Nonnull String nick, int version) throws SQLException;
 
-	public void registerActivity(String nick);
+	@CheckForNull
+	public OsuApiUser getUser(@Nonnull String ircNick) throws SQLException, IOException;
+	
+	public void registerActivity(@Nonnull String nick);
+	
+	public long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
+
+	public int getDonator(@Nonnull OsuApiUser user) throws SQLException, IOException;
 }
