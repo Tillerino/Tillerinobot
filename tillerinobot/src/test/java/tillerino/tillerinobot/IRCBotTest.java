@@ -258,6 +258,7 @@ public class IRCBotTest {
 		OutputUser outputUser = mock(OutputUser.class);
 		User user = mock(User.class);
 		when(user.send()).thenReturn(outputUser);
+		when(user.getNick()).thenReturn("TheDonator");
 		
 		IRCBot bot = getTestBot(backend);
 		
