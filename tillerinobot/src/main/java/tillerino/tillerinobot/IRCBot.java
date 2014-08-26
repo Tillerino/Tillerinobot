@@ -601,6 +601,8 @@ public class IRCBot extends CoreHooks {
 	
 	void welcomeIfDonator(User user) {
 		try {
+			MDC.put("user", user.getNick());
+			
 			OsuApiUser apiUser = backend.getUser(user.getNick());
 			
 			if(apiUser == null)
