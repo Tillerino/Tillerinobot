@@ -315,6 +315,28 @@ public class IRCBot extends CoreHooks {
 			}
 			
 			@Override
+			public boolean action(String msg) {
+				try {
+					senderSemaphore.acquire();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					return false;
+				}
+				try {
+					pinger.ping();
+					
+					user.send().action(msg);
+					log.info("sent action: " + msg);
+					return true;
+				} catch (IOException | InterruptedException e) {
+					log.error("action not sent: " + e.getMessage());
+					return false;
+				} finally {
+					senderSemaphore.release();
+				}
+			}
+			
+			@Override
 			public String getNick() {
 				return user.getNick();
 			}
@@ -327,14 +349,6 @@ public class IRCBot extends CoreHooks {
 		MDC.put("user", user.getNick());
 		log.info("received: " + message);
 
-		String commandChar = "!";
-		if(user.getNick().equals("Tillerino"))
-			commandChar = ".";
-
-		if (!message.startsWith(commandChar)) {
-			return;
-		}
-
 		Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
 			log.warn("concurrent message");
@@ -343,6 +357,26 @@ public class IRCBot extends CoreHooks {
 
 		try {
 			checkVersionInfo(user);
+
+			OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
+			
+			Pattern hugPattern = Pattern.compile("\\bhugs?\\b");
+			
+			if(hugPattern.matcher(message).find()) {
+				if(apiUser != null && backend.getDonator(apiUser) > 0) {
+					user.message("Come here, you!");
+					user.action("hugs " + apiUser.getUsername());
+					return;
+				}
+			}
+			
+			String commandChar = "!";
+			if(user.getNick().equals("Tillerino"))
+				commandChar = ".";
+
+			if (!message.startsWith(commandChar)) {
+				return;
+			}
 
 			message = message.substring(1).trim().toLowerCase();
 			
@@ -424,7 +458,6 @@ public class IRCBot extends CoreHooks {
 					addition = "Try this map with " + Mods.toShortNamesContinuous(Mods.getMods(recommendation.mods));
 				}
 				
-				OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
 				if(apiUser == null) {
 					throw new NullPointerException("osu api user was null, but name was already resolved?");
 				}
@@ -456,7 +489,6 @@ public class IRCBot extends CoreHooks {
 				}
 				
 				int hearts = 0;
-				OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
 				if(apiUser != null) {
 					hearts = backend.getDonator(apiUser);
 				}
