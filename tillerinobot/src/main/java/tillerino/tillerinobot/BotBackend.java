@@ -34,8 +34,16 @@ public interface BotBackend {
 	
 	public void setLastVisitedVersion(@Nonnull String nick, int version) throws SQLException;
 
+	/**
+	 * resolve an IRC user name and get the user's information
+	 * @param ircNick IRC nickname
+	 * @param maxAge maximum age of the information. if <= 0 any cached information, if available, will be returned
+	 * @return null if the user name can't be resolved
+	 * @throws SQLException
+	 * @throws IOException
+	 */
 	@CheckForNull
-	public OsuApiUser getUser(@Nonnull String ircNick) throws SQLException, IOException;
+	public OsuApiUser getUser(@Nonnull String ircNick, long maxAge) throws SQLException, IOException;
 	
 	public void registerActivity(@Nonnull String nick);
 	

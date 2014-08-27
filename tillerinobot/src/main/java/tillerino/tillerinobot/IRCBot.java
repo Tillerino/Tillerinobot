@@ -155,7 +155,7 @@ public class IRCBot extends CoreHooks {
 				return;
 			}
 
-			OsuApiUser apiUser = backend.getUser(user.getNick());
+			OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
 			if(apiUser == null) {
 				throw new NullPointerException("osu api user was null, but name was already resolved?");
 			}
@@ -419,10 +419,10 @@ public class IRCBot extends CoreHooks {
 					addition = "Try this map with some mods!";
 				}
 				if(recommendation.mods > 0 && recommendation.beatmap.getMods() == 0) {
-					addition = "Try this map with " + Mods.getShortNames(Mods.getMods(recommendation.mods));
+					addition = "Try this map with " + Mods.toShortNamesContinuous(Mods.getMods(recommendation.mods));
 				}
 				
-				OsuApiUser apiUser = backend.getUser(user.getNick());
+				OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
 				if(apiUser == null) {
 					throw new NullPointerException("osu api user was null, but name was already resolved?");
 				}
@@ -442,7 +442,7 @@ public class IRCBot extends CoreHooks {
 				}
 				message = message.substring(5);
 				
-				Long mods = getMods(message);
+				Long mods = Mods.fromShortNamesContinuous(message);
 				if(mods == null) {
 					throw new UserException("those mods don't look right. mods can be any combination of DT HR HD HT EZ NC FL SO NF. Combine them without any spaces or special chars. Example: !with HDHR, !with DTEZ");
 				}
@@ -454,7 +454,7 @@ public class IRCBot extends CoreHooks {
 				}
 				
 				int hearts = 0;
-				OsuApiUser apiUser = backend.getUser(user.getNick());
+				OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
 				if(apiUser != null) {
 					hearts = backend.getDonator(apiUser);
 				}
@@ -469,25 +469,6 @@ public class IRCBot extends CoreHooks {
 		} finally {
 			semaphore.release();
 		}
-	}
-
-	private Long getMods(String message) throws UserException {
-		long mods = 0;
-		for(int i = 0; i < message.length(); i+=2) {
-			try {
-				Mods mod = Mods.fromShortName(message.substring(i, i + 2).toUpperCase());
-				if(mod.isEffective()) {
-					if(mod == Mods.Nightcore) {
-						mods |= Mods.getMask(Mods.DoubleTime);
-					} else {
-						mods |= Mods.getMask(mod);
-					}
-				}
-			} catch(Exception e) {
-				return null;
-			}
-		}
-		return mods;
 	}
 
 	private void checkVersionInfo(final IRCBotUser user) throws SQLException, UserException {
@@ -589,8 +570,10 @@ public class IRCBot extends CoreHooks {
 	@Override
 	public void onJoin(JoinEvent event) throws Exception {
 		final String fNick = event.getUser().getNick();
-		
-		welcomeIfDonator(event.getUser());
+
+		MDC.put("user", fNick);
+		IRCBotUser user = fromIRC(event.getUser());
+		welcomeIfDonator(user);
 		
 		exec.submit(new Runnable() {
 			public void run() {
@@ -599,11 +582,10 @@ public class IRCBot extends CoreHooks {
 		});
 	}
 	
-	void welcomeIfDonator(User user) {
+	void welcomeIfDonator(IRCBotUser user) {
 		try {
-			MDC.put("user", user.getNick());
 			
-			OsuApiUser apiUser = backend.getUser(user.getNick());
+			OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
 			
 			if(apiUser == null)
 				return;
@@ -611,15 +593,13 @@ public class IRCBot extends CoreHooks {
 			if(backend.getDonator(apiUser) > 0) {
 				// this is a donator, let's welcome them!
 				
-				IRCBotUser botUser = fromIRC(user);
-				
 				long lastActivity = backend.getLastActivity(apiUser);
 				
 				if(lastActivity > System.currentTimeMillis() - 60 * 1000) {
-					botUser.message("beep boop");
+					user.message("beep boop");
 				} else if(lastActivity > System.currentTimeMillis() - 60 * 60 * 1000) {
-					botUser.message("Welcome back, " + apiUser.getUsername() + ".");
-					checkVersionInfo(botUser);
+					user.message("Welcome back, " + apiUser.getUsername() + ".");
+					checkVersionInfo(user);
 				} else if(lastActivity > System.currentTimeMillis() - 24 * 60 * 60 * 1000) {
 					String[] messages = {
 							"you look like you want a recommendation.",
@@ -634,13 +614,13 @@ public class IRCBot extends CoreHooks {
 					
 					String message = messages[random.nextInt(messages.length)];
 					
-					botUser.message(apiUser.getUsername() + ", " + message);
-					checkVersionInfo(botUser);
+					user.message(apiUser.getUsername() + ", " + message);
+					checkVersionInfo(user);
 				} else if(lastActivity < System.currentTimeMillis() - 7l * 24 * 60 * 60 * 1000) {
-					botUser.message(apiUser.getUsername() + "...");
-					botUser.message("...is that you? It's been so long!");
-					checkVersionInfo(botUser);
-					botUser.message("It's good to have you back. Can I interest you in a recommendation?");
+					user.message(apiUser.getUsername() + "...");
+					user.message("...is that you? It's been so long!");
+					checkVersionInfo(user);
+					user.message("It's good to have you back. Can I interest you in a recommendation?");
 				}
 			}
 		} catch (Exception e) {

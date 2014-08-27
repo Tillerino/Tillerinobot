@@ -174,7 +174,7 @@ public class IRCBotTest {
 		}
 
 		@Override
-		public OsuApiUser getUser(String ircNick) throws SQLException,
+		public OsuApiUser getUser(String ircNick, long maxAge) throws SQLException,
 				IOException {
 			return new OsuApiUser();
 		}
@@ -252,23 +252,21 @@ public class IRCBotTest {
 		OsuApiUser osuApiUser = mock(OsuApiUser.class);
 		when(osuApiUser.getUsername()).thenReturn("TheDonator");
 		
-		when(backend.getUser(anyString())).thenReturn(osuApiUser);
+		when(backend.getUser(anyString(), anyLong())).thenReturn(osuApiUser);
 		when(backend.getDonator(any(OsuApiUser.class))).thenReturn(1);
 		
-		OutputUser outputUser = mock(OutputUser.class);
-		User user = mock(User.class);
-		when(user.send()).thenReturn(outputUser);
+		IRCBotUser user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("TheDonator");
 		
 		IRCBot bot = getTestBot(backend);
 		
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 1000);
 		bot.welcomeIfDonator(user);
-		verify(outputUser).message("beep boop");
+		verify(user).message("beep boop");
 
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 100000);
 		bot.welcomeIfDonator(user);
-		verify(outputUser).message("Welcome back, TheDonator.");
+		verify(user).message("Welcome back, TheDonator.");
 	}
 	
 	IRCBot getTestBot(BotBackend backend) {

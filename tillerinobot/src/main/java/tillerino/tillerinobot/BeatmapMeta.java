@@ -28,5 +28,9 @@ public interface BeatmapMeta {
 	
 	Estimates getEstimates();
 	
+	/**
+	 * mods for this beatmap meta. this may not be equal to the mods of a recommendation.
+	 * @return
+	 */
 	long getMods();
 }
