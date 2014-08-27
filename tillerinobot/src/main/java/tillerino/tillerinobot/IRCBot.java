@@ -369,11 +369,13 @@ public class IRCBot extends CoreHooks {
 			}
 			
 			if(getLevenshteinDistance(message, "help") <= 1) {
-				user.message("Hi! I'm the robot who killed Tillerino and took over his account."
+				user.message("Hi! I'm the robot who killed Tillerino and took over his account. Jk, but I'm still using the account."
 						+ " Check https://twitter.com/Tillerinobot for status and updates!"
 						+ " See https://github.com/Tillerino/Tillerinobot/wiki for commands!");
 			} else if(getLevenshteinDistance(message, "faq") <= 1) {
 				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!");
+			} else if(getLevenshteinDistance(message, "donate") <= 2 || getLevenshteinDistance(message, "donation") <= 2) {
+				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/Donate for more information on why and how to donate!");
 			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
 				Recommendation lastRecommendation = backend.getLastRecommendation(user.getNick());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
@@ -553,8 +555,11 @@ public class IRCBot extends CoreHooks {
 		pinger.handleUnknownEvent(event);
 	}
 	
-	static final int currentVersion = 5;
-	static final String versionMessage = "I made recommendations a little easier to get some of the farmy nature of the early versions back. Let me know if they've become too easy, too hard, or *just right* @Tillerinobot. They should now also consider a little more than just your top 10 scores depending on how steep your top pp contributors fall off.";
+	static final int currentVersion = 6;
+	static final String versionMessage = "Guess what! I am now running on a server in the US ^.^ "
+			+ "This gives me more security and less delay, and human Tillerino doesn't have to worry about me when he does whatever he does with his PC (poor thing). "
+			+ "Since human Tillerino is now spending actual money and not just time, we're accepting donations. "
+			+ "If you want to know more, send !donate (there's also some sweet perks).";
 	
 	long lastListTime = System.currentTimeMillis();
 	
@@ -597,10 +602,15 @@ public class IRCBot extends CoreHooks {
 				
 				if(lastActivity > System.currentTimeMillis() - 60 * 1000) {
 					user.message("beep boop");
-				} else if(lastActivity > System.currentTimeMillis() - 60 * 60 * 1000) {
+				} else if(lastActivity > System.currentTimeMillis() - 24 * 60 * 60 * 1000) {
 					user.message("Welcome back, " + apiUser.getUsername() + ".");
 					checkVersionInfo(user);
-				} else if(lastActivity > System.currentTimeMillis() - 24 * 60 * 60 * 1000) {
+				} else if(lastActivity < System.currentTimeMillis() - 7l * 24 * 60 * 60 * 1000) {
+					user.message(apiUser.getUsername() + "...");
+					user.message("...is that you? It's been so long!");
+					checkVersionInfo(user);
+					user.message("It's good to have you back. Can I interest you in a recommendation?");
+				} else {
 					String[] messages = {
 							"you look like you want a recommendation.",
 							"how nice to see you! :)",
@@ -616,12 +626,7 @@ public class IRCBot extends CoreHooks {
 					
 					user.message(apiUser.getUsername() + ", " + message);
 					checkVersionInfo(user);
-				} else if(lastActivity < System.currentTimeMillis() - 7l * 24 * 60 * 60 * 1000) {
-					user.message(apiUser.getUsername() + "...");
-					user.message("...is that you? It's been so long!");
-					checkVersionInfo(user);
-					user.message("It's good to have you back. Can I interest you in a recommendation?");
-				}
+				} 
 			}
 		} catch (Exception e) {
 			log.error("error welcoming potential donator", e);

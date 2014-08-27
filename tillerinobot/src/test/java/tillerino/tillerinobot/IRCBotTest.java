@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.junit.Test;
-import org.pircbotx.User;
-import org.pircbotx.output.OutputUser;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 
@@ -257,21 +257,48 @@ public class IRCBotTest {
 		
 		IRCBotUser user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("TheDonator");
+		when(user.message(anyString())).then(new Answer<Object>() {
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				syso((String) invocation.getArguments()[0]);
+				return true;
+			}
+		});
 		
 		IRCBot bot = getTestBot(backend);
 		
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 1000);
 		bot.welcomeIfDonator(user);
-		verify(user).message("beep boop");
+		verify(user).message(startsWith("beep boop"));
 
-		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 100000);
+		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 10 * 60 * 1000);
 		bot.welcomeIfDonator(user);
 		verify(user).message("Welcome back, TheDonator.");
+		
+		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000);
+		bot.welcomeIfDonator(user);
+		verify(user).message(startsWith("TheDonator, "));
+		
+		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000);
+		bot.welcomeIfDonator(user);
+		verify(user).message(contains("so long"));
 	}
 	
 	IRCBot getTestBot(BotBackend backend) {
 		IRCBot ircBot = new IRCBot(backend, "server", 1, "botuser", null, null, false, false);
 		ircBot.pinger = mock(Pinger.class);
 		return ircBot;
+	}
+	
+	@Test
+	public void testDonateLink() throws Exception {
+		IRCBot bot = getTestBot(mock(BotBackend.class));
+
+		IRCBotUser botUser = mock(IRCBotUser.class);
+		when(botUser.getNick()).thenReturn("someuser");
+		
+		bot.processPrivateMessage(botUser, "!donat");
+
+		verify(botUser).message(contains("wiki/Donate"));
 	}
 }
