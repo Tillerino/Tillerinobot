@@ -4,7 +4,6 @@ package tillerino.tillerinobot;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -17,10 +16,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.CheckForNull;
+
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.MDC;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
@@ -42,9 +42,8 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta.Estimates;
-import tillerino.tillerinobot.BeatmapMeta.OldEstimates;
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
+import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.UserException.QuietException;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -55,13 +54,34 @@ import com.google.common.collect.ImmutableList;
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
+	public interface IRCBotUser {
+		String getNick();
+		/**
+		 * 
+		 * @param msg
+		 * @return true if the message was sent
+		 */
+		boolean message(String msg);
+		
+		/**
+		 * 
+		 * @param msg
+		 * @return true if the action was sent
+		 */
+		boolean action(String msg);
+	}
+	
 	final PircBotX bot;
 	final BotBackend backend;
 	final private String server;
 	final private boolean rememberRecommendations;
 	final private boolean silent;
+	RecommendationsManager manager;
 	
-	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel, boolean rememberRecommendations, boolean silent) {
+	@CheckForNull
+	final BotAPIServer apiServer;
+	
+	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel, boolean rememberRecommendations, boolean silent, BotAPIServer apiServer) {
 		this.server = server;
 		Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
 				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this).setEncoding(Charset.forName("UTF-8")).setAutoReconnect(false);
@@ -73,11 +93,17 @@ public class IRCBot extends CoreHooks {
 		}
 		bot = new PircBotX(configurationBuilder.buildConfiguration());
 		this.backend = backend;
+		this.manager = new RecommendationsManager(backend);
 		this.rememberRecommendations = rememberRecommendations;
 		this.silent = silent;
+		this.apiServer = apiServer;
 	}
 
 	public void run() throws IOException, IrcException {
+		if(apiServer != null) {
+			apiServer.botInfo.runningSince = System.currentTimeMillis();
+			apiServer.bot = this;
+		}
 		bot.startBot();
 	}
 
@@ -155,13 +181,14 @@ public class IRCBot extends CoreHooks {
 				return;
 			}
 
-			OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
+			Integer userid = backend.resolveIRCName(user.getNick());
+			OsuApiUser apiUser = userid != null ? backend.getUser(userid, 0) : null;
 			if(apiUser == null) {
 				throw new NullPointerException("osu api user was null, but name was already resolved?");
 			}
 			int hearts = backend.getDonator(apiUser);
 			
-			if(sendSongInfo(user, beatmap, false, null, hearts)) {
+			if(user.message(beatmap.formInfoMessage(false, null, hearts))) {
 				songInfoCache.put(user.getNick(), beatmapid);
 			}
 
@@ -192,69 +219,6 @@ public class IRCBot extends CoreHooks {
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
 		}
-	}
-	
-	static DecimalFormat format = new DecimalFormat("#.##");
-	static DecimalFormat noDecimalsFormat = new DecimalFormat("#");
-	
-	public static boolean sendSongInfo(IRCBotUser user, BeatmapMeta beatmap, boolean formLink, String addition, int hearts) {
-		String beatmapName = beatmap.getBeatmap().getArtist() + " - " + beatmap.getBeatmap().getTitle()
-				+ " [" + beatmap.getBeatmap().getVersion() + "]";
-		if(formLink) {
-			beatmapName = "[http://osu.ppy.sh/b/" + beatmap.getBeatmap().getId() + " " + beatmapName + "]";
-		}
-		
-		if(beatmap.getMods() != 0) {
-			String mods = "";
-			for(Mods mod : Mods.getMods(beatmap.getMods())) {
-				if(mod.isEffective()) {
-					mods += mod.getShortName();
-				}
-			}
-			beatmapName += " " + mods;
-		}
-
-		String estimateMessage = "";
-		if(beatmap.getPersonalPP() != null) {
-			estimateMessage += "future you: " + beatmap.getPersonalPP() + "pp | ";
-		}
-		
-		Estimates estimates = beatmap.getEstimates();
-		
-		if (estimates instanceof OldEstimates) {
-			OldEstimates oldEstimates = (OldEstimates) estimates;
-			
-			double community = oldEstimates.getCommunityPP();
-			community = Math.round(community * 2) / 2;
-			String ppestimate = community % 1 == 0 ? "" + (int) community : "" + format.format(community);
-
-			String cQ = oldEstimates.isTrustCommunity() ? "" : "??";
-			String bQ = oldEstimates.isTrustMax() ? "" : "??";
-			
-			estimateMessage += "community: " + ppestimate + cQ + "pp";
-			if(oldEstimates.getMaxPP() != null)
-				estimateMessage += " | best: " + oldEstimates.getMaxPP() + bQ + "pp";
-		} else if (estimates instanceof PercentageEstimates) {
-			PercentageEstimates percentageEstimates = (PercentageEstimates) estimates;
-
-			estimateMessage += "95%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.95)) + "pp";
-			estimateMessage += " | 98%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.98)) + "pp";
-			estimateMessage += " | 99%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.99)) + "pp";
-			estimateMessage += " | 100%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(1)) + "pp";
-		}
-		
-		estimateMessage += " | " + secondsToMinuteColonSecond(beatmap.getBeatmap().getTotalLength());
-		estimateMessage += " ★ " + format.format(beatmap.getBeatmap().getStarDifficulty());
-		estimateMessage += " ♫ " + format.format(beatmap.getBeatmap().getBpm());
-		estimateMessage += " AR" + format.format(beatmap.getBeatmap().getApproachRate());
-
-		String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
-
-		return user.message(beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : "") + heartString);
-	}
-
-	public static String secondsToMinuteColonSecond(int length) {
-		return length / 60 + ":" + StringUtils.leftPad(String.valueOf(length % 60), 2, '0');
 	}
 	
 	public static String getRandomString(int length) {
@@ -356,9 +320,8 @@ public class IRCBot extends CoreHooks {
 		}
 
 		try {
-			checkVersionInfo(user);
-
-			OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
+			Integer userid = backend.resolveIRCName(user.getNick());
+			OsuApiUser apiUser = userid != null ? backend.getUser(userid, 0) : null;
 			
 			Pattern hugPattern = Pattern.compile("\\bhugs?\\b");
 			
@@ -377,6 +340,8 @@ public class IRCBot extends CoreHooks {
 			if (!message.startsWith(commandChar)) {
 				return;
 			}
+
+			checkVersionInfo(user);
 
 			message = message.substring(1).trim().toLowerCase();
 			
@@ -411,39 +376,19 @@ public class IRCBot extends CoreHooks {
 			} else if(getLevenshteinDistance(message, "donate") <= 2 || getLevenshteinDistance(message, "donation") <= 2) {
 				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/Donate for more information on why and how to donate!");
 			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
-				Recommendation lastRecommendation = backend.getLastRecommendation(user.getNick());
+				Recommendation lastRecommendation = manager.getLastRecommendation(user.getNick());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
-					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + " mods: " + lastRecommendation.mods + ". Recommendation source: " + backend.getCause(user.getNick(), lastRecommendation.beatmap.getBeatmap().getId()));
+					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + lastRecommendation.bareRecommendation.getCauses());
 					user.message("Your complaint has been filed. Tillerino will look into it when he can.");
 				}
 			} else if(isRecommend) {
-				String[] remaining = message.split(" ");
-				
-				boolean isGamma = false;
-				
-				for (int i = 0; i < remaining.length; i++) {
-					if(remaining[i].length() == 0)
-						continue;
-					if(getLevenshteinDistance(remaining[i], "nomod") <= 2) {
-						remaining[i] = "nomod";
-						continue;
-					}
-					if(getLevenshteinDistance(remaining[i], "relax") <= 2) {
-						remaining[i] = "relax";
-						continue;
-					}
-					if(getLevenshteinDistance(remaining[i], "gamma") <= 2) {
-						remaining[i] = "gamma";
-						isGamma = true;
-						continue;
-					}
-					if(isGamma && remaining[i].equals("dt") || remaining[i].equals("hr")) {
-						continue;
-					}
-					throw new UserException("I don't know what \"" + remaining[i] + "\" is supposed to mean. Try !help if you need some pointers.");
+				if(apiUser == null) {
+					String string = IRCBot.getRandomString(8);
+					log.error("bot user not resolvable " + string + " name: " + user.getNick());
+					throw new UserException("Your name is confusing me. Did you recently change it? If not, pls contact me and say " + string);
 				}
 				
-				Recommendation recommendation = backend.loadRecommendation(user.getNick(), message);
+				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message);
 
 				if(recommendation.beatmap == null) {
 					user.message("I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?");
@@ -451,19 +396,16 @@ public class IRCBot extends CoreHooks {
 					return;
 				}
 				String addition = null;
-				if(recommendation.mods < 0) {
+				if(recommendation.bareRecommendation.getMods() < 0) {
 					addition = "Try this map with some mods!";
 				}
-				if(recommendation.mods > 0 && recommendation.beatmap.getMods() == 0) {
-					addition = "Try this map with " + Mods.toShortNamesContinuous(Mods.getMods(recommendation.mods));
+				if(recommendation.bareRecommendation.getMods() > 0 && recommendation.beatmap.getMods() == 0) {
+					addition = "Try this map with " + Mods.toShortNamesContinuous(Mods.getMods(recommendation.bareRecommendation.getMods()));
 				}
 				
-				if(apiUser == null) {
-					throw new NullPointerException("osu api user was null, but name was already resolved?");
-				}
 				int hearts = backend.getDonator(apiUser);
 				
-				if(sendSongInfo(user, recommendation.beatmap, true, addition, hearts)) {
+				if(user.message(recommendation.beatmap.formInfoMessage(true, addition, hearts))) {
 					songInfoCache.put(user.getNick(), recommendation.beatmap.getBeatmap().getId());
 					if(rememberRecommendations) {
 						backend.saveGivenRecommendation(user.getNick(), recommendation.beatmap.getBeatmap().getId());
@@ -493,7 +435,7 @@ public class IRCBot extends CoreHooks {
 					hearts = backend.getDonator(apiUser);
 				}
 				
-				sendSongInfo(user, beatmap, false, null, hearts);
+				user.message(beatmap.formInfoMessage(false, null, hearts));
 			} else {
 				throw new UserException("unknown command " + message
 						+ ". type !help if you need help!");
@@ -508,8 +450,9 @@ public class IRCBot extends CoreHooks {
 	private void checkVersionInfo(final IRCBotUser user) throws SQLException, UserException {
 		int userVersion = backend.getLastVisitedVersion(user.getNick());
 		if(userVersion < currentVersion) {
-			user.message(versionMessage);
-			backend.setLastVisitedVersion(user.getNick(), currentVersion);
+			if(user.message(versionMessage)) {
+				backend.setLastVisitedVersion(user.getNick(), currentVersion);
+			}
 		}
 	}
 	
@@ -546,6 +489,9 @@ public class IRCBot extends CoreHooks {
 			
 			if(ping > 1500) {
 				pingGate.set(System.currentTimeMillis() + 60000);
+				if(apiServer != null) {
+					apiServer.botInfo.lastPingDeath = System.currentTimeMillis();
+				}
 				throw new IOException("death ping: " + ping);
 			}
 			} catch(IOException e) {
@@ -577,6 +523,10 @@ public class IRCBot extends CoreHooks {
 		MDC.put("server", server);
 		MDC.put("event", lastSerial.incrementAndGet());
 		MDC.put("permanent", rememberRecommendations ? 1 : 0);
+		
+		if(apiServer != null) {
+			apiServer.botInfo.lastInteraction = System.currentTimeMillis();
+		}
 		
 		if(lastListTime < System.currentTimeMillis() - 60 * 60 * 1000) {
 			lastListTime = System.currentTimeMillis();
@@ -618,16 +568,21 @@ public class IRCBot extends CoreHooks {
 		welcomeIfDonator(user);
 		
 		exec.submit(new Runnable() {
+			@Override
 			public void run() {
-				backend.registerActivity(fNick);
+				registerActivity(fNick);
 			}
 		});
 	}
 	
 	void welcomeIfDonator(IRCBotUser user) {
 		try {
+			Integer userid = backend.resolveIRCName(user.getNick());
 			
-			OsuApiUser apiUser = backend.getUser(user.getNick(), 0);
+			if(userid == null)
+				return;
+			
+			OsuApiUser apiUser = backend.getUser(userid, 0);
 			
 			if(apiUser == null)
 				return;
@@ -675,8 +630,9 @@ public class IRCBot extends CoreHooks {
 		final String fNick = event.getUser().getNick();
 		
 		exec.submit(new Runnable() {
+			@Override
 			public void run() {
-				backend.registerActivity(fNick);
+				registerActivity(fNick);
 			}
 		});
 	}
@@ -686,8 +642,9 @@ public class IRCBot extends CoreHooks {
 		final String fNick = event.getUser().getNick();
 		
 		exec.submit(new Runnable() {
+			@Override
 			public void run() {
-				backend.registerActivity(fNick);
+				registerActivity(fNick);
 			}
 		});
 	}
@@ -708,8 +665,9 @@ public class IRCBot extends CoreHooks {
 				final String fNick = nick;
 				
 				exec.submit(new Runnable() {
+					@Override
 					public void run() {
-						backend.registerActivity(fNick);
+						registerActivity(fNick);
 					}
 				});
 			}
@@ -717,6 +675,21 @@ public class IRCBot extends CoreHooks {
 			System.out.println("processed user list event");
 		} else {
 			super.onServerResponse(event);
+		}
+	}
+
+	private void registerActivity(final String fNick) {
+		try {
+			Integer userid = backend.resolveIRCName(fNick);
+			
+			if(userid == null) {
+				log.warn("user " + fNick + " could not be found");
+				return;
+			}
+			
+			backend.registerActivity(userid);
+		} catch (Exception e) {
+			log.error("error logging activity", e);
 		}
 	}
 }
