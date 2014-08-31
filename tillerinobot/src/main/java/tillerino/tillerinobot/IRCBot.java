@@ -64,7 +64,7 @@ public class IRCBot extends CoreHooks {
 	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel, boolean rememberRecommendations, boolean silent) {
 		this.server = server;
 		Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this).setEncoding(Charset.forName("UTF-8"));
+				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this).setEncoding(Charset.forName("UTF-8")).setAutoReconnect(false);
 		if(password != null) {
 				configurationBuilder.setServerPassword(password);
 		}
@@ -523,6 +523,7 @@ public class IRCBot extends CoreHooks {
 		final AtomicLong pingGate = new AtomicLong();
 		
 		void ping() throws IOException, InterruptedException {
+			try {
 			long time = System.currentTimeMillis();
 			
 			if(pingGate.get() > System.currentTimeMillis()) {
@@ -546,6 +547,10 @@ public class IRCBot extends CoreHooks {
 			if(ping > 1500) {
 				pingGate.set(System.currentTimeMillis() + 60000);
 				throw new IOException("death ping: " + ping);
+			}
+			} catch(IOException e) {
+				bot.sendIRC().quitServer();
+				throw e;
 			}
 		}
 		
