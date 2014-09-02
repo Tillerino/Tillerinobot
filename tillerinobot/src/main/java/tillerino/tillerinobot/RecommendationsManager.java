@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
@@ -108,8 +109,8 @@ public class RecommendationsManager {
 		public final long requestedMods;
 		public Sampler(Collection<BareRecommendation> recommendations, Model type, boolean nomod, long requestedMods) {
 			for (BareRecommendation bareRecommendation : recommendations) {
-				distribution.put(sum, bareRecommendation);
 				sum += bareRecommendation.getProbability();
+				distribution.put(sum, bareRecommendation);
 			}
 			
 			this.nomod = nomod;
@@ -120,15 +121,34 @@ public class RecommendationsManager {
 			return distribution.isEmpty();
 		}
 		public BareRecommendation sample() {
-			SortedMap<Double, BareRecommendation> rest = distribution.tailMap(random.nextDouble() * sum);
+			double x = random.nextDouble() * sum;
+			
+			SortedMap<Double, BareRecommendation> rest = distribution.tailMap(x);
 			if(rest.size() == 0) {
 				// this means that there was some extreme numerical instability.
 				// this is practically not possible. at least not *maximum stack
 				// size* times in a row.
 				return sample();
 			}
-			sum -= rest.firstKey();
-			return rest.remove(rest.firstKey());
+			
+			sum = rest.firstKey();
+			
+			BareRecommendation sample = rest.remove(sum);
+			
+			sum -= sample.getProbability();
+			
+			Collection<BareRecommendation> refill = new ArrayList<>();
+			
+			while(!rest.isEmpty()) {
+				refill.add(rest.remove(rest.firstKey()));
+			}
+			
+			for(BareRecommendation bareRecommendation : refill) {
+				sum += bareRecommendation.getProbability();
+				distribution.put(sum, bareRecommendation);
+			}
+			
+			return sample;
 		}
 	}
 	
