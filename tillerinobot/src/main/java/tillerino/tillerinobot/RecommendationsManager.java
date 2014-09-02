@@ -99,7 +99,7 @@ public class RecommendationsManager {
 	 * 
 	 * @author Tillerino
 	 */
-	public class Sampler {
+	public static class Sampler {
 		final SortedMap<Double, BareRecommendation> distribution = new TreeMap<>();
 		double sum = 0;
 		final Random random = new Random();
@@ -147,7 +147,10 @@ public class RecommendationsManager {
 		}
 	});
 	
-	public Cache<Integer, Sampler> samplers = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
+	/**
+	 * These take long to calculate, so we want to keep them for a bit, but they also take a lot of space. 100 should be a good balance.
+	 */
+	public Cache<Integer, Sampler> samplers = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).maximumSize(100).build();
 
 	@CheckForNull
 	public Recommendation getLastRecommendation(String nick) {
