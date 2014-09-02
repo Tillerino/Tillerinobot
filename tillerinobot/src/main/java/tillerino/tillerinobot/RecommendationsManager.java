@@ -240,15 +240,15 @@ public class RecommendationsManager {
 		}
 		
 		if(model == Model.GAMMA) {
-			if(apiUser.getRank() > 15000) {
+			if(apiUser.getRank() > 25000) {
 				apiUser = backend.getUser(userid, 1);
 				
 				if(apiUser == null) {
 					throw new RuntimeException("trolled by the API? " + userid);
 				}
 				
-				if(apiUser.getRank() > 15000) {
-					throw new UserException("Sorry, at this point gamma recommendations are only available for players who have surpassed rank 15k.");
+				if(apiUser.getRank() > 25000) {
+					throw new UserException("Sorry, at this point gamma recommendations are only available for players who have surpassed rank 25k.");
 				}
 			}
 		}
