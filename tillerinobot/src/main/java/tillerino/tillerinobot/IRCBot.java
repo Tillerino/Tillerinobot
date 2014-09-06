@@ -101,8 +101,7 @@ public class IRCBot extends CoreHooks {
 
 	public void run() throws IOException, IrcException {
 		if(apiServer != null) {
-			apiServer.botInfo.runningSince = System.currentTimeMillis();
-			apiServer.bot = this;
+			apiServer.botInfo.setRunningSince(System.currentTimeMillis());
 		}
 		bot.startBot();
 	}
@@ -408,7 +407,7 @@ public class IRCBot extends CoreHooks {
 				if(user.message(recommendation.beatmap.formInfoMessage(true, addition, hearts))) {
 					songInfoCache.put(user.getNick(), recommendation.beatmap.getBeatmap().getId());
 					if(rememberRecommendations) {
-						backend.saveGivenRecommendation(user.getNick(), recommendation.beatmap.getBeatmap().getId());
+						backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), recommendation.beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
 					}
 				}
 
@@ -490,7 +489,7 @@ public class IRCBot extends CoreHooks {
 			if(ping > 1500) {
 				pingGate.set(System.currentTimeMillis() + 60000);
 				if(apiServer != null) {
-					apiServer.botInfo.lastPingDeath = System.currentTimeMillis();
+					apiServer.botInfo.setLastPingDeath(System.currentTimeMillis());
 				}
 				throw new IOException("death ping: " + ping);
 			}
@@ -525,7 +524,7 @@ public class IRCBot extends CoreHooks {
 		MDC.put("permanent", rememberRecommendations ? 1 : 0);
 		
 		if(apiServer != null) {
-			apiServer.botInfo.lastInteraction = System.currentTimeMillis();
+			apiServer.botInfo.setLastInteraction(System.currentTimeMillis());
 		}
 		
 		if(lastListTime < System.currentTimeMillis() - 60 * 60 * 1000) {
@@ -691,5 +690,9 @@ public class IRCBot extends CoreHooks {
 		} catch (Exception e) {
 			log.error("error logging activity", e);
 		}
+	}
+
+	public boolean isConnected() {
+		return bot.isConnected();
 	}
 }

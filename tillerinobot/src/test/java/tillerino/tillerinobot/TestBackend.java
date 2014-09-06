@@ -5,14 +5,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.List;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
+import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import static org.mockito.Mockito.*;
 
@@ -69,9 +68,9 @@ public abstract class TestBackend implements BotBackend {
 	}
 	
 	@Override
-	public Set<Integer> loadGivenRecommendations(String ircName)
+	public List<GivenRecommendation> loadGivenRecommendations(int userId)
 			throws SQLException {
-		return new HashSet<>();
+		return new ArrayList<>();
 	}
 	
 	int lastVisitedVersion = 1;

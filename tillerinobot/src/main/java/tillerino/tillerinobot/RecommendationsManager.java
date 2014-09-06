@@ -6,15 +6,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+
+import lombok.Data;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -56,6 +57,15 @@ public class RecommendationsManager {
 		 * @return this is not normed, so the sum of all probabilities can be greater than 1 and this must be accounted for!
 		 */
 		double getProbability();
+	}
+	
+	@Data
+	public static class GivenRecommendation {
+		public int userid;
+		public String username;
+		public int beatmapid;
+		public long date;
+		public long mods;
 	}
 	
 	/**
@@ -160,10 +170,14 @@ public class RecommendationsManager {
 	
 	public Cache<String, Recommendation> lastRecommendation = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
 
-	public LoadingCache<String, Set<Integer>> givenRecomendations =  CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build(new CacheLoader<String, Set<Integer>>() {
+	public LoadingCache<Integer, List<Integer>> givenRecomendations =  CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build(new CacheLoader<Integer, List<Integer>>() {
 		@Override
-		public Set<Integer> load(String key) throws Exception {
-			return backend.loadGivenRecommendations(key);
+		public List<Integer> load(Integer key) throws Exception {
+			List<Integer> list = new ArrayList<>();
+			for (GivenRecommendation recommendation : backend.loadGivenRecommendations(key)) {
+				list.add(recommendation.getBeatmapid());
+			}
+			return list;
 		}
 	});
 	
@@ -260,14 +274,14 @@ public class RecommendationsManager {
 		Sampler sampler = samplers.getIfPresent(userid);
 		
 		if(sampler == null || sampler.nomod != nomod || sampler.type != model || sampler.requestedMods != requestMods) {
-			sampler = new Sampler(backend.loadRecommendations(userid, givenRecomendations.getUnchecked(ircName), model, nomod, requestMods), model, nomod, requestMods);
+			sampler = new Sampler(backend.loadRecommendations(userid, givenRecomendations.getUnchecked(userid), model, nomod, requestMods), model, nomod, requestMods);
 			
 			samplers.put(userid, sampler);
 		}
 		
 		if(sampler.isEmpty()) {
 			samplers.invalidate(userid);
-			givenRecomendations.put(ircName, new HashSet<Integer>());
+			givenRecomendations.put(userid, new ArrayList<Integer>());
 			lastRecommendation.invalidate(ircName);
 			throw new UserException("I've recommended everything that I can think of. Try again to start over!");
 		}
@@ -304,7 +318,7 @@ public class RecommendationsManager {
 		 * save recommendation internally
 		 */
 		
-		givenRecomendations.getUnchecked(ircName).add(beatmapid);
+		givenRecomendations.getUnchecked(userid).add(beatmapid);
 		lastRecommendation.put(ircName, recommendation);
 		
 		return recommendation;

@@ -4,6 +4,7 @@ package tillerino.tillerinobot;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.CheckForNull;
@@ -13,6 +14,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
+import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 
 public interface BotBackend {
@@ -25,14 +27,20 @@ public interface BotBackend {
 	 */
 	public BeatmapMeta loadBeatmap(int beatmapid, long mods) throws SQLException, IOException, UserException;
 
-	public void saveGivenRecommendation(@Nonnull String nick, int beatmapid) throws SQLException;
+	public void saveGivenRecommendation(@Nonnull String nick, int userid, int beatmapid, long mods) throws SQLException;
 
 	/**
 	 * @return the last version of the bot that was visited by this user. -1 if no information available.
 	 */
 	public int getLastVisitedVersion(@Nonnull String nick) throws SQLException, UserException;
 	
-	Set<Integer> loadGivenRecommendations(@Nonnull String ircName) throws SQLException;
+	/**
+	 * recommendations from the last two weeks
+	 * @param userid
+	 * @return ordered by date given from newest to oldest
+	 * @throws SQLException
+	 */
+	List<GivenRecommendation> loadGivenRecommendations(int userid) throws SQLException;
 
 	public void setLastVisitedVersion(@Nonnull String nick, int version) throws SQLException;
 
@@ -77,4 +85,19 @@ public interface BotBackend {
 	 */
 	public Collection<BareRecommendation> loadRecommendations(int userid, @Nonnull Collection<Integer> exclude,
 			@Nonnull Model model, boolean nomod, long requestMods) throws SQLException, IOException, UserException;
+	
+	/**
+	 * gets the userid which belogs to the given key
+	 * @param key 
+	 * @return null if key not found
+	 */
+	public Integer resolveUserKey(String key) throws SQLException;
+	
+	/**
+	 * verifies a key for general data queries
+	 * @param key
+	 * @return
+	 * @throws SQLException
+	 */
+	public boolean verifyGeneralKey(String key) throws SQLException;
 }

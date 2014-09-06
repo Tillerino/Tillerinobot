@@ -1,55 +1,66 @@
 package tillerino.tillerinobot;
 
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import com.google.gson.Gson;
+import tillerino.tillerinobot.rest.BeatmapInfoService;
+import tillerino.tillerinobot.rest.BotInfoService;
+import tillerino.tillerinobot.rest.RecommendationHistoryService;
 
 /**
- * 
- * 
  * @author Tillerino
  */
-public class BotAPIServer extends AbstractHandler {
-	IRCBot bot;
+public class BotAPIServer extends Application {
+	public IRCBot bot;
+	public BotBackend backend;
 	
-	@Override
-	public void handle(String target, Request baseRequest,
-			HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
-		if(bot == null)
-			return;
-		
-		if(!baseRequest.getRemoteAddr().equals("127.0.0.1") && !baseRequest.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
-			return;
-		}
-		
-		System.out.println(target);
-		
-		if(target.startsWith("/botinfo")) {
-			botinfo(baseRequest, response);
-		}
+	public BotAPIServer(BotBackend backend) {
+		this.backend = backend;
 	}
 
-	Gson gson = new Gson();
+	BotInfoService botInfo = new BotInfoService(this);
+	RecommendationHistoryService history = new RecommendationHistoryService(this);
+	BeatmapInfoService beatmapInfo = new BeatmapInfoService(this);
 	
-	public static class BotInfo {
-		boolean isConnected;
-		long runningSince;
-		long lastPingDeath;
-		long lastInteraction;
+	@Override
+	public Set<Object> getSingletons() {
+		return new HashSet<Object>(Arrays.asList(botInfo, history, beatmapInfo));
 	}
 	
-	BotInfo botInfo = new BotInfo();
+	public void setBot(IRCBot bot) {
+		this.bot = bot;
+	}
+
+	public static void throwUnautorized(boolean authorized) throws WebApplicationException {
+		if(authorized)
+			return;
+		
+		throw exceptionFor(Status.UNAUTHORIZED, "Your key is not authorized for this method.");
+	}
 	
-	private void botinfo(Request request, HttpServletResponse response) throws IOException {
-		botInfo.isConnected = bot.bot.isConnected();
-		gson.toJson(botInfo, response.getWriter());
-		request.setHandled(true);
+	public static WebApplicationException getBadGateway() {
+		return exceptionFor(Status.BAD_GATEWAY, "Communication with the osu API server failed.");
+	}
+	
+	public static WebApplicationException getNotFound(String message) {
+		return exceptionFor(Status.NOT_FOUND, message);
+	}
+
+	public static WebApplicationException getUserMessage(UserException exception) {
+		return getNotFound(exception.getMessage());
+	}
+
+	public static WebApplicationException exceptionFor(Status status, String message) {
+		return new WebApplicationException(Response.status(status).entity(message).build());
+	}
+
+	public static WebApplicationException getInterrupted() {
+		return exceptionFor(Status.SERVICE_UNAVAILABLE, "The server is being shutdown for maintenance");
 	}
 }
