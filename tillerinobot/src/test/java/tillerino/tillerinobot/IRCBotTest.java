@@ -112,18 +112,6 @@ public class IRCBotTest {
 		return ircBot;
 	}
 	
-	@Test
-	public void testDonateLink() throws Exception {
-		IRCBot bot = getTestBot(backend);
-
-		IRCBotUser botUser = mock(IRCBotUser.class);
-		when(botUser.getNick()).thenReturn("someuser");
-		
-		bot.processPrivateMessage(botUser, "!donat");
-
-		verify(botUser).message(contains("wiki/Donate"));
-	}
-	
 	@Before
 	public void mockBackend() {
 		MockitoAnnotations.initMocks(this);
