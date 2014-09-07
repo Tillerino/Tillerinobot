@@ -540,7 +540,7 @@ public class IRCBot extends CoreHooks {
 	}
 	
 	static final int currentVersion = 7;
-	static final String versionMessage = null;
+	static final String versionMessage = "I'm back \\o/";
 	
 	long lastListTime = System.currentTimeMillis();
 	
