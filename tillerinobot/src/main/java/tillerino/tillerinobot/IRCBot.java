@@ -372,8 +372,6 @@ public class IRCBot extends CoreHooks {
 						+ " See https://github.com/Tillerino/Tillerinobot/wiki for commands!");
 			} else if(getLevenshteinDistance(message, "faq") <= 1) {
 				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!");
-			} else if(getLevenshteinDistance(message, "donate") <= 2 || getLevenshteinDistance(message, "donation") <= 2) {
-				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/Donate for more information on why and how to donate!");
 			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
 				Recommendation lastRecommendation = manager.getLastRecommendation(user.getNick());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
@@ -449,7 +447,7 @@ public class IRCBot extends CoreHooks {
 	private void checkVersionInfo(final IRCBotUser user) throws SQLException, UserException {
 		int userVersion = backend.getLastVisitedVersion(user.getNick());
 		if(userVersion < currentVersion) {
-			if(user.message(versionMessage)) {
+			if(versionMessage == null || user.message(versionMessage)) {
 				backend.setLastVisitedVersion(user.getNick(), currentVersion);
 			}
 		}
@@ -541,11 +539,8 @@ public class IRCBot extends CoreHooks {
 		pinger.handleUnknownEvent(event);
 	}
 	
-	static final int currentVersion = 6;
-	static final String versionMessage = "Guess what! I am now running on a server in the US ^.^ "
-			+ "This gives me more security and less delay, and human Tillerino doesn't have to worry about me when he does whatever he does with his PC (poor thing). "
-			+ "Since human Tillerino is now spending actual money and not just time, we're accepting donations. "
-			+ "If you want to know more, send !donate (there's also some sweet perks).";
+	static final int currentVersion = 7;
+	static final String versionMessage = null;
 	
 	long lastListTime = System.currentTimeMillis();
 	
