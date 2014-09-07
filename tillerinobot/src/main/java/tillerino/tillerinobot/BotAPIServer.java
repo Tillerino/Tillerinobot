@@ -63,4 +63,11 @@ public class BotAPIServer extends Application {
 	public static WebApplicationException getInterrupted() {
 		return exceptionFor(Status.SERVICE_UNAVAILABLE, "The server is being shutdown for maintenance");
 	}
+	
+	public static Throwable refreshWebApplicationException(Throwable t) {
+		if (t instanceof WebApplicationException) {
+			return new WebApplicationException(t.getMessage(), t.getCause(), Response.fromResponse(((WebApplicationException) t).getResponse()).build());
+		}
+		return t;
+	}
 }

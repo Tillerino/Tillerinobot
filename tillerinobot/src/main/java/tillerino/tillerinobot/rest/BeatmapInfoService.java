@@ -78,43 +78,37 @@ public class BeatmapInfoService {
 	@GET
 	@Produces("application/json")
 	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") int beatmapid, @QueryParam("mods") long mods, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
-		try {
-			BotAPIServer.throwUnautorized(server.backend.verifyGeneralKey(key));
-			
-			mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
-			
-			BeatmapMeta beatmapMeta;
+		BotAPIServer.throwUnautorized(server.backend.verifyGeneralKey(key));
+		
+		mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
+		
+		BeatmapMeta beatmapMeta;
 
-			try {
-				Future<BeatmapMeta> future = cache.getUnchecked(Pair.of(beatmapid, mods));
-				beatmapMeta = future.get(wait, TimeUnit.MILLISECONDS);
+		try {
+			Future<BeatmapMeta> future = cache.getUnchecked(Pair.of(beatmapid, mods));
+			beatmapMeta = wait < 0 ? future.get() : future.get(wait, TimeUnit.MILLISECONDS);
+			
+			if (beatmapMeta.getEstimates() instanceof PercentageEstimates) {
+				PercentageEstimates estimates = (PercentageEstimates) beatmapMeta.getEstimates();
 				
-				if (beatmapMeta.getEstimates() instanceof PercentageEstimates) {
-					PercentageEstimates estimates = (PercentageEstimates) beatmapMeta.getEstimates();
-					
-					BeatmapInfo info = new BeatmapInfo();
-					info.beatmapid = beatmapid;
-					info.mods = estimates.getMods();
-					
-					for(double acc : new double[] { 1, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75 }) {
-						info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
-					}
-					
-					return info;
+				BeatmapInfo info = new BeatmapInfo();
+				info.beatmapid = beatmapid;
+				info.mods = estimates.getMods();
+				
+				for(double acc : new double[] { 1, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75 }) {
+					info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
 				}
 				
-				throw BotAPIServer.getNotFound("Percentages estimates not found.");
-			} catch (InterruptedException e) {
-				throw BotAPIServer.getInterrupted();
-			} catch (ExecutionException e) {
-				throw e.getCause();
-			} catch (TimeoutException e) {
-				throw BotAPIServer.exceptionFor(Status.ACCEPTED, "The request is being processed. Please try again in a few moments.");
+				return info;
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw e;
+			
+			throw BotAPIServer.getNotFound("Percentages estimates not found.");
+		} catch (InterruptedException e) {
+			throw BotAPIServer.getInterrupted();
+		} catch (ExecutionException e) {
+			throw BotAPIServer.refreshWebApplicationException(e.getCause());
+		} catch (TimeoutException e) {
+			throw BotAPIServer.exceptionFor(Status.ACCEPTED, "The request is being processed. Please try again in a few moments.");
 		}
 	}
 }
