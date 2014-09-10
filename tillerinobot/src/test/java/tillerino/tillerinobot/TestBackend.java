@@ -95,7 +95,7 @@ public abstract class TestBackend implements BotBackend {
 		for(int i = 1; i <= 10; i++) {
 			BareRecommendation bareRecommendation = mock(BareRecommendation.class);
 			when(bareRecommendation.getBeatmapId()).thenReturn(i);
-			when(bareRecommendation.getCauses()).thenReturn(Collections.singleton(2l));
+			when(bareRecommendation.getCauses()).thenReturn(new long[] { 2l });
 			when(bareRecommendation.getPersonalPP()).thenReturn(100);
 			when(bareRecommendation.getProbability()).thenReturn(1d);
 			when(bareRecommendation.getMods()).thenReturn(requestMods);

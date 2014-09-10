@@ -28,10 +28,6 @@ public class BotInfoService {
 	@GET
 	@Produces("application/json")
 	public BotInfo botinfo() {
-		if(true) {
-			throw BotAPIServer.getNotFound("something");
-		}
-		
 		if(server.bot != null) {
 			botInfo.isConnected = server.bot.isConnected();
 		} else {

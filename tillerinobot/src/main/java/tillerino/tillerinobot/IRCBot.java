@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,7 +85,7 @@ public class IRCBot extends CoreHooks {
 	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel, boolean rememberRecommendations, boolean silent, BotAPIServer apiServer) {
 		this.server = server;
 		Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this).setEncoding(Charset.forName("UTF-8")).setAutoReconnect(false);
+				.setServer(server, port).setMessageDelay(1000).setName(nickname).addListener(this).setEncoding(Charset.forName("UTF-8")).setAutoReconnect(false);
 		if(password != null) {
 				configurationBuilder.setServerPassword(password);
 		}
@@ -460,39 +461,43 @@ public class IRCBot extends CoreHooks {
 	class Pinger {
 		volatile String pingMessage = null;
 		volatile CountDownLatch pingLatch = null;
-		final AtomicLong pingGate = new AtomicLong();
+		final AtomicBoolean quit = new AtomicBoolean(false);
 		
+		/*
+		 * this method is synchronized through the sender semaphore
+		 */
 		void ping() throws IOException, InterruptedException {
 			try {
-			long time = System.currentTimeMillis();
-			
-			if(pingGate.get() > System.currentTimeMillis()) {
-				throw new IOException("ping gate closed");
-			}
-			
-			synchronized (this) {
-				pingLatch = new CountDownLatch(1);
-				pingMessage = getRandomString(16);
-			}
-
-			Utils.sendRawLineToServer(bot, "PING " + pingMessage);
-			
-			if(!pingLatch.await(10, TimeUnit.SECONDS)) {
-				pingGate.set(System.currentTimeMillis() + 60000);
-				throw new IOException("ping timed out");
-			}
-			
-			long ping = System.currentTimeMillis() - time;
-			
-			if(ping > 1500) {
-				pingGate.set(System.currentTimeMillis() + 60000);
-				if(apiServer != null) {
-					apiServer.botInfo.setLastPingDeath(System.currentTimeMillis());
+				if(quit.get()) {
+					throw new IOException("ping gate closed");
 				}
-				throw new IOException("death ping: " + ping);
-			}
+
+				long time = System.currentTimeMillis();
+
+				synchronized (this) {
+					pingLatch = new CountDownLatch(1);
+					pingMessage = getRandomString(16);
+				}
+
+				Utils.sendRawLineToServer(bot, "PING " + pingMessage);
+
+				if(!pingLatch.await(10, TimeUnit.SECONDS)) {
+					throw new IOException("ping timed out");
+				}
+
+				long ping = System.currentTimeMillis() - time;
+
+				if(ping > 1500) {
+					if(apiServer != null) {
+						apiServer.botInfo.setLastPingDeath(System.currentTimeMillis());
+					}
+					throw new IOException("death ping: " + ping);
+				}
 			} catch(IOException e) {
-				bot.sendIRC().quitServer();
+				if(!quit.get()) {
+					quit.set(true);
+					bot.sendIRC().quitServer();
+				}
 				throw e;
 			}
 		}

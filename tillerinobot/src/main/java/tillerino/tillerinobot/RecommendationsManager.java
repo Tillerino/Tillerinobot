@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.SortedMap;
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.sound.sampled.ReverbType;
 
 import lombok.Data;
 
@@ -45,7 +48,7 @@ public class RecommendationsManager {
 		 */
 		long getMods();
 		
-		Collection<Long> getCauses();
+		long[] getCauses();
 		
 		/**
 		 * returns a guess at how much pp the player could achieve for this recommendation
@@ -274,7 +277,12 @@ public class RecommendationsManager {
 		Sampler sampler = samplers.getIfPresent(userid);
 		
 		if(sampler == null || sampler.nomod != nomod || sampler.type != model || sampler.requestedMods != requestMods) {
-			sampler = new Sampler(backend.loadRecommendations(userid, givenRecomendations.getUnchecked(userid), model, nomod, requestMods), model, nomod, requestMods);
+			Collection<BareRecommendation> recommendations = backend.loadRecommendations(userid, givenRecomendations.getUnchecked(userid), model, nomod, requestMods);
+			
+			// only keep the 1k most probable recommendations to save some memory
+			recommendations = getTopRecommendations(recommendations);
+			
+			sampler = new Sampler(recommendations, model, nomod, requestMods);
 			
 			samplers.put(userid, sampler);
 		}
@@ -322,5 +330,27 @@ public class RecommendationsManager {
 		lastRecommendation.put(ircName, recommendation);
 		
 		return recommendation;
+	}
+	
+	/**
+	 * returns
+	 * @param recommendations
+	 * @return
+	 */
+	public static List<BareRecommendation> getTopRecommendations(Collection<BareRecommendation> recommendations) {
+		List<BareRecommendation> list = new ArrayList<>(recommendations);
+		
+		Collections.sort(list, new Comparator<BareRecommendation>() {
+			@Override
+			public int compare(BareRecommendation o1, BareRecommendation o2) {
+				return (int) Math.signum(o2.getProbability() - o1.getProbability());
+			}
+		});
+
+		int size = Math.min(list.size(), 1000);
+		ArrayList<BareRecommendation> arrayList = new ArrayList<>(size);
+		arrayList.addAll(list.subList(0, size));
+		
+		return arrayList;
 	}
 }
