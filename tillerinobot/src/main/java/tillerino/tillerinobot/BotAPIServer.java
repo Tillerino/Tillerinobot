@@ -1,6 +1,5 @@
 package tillerino.tillerinobot;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,9 +27,24 @@ public class BotAPIServer extends Application {
 	RecommendationHistoryService history = new RecommendationHistoryService(this);
 	BeatmapInfoService beatmapInfo = new BeatmapInfoService(this);
 	
+	Set<Object> singletons = new HashSet<>();
+	
+	{
+		singletons.add(botInfo);
+		singletons.add(history);
+		singletons.add(beatmapInfo);
+	}
+	
 	@Override
 	public Set<Object> getSingletons() {
-		return new HashSet<Object>(Arrays.asList(botInfo, history, beatmapInfo));
+		return singletons;
+	}
+	
+	Set<Class<?>> classes = new HashSet<>();
+	
+	@Override
+	public Set<Class<?>> getClasses() {
+		return classes;
 	}
 	
 	public void setBot(IRCBot bot) {
