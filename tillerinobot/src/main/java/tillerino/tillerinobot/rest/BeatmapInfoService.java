@@ -16,6 +16,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -76,7 +77,7 @@ public class BeatmapInfoService {
 	}
 	
 	@GET
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") int beatmapid, @QueryParam("mods") long mods, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
 		BotAPIServer.throwUnautorized(server.backend.verifyGeneralKey(key));
 		

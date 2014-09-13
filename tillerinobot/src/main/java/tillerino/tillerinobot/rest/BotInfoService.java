@@ -3,6 +3,7 @@ package tillerino.tillerinobot.rest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import lombok.Data;
 import tillerino.tillerinobot.BotAPIServer;
@@ -26,7 +27,7 @@ public class BotInfoService {
 	public BotInfo botInfo = new BotInfo();
 
 	@GET
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public BotInfo botinfo() {
 		if(server.bot != null) {
 			botInfo.isConnected = server.bot.isConnected();

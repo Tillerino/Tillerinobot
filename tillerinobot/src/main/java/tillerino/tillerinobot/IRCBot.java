@@ -40,9 +40,11 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
+import org.tillerino.osuApiModel.GameMode;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserException.QuietException;
 
@@ -177,8 +179,17 @@ public class IRCBot extends CoreHooks {
 			BeatmapMeta beatmap = backend.loadBeatmap(beatmapid, mods);
 
 			if (beatmap == null) {
-				user.message("I'm sorry, I don't know that map. It might be very new, very hard or simply unranked.");
+				user.message("I'm sorry, I don't know that map. It might be very new, very hard, unranked or not standard osu mode.");
 				return;
+			}
+			
+			String addition = null;
+			if (beatmap.getEstimates() instanceof PercentageEstimates) {
+				PercentageEstimates estimates = (PercentageEstimates) beatmap.getEstimates();
+				
+				if(estimates.getMods() != mods) {
+					addition = "(no data for requested mods)";
+				}
 			}
 
 			Integer userid = backend.resolveIRCName(user.getNick());
@@ -188,7 +199,7 @@ public class IRCBot extends CoreHooks {
 			}
 			int hearts = backend.getDonator(apiUser);
 			
-			if(user.message(beatmap.formInfoMessage(false, null, hearts))) {
+			if(user.message(beatmap.formInfoMessage(false, addition, hearts))) {
 				songInfoCache.put(user.getNick(), beatmapid);
 			}
 

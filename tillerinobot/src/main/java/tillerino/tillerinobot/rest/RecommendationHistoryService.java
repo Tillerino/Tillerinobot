@@ -8,6 +8,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
@@ -21,7 +22,7 @@ public class RecommendationHistoryService {
 	}
 
 	@GET
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<GivenRecommendation> getHistory(@QueryParam("k") String tillerinobotKey) throws SQLException {
 		System.out.println(tillerinobotKey);
 		
