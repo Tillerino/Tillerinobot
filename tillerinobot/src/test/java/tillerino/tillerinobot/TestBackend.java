@@ -125,6 +125,11 @@ public abstract class TestBackend implements BotBackend {
 			public long getMods() {
 				return mods;
 			}
+			
+			@Override
+			public boolean isShaky() {
+				return false;
+			}
 		});
 		
 		return beatmapMeta;

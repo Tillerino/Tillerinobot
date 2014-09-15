@@ -30,6 +30,8 @@ public class BeatmapMeta {
 		double getPPForAcc(double acc);
 		
 		long getMods();
+		
+		boolean isShaky();
 	}
 	
 	OsuApiBeatmap beatmap;
@@ -89,6 +91,10 @@ public class BeatmapMeta {
 			estimateMessage += " | 98%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.98)) + "pp";
 			estimateMessage += " | 99%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.99)) + "pp";
 			estimateMessage += " | 100%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(1)) + "pp";
+			
+			if(percentageEstimates.isShaky()) {
+				estimateMessage += " (rough estimates)";
+			}
 		}
 		
 		estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength());
