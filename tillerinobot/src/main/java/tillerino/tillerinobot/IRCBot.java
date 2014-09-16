@@ -243,16 +243,6 @@ public class IRCBot extends CoreHooks {
 	}
 
 	@Override
-	public void onMessage(MessageEvent event) throws Exception {
-		if(silent)
-			return;
-		
-		if(event.getUser().getNick().equals("Tillerino")) {
-			processPrivateMessage(fromIRC(event.getUser()), event.getMessage());
-		}
-	}
-
-	@Override
 	public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
 		if(silent)
 			return;
@@ -344,11 +334,7 @@ public class IRCBot extends CoreHooks {
 				}
 			}
 			
-			String commandChar = "!";
-			if(user.getNick().equals("Tillerino"))
-				commandChar = ".";
-
-			if (!message.startsWith(commandChar)) {
+			if (!message.startsWith("!")) {
 				return;
 			}
 
