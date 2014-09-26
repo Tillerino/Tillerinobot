@@ -48,6 +48,8 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserException.QuietException;
+import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.lang.Language;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -58,6 +60,8 @@ import com.google.common.collect.ImmutableList;
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
+	Language lang = new Default();
+	
 	public interface IRCBotUser {
 		String getNick();
 		/**
@@ -177,10 +181,10 @@ public class IRCBot extends CoreHooks {
 					mods |= Mods.getMask(mod);
 			}
 
-			BeatmapMeta beatmap = backend.loadBeatmap(beatmapid, mods);
+			BeatmapMeta beatmap = backend.loadBeatmap(beatmapid, mods, lang);
 
 			if (beatmap == null) {
-				user.message("I'm sorry, I don't know that map. It might be very new, very hard, unranked or not standard osu mode.");
+				user.message(lang.unknownBeatmap());
 				return;
 			}
 			
@@ -189,7 +193,7 @@ public class IRCBot extends CoreHooks {
 				PercentageEstimates estimates = (PercentageEstimates) beatmap.getEstimates();
 				
 				if(estimates.getMods() != mods) {
-					addition = "(no data for requested mods)";
+					addition = "(" + lang.noInformationForModsShort() + ")";
 				}
 			}
 
@@ -224,15 +228,14 @@ public class IRCBot extends CoreHooks {
 			} else {
 				String string = getRandomString(6);
 
-				user.message("Something went wrong. If this keeps happening, tell Tillerino to look after incident "
-						+ string + ", please.");
+				user.message(lang.exception(string));
 				log.error(string + ": fucked up", e);
 			}
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
 		}
 	}
-	
+
 	public static String getRandomString(int length) {
 		Random r = new Random();
 		char[] chars = new char[length];
@@ -330,8 +333,7 @@ public class IRCBot extends CoreHooks {
 			
 			if(hugPattern.matcher(message).find()) {
 				if(apiUser != null && backend.getDonator(apiUser) > 0) {
-					user.message("Come here, you!");
-					user.action("hugs " + apiUser.getUsername());
+					lang.hug(user, apiUser);
 					return;
 				}
 			}
@@ -367,37 +369,35 @@ public class IRCBot extends CoreHooks {
 			}
 			
 			if(getLevenshteinDistance(message, "help") <= 1) {
-				user.message("Hi! I'm the robot who killed Tillerino and took over his account. Jk, but I'm still using the account."
-						+ " Check https://twitter.com/Tillerinobot for status and updates!"
-						+ " See https://github.com/Tillerino/Tillerinobot/wiki for commands!");
+				user.message(lang.help());
 			} else if(getLevenshteinDistance(message, "faq") <= 1) {
-				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!");
+				user.message(lang.faq());
 			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
 				Recommendation lastRecommendation = manager.getLastRecommendation(user.getNick());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
 					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(lastRecommendation.bareRecommendation.getCauses()));
-					user.message("Your complaint has been filed. Tillerino will look into it when he can.");
+					user.message(lang.complaint());
 				}
 			} else if(isRecommend) {
 				if(apiUser == null) {
 					String string = IRCBot.getRandomString(8);
 					log.error("bot user not resolvable " + string + " name: " + user.getNick());
-					throw new UserException("Your name is confusing me. Did you recently change it? If not, pls contact me and say " + string);
+					throw new UserException(lang.unresolvableName(string));
 				}
 				
-				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message);
+				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message, lang);
 
 				if(recommendation.beatmap == null) {
-					user.message("I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?");
+					user.message(lang.excuseForError());
 					log.error("unknow recommendation occurred");
 					return;
 				}
 				String addition = null;
 				if(recommendation.bareRecommendation.getMods() < 0) {
-					addition = "Try this map with some mods!";
+					addition = lang.tryWithMods();
 				}
 				if(recommendation.bareRecommendation.getMods() > 0 && recommendation.beatmap.getMods() == 0) {
-					addition = "Try this map with " + Mods.toShortNamesContinuous(Mods.getMods(recommendation.bareRecommendation.getMods()));
+					addition = lang.tryWithMods(Mods.getMods(recommendation.bareRecommendation.getMods()));
 				}
 				
 				int hearts = backend.getDonator(apiUser);
@@ -412,19 +412,19 @@ public class IRCBot extends CoreHooks {
 			} else if(message.startsWith("with ")) {
 				Integer lastSongInfo = songInfoCache.getIfPresent(user.getNick());
 				if(lastSongInfo == null) {
-					throw new UserException("I don't remember you getting any song info...");
+					throw new UserException(lang.noLastSongInfo());
 				}
 				message = message.substring(5);
 				
 				Long mods = Mods.fromShortNamesContinuous(message);
 				if(mods == null) {
-					throw new UserException("those mods don't look right. mods can be any combination of DT HR HD HT EZ NC FL SO NF. Combine them without any spaces or special chars. Example: !with HDHR, !with DTEZ");
+					throw new UserException(lang.malformattedMods());
 				}
 				if(mods == 0)
 					return;
-				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo, mods);
+				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo, mods, lang);
 				if(beatmap.getMods() == 0) {
-					throw new UserException("Sorry, I can't provide information for those mods at this time.");
+					throw new UserException(lang.noInformationForMops());
 				}
 				
 				int hearts = 0;
@@ -434,8 +434,7 @@ public class IRCBot extends CoreHooks {
 				
 				user.message(beatmap.formInfoMessage(false, null, hearts));
 			} else {
-				throw new UserException("unknown command " + message
-						+ ". type !help if you need help!");
+				throw new UserException(lang.unknownCommand(message));
 			}
 		} catch (Throwable e) {
 			handleException(user, e);
@@ -593,35 +592,11 @@ public class IRCBot extends CoreHooks {
 			if(backend.getDonator(apiUser) > 0) {
 				// this is a donator, let's welcome them!
 				
-				long lastActivity = backend.getLastActivity(apiUser);
+				long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
 				
-				if(lastActivity > System.currentTimeMillis() - 60 * 1000) {
-					user.message("beep boop");
-				} else if(lastActivity > System.currentTimeMillis() - 24 * 60 * 60 * 1000) {
-					user.message("Welcome back, " + apiUser.getUsername() + ".");
-					checkVersionInfo(user);
-				} else if(lastActivity < System.currentTimeMillis() - 7l * 24 * 60 * 60 * 1000) {
-					user.message(apiUser.getUsername() + "...");
-					user.message("...is that you? It's been so long!");
-					checkVersionInfo(user);
-					user.message("It's good to have you back. Can I interest you in a recommendation?");
-				} else {
-					String[] messages = {
-							"you look like you want a recommendation.",
-							"how nice to see you! :)",
-							"my favourite human. (Don't tell the other humans!)",
-							"what a pleasant surprise! ^.^",
-							"I was hoping you'd show up. All the other humans are lame, but don't tell them I said that! :3",
-							"what do you feel like doing today?",
-					};
-					
-					Random random = new Random();
-					
-					String message = messages[random.nextInt(messages.length)];
-					
-					user.message(apiUser.getUsername() + ", " + message);
-					checkVersionInfo(user);
-				} 
+				lang.welcomeUser(user, apiUser, inactiveTime);
+				
+				checkVersionInfo(user);
 			}
 		} catch (Exception e) {
 			log.error("error welcoming potential donator", e);

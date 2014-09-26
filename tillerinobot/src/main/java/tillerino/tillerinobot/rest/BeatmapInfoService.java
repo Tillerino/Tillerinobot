@@ -32,6 +32,7 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
+import tillerino.tillerinobot.lang.Default;
 
 @Path("/beatmapinfo")
 public class BeatmapInfoService {
@@ -52,7 +53,7 @@ public class BeatmapInfoService {
 						@Override
 						public BeatmapMeta call() throws SQLException {
 							try {
-								BeatmapMeta beatmap = server.backend.loadBeatmap(key.getKey(), key.getValue());
+								BeatmapMeta beatmap = server.backend.loadBeatmap(key.getKey(), key.getValue(), new Default());
 								
 								if(beatmap == null) {
 									throw BotAPIServer.getNotFound("Beatmap " + key.getKey() + " not found.");

@@ -24,6 +24,7 @@ import tillerino.tillerinobot.IRCBot.Pinger;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.lang.Language;
 
 public class IRCBotTest {
 	public abstract class TestBackend implements BotBackend {
@@ -117,7 +118,7 @@ public class IRCBotTest {
 		}
 		
 		@Override
-		public BeatmapMeta loadBeatmap(int beatmapid, final long mods)
+		public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
 				throws SQLException, IOException, UserException {
 			OsuApiBeatmap beatmap = new OsuApiBeatmap();
 			
