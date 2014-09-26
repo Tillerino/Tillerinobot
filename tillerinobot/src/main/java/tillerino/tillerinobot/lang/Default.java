@@ -66,7 +66,7 @@ public class Default implements Language {
 	}
 
 	@Override
-	public String malformattedMods() {
+	public String malformattedMods(String mods) {
 		return "those mods don't look right. mods can be any combination of DT HR HD HT EZ NC FL SO NF. Combine them without any spaces or special chars. Example: !with HDHR, !with DTEZ";
 	}
 

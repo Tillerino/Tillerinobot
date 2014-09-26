@@ -63,6 +63,9 @@ public class IRCBot extends CoreHooks {
 	Language lang = new Default();
 	
 	public interface IRCBotUser {
+		/**
+		 * @return the user's IRC nick, not their actual user name.
+		 */
 		String getNick();
 		/**
 		 * 
@@ -418,7 +421,7 @@ public class IRCBot extends CoreHooks {
 				
 				Long mods = Mods.fromShortNamesContinuous(message);
 				if(mods == null) {
-					throw new UserException(lang.malformattedMods());
+					throw new UserException(lang.malformattedMods(message));
 				}
 				if(mods == 0)
 					return;
