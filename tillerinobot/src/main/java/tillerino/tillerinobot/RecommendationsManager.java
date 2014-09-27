@@ -269,7 +269,7 @@ public class RecommendationsManager {
 				}
 				
 				if(apiUser.getRank() > minRank) {
-					throw new UserException(lang.featureRankRestricted("gamma", minRank));
+					throw new UserException(lang.featureRankRestricted("gamma", minRank, apiUser));
 				}
 			}
 		}

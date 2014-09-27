@@ -6,7 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 public class Default implements Language {
 
@@ -61,7 +63,7 @@ public class Default implements Language {
 	}
 
 	@Override
-	public String noInformationForMops() {
+	public String noInformationForMods() {
 		return "Sorry, I can't provide information for those mods at this time.";
 	}
 
@@ -86,7 +88,7 @@ public class Default implements Language {
 	}
 
 	@Override
-	public String unresolvableName(String exceptionMarker) {
+	public String unresolvableName(String exceptionMarker, String name) {
 		return "Your name is confusing me. Did you recently change it? If not, pls contact me and say " + exceptionMarker;
 	}
 
@@ -124,7 +126,7 @@ public class Default implements Language {
 	}
 	
 	@Override
-	public String featureRankRestricted(String feature, int minRank) {
+	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
 		return "Sorry, at this point " + feature + " is only available for players who have surpassed rank " + minRank + ".";
 	}
 	
@@ -141,5 +143,23 @@ public class Default implements Language {
 	@Override
 	public String notRanked() {
 		return "looks like that beatmap is not ranked.";
+	}
+
+	@Override
+	public void optionalCommentOnNP(IRCBotUser user,
+			OsuApiUser apiUser, BeatmapMeta meta) {
+		// regular Tillerino doesn't comment on this
+	}
+
+	@Override
+	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
+			BeatmapMeta meta) {
+		// regular Tillerino doesn't comment on this
+	}
+
+	@Override
+	public void optionalCommentOnRecommendation(IRCBotUser user,
+			OsuApiUser apiUser, Recommendation meta) {
+		// regular Tillerino doesn't comment on this
 	}
 }

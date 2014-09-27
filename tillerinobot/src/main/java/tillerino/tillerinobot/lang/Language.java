@@ -5,10 +5,14 @@ import java.util.List;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 /**
- * 
+ * Implementations of this interface will be instantiated once per user to allow
+ * for shuffling of messages, counters and time delay measurements. This is why
+ * implementations need to be kept very lightweight.
  * 
  * @author Tillerino
  */
@@ -47,7 +51,7 @@ public interface Language {
 	 * 
 	 * @return
 	 */
-	String noInformationForMops();
+	String noInformationForMods();
 
 	/**
 	 * Welcome a donator who has been offline. This can include multiple
@@ -115,9 +119,11 @@ public interface Language {
 	 * @param exceptionMarker
 	 *            a marker to reference the created log entry. six or eight
 	 *            characters.
+	 * @param ircNick
+	 *            the irc nick which could not be resolved
 	 * @return
 	 */
-	String unresolvableName(String exceptionMarker);
+	String unresolvableName(String exceptionMarker, String ircNick);
 
 	/**
 	 * A rare internal error has occurred, which is no cause for concern. Rather
@@ -176,9 +182,11 @@ public interface Language {
 	 *            The feature's name.
 	 * @param minRank
 	 *            The minimum rank to be able to use this feature.
+	 * @param user
+	 *            ther user who is requesting the feature
 	 * @return
 	 */
-	String featureRankRestricted(String feature, int minRank);
+	String featureRankRestricted(String feature, int minRank, OsuApiUser user);
 
 	/**
 	 * The user requested a recommendation and both gave a mod and the nomod
@@ -202,4 +210,18 @@ public interface Language {
 	 */
 	String notRanked();
 
+	/**
+	 * Comment after beatmap info was sent in response to /np
+	 */
+	void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta);
+
+	/**
+	 * Comment after beatmap info was sent in response to !with
+	 */
+	void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta);
+	
+	/**
+	 * Comment after beatmap info was sent in response to !recommend
+	 */
+	void optionalCommentOnRecommendation(IRCBotUser user, OsuApiUser apiUser, Recommendation recommendation);
 }

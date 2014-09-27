@@ -158,7 +158,7 @@ public class IRCBotTest {
 		IRCBot bot = getTestBot(backend);
 		
 		IRCBotUser user = mock(IRCBotUser.class);
-		when(user.getNick()).thenReturn("");
+		when(user.getNick()).thenReturn("user");
 		when(user.message(anyString())).thenReturn(true);
 		
 		bot.processPrivateMessage(user, "!recommend");

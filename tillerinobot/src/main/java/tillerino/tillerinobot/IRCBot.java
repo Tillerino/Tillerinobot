@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
@@ -160,6 +161,8 @@ public class IRCBot extends CoreHooks {
 		}
 
 		try {
+			OsuApiUser apiUser = getUserOrThrow(user);
+			
 			checkVersionInfo(user);
 
 			Matcher m = npPattern.matcher(message);
@@ -200,15 +203,12 @@ public class IRCBot extends CoreHooks {
 				}
 			}
 
-			Integer userid = backend.resolveIRCName(user.getNick());
-			OsuApiUser apiUser = userid != null ? backend.getUser(userid, 0) : null;
-			if(apiUser == null) {
-				throw new NullPointerException("osu api user was null, but name was already resolved?");
-			}
 			int hearts = backend.getDonator(apiUser);
 			
 			if(user.message(beatmap.formInfoMessage(false, addition, hearts))) {
 				songInfoCache.put(user.getNick(), beatmapid);
+				
+				lang.optionalCommentOnNP(user, apiUser, beatmap);
 			}
 
 		} catch (Throwable e) {
@@ -329,8 +329,7 @@ public class IRCBot extends CoreHooks {
 		}
 
 		try {
-			Integer userid = backend.resolveIRCName(user.getNick());
-			OsuApiUser apiUser = userid != null ? backend.getUser(userid, 0) : null;
+			OsuApiUser apiUser = getUserOrThrow(user);
 			
 			Pattern hugPattern = Pattern.compile("\\bhugs?\\b");
 			
@@ -382,12 +381,6 @@ public class IRCBot extends CoreHooks {
 					user.message(lang.complaint());
 				}
 			} else if(isRecommend) {
-				if(apiUser == null) {
-					String string = IRCBot.getRandomString(8);
-					log.error("bot user not resolvable " + string + " name: " + user.getNick());
-					throw new UserException(lang.unresolvableName(string));
-				}
-				
 				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message, lang);
 
 				if(recommendation.beatmap == null) {
@@ -410,6 +403,8 @@ public class IRCBot extends CoreHooks {
 					if(rememberRecommendations) {
 						backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), recommendation.beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
 					}
+					
+					lang.optionalCommentOnRecommendation(user, apiUser, recommendation);
 				}
 
 			} else if(message.startsWith("with ")) {
@@ -427,15 +422,14 @@ public class IRCBot extends CoreHooks {
 					return;
 				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo, mods, lang);
 				if(beatmap.getMods() == 0) {
-					throw new UserException(lang.noInformationForMops());
+					throw new UserException(lang.noInformationForMods());
 				}
 				
-				int hearts = 0;
-				if(apiUser != null) {
-					hearts = backend.getDonator(apiUser);
-				}
+				int hearts = backend.getDonator(apiUser);
 				
-				user.message(beatmap.formInfoMessage(false, null, hearts));
+				if(user.message(beatmap.formInfoMessage(false, null, hearts))) {
+					lang.optionalCommentOnWith(user, apiUser, beatmap);
+				}
 			} else {
 				throw new UserException(lang.unknownCommand(message));
 			}
@@ -668,5 +662,25 @@ public class IRCBot extends CoreHooks {
 
 	public boolean isConnected() {
 		return bot.isConnected();
+	}
+	
+	@Nonnull
+	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException {
+		Integer userId = backend.resolveIRCName(user.getNick());
+		
+		if(userId == null) {
+			String string = IRCBot.getRandomString(8);
+			log.error("bot user not resolvable " + string + " name: " + user.getNick());
+			
+			throw new UserException(lang.unresolvableName(string, user.getNick()));
+		}
+		
+		OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000);
+		
+		if(apiUser == null) {
+			throw new RuntimeException("nickname was resolved, but user not found in api.");
+		}
+		
+		return apiUser;
 	}
 }

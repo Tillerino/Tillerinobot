@@ -1,20 +1,27 @@
 package tillerino.tillerinobot.lang;
 
 import java.util.List;
+import java.util.Random;
+
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 public class Tsundere implements Language {
-	StringShuffler unknown = new StringShuffler(
-			"Are you stupid? No one plays that map!",
-			"Huh? Are you asking these dumb questions just to hear me talk?",
-			"What!? You can't possibly expect me to know the answer to that!");
+	static final Random rnd = new Random();
+	
+	StringShuffler unknown = new StringShuffler(rnd);
 
 	@Override
 	public String unknownBeatmap() {
-		return unknown.get();
+		return unknown.get(
+				"Are you stupid? No one plays that map!",
+				"Huh? Are you asking these dumb questions just to hear me talk?",
+				"What!? You can't possibly expect me to know the answer to that!"
+		);
 	}
 
 	@Override
@@ -39,7 +46,7 @@ public class Tsundere implements Language {
 	}
 
 	@Override
-	public String noInformationForMops() {
+	public String noInformationForMods() {
 		/*
 		 * TODO
 		 * No information was available for the given mods. This message will be
@@ -90,13 +97,14 @@ public class Tsundere implements Language {
 		return null;
 	}
 
-	StringShuffler anyMods = new StringShuffler(
-			"An idiot like you wouldn't know to try this with mods. You should thank me.",
-			"I almost think you could use mods here without making a complete fool of yourself.");
+	StringShuffler anyMods = new StringShuffler(rnd);
 
 	@Override
 	public String tryWithMods() {
-		return anyMods.get();
+		return anyMods.get(
+				"An idiot like you wouldn't know to try this with mods. You should thank me.",
+				"I almost think you could use mods here without making a complete fool of yourself."
+		);
 	}
 
 	@Override
@@ -111,7 +119,7 @@ public class Tsundere implements Language {
 	}
 
 	@Override
-	public String unresolvableName(String exceptionMarker) {
+	public String unresolvableName(String exceptionMarker, String name) {
 		/*
 		 * TODO
 		 * The user's IRC nick name could not be resolved to an osu user id. The
@@ -177,7 +185,7 @@ public class Tsundere implements Language {
 	}
 
 	@Override
-	public String featureRankRestricted(String feature, int minRank) {
+	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
 		/*
 		 * TODO
 		 * A feature is rank restricted.
@@ -212,6 +220,48 @@ public class Tsundere implements Language {
 		 * The requested beatmap is not ranked.
 		 */
 		return null;
+	}
+
+	StringShuffler commentNP = new StringShuffler(rnd);
+
+	@Override
+	public void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser,
+			BeatmapMeta meta) {
+		String message = commentNP.get(
+				"Playing that won't impress me much... n-n-not that I'd want you to.",
+				"Are you serious!? If that map doesn't kill you, I will."
+		);
+		user.message(message);
+	}
+
+	StringShuffler commentWith = new StringShuffler(rnd);
+
+	@Override
+	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
+			BeatmapMeta meta) {
+		String message = commentWith.get(
+				"If you wanted to be treated like a baby, you could just ask... no, go ahead and play.",
+				"You idiot! You're going to get hurt trying mods like that!"
+		);
+		user.message(message);
+	}
+	
+	static final int COMMENT_ON_R_INTERVAL = 20;
+	StringShuffler commentNRecommendations = new StringShuffler(rnd);
+	int countRecommendations = 0;
+
+	@Override
+	public void optionalCommentOnRecommendation(IRCBotUser user,
+			OsuApiUser apiUser, Recommendation meta) {
+		if((++countRecommendations) % COMMENT_ON_R_INTERVAL == 0) {
+			String message = commentNRecommendations.get(
+					"I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.", 
+					"You know, it's a privilege to talk to me this much, not a right.", 
+					"I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything."
+			);
+			
+			user.message(message);
+		}
 	}
 
 }
