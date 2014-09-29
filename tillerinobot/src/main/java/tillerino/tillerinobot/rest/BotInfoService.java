@@ -22,6 +22,7 @@ public class BotInfoService {
 		long runningSince;
 		long lastPingDeath;
 		long lastInteraction;
+		long lastSentMessage;
 	}
 
 	public BotInfo botInfo = new BotInfo();
@@ -47,6 +48,10 @@ public class BotInfoService {
 
 	public void setLastInteraction(long lastInteraction) {
 		botInfo.lastInteraction = lastInteraction;
+	}
+
+	public void setLastSentMessage(long lastSentMessage) {
+		botInfo.lastSentMessage = lastSentMessage;
 	}
 
 }

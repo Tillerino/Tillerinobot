@@ -271,6 +271,7 @@ public class IRCBot extends CoreHooks {
 					
 					user.send().message(msg);
 					log.info("sent: " + msg);
+					apiServer.botInfo.setLastSentMessage(System.currentTimeMillis());
 					return true;
 				} catch (IOException | InterruptedException e) {
 					log.error("not sent: " + e.getMessage());
