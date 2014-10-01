@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.lang.Language;
 
 /**
  * <p>
@@ -139,7 +141,7 @@ public class TestBackend implements BotBackend {
 	Database database = new Database();
 
 	@Override
-	public BeatmapMeta loadBeatmap(int beatmapid, final long mods)
+	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
 			throws SQLException, IOException, UserException {
 		OsuApiBeatmap beatmap = getBeatmap(beatmapid);
 
@@ -310,7 +312,7 @@ public class TestBackend implements BotBackend {
 		final double equivalent = user.getPp() / 20;
 		for(int i = 1; i <= 10000; i++) {
 			for(long m : mods) {
-				BeatmapMeta meta = loadBeatmap(i, m);
+				BeatmapMeta meta = loadBeatmap(i, m, null);
 				if(Math.abs(1 - ((PercentageEstimates) meta.getEstimates()).getPPForAcc(.98) / equivalent) < .15) {
 					maps.add(meta);
 				}

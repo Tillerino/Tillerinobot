@@ -15,16 +15,18 @@ import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.lang.Language;
 
 public interface BotBackend {
 	/**
 	 * @param beatmapid
 	 * @param mods mods for {@link PercentageEstimates}. These might be ignored if they can't be satisfied
+	 * @param lang TODO
 	 * @return null if not found
 	 * @throws IOException 
 	 * @throws UserException 
 	 */
-	public BeatmapMeta loadBeatmap(int beatmapid, long mods) throws SQLException, IOException, UserException;
+	public BeatmapMeta loadBeatmap(int beatmapid, long mods, Language lang) throws SQLException, IOException, UserException;
 
 	public void saveGivenRecommendation(@Nonnull String nick, int userid, int beatmapid, long mods) throws SQLException;
 
