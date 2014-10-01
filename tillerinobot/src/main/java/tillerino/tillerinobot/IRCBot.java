@@ -10,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -34,14 +35,13 @@ import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.ConnectEvent;
+import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
-import org.tillerino.osuApiModel.GameMode;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
@@ -75,7 +75,7 @@ public class IRCBot extends CoreHooks {
 		boolean action(String msg);
 	}
 	
-	final PircBotX bot;
+	PircBotX bot;
 	final BotBackend backend;
 	final private String server;
 	final private boolean rememberRecommendations;
@@ -457,6 +457,11 @@ public class IRCBot extends CoreHooks {
 		bot.sendIRC().quitServer();
 	}
 	
+	@Override
+	public void onDisconnect(DisconnectEvent event) throws Exception {
+		exec.shutdown();
+	}
+	
 	class Pinger {
 		volatile String pingMessage = null;
 		volatile CountDownLatch pingLatch = null;
@@ -623,28 +628,27 @@ public class IRCBot extends CoreHooks {
 		}
 	}
 
-	@Override
-	public void onPart(PartEvent event) throws Exception {
-		final String fNick = event.getUser().getNick();
-		
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				registerActivity(fNick);
-			}
-		});
+	public void scheduleRegisterActivity(final String nick) {
+		try {
+			exec.submit(new Runnable() {
+				@Override
+				public void run() {
+					registerActivity(nick);
+				}
+			});
+		} catch (RejectedExecutionException e) {
+			// bot is shutting down
+		}
 	}
 	
 	@Override
+	public void onPart(PartEvent event) throws Exception {
+		scheduleRegisterActivity(event.getUser().getNick());
+	}
+
+	@Override
 	public void onQuit(QuitEvent event) throws Exception {
-		final String fNick = event.getUser().getNick();
-		
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				registerActivity(fNick);
-			}
-		});
+		scheduleRegisterActivity(event.getUser().getNick());
 	}
 	
 	@Override
@@ -660,14 +664,7 @@ public class IRCBot extends CoreHooks {
 				if(nick.startsWith("@") || nick.startsWith("+"))
 					nick = nick.substring(1);
 				
-				final String fNick = nick;
-				
-				exec.submit(new Runnable() {
-					@Override
-					public void run() {
-						registerActivity(fNick);
-					}
-				});
+				scheduleRegisterActivity(nick);
 			}
 			
 			System.out.println("processed user list event");

@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.sound.sampled.ReverbType;
 
 import lombok.Data;
 
