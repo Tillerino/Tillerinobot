@@ -11,17 +11,12 @@ import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 public class Tsundere implements Language {
+	//I HAVE NO IDEA WHAT I'M DOING
 	static final Random rnd = new Random();
-	
-	StringShuffler unknown = new StringShuffler(rnd);
 
 	@Override
 	public String unknownBeatmap() {
-		return unknown.get(
-				"Are you stupid? No one plays that map!",
-				"Huh? Are you asking these dumb questions just to hear me talk?",
-				"What!? You can't possibly expect me to know the answer to that!"
-		);
+		return "Are you stupid? No one plays that map!";
 	}
 
 	@Override
@@ -32,7 +27,8 @@ public class Tsundere implements Language {
 		 * here should indicated that if the error occurs repeatedly, Tillerino
 		 * should be contacted via Twitter @Tillerinobot or reddit /u/Tillerino
 		 */
-		return null;
+		return "If this keeps happening, tell Tillerino to look after incident "
+				+ marker + ".";
 	}
 
 	@Override
@@ -42,7 +38,7 @@ public class Tsundere implements Language {
 		 * No information was available for the given mods. This message will be
 		 * appended to the song info in brackets.
 		 */
-		return null;
+		return "Those mods? You wish!";
 	}
 
 	@Override
@@ -52,7 +48,7 @@ public class Tsundere implements Language {
 		 * No information was available for the given mods. This message will be
 		 * displayed by itself, so it can be longer.
 		 */
-		return null;
+		return "What!? You can't possibly expect me to know the answer to that!";
 	}
 
 	@Override
@@ -74,7 +70,7 @@ public class Tsundere implements Language {
 		 * TODO
 		 * The entire command that the user typed is not known.
 		 */
-		return null;
+		return command + "? I think you've got the hierarchy backwards. You do what I tell you, and I respond if I feel like it. Type !help if you're too stupid to even tell what I want.";
 	}
 
 	@Override
@@ -83,7 +79,7 @@ public class Tsundere implements Language {
 		 * TODO
 		 * given mods in !with command could not be interpreted
 		 */
-		return null;
+		return "You dummy... you can't just make up your own mods. If you can't write normal things like !with HR or !with HDDT, I won't even to bother trying to interpret.";
 	}
 
 	@Override
@@ -94,7 +90,7 @@ public class Tsundere implements Language {
 		 * was given. This may be because it was restarted or because the cache
 		 * timed out.
 		 */
-		return null;
+		return "You didn't even mention a song. Wait, were you trying to use those mods on ME!?";
 	}
 
 	StringShuffler anyMods = new StringShuffler(rnd);
@@ -115,7 +111,7 @@ public class Tsundere implements Language {
 		 * mods if the song info doesn't include that information already.
 		 * Appended to song info.
 		 */
-		return null;
+		return "Use " + Mods.toShortNamesContinuous(mods) + "... or else.";
 	}
 
 	@Override
@@ -125,7 +121,8 @@ public class Tsundere implements Language {
 		 * The user's IRC nick name could not be resolved to an osu user id. The
 		 * message should suggest to contact @Tillerinobot or /u/Tillerino.
 		 */
-		return null;
+		return "Who the heck are you!? Are you one of those idiots that changes their name more often than their underwear? Ugh... contact Tillerino and say "
+		+ exceptionMarker + " if this seems to happen a lot."";
 	}
 
 	@Override
@@ -136,7 +133,7 @@ public class Tsundere implements Language {
 		 * Rather than admiting that an error occurred, this message should make
 		 * an excuse why the request could not be fulfilled.
 		 */
-		return null;
+		return "Did you say something? It's not l-like I care if ";
 	}
 
 	@Override
@@ -145,8 +142,10 @@ public class Tsundere implements Language {
 		 * TODO
 		 * Response to the !complain command.
 		 */
-		return null;
+		return "";
 	}
+	
+	int countHugs = 0;
 
 	@Override
 	public void hug(IRCBotUser user, OsuApiUser apiUser) {
@@ -155,6 +154,16 @@ public class Tsundere implements Language {
 		 * Donator mentioned hug or hugs. Response can include multiple messages
 		 * or even actions.
 		 */
+         //Shuffler?
+         //T-There's something on your back, you slob. Here, let me get that
+         //Wow, you suck at hugs. Someone needs to teach you.
+         //
+         //I w-wasn't trying to hug you! I just lost my balance for a second and fell onto you.
+         //I'm not hugging you, I'm taking a rough chest measurement, because you clearly don't know what size to wear.
+         //
+         // Come here, you! /me slaps [user]
+         // /me slaps. Sorry, that was just a reflex.
+         
 	}
 
 	@Override
@@ -164,6 +173,7 @@ public class Tsundere implements Language {
 		 * Response to !help command.
 		 */
 		return null;
+        //Feeling helpless (as always)?  Check [url] for status and updates, and [url] for commands. Remember, there are no stupid questions, only stupid people, like you.
 	}
 
 	@Override
@@ -173,6 +183,7 @@ public class Tsundere implements Language {
 		 * Response to !faq command.
 		 */
 		return null;
+        //Here, Tillerino made this 
 	}
 
 	@Override
@@ -182,6 +193,15 @@ public class Tsundere implements Language {
 		 * A part of the !recommend command was not recognized.
 		 */
 		return null;
+        //
+        //Fake recommendation 1,2,3,4,5  - you are an idiot, aha?, i wish you would die, i'm not your toy, battements d'ame, call me when you're sober, extra bitter, fuck you, fuck you!, pony song, i bet you'll forget that even if you notice dthat, i knew you were trouble, i know wher eyou sleep, i hope you die, i'm not your boyfriend baby, may i help you?, may these noises startle you in your sleep tnoight, my life would suck without you, never gonna give you up, stupid mf, thank you for playing, that's what you get, the mysterious ticking noise
+        
+        //what do you want from me, may i help you
+        //rainbow dash, freedom dive, big black, airman, square hdhrdt
+        //rickroll, baattlements d'ame, pony song, ticking noise, ronald's perfect math class, classico, mandelbrot set, survival dance, they're talking the hobbits to, centipede, babilfrenzo, invasion of the gabber robots, scatman, timebomb+hr, my heart will go on
+        //you are a pitrate, you fucking motherfucker, you goddamn fish
+        
+        //Want you gone x3, why are you being like this, you're not thinking, dummy dummy, baka go home, lie lie lie
 	}
 
 	@Override
@@ -191,6 +211,8 @@ public class Tsundere implements Language {
 		 * A feature is rank restricted.
 		 */
 		return null;
+        //Filthy casual, don't even try until you're at least rank 25000
+        //Sorry, this feature is only available for people that can actually play osu!
 	}
 
 	@Override
@@ -201,6 +223,7 @@ public class Tsundere implements Language {
 		 * option.
 		 */
 		return null;
+         //Contradiction
 	}
 
 	@Override
@@ -210,7 +233,9 @@ public class Tsundere implements Language {
 		 * The current recommendations sampler is empty.
 		 * "try again to start over".
 		 */
-		return null;
+		return " Let's start over again.";
+        //I'm SURE you played all of those
+        //To double check
 	}
 
 	@Override
@@ -219,48 +244,51 @@ public class Tsundere implements Language {
 		 * TODO
 		 * The requested beatmap is not ranked.
 		 */
-		return null;
+		return "";
+        //Why don't 
+        // Listing: 95% [0pp], 98% [0pp] 
+        //Unranked maps for PP, great idea
 	}
 
 	StringShuffler commentNP = new StringShuffler(rnd);
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		String message = commentNP.get(
-				"Playing that won't impress me much... n-n-not that I'd want you to.",
-				"Are you serious!? If that map doesn't kill you, I will."
-		);
-		user.message(message);
+	public void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta) {
+        double typicalPP = (apiUser.pp/20.0);
+        if((meta.get95percentpp)/typicalPP > 2.0) {
+            user.message("Are you serious!? If that map doesn't kill you, I will.");
+        } else if((meta.get100percentpp)/typicalPP < 0.333) {
+            user.message("Playing that won't impress me much... n-n-not that I'd want you to.");
+        }
 	}
 
 	StringShuffler commentWith = new StringShuffler(rnd);
-
+	
 	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		String message = commentWith.get(
-				"If you wanted to be treated like a baby, you could just ask... no, go ahead and play.",
-				"You idiot! You're going to get hurt trying mods like that!"
-		);
-		user.message(message);
+	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta) {
+		double typicalPP = (apiUser.pp/20);
+		if((meta.get95percentpp)/typicalPP > 2.0) {
+			user.message("You idiot! You're going to get hurt trying mods like that!");
+		} else if((meta.get100percentpp)/typicalPP < 0.5) {
+			user.message("If you wanted to be treated like a baby, you could just ask... no, go ahead and play.");
+		}
 	}
 	
-	static final int COMMENT_ON_R_INTERVAL = 20;
-	StringShuffler commentNRecommendations = new StringShuffler(rnd);
 	int countRecommendations = 0;
 
 	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		if((++countRecommendations) % COMMENT_ON_R_INTERVAL == 0) {
-			String message = commentNRecommendations.get(
-					"I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.", 
-					"You know, it's a privilege to talk to me this much, not a right.", 
-					"I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything."
-			);
-			
-			user.message(message);
+	public void optionalCommentOnRecommendation(IRCBotUser user, OsuApiUser apiUser, Recommendation meta) {
+		countRecommendations++;
+		if(countRecommendations == 7) {
+			user.message("I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.");
+		} else if(countRecommendations == 17) {
+			user.message("You know, it's a privilege to talk to me this much, not a right.");
+		} else if(countRecommendations == 37) {
+			user.message("How would you even play this game if I wasn't telling you what to do?");
+		} else if(countRecommendations == 73) {
+			user.message("I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything.");
+		} else if(countRecommendations == 173) {
+			user.message("Just can't leave me alone, huh? I guess t-that's okay. But don't you dare tell anyone!");
 		}
 	}
 
