@@ -45,22 +45,26 @@ public class BeatmapMeta {
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#");
 
 	public String formInfoMessage(boolean formLink, String addition, int hearts) {
+		
 		String beatmapName = getBeatmap().getArtist() + " - " + getBeatmap().getTitle()
 				+ " [" + getBeatmap().getVersion() + "]";
 		if(formLink) {
 			beatmapName = "[http://osu.ppy.sh/b/" + getBeatmap().getId() + " " + beatmapName + "]";
 		}
 		
+		long mods = 0;
+		
 		if(getEstimates() instanceof PercentageEstimates) {
 			PercentageEstimates percentageEstimates = (PercentageEstimates) getEstimates();
+			mods = percentageEstimates.getMods();
 			if(percentageEstimates.getMods() != 0) {
-				String mods = "";
+				String modsString = "";
 				for(Mods mod : Mods.getMods(percentageEstimates.getMods())) {
 					if(mod.isEffective()) {
-						mods += mod.getShortName();
+						modsString += mod.getShortName();
 					}
 				}
-				beatmapName += " " + mods;
+				beatmapName += " " + modsString;
 			}
 		}
 
@@ -97,10 +101,11 @@ public class BeatmapMeta {
 			}
 		}
 		
-		estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength());
-		estimateMessage += " ★ " + format.format(getBeatmap().getStarDifficulty());
-		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm());
-		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate());
+		estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(mods));
+		if(mods == 0)
+			estimateMessage += " ★ " + format.format(getBeatmap().getStarDifficulty());
+		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(mods));
+		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(mods));
 
 		String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
 
