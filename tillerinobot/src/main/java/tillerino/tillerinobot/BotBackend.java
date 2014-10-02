@@ -15,16 +15,18 @@ import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.lang.Language;
 
 public interface BotBackend {
 	/**
 	 * @param beatmapid
 	 * @param mods mods for {@link PercentageEstimates}. These might be ignored if they can't be satisfied
+	 * @param lang TODO
 	 * @return null if not found
 	 * @throws IOException 
 	 * @throws UserException 
 	 */
-	public BeatmapMeta loadBeatmap(int beatmapid, long mods) throws SQLException, IOException, UserException;
+	public BeatmapMeta loadBeatmap(int beatmapid, long mods, Language lang) throws SQLException, IOException, UserException;
 
 	public void saveGivenRecommendation(@Nonnull String nick, int userid, int beatmapid, long mods) throws SQLException;
 
@@ -99,4 +101,26 @@ public interface BotBackend {
 	 * @throws SQLException
 	 */
 	public boolean verifyGeneralKey(String key) throws SQLException;
+	
+	/**
+	 * retreives options for this user as saved through the
+	 * {@link #saveOptions(OsuApiUser, String)} method.
+	 * 
+	 * @param user
+	 * @return may be null or empty string.
+	 * @throws SQLException
+	 */
+	@CheckForNull
+	public String getOptions(int user) throws SQLException;
+	
+	/**
+	 * saves options for this user. options should be saved in a human-readable
+	 * format. care must be taken to keep the format backwards-compatible at all
+	 * times.
+	 * 
+	 * @param user
+	 * @param options
+	 * @throws SQLException
+	 */
+	public void saveOptions(int user, String options) throws SQLException;
 }

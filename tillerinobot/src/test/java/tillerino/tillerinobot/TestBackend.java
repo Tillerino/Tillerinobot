@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,11 +30,11 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.lang.Language;
 
 /**
  * <p>
@@ -95,6 +99,7 @@ public class TestBackend implements BotBackend {
 		OsuApiUser apiUser;
 		boolean isDonator = false;
 		long lastActivity;
+		String options;
 	}
 
 	static class Database {
@@ -112,7 +117,9 @@ public class TestBackend implements BotBackend {
 
 	boolean serialize;
 	
-	public TestBackend(boolean serialize) {
+	@Inject
+	public TestBackend(
+			@Named("tillerinobot.test.persistentBackend") boolean serialize) {
 		this.serialize = serialize;
 		if(serialize) {
 			try (Reader reader = new InputStreamReader(new BufferedInputStream(
@@ -139,7 +146,7 @@ public class TestBackend implements BotBackend {
 	Database database = new Database();
 
 	@Override
-	public BeatmapMeta loadBeatmap(int beatmapid, final long mods)
+	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
 			throws SQLException, IOException, UserException {
 		OsuApiBeatmap beatmap = getBeatmap(beatmapid);
 
@@ -310,7 +317,7 @@ public class TestBackend implements BotBackend {
 		final double equivalent = user.getPp() / 20;
 		for(int i = 1; i <= 10000; i++) {
 			for(long m : mods) {
-				BeatmapMeta meta = loadBeatmap(i, m);
+				BeatmapMeta meta = loadBeatmap(i, m, null);
 				if(Math.abs(1 - ((PercentageEstimates) meta.getEstimates()).getPPForAcc(.98) / equivalent) < .15) {
 					maps.add(meta);
 				}
@@ -357,5 +364,16 @@ public class TestBackend implements BotBackend {
 	@Override
 	public boolean verifyGeneralKey(String key) throws SQLException {
 		return false;
+	}
+	
+	@Override
+	public String getOptions(int user) throws SQLException {
+		return database.users.get(user).options;
+	}
+	
+	@Override
+	public void saveOptions(int user, String options) throws SQLException {
+		database.users.get(user).options = options;
+		writeDatabase();
 	}
 }

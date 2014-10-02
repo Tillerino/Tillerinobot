@@ -2,10 +2,8 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -20,19 +18,19 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.MDC;
-import org.pircbotx.Configuration;
-import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.Utils;
-import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.ActionEvent;
@@ -49,18 +47,27 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
 import tillerino.tillerinobot.UserException.QuietException;
+import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.rest.BotInfoService;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 
 @Slf4j
+@Singleton
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
 	public interface IRCBotUser {
+		/**
+		 * @return the user's IRC nick, not their actual user name.
+		 */
 		String getNick();
 		/**
 		 * 
@@ -77,44 +84,28 @@ public class IRCBot extends CoreHooks {
 		boolean action(String msg);
 	}
 	
-	PircBotX bot;
 	final BotBackend backend;
-	final private String server;
-	final private boolean rememberRecommendations;
 	final private boolean silent;
-	RecommendationsManager manager;
+	final RecommendationsManager manager;
+	final BotInfoService botInfo;
+	final UserDataManager userDataManager;
 	
-	@CheckForNull
-	final BotAPIServer apiServer;
-	
-	public IRCBot(BotBackend backend, String server, int port, String nickname, String password, String autojoinChannel, boolean rememberRecommendations, boolean silent, BotAPIServer apiServer) {
-		this.server = server;
-		Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-				.setServer(server, port).setMessageDelay(2000).setName(nickname).addListener(this).setEncoding(Charset.forName("UTF-8")).setAutoReconnect(false);
-		if(password != null) {
-				configurationBuilder.setServerPassword(password);
-		}
-		if(autojoinChannel != null) {
-			configurationBuilder.addAutoJoinChannel(autojoinChannel);
-		}
-		bot = new PircBotX(configurationBuilder.buildConfiguration());
+	@Inject
+	public IRCBot(BotBackend backend, RecommendationsManager manager,
+			BotInfoService botInfo, UserDataManager userDataManager,
+			Pinger pinger, @Named("tillerinobot.ignore") boolean silent) {
 		this.backend = backend;
-		this.manager = new RecommendationsManager(backend);
-		this.rememberRecommendations = rememberRecommendations;
+		this.manager = manager;
+		this.botInfo = botInfo;
+		this.userDataManager = userDataManager;
+		this.pinger = pinger;
 		this.silent = silent;
-		this.apiServer = apiServer;
-	}
-
-	public void run() throws IOException, IrcException {
-		if(apiServer != null) {
-			apiServer.botInfo.setRunningSince(System.currentTimeMillis());
-		}
-		bot.startBot();
 	}
 
 	@Override
 	public void onConnect(ConnectEvent event) throws Exception {
-		System.out.println("connected!");
+		botInfo.setRunningSince(System.currentTimeMillis());
+		log.info("connected");
 	}
 	
 	@Override
@@ -127,7 +118,7 @@ public class IRCBot extends CoreHooks {
 		}
 	}
 
-	Pattern npPattern = Pattern
+	static final Pattern npPattern = Pattern
 			.compile("(?:is listening to|is watching|is playing) \\[http://osu.ppy.sh/b/(\\d+).*\\]((?: "
 					+ "(?:"
 					+ "-Easy|-NoFail|-HalfTime"
@@ -154,7 +145,13 @@ public class IRCBot extends CoreHooks {
 			return;
 		}
 
+		Language lang = new Default();
+
 		try {
+			OsuApiUser apiUser = getUserOrThrow(user);
+			UserData userData = userDataManager.getData(apiUser.getUserId());
+			lang = userData.getLanguage();
+			
 			checkVersionInfo(user);
 
 			Matcher m = npPattern.matcher(message);
@@ -179,10 +176,10 @@ public class IRCBot extends CoreHooks {
 					mods |= Mods.getMask(mod);
 			}
 
-			BeatmapMeta beatmap = backend.loadBeatmap(beatmapid, mods);
+			BeatmapMeta beatmap = backend.loadBeatmap(beatmapid, mods, lang);
 
 			if (beatmap == null) {
-				user.message("I'm sorry, I don't know that map. It might be very new, very hard, unranked or not standard osu mode.");
+				user.message(lang.unknownBeatmap());
 				return;
 			}
 			
@@ -191,29 +188,26 @@ public class IRCBot extends CoreHooks {
 				PercentageEstimates estimates = (PercentageEstimates) beatmap.getEstimates();
 				
 				if(estimates.getMods() != mods) {
-					addition = "(no data for requested mods)";
+					addition = "(" + lang.noInformationForModsShort() + ")";
 				}
 			}
 
-			Integer userid = backend.resolveIRCName(user.getNick());
-			OsuApiUser apiUser = userid != null ? backend.getUser(userid, 0) : null;
-			if(apiUser == null) {
-				throw new NullPointerException("osu api user was null, but name was already resolved?");
-			}
 			int hearts = backend.getDonator(apiUser);
 			
 			if(user.message(beatmap.formInfoMessage(false, addition, hearts, null))) {
-				songInfoCache.put(user.getNick(), Pair.of(beatmapid, beatmap.getMods()));
+				userData.setLastSongInfo(new BeatmapWithMods(beatmapid, beatmap.getMods()));
+				
+				lang.optionalCommentOnNP(user, apiUser, beatmap);
 			}
 
 		} catch (Throwable e) {
-			handleException(user, e);
+			handleException(user, e, lang);
 		} finally {
 			semaphore.release();
 		}
 	}
 
-	private void handleException(IRCBotUser user, Throwable e) {
+	private void handleException(IRCBotUser user, Throwable e, Language lang) {
 		try {
 			if(e instanceof ExecutionException) {
 				e = e.getCause();
@@ -226,15 +220,18 @@ public class IRCBot extends CoreHooks {
 			} else {
 				String string = getRandomString(6);
 
-				user.message("Something went wrong. If this keeps happening, tell Tillerino to look after incident "
-						+ string + ", please.");
+				if (e instanceof IOException) {
+					user.message(lang.externalException(string));
+				} else {
+					user.message(lang.internalException(string));
+				}
 				log.error(string + ": fucked up", e);
 			}
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
 		}
 	}
-	
+
 	public static String getRandomString(int length) {
 		Random r = new Random();
 		char[] chars = new char[length];
@@ -255,7 +252,7 @@ public class IRCBot extends CoreHooks {
 	
 	Semaphore senderSemaphore = new Semaphore(1, true);
 	
-	Pinger pinger = new Pinger();
+	final Pinger pinger;
 	
 	IRCBotUser fromIRC(final User user) {
 		return new IRCBotUser() {
@@ -269,11 +266,11 @@ public class IRCBot extends CoreHooks {
 					return false;
 				}
 				try {
-					pinger.ping();
+					pinger.ping(user.getBot());
 					
 					user.send().message(msg);
 					log.info("sent: " + msg);
-					apiServer.botInfo.setLastSentMessage(System.currentTimeMillis());
+					botInfo.setLastSentMessage(System.currentTimeMillis());
 					return true;
 				} catch (IOException | InterruptedException e) {
 					log.error("not sent: " + e.getMessage());
@@ -292,7 +289,7 @@ public class IRCBot extends CoreHooks {
 					return false;
 				}
 				try {
-					pinger.ping();
+					pinger.ping(user.getBot());
 					
 					user.send().action(msg);
 					log.info("sent action: " + msg);
@@ -312,11 +309,9 @@ public class IRCBot extends CoreHooks {
 		};
 	}
 	
-	Cache<String, Entry<Integer, Long>> songInfoCache = CacheBuilder.newBuilder().build(); 
-	
-	void processPrivateMessage(final IRCBotUser user, String message) throws IOException {
+	void processPrivateMessage(final IRCBotUser user, final String originalMessage) throws IOException {
 		MDC.put("user", user.getNick());
-		log.info("received: " + message);
+		log.info("received: " + originalMessage);
 
 		Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
@@ -324,27 +319,29 @@ public class IRCBot extends CoreHooks {
 			return;
 		}
 
+		Language lang = new Default();
+
 		try {
-			Integer userid = backend.resolveIRCName(user.getNick());
-			OsuApiUser apiUser = userid != null ? backend.getUser(userid, 0) : null;
+			OsuApiUser apiUser = getUserOrThrow(user);
+			UserData userData = userDataManager.getData(apiUser.getUserId());
+			lang = userData.getLanguage();
 			
-			Pattern hugPattern = Pattern.compile("\\bhugs?\\b");
+			Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
 			
-			if(hugPattern.matcher(message).find()) {
+			if(hugPattern.matcher(originalMessage).find()) {
 				if(apiUser != null && backend.getDonator(apiUser) > 0) {
-					user.message("Come here, you!");
-					user.action("hugs " + apiUser.getUsername());
+					lang.hug(user, apiUser);
 					return;
 				}
 			}
 			
-			if (!message.startsWith("!")) {
+			if (!originalMessage.startsWith("!")) {
 				return;
 			}
 
 			checkVersionInfo(user);
 
-			message = message.substring(1).trim().toLowerCase();
+			String message = originalMessage.substring(1).trim().toLowerCase();
 			
 			boolean isRecommend = false;
 			
@@ -369,98 +366,86 @@ public class IRCBot extends CoreHooks {
 			}
 			
 			if(getLevenshteinDistance(message, "help") <= 1) {
-				user.message("Hi! I'm the robot who killed Tillerino and took over his account. Jk, but I'm still using the account."
-						+ " Check https://twitter.com/Tillerinobot for status and updates!"
-						+ " See https://github.com/Tillerino/Tillerinobot/wiki for commands!");
+				user.message(lang.help());
 			} else if(getLevenshteinDistance(message, "faq") <= 1) {
-				user.message("See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!");
+				user.message(lang.faq());
 			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
 				Recommendation lastRecommendation = manager.getLastRecommendation(user.getNick());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
 					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(lastRecommendation.bareRecommendation.getCauses()));
-					user.message("Your complaint has been filed. Tillerino will look into it when he can.");
+					user.message(lang.complaint());
 				}
 			} else if(isRecommend) {
-				if(apiUser == null) {
-					String string = IRCBot.getRandomString(8);
-					log.error("bot user not resolvable " + string + " name: " + user.getNick());
-					throw new UserException("Your name is confusing me. Did you recently change it? If not, pls contact me and say " + string);
-				}
-				
-				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message);
+				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message, lang);
 				BeatmapMeta beatmap = recommendation.beatmap;
 				
 				if(beatmap == null) {
-					user.message("I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?");
+					user.message(lang.excuseForError());
 					log.error("unknow recommendation occurred");
 					return;
 				}
 				String addition = null;
 				if(recommendation.bareRecommendation.getMods() < 0) {
-					addition = "Try this map with some mods!";
+					addition = lang.tryWithMods();
 				}
 				if(recommendation.bareRecommendation.getMods() > 0 && beatmap.getMods() == 0) {
-					addition = "Try this map with " + Mods.toShortNamesContinuous(Mods.getMods(recommendation.bareRecommendation.getMods()));
+					addition = lang.tryWithMods(Mods.getMods(recommendation.bareRecommendation.getMods()));
 				}
 				
 				int hearts = backend.getDonator(apiUser);
 				
 				if(user.message(beatmap.formInfoMessage(true, addition, hearts, null))) {
-					songInfoCache.put(user.getNick(), Pair.of(beatmap.getBeatmap().getId(), beatmap.getMods()));
-					if(rememberRecommendations) {
-						backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
-					}
+					userData.setLastSongInfo(new BeatmapWithMods(beatmap.getBeatmap().getId(), beatmap.getMods()));
+					backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
+					
+					lang.optionalCommentOnRecommendation(user, apiUser, recommendation);
 				}
 
 			} else if(message.startsWith("with ")) {
-				Entry<Integer, Long> lastSongInfo = songInfoCache.getIfPresent(user.getNick());
+				BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 				if(lastSongInfo == null) {
-					throw new UserException("I don't remember you getting any song info...");
+					throw new UserException(lang.noLastSongInfo());
 				}
 				message = message.substring(5);
 				
 				Long mods = Mods.fromShortNamesContinuous(message);
 				if(mods == null) {
-					throw new UserException("those mods don't look right. mods can be any combination of DT HR HD HT EZ NC FL SO NF. Combine them without any spaces or special chars. Example: !with HDHR, !with DTEZ");
+					throw new UserException(lang.malformattedMods(message));
 				}
 				if(mods == 0)
 					return;
-				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getKey(), mods);
+				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), mods, lang);
 				if(beatmap.getMods() == 0) {
-					throw new UserException("Sorry, I can't provide information for those mods at this time.");
+					throw new UserException(lang.noInformationForMods());
 				}
 				
-				int hearts = 0;
-				if(apiUser != null) {
-					hearts = backend.getDonator(apiUser);
+				int hearts = backend.getDonator(apiUser);
+				
+				if(user.message(beatmap.formInfoMessage(false, null, hearts, null))) {
+					lang.optionalCommentOnWith(user, apiUser, beatmap);
+
+					userData.setLastSongInfo(new BeatmapWithMods(beatmap.beatmap.getId(), beatmap.getMods()));
 				}
-				
-				user.message(beatmap.formInfoMessage(false, null, hearts, null));
-				
-				songInfoCache.put(user.getNick(), Pair.of(beatmap.beatmap.getId(), beatmap.getMods()));
 			} else if (message.startsWith("acc ")) {
-				Entry<Integer, Long> lastSongInfo = songInfoCache.getIfPresent(user
-						.getNick());
+				BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 				if (lastSongInfo == null) {
-					throw new UserException(
-							"I don't remember you getting any song info...");
+					throw new UserException(lang.noLastSongInfo());
 				}
 				message = message.substring(4);
 				Double acc = null;
 				try {
 					acc = Double.parseDouble(message);
 				} catch (Exception e) {
-					throw new UserException("This is not a valid accuracy!");
+					throw new UserException(lang.invalidAccuracy(message));
 				}
 				if (!(acc >= 0 && acc <= 100)) {
-					throw new UserException("This is not a valid accuracy!");
+					throw new UserException(lang.invalidAccuracy(message));
 				}
 				acc = Math.round(acc * 100) / 10000d;
-				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getKey(), lastSongInfo.getValue());
+				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
 
 				if (!(beatmap.getEstimates() instanceof PercentageEstimates)) {
-					throw new UserException(
-							"Sorry, I can't provide that information this time.");
+					throw new UserException(lang.noPercentageEstimates());
 				}
 
 				int hearts = 0;
@@ -469,12 +454,26 @@ public class IRCBot extends CoreHooks {
 				}
 
 				user.message(beatmap.formInfoMessage(false, null, hearts, acc));
+			} else if (message.startsWith("lang ")) {
+				String s = originalMessage.substring(6);
+
+				LanguageIdentifier ident;
+				try {
+					ident = LanguageIdentifier.valueOf(s);
+				} catch (IllegalArgumentException e) {
+					throw new UserException(lang.invalidChoice(s,
+							StringUtils.join(LanguageIdentifier.values())));
+				}
+
+				userData.setLanguage(ident);
+
+				(lang = userData.getLanguage()).optionalCommentOnLanguage(user,
+						apiUser);
 			} else {
-				throw new UserException("unknown command " + message
-						+ ". type !help if you need help!");
+				throw new UserException(lang.unknownCommand(message));
 			}
 		} catch (Throwable e) {
-			handleException(user, e);
+			handleException(user, e, lang);
 		} finally {
 			semaphore.release();
 		}
@@ -489,24 +488,31 @@ public class IRCBot extends CoreHooks {
 		}
 	}
 	
-	void shutDown() {
-		bot.sendIRC().quitServer();
-	}
-	
 	@Override
 	public void onDisconnect(DisconnectEvent event) throws Exception {
+		log.info("disconnected");
 		exec.shutdown();
 	}
 	
-	class Pinger {
+	public static class Pinger {
 		volatile String pingMessage = null;
 		volatile CountDownLatch pingLatch = null;
 		final AtomicBoolean quit = new AtomicBoolean(false);
 		
+		final BotInfoService botInfoService;
+
+		@Inject
+		public Pinger(BotInfoService infoService) {
+			super();
+			this.botInfoService = infoService;
+		}
+
+		long lastquit = 0l;
+
 		/*
 		 * this method is synchronized through the sender semaphore
 		 */
-		void ping() throws IOException, InterruptedException {
+		void ping(PircBotX bot) throws IOException, InterruptedException {
 			try {
 				if(quit.get()) {
 					throw new IOException("ping gate closed");
@@ -528,16 +534,18 @@ public class IRCBot extends CoreHooks {
 				long ping = System.currentTimeMillis() - time;
 
 				if(ping > 1500) {
-					if(apiServer != null) {
-						apiServer.botInfo.setLastPingDeath(System.currentTimeMillis());
+					if (botInfoService != null) {
+						botInfoService.setLastPingDeath(System
+								.currentTimeMillis());
 					}
 					throw new IOException("death ping: " + ping);
 				}
 			} catch(IOException e) {
-				if(!quit.get()) {
-					quit.set(true);
+				if (lastquit < System.currentTimeMillis() - 1000 || !quit.get()) {
 					bot.sendIRC().quitServer();
+					lastquit = System.currentTimeMillis();
 				}
+				quit.set(true);
 				throw e;
 			}
 		}
@@ -562,18 +570,14 @@ public class IRCBot extends CoreHooks {
 	
 	@Override
 	public void onEvent(Event event) throws Exception {
-		MDC.put("server", server);
 		MDC.put("event", lastSerial.incrementAndGet());
-		MDC.put("permanent", rememberRecommendations ? 1 : 0);
 		
-		if(apiServer != null) {
-			apiServer.botInfo.setLastInteraction(System.currentTimeMillis());
-		}
+		botInfo.setLastInteraction(System.currentTimeMillis());
 		
 		if(lastListTime < System.currentTimeMillis() - 60 * 60 * 1000) {
 			lastListTime = System.currentTimeMillis();
 			
-			bot.sendRaw().rawLine("NAMES #osu");
+			event.getBot().sendRaw().rawLine("NAMES #osu");
 		}
 		
 		super.onEvent(event);
@@ -600,18 +604,17 @@ public class IRCBot extends CoreHooks {
 	
 	@Override
 	public void onJoin(JoinEvent event) throws Exception {
-		final String fNick = event.getUser().getNick();
+		final String nick = event.getUser().getNick();
 
-		MDC.put("user", fNick);
+		scheduleRegisterActivity(nick);
+
+		if (silent) {
+			return;
+		}
+
+		MDC.put("user", nick);
 		IRCBotUser user = fromIRC(event.getUser());
 		welcomeIfDonator(user);
-		
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				registerActivity(fNick);
-			}
-		});
 	}
 	
 	void welcomeIfDonator(IRCBotUser user) {
@@ -629,35 +632,12 @@ public class IRCBot extends CoreHooks {
 			if(backend.getDonator(apiUser) > 0) {
 				// this is a donator, let's welcome them!
 				
-				long lastActivity = backend.getLastActivity(apiUser);
+				long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
 				
-				if(lastActivity > System.currentTimeMillis() - 60 * 1000) {
-					user.message("beep boop");
-				} else if(lastActivity > System.currentTimeMillis() - 24 * 60 * 60 * 1000) {
-					user.message("Welcome back, " + apiUser.getUsername() + ".");
-					checkVersionInfo(user);
-				} else if(lastActivity < System.currentTimeMillis() - 7l * 24 * 60 * 60 * 1000) {
-					user.message(apiUser.getUsername() + "...");
-					user.message("...is that you? It's been so long!");
-					checkVersionInfo(user);
-					user.message("It's good to have you back. Can I interest you in a recommendation?");
-				} else {
-					String[] messages = {
-							"you look like you want a recommendation.",
-							"how nice to see you! :)",
-							"my favourite human. (Don't tell the other humans!)",
-							"what a pleasant surprise! ^.^",
-							"I was hoping you'd show up. All the other humans are lame, but don't tell them I said that! :3",
-							"what do you feel like doing today?",
-					};
-					
-					Random random = new Random();
-					
-					String message = messages[random.nextInt(messages.length)];
-					
-					user.message(apiUser.getUsername() + ", " + message);
-					checkVersionInfo(user);
-				} 
+				userDataManager.getData(userid).getLanguage()
+						.welcomeUser(user, apiUser, inactiveTime);
+				
+				checkVersionInfo(user);
 			}
 		} catch (Exception e) {
 			log.error("error welcoming potential donator", e);
@@ -724,7 +704,23 @@ public class IRCBot extends CoreHooks {
 		}
 	}
 
-	public boolean isConnected() {
-		return bot.isConnected();
+	@Nonnull
+	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException {
+		Integer userId = backend.resolveIRCName(user.getNick());
+		
+		if(userId == null) {
+			String string = IRCBot.getRandomString(8);
+			log.error("bot user not resolvable " + string + " name: " + user.getNick());
+			
+			throw new UserException(new Default().unresolvableName(string, user.getNick()));
+		}
+		
+		OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000);
+		
+		if(apiUser == null) {
+			throw new RuntimeException("nickname was resolved, but user not found in api: " + userId);
+		}
+		
+		return apiUser;
 	}
 }

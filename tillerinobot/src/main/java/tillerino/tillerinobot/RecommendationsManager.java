@@ -16,11 +16,15 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import lombok.Data;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+
+import tillerino.tillerinobot.lang.Language;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -32,6 +36,7 @@ import com.google.common.cache.LoadingCache;
  * 
  * @author Tillerino
  */
+@Singleton
 public class RecommendationsManager {
 	/**
 	 * Recommendation as returned by the backend. Needs to be enriched before being displayed.
@@ -166,6 +171,7 @@ public class RecommendationsManager {
 	
 	BotBackend backend;
 
+	@Inject
 	public RecommendationsManager(BotBackend backend) {
 		this.backend = backend;
 	}
@@ -197,12 +203,13 @@ public class RecommendationsManager {
 	 * get an ready-to-display recommendation
 	 * @param ircName for legacy reasons, the IRC name is used to save recommendations
 	 * @param message the remaining arguments ("r" or "recommend" were removed)
+	 * @param lang TODO
 	 * @return
 	 * @throws UserException
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	public Recommendation getRecommendation(String ircName, @Nonnull OsuApiUser apiUser, String message) throws UserException, SQLException, IOException {
+	public Recommendation getRecommendation(String ircName, @Nonnull OsuApiUser apiUser, String message, Language lang) throws UserException, SQLException, IOException {
 		/*
 		 * log activity making sure that we can resolve the user's IRC name
 		 */
@@ -222,29 +229,30 @@ public class RecommendationsManager {
 		long requestMods = 0;
 		
 		for (int i = 0; i < remaining.length; i++) {
-			if(remaining[i].length() == 0)
+			String param = remaining[i];
+			if(param.length() == 0)
 				continue;
-			if(getLevenshteinDistance(remaining[i], "nomod") <= 2) {
+			if(getLevenshteinDistance(param, "nomod") <= 2) {
 				nomod = true;
 				continue;
 			}
-			if(getLevenshteinDistance(remaining[i], "relax") <= 2) {
+			if(getLevenshteinDistance(param, "relax") <= 2) {
 				model = Model.ALPHA;
 				continue;
 			}
-			if(getLevenshteinDistance(remaining[i], "gamma") <= 2) {
+			if(getLevenshteinDistance(param, "gamma") <= 2) {
 				model = Model.GAMMA;
 				continue;
 			}
-			if(model == Model.GAMMA && remaining[i].equals("dt")) {
+			if(model == Model.GAMMA && param.equals("dt")) {
 				requestMods |= Mods.getMask(Mods.DoubleTime);
 				continue;
 			}
-			if(model == Model.GAMMA &&  remaining[i].equals("hr")) {
+			if(model == Model.GAMMA &&  param.equals("hr")) {
 				requestMods |= Mods.getMask(Mods.HardRock);
 				continue;
 			}
-			throw new UserException("I don't know what \"" + remaining[i] + "\" is supposed to mean. Try !help if you need some pointers.");
+			throw new UserException(lang.unknownRecommendationParameter(param));
 		}
 		
 		/*
@@ -252,19 +260,20 @@ public class RecommendationsManager {
 		 */
 		
 		if(nomod && requestMods != 0) {
-			throw new UserException("nomod with mods?");
+			throw new UserException(lang.mixedNomodAndMods());
 		}
 		
 		if(model == Model.GAMMA) {
-			if(apiUser.getRank() > 25000) {
+			int minRank = 25000;
+			if(apiUser.getRank() > minRank) {
 				apiUser = backend.getUser(userid, 1);
 				
 				if(apiUser == null) {
 					throw new RuntimeException("trolled by the API? " + userid);
 				}
 				
-				if(apiUser.getRank() > 25000) {
-					throw new UserException("Sorry, at this point gamma recommendations are only available for players who have surpassed rank 25k.");
+				if(apiUser.getRank() > minRank) {
+					throw new UserException(lang.featureRankRestricted("gamma", minRank, apiUser));
 				}
 			}
 		}
@@ -290,7 +299,7 @@ public class RecommendationsManager {
 			samplers.invalidate(userid);
 			givenRecomendations.put(userid, new ArrayList<Integer>());
 			lastRecommendation.invalidate(ircName);
-			throw new UserException("I've recommended everything that I can think of. Try again to start over!");
+			throw new UserException(lang.outOfRecommendations());
 		}
 		
 		/*
@@ -308,14 +317,14 @@ public class RecommendationsManager {
 		BeatmapMeta loadBeatmap;
 		try {
 			if(sample.getMods() < 0) {
-				loadBeatmap = backend.loadBeatmap(beatmapid, 0);
+				loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
 			} else {
-				loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods());
+				loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods(), lang);
 				if(loadBeatmap == null)
-					loadBeatmap = backend.loadBeatmap(beatmapid, 0);
+					loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
 			}
 		} catch (NotRankedException e) {
-			throw new UserException("I'm sorry, I wasn't paying attention. Could you repeat that?");
+			throw new UserException(lang.excuseForError());
 		}
 		recommendation.beatmap = loadBeatmap;
 		
@@ -330,7 +339,7 @@ public class RecommendationsManager {
 		
 		return recommendation;
 	}
-	
+
 	/**
 	 * returns
 	 * @param recommendations

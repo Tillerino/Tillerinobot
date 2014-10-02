@@ -1,12 +1,11 @@
 package tillerino.tillerinobot;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import org.glassfish.jersey.server.ResourceConfig;
 
 import tillerino.tillerinobot.rest.BeatmapInfoService;
 import tillerino.tillerinobot.rest.BotInfoService;
@@ -15,40 +14,14 @@ import tillerino.tillerinobot.rest.RecommendationHistoryService;
 /**
  * @author Tillerino
  */
-public class BotAPIServer extends Application {
-	public IRCBot bot;
-	public BotBackend backend;
-	
-	public BotAPIServer(BotBackend backend) {
-		this.backend = backend;
-	}
+public class BotAPIServer extends ResourceConfig {
+	@Inject
+	public BotAPIServer(BotRunner bot, BotBackend backend,
+			BotInfoService botInfo, RecommendationHistoryService history,
+			BeatmapInfoService beatmapInfo) {
+		super();
 
-	BotInfoService botInfo = new BotInfoService(this);
-	RecommendationHistoryService history = new RecommendationHistoryService(this);
-	BeatmapInfoService beatmapInfo = new BeatmapInfoService(this);
-	
-	Set<Object> singletons = new HashSet<>();
-	
-	{
-		singletons.add(botInfo);
-		singletons.add(history);
-		singletons.add(beatmapInfo);
-	}
-	
-	@Override
-	public Set<Object> getSingletons() {
-		return singletons;
-	}
-	
-	Set<Class<?>> classes = new HashSet<>();
-	
-	@Override
-	public Set<Class<?>> getClasses() {
-		return classes;
-	}
-	
-	public void setBot(IRCBot bot) {
-		this.bot = bot;
+		registerInstances(botInfo, history, beatmapInfo);
 	}
 
 	public static void throwUnautorized(boolean authorized) throws WebApplicationException {

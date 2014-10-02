@@ -11,6 +11,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,15 +32,19 @@ import com.google.common.cache.LoadingCache;
 import lombok.Data;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotAPIServer;
+import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
+import tillerino.tillerinobot.lang.Default;
 
+@Singleton
 @Path("/beatmapinfo")
 public class BeatmapInfoService {
-	private BotAPIServer server;
+	private BotBackend backend;
 
-	public BeatmapInfoService(BotAPIServer server) {
-		this.server = server;
+	@Inject
+	public BeatmapInfoService(BotBackend server) {
+		this.backend = server;
 	}
 
 	ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -52,7 +58,9 @@ public class BeatmapInfoService {
 						@Override
 						public BeatmapMeta call() throws SQLException {
 							try {
-								BeatmapMeta beatmap = server.backend.loadBeatmap(key.getKey(), key.getValue());
+								BeatmapMeta beatmap = backend.loadBeatmap(
+										key.getKey(), key.getValue(),
+										new Default());
 								
 								if(beatmap == null) {
 									throw BotAPIServer.getNotFound("Beatmap " + key.getKey() + " not found.");
@@ -79,7 +87,7 @@ public class BeatmapInfoService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") int beatmapid, @QueryParam("mods") long mods, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
-		BotAPIServer.throwUnautorized(server.backend.verifyGeneralKey(key));
+		BotAPIServer.throwUnautorized(backend.verifyGeneralKey(key));
 		
 		mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
 		
