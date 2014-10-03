@@ -200,7 +200,7 @@ public class IRCBot extends CoreHooks {
 			}
 			int hearts = backend.getDonator(apiUser);
 			
-			if(user.message(beatmap.formInfoMessage(false, addition, hearts))) {
+			if(user.message(beatmap.formInfoMessage(false, addition, hearts, 0))) {
 				songInfoCache.put(user.getNick(), beatmapid);
 			}
 
@@ -402,7 +402,7 @@ public class IRCBot extends CoreHooks {
 				
 				int hearts = backend.getDonator(apiUser);
 				
-				if(user.message(recommendation.beatmap.formInfoMessage(true, addition, hearts))) {
+				if(user.message(recommendation.beatmap.formInfoMessage(true, addition, hearts, 0))) {
 					songInfoCache.put(user.getNick(), recommendation.beatmap.getBeatmap().getId());
 					if(rememberRecommendations) {
 						backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), recommendation.beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
@@ -432,7 +432,34 @@ public class IRCBot extends CoreHooks {
 					hearts = backend.getDonator(apiUser);
 				}
 				
-				user.message(beatmap.formInfoMessage(false, null, hearts));
+				user.message(beatmap.formInfoMessage(false, null, hearts, 0));
+
+
+			} else if(message.startsWith("acc ")) {
+				Integer lastSongInfo = songInfoCache.getIfPresent(user.getNick());
+				if(lastSongInfo == null) {
+					throw new UserException("I don't remember you getting any song info...");
+				}
+				message = message.substring(4);
+				double acc = 0;
+				try {
+					acc = Double.parseDouble(message);
+				}
+				catch(Exception e) {
+					throw new UserException("This is not a valid accuracy!");
+				}
+				if(!(acc >= 0 && acc <= 100)) {
+					throw new UserException("This is not a valid accuracy!");
+				}
+				acc = acc / 100D;
+				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo, 0);
+				
+				int hearts = 0;
+				if(apiUser != null) {
+					hearts = backend.getDonator(apiUser);
+				}
+				
+				user.message(beatmap.formInfoMessage(false, null, hearts, acc));
 			} else {
 				throw new UserException("unknown command " + message
 						+ ". type !help if you need help!");
