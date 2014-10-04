@@ -44,7 +44,7 @@ public class BeatmapMeta {
 
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#");
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, double acc) {
+	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc) {
 		
 		String beatmapName = getBeatmap().getArtist() + " - " + getBeatmap().getTitle()
 				+ " [" + getBeatmap().getVersion() + "]";
@@ -91,10 +91,10 @@ public class BeatmapMeta {
 		} else if (estimates instanceof PercentageEstimates) {
 			PercentageEstimates percentageEstimates = (PercentageEstimates) estimates;
 
-			if(acc != 0) {
-				estimateMessage += noDecimalsFormat.format(acc*100D)+"%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(acc)) + "pp";
-			}
-			else {
+			if(acc != null) {
+				estimateMessage += format.format(acc * 100) + "%: "
+						+ noDecimalsFormat.format(percentageEstimates.getPPForAcc(acc)) + "pp";
+			} else {
 				estimateMessage += "95%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.95)) + "pp";
 				estimateMessage += " | 98%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.98)) + "pp";
 				estimateMessage += " | 99%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.99)) + "pp";
@@ -132,10 +132,5 @@ public class BeatmapMeta {
 		}
 		
 		return 0;
-	}
-
-
-	public double getPPForAcc(double acc) {
-		return ((PercentageEstimates) getEstimates()).getPPForAcc(acc);
 	}
 }
