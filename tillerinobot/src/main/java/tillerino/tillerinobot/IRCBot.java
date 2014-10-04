@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -24,6 +25,7 @@ import javax.annotation.CheckForNull;
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.MDC;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
@@ -200,8 +202,8 @@ public class IRCBot extends CoreHooks {
 			}
 			int hearts = backend.getDonator(apiUser);
 			
-			if(user.message(beatmap.formInfoMessage(false, addition, hearts))) {
-				songInfoCache.put(user.getNick(), beatmapid);
+			if(user.message(beatmap.formInfoMessage(false, addition, hearts, null))) {
+				songInfoCache.put(user.getNick(), Pair.of(beatmapid, beatmap.getMods()));
 			}
 
 		} catch (Throwable e) {
@@ -310,7 +312,7 @@ public class IRCBot extends CoreHooks {
 		};
 	}
 	
-	Cache<String, Integer> songInfoCache = CacheBuilder.newBuilder().build(); 
+	Cache<String, Entry<Integer, Long>> songInfoCache = CacheBuilder.newBuilder().build(); 
 	
 	void processPrivateMessage(final IRCBotUser user, String message) throws IOException {
 		MDC.put("user", user.getNick());
@@ -386,8 +388,9 @@ public class IRCBot extends CoreHooks {
 				}
 				
 				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message);
-
-				if(recommendation.beatmap == null) {
+				BeatmapMeta beatmap = recommendation.beatmap;
+				
+				if(beatmap == null) {
 					user.message("I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?");
 					log.error("unknow recommendation occurred");
 					return;
@@ -396,21 +399,21 @@ public class IRCBot extends CoreHooks {
 				if(recommendation.bareRecommendation.getMods() < 0) {
 					addition = "Try this map with some mods!";
 				}
-				if(recommendation.bareRecommendation.getMods() > 0 && recommendation.beatmap.getMods() == 0) {
+				if(recommendation.bareRecommendation.getMods() > 0 && beatmap.getMods() == 0) {
 					addition = "Try this map with " + Mods.toShortNamesContinuous(Mods.getMods(recommendation.bareRecommendation.getMods()));
 				}
 				
 				int hearts = backend.getDonator(apiUser);
 				
-				if(user.message(recommendation.beatmap.formInfoMessage(true, addition, hearts))) {
-					songInfoCache.put(user.getNick(), recommendation.beatmap.getBeatmap().getId());
+				if(user.message(beatmap.formInfoMessage(true, addition, hearts, null))) {
+					songInfoCache.put(user.getNick(), Pair.of(beatmap.getBeatmap().getId(), beatmap.getMods()));
 					if(rememberRecommendations) {
-						backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), recommendation.beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
+						backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
 					}
 				}
 
 			} else if(message.startsWith("with ")) {
-				Integer lastSongInfo = songInfoCache.getIfPresent(user.getNick());
+				Entry<Integer, Long> lastSongInfo = songInfoCache.getIfPresent(user.getNick());
 				if(lastSongInfo == null) {
 					throw new UserException("I don't remember you getting any song info...");
 				}
@@ -422,7 +425,7 @@ public class IRCBot extends CoreHooks {
 				}
 				if(mods == 0)
 					return;
-				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo, mods);
+				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getKey(), mods);
 				if(beatmap.getMods() == 0) {
 					throw new UserException("Sorry, I can't provide information for those mods at this time.");
 				}
@@ -432,7 +435,40 @@ public class IRCBot extends CoreHooks {
 					hearts = backend.getDonator(apiUser);
 				}
 				
-				user.message(beatmap.formInfoMessage(false, null, hearts));
+				user.message(beatmap.formInfoMessage(false, null, hearts, null));
+				
+				songInfoCache.put(user.getNick(), Pair.of(beatmap.beatmap.getId(), beatmap.getMods()));
+			} else if (message.startsWith("acc ")) {
+				Entry<Integer, Long> lastSongInfo = songInfoCache.getIfPresent(user
+						.getNick());
+				if (lastSongInfo == null) {
+					throw new UserException(
+							"I don't remember you getting any song info...");
+				}
+				message = message.substring(4);
+				Double acc = null;
+				try {
+					acc = Double.parseDouble(message);
+				} catch (Exception e) {
+					throw new UserException("This is not a valid accuracy!");
+				}
+				if (!(acc >= 0 && acc <= 100)) {
+					throw new UserException("This is not a valid accuracy!");
+				}
+				acc = Math.round(acc * 100) / 10000d;
+				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getKey(), lastSongInfo.getValue());
+
+				if (!(beatmap.getEstimates() instanceof PercentageEstimates)) {
+					throw new UserException(
+							"Sorry, I can't provide that information this time.");
+				}
+
+				int hearts = 0;
+				if (apiUser != null) {
+					hearts = backend.getDonator(apiUser);
+				}
+
+				user.message(beatmap.formInfoMessage(false, null, hearts, acc));
 			} else {
 				throw new UserException("unknown command " + message
 						+ ". type !help if you need help!");
