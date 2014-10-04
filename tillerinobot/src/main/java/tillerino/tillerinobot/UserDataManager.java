@@ -20,6 +20,7 @@ import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.lang.Tsundere;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
 import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
@@ -60,7 +61,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 	 */
 	public static class UserData {
 		public enum LanguageIdentifier {
-			Default(Default.class);
+			Default(Default.class),
+			Tsundere(Tsundere.class);
 			
 			Class<? extends Language> cls;
 

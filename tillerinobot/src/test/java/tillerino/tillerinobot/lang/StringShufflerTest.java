@@ -39,4 +39,30 @@ public class StringShufflerTest {
 			}
 		}
 	}
+	
+	@Test
+	public void testInTsundere() {
+		Tsundere tsundere = new Tsundere();
+		
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		
+		for(int i = 1; i <= 100; i++) {
+			for (int j = 0; j < 3; j++) {
+				String s = tsundere.unknownBeatmap();
+				
+				Integer x = map.get(s);
+				if(x == null) {
+					x = 0;
+				}
+				
+				x++;
+				
+				map.put(s, x);
+			}
+			
+			for (Integer count : map.values()) {
+				assertEquals(i, (int) count);
+			}
+		}
+	}
 }
