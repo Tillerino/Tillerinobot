@@ -69,7 +69,6 @@ public class RecommendationsManager {
 	@Data
 	public static class GivenRecommendation {
 		public int userid;
-		public String username;
 		public int beatmapid;
 		public long date;
 		public long mods;
@@ -176,7 +175,8 @@ public class RecommendationsManager {
 		this.backend = backend;
 	}
 	
-	public Cache<String, Recommendation> lastRecommendation = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
+	public Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
+			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
 
 	public LoadingCache<Integer, List<Integer>> givenRecomendations =  CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build(new CacheLoader<Integer, List<Integer>>() {
 		@Override
@@ -195,13 +195,12 @@ public class RecommendationsManager {
 	public Cache<Integer, Sampler> samplers = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).maximumSize(100).build();
 
 	@CheckForNull
-	public Recommendation getLastRecommendation(String nick) {
-		return lastRecommendation.getIfPresent(nick);
+	public Recommendation getLastRecommendation(Integer userid) {
+		return lastRecommendation.getIfPresent(userid);
 	}
 
 	/**
 	 * get an ready-to-display recommendation
-	 * @param ircName for legacy reasons, the IRC name is used to save recommendations
 	 * @param message the remaining arguments ("r" or "recommend" were removed)
 	 * @param lang TODO
 	 * @return
@@ -209,7 +208,7 @@ public class RecommendationsManager {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	public Recommendation getRecommendation(String ircName, @Nonnull OsuApiUser apiUser, String message, Language lang) throws UserException, SQLException, IOException {
+	public Recommendation getRecommendation(@Nonnull OsuApiUser apiUser, String message, Language lang) throws UserException, SQLException, IOException {
 		/*
 		 * log activity making sure that we can resolve the user's IRC name
 		 */
@@ -297,8 +296,6 @@ public class RecommendationsManager {
 		
 		if(sampler.isEmpty()) {
 			samplers.invalidate(userid);
-			givenRecomendations.put(userid, new ArrayList<Integer>());
-			lastRecommendation.invalidate(ircName);
 			throw new UserException(lang.outOfRecommendations());
 		}
 		
@@ -335,7 +332,7 @@ public class RecommendationsManager {
 		 */
 		
 		givenRecomendations.getUnchecked(userid).add(beatmapid);
-		lastRecommendation.put(ircName, recommendation);
+		lastRecommendation.put(userid, recommendation);
 		
 		return recommendation;
 	}
@@ -360,5 +357,10 @@ public class RecommendationsManager {
 		arrayList.addAll(list.subList(0, size));
 		
 		return arrayList;
+	}
+
+	public void forgetRecommendations(int userid) throws SQLException {
+		givenRecomendations.getUnchecked(userid).clear();
+		backend.forgetRecommendations(userid);
 	}
 }

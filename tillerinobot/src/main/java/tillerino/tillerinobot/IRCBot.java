@@ -3,7 +3,9 @@ package tillerino.tillerinobot;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +28,7 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.MDC;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -49,8 +51,9 @@ import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
 import tillerino.tillerinobot.UserException.QuietException;
+import tillerino.tillerinobot.handlers.OptionsHandler;
+import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BotInfoService;
@@ -84,11 +87,17 @@ public class IRCBot extends CoreHooks {
 		boolean action(String msg);
 	}
 	
+	public interface CommandHandler {
+		public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
+				throws UserException, IOException, SQLException;
+	}
+	
 	final BotBackend backend;
 	final private boolean silent;
 	final RecommendationsManager manager;
 	final BotInfoService botInfo;
 	final UserDataManager userDataManager;
+	final List<CommandHandler> commandHandlers = new ArrayList<>();
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
@@ -100,6 +109,9 @@ public class IRCBot extends CoreHooks {
 		this.userDataManager = userDataManager;
 		this.pinger = pinger;
 		this.silent = silent;
+		
+		commandHandlers.add(new ResetHandler(manager));
+		commandHandlers.add(new OptionsHandler());
 	}
 
 	@Override
@@ -139,13 +151,13 @@ public class IRCBot extends CoreHooks {
 		MDC.put("user", user.getNick());
 		log.info("action: " + message);
 		
+		Language lang = new Default();
+
 		Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
 			log.warn("concurrent action");
 			return;
 		}
-
-		Language lang = new Default();
 
 		try {
 			OsuApiUser apiUser = getUserOrThrow(user);
@@ -192,14 +204,11 @@ public class IRCBot extends CoreHooks {
 				}
 			}
 
-			int hearts = backend.getDonator(apiUser);
-			
-			if(user.message(beatmap.formInfoMessage(false, addition, hearts, null))) {
+			if(user.message(beatmap.formInfoMessage(false, addition, userData.getHearts(), null))) {
 				userData.setLastSongInfo(new BeatmapWithMods(beatmapid, beatmap.getMods()));
 				
 				lang.optionalCommentOnNP(user, apiUser, beatmap);
 			}
-
 		} catch (Throwable e) {
 			handleException(user, e, lang);
 		} finally {
@@ -309,17 +318,18 @@ public class IRCBot extends CoreHooks {
 		};
 	}
 	
-	void processPrivateMessage(final IRCBotUser user, final String originalMessage) throws IOException {
+	void processPrivateMessage(final IRCBotUser user, String originalMessage)
+			throws IOException {
 		MDC.put("user", user.getNick());
 		log.info("received: " + originalMessage);
+
+		Language lang = new Default();
 
 		Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
 			log.warn("concurrent message");
 			return;
 		}
-
-		Language lang = new Default();
 
 		try {
 			OsuApiUser apiUser = getUserOrThrow(user);
@@ -329,7 +339,7 @@ public class IRCBot extends CoreHooks {
 			Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
 			
 			if(hugPattern.matcher(originalMessage).find()) {
-				if(apiUser != null && backend.getDonator(apiUser) > 0) {
+				if (apiUser != null && userData.getHearts() > 0) {
 					lang.hug(user, apiUser);
 					return;
 				}
@@ -338,10 +348,11 @@ public class IRCBot extends CoreHooks {
 			if (!originalMessage.startsWith("!")) {
 				return;
 			}
+			originalMessage = originalMessage.substring(1);
 
 			checkVersionInfo(user);
 
-			String message = originalMessage.substring(1).trim().toLowerCase();
+			String message = originalMessage.trim().toLowerCase();
 			
 			boolean isRecommend = false;
 			
@@ -370,13 +381,14 @@ public class IRCBot extends CoreHooks {
 			} else if(getLevenshteinDistance(message, "faq") <= 1) {
 				user.message(lang.faq());
 			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
-				Recommendation lastRecommendation = manager.getLastRecommendation(user.getNick());
+				Recommendation lastRecommendation = manager
+						.getLastRecommendation(apiUser.getUserId());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
-					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(lastRecommendation.bareRecommendation.getCauses()));
+					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.getCauses())));
 					user.message(lang.complaint());
 				}
 			} else if(isRecommend) {
-				Recommendation recommendation = manager.getRecommendation(user.getNick(), apiUser, message, lang);
+				Recommendation recommendation = manager.getRecommendation(apiUser, message, lang);
 				BeatmapMeta beatmap = recommendation.beatmap;
 				
 				if(beatmap == null) {
@@ -392,11 +404,9 @@ public class IRCBot extends CoreHooks {
 					addition = lang.tryWithMods(Mods.getMods(recommendation.bareRecommendation.getMods()));
 				}
 				
-				int hearts = backend.getDonator(apiUser);
-				
-				if(user.message(beatmap.formInfoMessage(true, addition, hearts, null))) {
+				if(user.message(beatmap.formInfoMessage(true, addition, userData.getHearts(), null))) {
 					userData.setLastSongInfo(new BeatmapWithMods(beatmap.getBeatmap().getId(), beatmap.getMods()));
-					backend.saveGivenRecommendation(user.getNick(), apiUser.getUserId(), beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
+					backend.saveGivenRecommendation(apiUser.getUserId(), beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
 					
 					lang.optionalCommentOnRecommendation(user, apiUser, recommendation);
 				}
@@ -419,9 +429,7 @@ public class IRCBot extends CoreHooks {
 					throw new UserException(lang.noInformationForMods());
 				}
 				
-				int hearts = backend.getDonator(apiUser);
-				
-				if(user.message(beatmap.formInfoMessage(false, null, hearts, null))) {
+				if(user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), null))) {
 					lang.optionalCommentOnWith(user, apiUser, beatmap);
 
 					userData.setLastSongInfo(new BeatmapWithMods(beatmap.beatmap.getId(), beatmap.getMods()));
@@ -448,29 +456,17 @@ public class IRCBot extends CoreHooks {
 					throw new UserException(lang.noPercentageEstimates());
 				}
 
-				int hearts = 0;
-				if (apiUser != null) {
-					hearts = backend.getDonator(apiUser);
-				}
-
-				user.message(beatmap.formInfoMessage(false, null, hearts, acc));
-			} else if (message.startsWith("lang ")) {
-				String s = originalMessage.substring(6);
-
-				LanguageIdentifier ident;
-				try {
-					ident = LanguageIdentifier.valueOf(s);
-				} catch (IllegalArgumentException e) {
-					throw new UserException(lang.invalidChoice(s,
-							StringUtils.join(LanguageIdentifier.values())));
-				}
-
-				userData.setLanguage(ident);
-
-				(lang = userData.getLanguage()).optionalCommentOnLanguage(user,
-						apiUser);
+				user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc));
 			} else {
-				throw new UserException(lang.unknownCommand(message));
+				boolean handled = false;
+				for (CommandHandler handler : commandHandlers) {
+					if (handled = handler.handle(originalMessage, user,	apiUser, userData)) {
+						break;
+					}
+				}
+				if (!handled) {
+					throw new UserException(lang.unknownCommand(message));
+				}
 			}
 		} catch (Throwable e) {
 			handleException(user, e, lang);
@@ -606,8 +602,6 @@ public class IRCBot extends CoreHooks {
 	public void onJoin(JoinEvent event) throws Exception {
 		final String nick = event.getUser().getNick();
 
-		scheduleRegisterActivity(nick);
-
 		if (silent) {
 			return;
 		}
@@ -615,6 +609,8 @@ public class IRCBot extends CoreHooks {
 		MDC.put("user", nick);
 		IRCBotUser user = fromIRC(event.getUser());
 		welcomeIfDonator(user);
+
+		scheduleRegisterActivity(nick);
 	}
 	
 	void welcomeIfDonator(IRCBotUser user) {
@@ -694,7 +690,6 @@ public class IRCBot extends CoreHooks {
 			Integer userid = backend.resolveIRCName(fNick);
 			
 			if(userid == null) {
-				log.warn("user " + fNick + " could not be found");
 				return;
 			}
 			

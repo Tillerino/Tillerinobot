@@ -156,7 +156,8 @@ public class Default implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "I've recommended everything that I can think of. Try again to start over!";
+		return "I've recommended everything that I can think of."
+				+ " Try other recommendation options or use !reset. If you're not sure, check !help.";
 	}
 
 	@Override
@@ -211,5 +212,10 @@ public class Default implements Language {
 	public String invalidChoice(String invalid, String choices) {
 		return "I'm sorry, but \"" + invalid
 				+ "\" does not compute. Try one of these: " + choices + "!";
+	}
+
+	@Override
+	public String setFormat() {
+		return "The syntax to set a parameter is !set option value. Try !help if you need more pointers.";
 	}
 }

@@ -28,7 +28,7 @@ public interface BotBackend {
 	 */
 	public BeatmapMeta loadBeatmap(int beatmapid, long mods, Language lang) throws SQLException, IOException, UserException;
 
-	public void saveGivenRecommendation(@Nonnull String nick, int userid, int beatmapid, long mods) throws SQLException;
+	public void saveGivenRecommendation(int userid, int beatmapid, long mods) throws SQLException;
 
 	/**
 	 * @return the last version of the bot that was visited by this user. -1 if no information available.
@@ -123,4 +123,12 @@ public interface BotBackend {
 	 * @throws SQLException
 	 */
 	public void saveOptions(int user, String options) throws SQLException;
+
+	/**
+	 * forgets all given recommendations of the past for a single user
+	 * 
+	 * @param user
+	 * @throws SQLException
+	 */
+	public void forgetRecommendations(int user) throws SQLException;
 }

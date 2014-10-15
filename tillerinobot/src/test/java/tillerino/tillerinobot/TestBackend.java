@@ -228,14 +228,12 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public void saveGivenRecommendation(String nick, int userid, int beatmapid,
-			long mods) throws SQLException {
+	public void saveGivenRecommendation(int userid, int beatmapid, long mods) throws SQLException {
 		GivenRecommendation rec = new GivenRecommendation();
 		rec.beatmapid = beatmapid;
 		rec.date = System.currentTimeMillis();
 		rec.mods = mods;
 		rec.userid = userid;
-		rec.username = nick;
 		database.users.get(userid).givenRecommendations.add(rec);
 		writeDatabase();
 	}
@@ -375,5 +373,10 @@ public class TestBackend implements BotBackend {
 	public void saveOptions(int user, String options) throws SQLException {
 		database.users.get(user).options = options;
 		writeDatabase();
+	}
+
+	@Override
+	public void forgetRecommendations(int user) throws SQLException {
+		database.users.get(user).givenRecommendations.clear();
 	}
 }

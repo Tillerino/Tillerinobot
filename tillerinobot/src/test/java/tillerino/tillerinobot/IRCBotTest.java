@@ -3,16 +3,23 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.IRCBot.Pinger;
+import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
+import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.rest.BotInfoService;
 
 public class IRCBotTest {
@@ -129,7 +136,88 @@ public class IRCBotTest {
 	}
 	
 	@Test
-	public void testNP() throws Exception {
+	public void testComplaint() throws Exception {
+		IRCBot bot = getTestBot(backend);
+
+		backend.hintUser("user", false, 0, 1000);
+
+		IRCBotUser botUser = mock(IRCBotUser.class);
+		when(botUser.getNick()).thenReturn("user");
+
+		bot.processPrivateMessage(botUser, "!r");
+		bot.processPrivateMessage(botUser, "!complain");
 		
+		verify(botUser, times(1)).message(contains("complaint"));
+	}
+
+	@Test
+	public void testResetHandler() throws Exception {
+		IRCBot bot = getTestBot(backend);
+
+		backend.hintUser("user", false, 0, 1000);
+
+		IRCBotUser botUser = mock(IRCBotUser.class);
+		when(botUser.getNick()).thenReturn("user");
+
+		bot.processPrivateMessage(botUser, "!reset");
+
+		Integer id = backend.resolveIRCName("user");
+
+		verify(backend).forgetRecommendations(id);
+		verify(bot.manager).forgetRecommendations(id);
+	}
+
+	IRCBotUser mockBotUser(String name) {
+		IRCBotUser botUser = mock(IRCBotUser.class);
+		when(botUser.getNick()).thenReturn("user");
+		when(botUser.message(anyString())).thenAnswer(new Answer<Boolean>() {
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+				System.out.println(invocation.getArguments()[0]);
+				return true;
+			}
+		});
+		return botUser;
+	}
+
+	@Test
+	public void testProperEmptySamplerHandling() throws Exception {
+		TestBackend backend = new TestBackend(false) {
+			@Override
+			public Collection<BareRecommendation> loadRecommendations(
+					int userid, Collection<Integer> exclude, Model model,
+					boolean nomod, long requestMods) throws SQLException,
+					IOException, UserException {
+				if (exclude.contains(1)) {
+					return Collections.emptyList();
+				}
+
+				BareRecommendation bareRecommendation = mock(BareRecommendation.class);
+				when(bareRecommendation.getProbability()).thenReturn(1d);
+				when(bareRecommendation.getBeatmapId()).thenReturn(1);
+				return Arrays.asList(bareRecommendation);
+			}
+		};
+		IRCBot bot = getTestBot(backend);
+
+		backend.hintUser("user", false, 0, 1000);
+
+		IRCBotUser botUser = mockBotUser("user");
+
+		bot.processPrivateMessage(botUser, "!r");
+		verify(botUser, times(1)).message(contains("/b/1"));
+
+		bot.processPrivateMessage(botUser, "!r");
+		verify(botUser, times(1)).message(contains("!reset"));
+		verify(botUser, times(1)).message(contains("/b/1"));
+
+		bot.processPrivateMessage(botUser, "!r");
+		verify(botUser, times(2)).message(contains("!reset"));
+		verify(botUser, times(1)).message(contains("/b/1"));
+
+		bot.processPrivateMessage(botUser, "!reset");
+
+		bot.processPrivateMessage(botUser, "!r");
+		verify(botUser, times(2)).message(contains("/b/1"));
 	}
 }

@@ -1,5 +1,6 @@
 package tillerino.tillerinobot;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -9,6 +10,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
@@ -39,6 +42,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Singleton
 public class UserDataManager {
+	/**
+	 * Bot-specific user data. It is only saved when changed and responsible for
+	 * determining if it has been changed. Manual getters and setters must be
+	 * written with caution.
+	 * 
+	 * @author Tillerino
+	 */
 	public static class UserData {
 		public enum LanguageIdentifier {
 			Default(Default.class);
@@ -121,6 +131,17 @@ public class UserDataManager {
 		 * at the end because it may get large.
 		 */
 		JsonObject serializedLanguage;
+
+		transient BotBackend backend;
+
+		transient int userid;
+
+		public int getHearts() throws SQLException, IOException {
+			OsuApiUser user = backend.getUser(userid, 0);
+			if (user == null)
+				return 0;
+			return backend.getDonator(user);
+		}
 	}
 	
 	BotBackend backend;
@@ -144,9 +165,7 @@ public class UserDataManager {
 		} catch (ExecutionException e) {
 			try {
 				throw e.getCause();
-			} catch (SQLException f) {
-				throw f;
-			} catch (RuntimeException f) {
+			} catch (SQLException | RuntimeException f) {
 				throw f;
 			} catch (Throwable f) {
 				throw new RuntimeException(e);
@@ -175,7 +194,7 @@ public class UserDataManager {
 	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
 			.create();
 	
-	private UserData load(Integer key) throws SQLException {
+	private UserData load(int key) throws SQLException {
 		String rawOptions = backend.getOptions(key);
 		
 		UserData options;
@@ -184,7 +203,10 @@ public class UserDataManager {
 		} else {
 			options = gson.fromJson(rawOptions, UserData.class);
 		}
-		
+
+		options.backend = backend;
+		options.userid = key;
+
 		return options;
 	}
 
