@@ -47,6 +47,7 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException.QuietException;
+import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.lang.Default;
@@ -106,6 +107,7 @@ public class IRCBot extends CoreHooks {
 		
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler());
+		commandHandlers.add(new AccHandler(backend));
 	}
 
 	@Override
@@ -405,12 +407,12 @@ public class IRCBot extends CoreHooks {
 					lang.optionalCommentOnRecommendation(user, apiUser, recommendation);
 				}
 
-			} else if(message.startsWith("with ")) {
+			} else if (message.startsWith("with")) {
 				BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 				if(lastSongInfo == null) {
 					throw new UserException(lang.noLastSongInfo());
 				}
-				message = message.substring(5);
+				message = message.substring(4).trim();
 				
 				Long mods = Mods.fromShortNamesContinuous(message);
 				if(mods == null) {
@@ -428,29 +430,6 @@ public class IRCBot extends CoreHooks {
 
 					userData.setLastSongInfo(new BeatmapWithMods(beatmap.beatmap.getId(), beatmap.getMods()));
 				}
-			} else if (message.startsWith("acc ")) {
-				BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
-				if (lastSongInfo == null) {
-					throw new UserException(lang.noLastSongInfo());
-				}
-				message = message.substring(4);
-				Double acc = null;
-				try {
-					acc = Double.parseDouble(message);
-				} catch (Exception e) {
-					throw new UserException(lang.invalidAccuracy(message));
-				}
-				if (!(acc >= 0 && acc <= 100)) {
-					throw new UserException(lang.invalidAccuracy(message));
-				}
-				acc = Math.round(acc * 100) / 10000d;
-				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
-
-				if (!(beatmap.getEstimates() instanceof PercentageEstimates)) {
-					throw new UserException(lang.noPercentageEstimates());
-				}
-
-				user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc));
 			} else {
 				boolean handled = false;
 				for (CommandHandler handler : commandHandlers) {
