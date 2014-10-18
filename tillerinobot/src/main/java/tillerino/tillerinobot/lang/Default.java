@@ -138,11 +138,6 @@ public class Default implements Language {
 	public String faq() {
 		return "See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!";
 	}
-
-	@Override
-	public String unknownRecommendationParameter(String param) {
-		return "I don't know what \"" + param + "\" is supposed to mean. Try !help if you need some pointers.";
-	}
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
@@ -211,7 +206,7 @@ public class Default implements Language {
 	@Override
 	public String invalidChoice(String invalid, String choices) {
 		return "I'm sorry, but \"" + invalid
-				+ "\" does not compute. Try one of these: " + choices + "!";
+				+ "\" does not compute. Try these: " + choices + "!";
 	}
 
 	@Override

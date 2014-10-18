@@ -177,15 +177,6 @@ public interface Language {
 	String faq();
 
 	/**
-	 * A part of the !recommend command was not recognized.
-	 * 
-	 * @param param
-	 *            the part of the command which was not recognized.
-	 * @return
-	 */
-	String unknownRecommendationParameter(String param);
-
-	/**
 	 * A feature is rank restricted.
 	 * 
 	 * @param feature

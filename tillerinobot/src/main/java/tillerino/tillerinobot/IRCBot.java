@@ -50,6 +50,7 @@ import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
+import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BotInfoService;
@@ -108,6 +109,7 @@ public class IRCBot extends CoreHooks {
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler());
 		commandHandlers.add(new AccHandler(backend));
+		commandHandlers.add(new WithHandler(backend));
 	}
 
 	@Override
@@ -314,8 +316,7 @@ public class IRCBot extends CoreHooks {
 		};
 	}
 	
-	void processPrivateMessage(final IRCBotUser user, String originalMessage)
-			throws IOException {
+	void processPrivateMessage(final IRCBotUser user, String originalMessage) {
 		MDC.put("user", user.getNick());
 		log.info("received: " + originalMessage);
 
@@ -407,29 +408,6 @@ public class IRCBot extends CoreHooks {
 					lang.optionalCommentOnRecommendation(user, apiUser, recommendation);
 				}
 
-			} else if (message.startsWith("with")) {
-				BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
-				if(lastSongInfo == null) {
-					throw new UserException(lang.noLastSongInfo());
-				}
-				message = message.substring(4).trim();
-				
-				Long mods = Mods.fromShortNamesContinuous(message);
-				if(mods == null) {
-					throw new UserException(lang.malformattedMods(message));
-				}
-				if(mods == 0)
-					return;
-				BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), mods, lang);
-				if(beatmap.getMods() == 0) {
-					throw new UserException(lang.noInformationForMods());
-				}
-				
-				if(user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), null))) {
-					lang.optionalCommentOnWith(user, apiUser, beatmap);
-
-					userData.setLastSongInfo(new BeatmapWithMods(beatmap.beatmap.getId(), beatmap.getMods()));
-				}
 			} else {
 				boolean handled = false;
 				for (CommandHandler handler : commandHandlers) {

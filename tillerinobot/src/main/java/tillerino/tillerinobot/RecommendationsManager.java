@@ -288,7 +288,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				requestMods |= Mods.getMask(Mods.HardRock);
 				continue;
 			}
-			throw new UserException(lang.unknownRecommendationParameter(param));
+			throw new UserException(lang.invalidChoice(param, "[nomod] [relax|beta|gamma] [dt|hr]"));
 		}
 		
 		/*
