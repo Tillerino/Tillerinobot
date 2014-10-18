@@ -10,11 +10,17 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
+import tillerino.tillerinobot.mbeans.CacheMXBean;
+import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
+import tillerino.tillerinobot.mbeans.UserDataManagerMXBean;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -41,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Singleton
-public class UserDataManager {
+public class UserDataManager extends AbstractMBeanRegistration implements UserDataManagerMXBean {
 	/**
 	 * Bot-specific user data. It is only saved when changed and responsible for
 	 * determining if it has been changed. Manual getters and setters must be
@@ -159,6 +165,13 @@ public class UserDataManager {
 		});
 	}
 
+	@Override
+	public ObjectName preRegister(MBeanServer server, ObjectName objectName)
+			throws Exception {
+		server.registerMBean(cacheMXBean, null);
+		return super.preRegister(server, objectName);
+	}
+
 	public UserData getData(int userid) throws SQLException {
 		try {
 			return cache.get(userid);
@@ -174,7 +187,7 @@ public class UserDataManager {
 	}
 
 	LoadingCache<Integer, UserData> cache = CacheBuilder.newBuilder()
-			.expireAfterAccess(1, TimeUnit.HOURS).maximumSize(1000)
+			.expireAfterAccess(1, TimeUnit.HOURS).maximumSize(1000).recordStats()
 			.removalListener(new RemovalListener<Integer, UserData>() {
 				@Override
 				public void onRemoval(RemovalNotification<Integer, UserData> notification) {
@@ -190,6 +203,13 @@ public class UserDataManager {
 					return UserDataManager.this.load(key);
 				}
 			});
+	
+	CacheMXBean cacheMXBean = new CacheMXBeanImpl(cache, getClass(), "userDataCache");
+
+	@Override
+	public CacheMXBean fetchCache() {
+		return cacheMXBean;
+	}
 	
 	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
 			.create();

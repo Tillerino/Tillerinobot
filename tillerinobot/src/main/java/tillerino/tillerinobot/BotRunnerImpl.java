@@ -5,18 +5,22 @@ import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
 
+@Slf4j
 @Singleton
 public class BotRunnerImpl implements BotRunner {
 	PircBotX bot = null;
 
 	@Inject
-	public BotRunnerImpl(IRCBot tillerinoBot,
+	public BotRunnerImpl(Provider<IRCBot> tillerinoBot,
 			@Named("tillerinobot.irc.server") String server,
 			@Named("tillerinobot.irc.port") int port,
 			@Named("tillerinobot.irc.nickname") String nickname,
@@ -31,7 +35,7 @@ public class BotRunnerImpl implements BotRunner {
 		this.autojoinChannel = autojoinChannel;
 	}
 
-	private final IRCBot tillerinoBot;
+	private final Provider<IRCBot> tillerinoBot;
 
 	private final String server;
 	private final int port;
@@ -50,26 +54,28 @@ public class BotRunnerImpl implements BotRunner {
 
 	@Override
 	public void run() {
-		@SuppressWarnings("unchecked")
-		Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-				.setServer(server, port).setMessageDelay(1000)
-				.setName(nickname).addListener(tillerinoBot)
-				.setEncoding(Charset.forName("UTF-8")).setAutoReconnect(false);
-		if (password != null) {
-			configurationBuilder.setServerPassword(password);
-		}
-		if (autojoinChannel != null) {
-			configurationBuilder.addAutoJoinChannel(autojoinChannel);
-		}
 		for (; reconnect;) {
+			@SuppressWarnings("unchecked")
+			Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
+					.setServer(server, port).setMessageDelay(1000)
+					.setName(nickname).addListener(tillerinoBot.get())
+					.setEncoding(Charset.forName("UTF-8"))
+					.setAutoReconnect(false);
+			if (password != null) {
+				configurationBuilder.setServerPassword(password);
+			}
+			if (autojoinChannel != null) {
+				configurationBuilder.addAutoJoinChannel(autojoinChannel);
+			}
 			try {
 				try {
-					tillerinoBot.pinger.quit.set(false);
 					(bot = new PircBotX(configurationBuilder.buildConfiguration())).startBot();
 				} finally {
 					bot = null;
 				}
 			} catch (Exception e) {
+				log.error("exception running IRC bot", e);
+			} finally {
 				try {
 					Thread.sleep(reconnectTimeout);
 				} catch (InterruptedException e1) {

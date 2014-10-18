@@ -313,7 +313,7 @@ public class TestBackend implements BotBackend {
 		}
 		OsuApiUser user = getUser(userid, 0);
 		final double equivalent = user.getPp() / 20;
-		for(int i = 1; i <= 10000; i++) {
+		for (int i = 1; i <= 1000; i++) {
 			for(long m : mods) {
 				BeatmapMeta meta = loadBeatmap(i, m, null);
 				if(Math.abs(1 - ((PercentageEstimates) meta.getEstimates()).getPPForAcc(.98) / equivalent) < .15) {

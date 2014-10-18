@@ -17,7 +17,6 @@ import org.mockito.stubbing.Answer;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.IRCBot.Pinger;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.rest.BotInfoService;
@@ -219,5 +218,29 @@ public class IRCBotTest {
 
 		bot.processPrivateMessage(botUser, "!r");
 		verify(botUser, times(2)).message(contains("/b/1"));
+	}
+
+	@Test
+	public void testGammaDefault() throws SQLException, IOException,
+			UserException {
+		IRCBot bot = getTestBot(backend);
+		backend.hintUser("user", false, 75000, 1000);
+
+		bot.processPrivateMessage(mockBotUser("user"), "!R");
+
+		verify(backend).loadRecommendations(anyInt(), anyCollection(),
+				eq(Model.GAMMA), anyBoolean(), anyLong());
+	}
+
+	@Test
+	public void testBetaDefaultSub100k() throws SQLException, IOException,
+			UserException {
+		IRCBot bot = getTestBot(backend);
+		backend.hintUser("user", false, 125000, 1000);
+
+		bot.processPrivateMessage(mockBotUser("user"), "!R");
+
+		verify(backend).loadRecommendations(anyInt(), anyCollection(),
+				eq(Model.BETA), anyBoolean(), anyLong());
 	}
 }

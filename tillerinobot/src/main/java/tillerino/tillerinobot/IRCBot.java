@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +14,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,16 +21,13 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.MDC;
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.Utils;
 import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.ActionEvent;
@@ -64,7 +59,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 
 @Slf4j
-@Singleton
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
 	public interface IRCBotUser {
@@ -490,78 +484,6 @@ public class IRCBot extends CoreHooks {
 		exec.shutdown();
 	}
 	
-	public static class Pinger {
-		volatile String pingMessage = null;
-		volatile CountDownLatch pingLatch = null;
-		final AtomicBoolean quit = new AtomicBoolean(false);
-		
-		final BotInfoService botInfoService;
-
-		@Inject
-		public Pinger(BotInfoService infoService) {
-			super();
-			this.botInfoService = infoService;
-		}
-
-		long lastquit = 0l;
-
-		/*
-		 * this method is synchronized through the sender semaphore
-		 */
-		void ping(PircBotX bot) throws IOException, InterruptedException {
-			try {
-				if(quit.get()) {
-					throw new IOException("ping gate closed");
-				}
-
-				long time = System.currentTimeMillis();
-
-				synchronized (this) {
-					pingLatch = new CountDownLatch(1);
-					pingMessage = getRandomString(16);
-				}
-
-				Utils.sendRawLineToServer(bot, "PING " + pingMessage);
-
-				if(!pingLatch.await(10, TimeUnit.SECONDS)) {
-					throw new IOException("ping timed out");
-				}
-
-				long ping = System.currentTimeMillis() - time;
-
-				if(ping > 1500) {
-					if (botInfoService != null) {
-						botInfoService.setLastPingDeath(System
-								.currentTimeMillis());
-					}
-					throw new IOException("death ping: " + ping);
-				}
-			} catch(IOException e) {
-				if (lastquit < System.currentTimeMillis() - 1000 || !quit.get()) {
-					bot.sendIRC().quitServer();
-					lastquit = System.currentTimeMillis();
-				}
-				quit.set(true);
-				throw e;
-			}
-		}
-		
-		void handleUnknownEvent(UnknownEvent event) {
-			synchronized(this) {
-				if (pingMessage == null)
-					return;
-
-				boolean contains = event.getLine().contains(" PONG ");
-				boolean endsWith = event.getLine().endsWith(pingMessage);
-				if (contains
-						&& endsWith) {
-					pingLatch.countDown();
-				}
-			}
-		}
-	}
-	
-	
 	AtomicLong lastSerial = new AtomicLong(System.currentTimeMillis());
 	
 	@Override
@@ -584,8 +506,8 @@ public class IRCBot extends CoreHooks {
 		pinger.handleUnknownEvent(event);
 	}
 	
-	static final int currentVersion = 7;
-	static final String versionMessage = "I'm back \\o/";
+	static final int currentVersion = 8;
+	static final String versionMessage = "Gamma recommendations are now available and the default engine for players upward of rank 100k. You can now check pp for custom accuracies with the !acc command. See !help for more information.";
 	
 	long lastListTime = System.currentTimeMillis();
 	

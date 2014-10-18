@@ -18,6 +18,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import lombok.Data;
 
@@ -25,6 +27,10 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
+import tillerino.tillerinobot.mbeans.CacheMXBean;
+import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
+import tillerino.tillerinobot.mbeans.RecommendationsManagerMXBean;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -37,7 +43,7 @@ import com.google.common.cache.LoadingCache;
  * @author Tillerino
  */
 @Singleton
-public class RecommendationsManager {
+public class RecommendationsManager extends AbstractMBeanRegistration implements RecommendationsManagerMXBean {
 	/**
 	 * Recommendation as returned by the backend. Needs to be enriched before being displayed.
 	 * 
@@ -174,11 +180,20 @@ public class RecommendationsManager {
 	public RecommendationsManager(BotBackend backend) {
 		this.backend = backend;
 	}
-	
-	public Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
-			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
 
-	public LoadingCache<Integer, List<Integer>> givenRecomendations =  CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build(new CacheLoader<Integer, List<Integer>>() {
+	@Override
+	public ObjectName preRegister(MBeanServer server, ObjectName objectName)
+			throws Exception {
+		server.registerMBean(givenRecomendationsMXBean, null);
+		server.registerMBean(samplersMXBean, null);
+
+		return super.preRegister(server, objectName);
+	}
+
+	public Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
+			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).recordStats().build();
+
+	public LoadingCache<Integer, List<Integer>> givenRecomendations =  CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).recordStats().build(new CacheLoader<Integer, List<Integer>>() {
 		@Override
 		public List<Integer> load(Integer key) throws Exception {
 			List<Integer> list = new ArrayList<>();
@@ -189,10 +204,24 @@ public class RecommendationsManager {
 		}
 	});
 	
+	public CacheMXBean givenRecomendationsMXBean = new CacheMXBeanImpl(givenRecomendations, getClass(), "givenRecommendations");
+	
+	@Override
+	public CacheMXBean fetchGivenRecommendations() {
+		return givenRecomendationsMXBean;
+	}
+
 	/**
 	 * These take long to calculate, so we want to keep them for a bit, but they also take a lot of space. 100 should be a good balance.
 	 */
 	public Cache<Integer, Sampler> samplers = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).maximumSize(100).build();
+
+	public CacheMXBean samplersMXBean = new CacheMXBeanImpl(samplers, getClass(), "samplers");
+
+	@Override
+	public CacheMXBean fetchSamplers() {
+		return samplersMXBean;
+	}
 
 	@CheckForNull
 	public Recommendation getLastRecommendation(Integer userid) {
@@ -202,7 +231,7 @@ public class RecommendationsManager {
 	/**
 	 * get an ready-to-display recommendation
 	 * @param message the remaining arguments ("r" or "recommend" were removed)
-	 * @param lang TODO
+	 * @param lang 
 	 * @return
 	 * @throws UserException
 	 * @throws SQLException
@@ -227,6 +256,10 @@ public class RecommendationsManager {
 		Model model = Model.BETA;
 		long requestMods = 0;
 		
+		if (apiUser.getRank() <= 100_000) {
+			model = Model.GAMMA;
+		}
+
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
 			if(param.length() == 0)
@@ -237,6 +270,10 @@ public class RecommendationsManager {
 			}
 			if(getLevenshteinDistance(param, "relax") <= 2) {
 				model = Model.ALPHA;
+				continue;
+			}
+			if(getLevenshteinDistance(param, "beta") <= 1) {
+				model = Model.BETA;
 				continue;
 			}
 			if(getLevenshteinDistance(param, "gamma") <= 2) {
@@ -263,7 +300,7 @@ public class RecommendationsManager {
 		}
 		
 		if(model == Model.GAMMA) {
-			int minRank = 25000;
+			int minRank = 100000;
 			if(apiUser.getRank() > minRank) {
 				apiUser = backend.getUser(userid, 1);
 				

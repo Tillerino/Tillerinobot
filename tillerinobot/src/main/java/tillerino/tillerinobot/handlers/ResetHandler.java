@@ -3,9 +3,9 @@ package tillerino.tillerinobot.handlers;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.tillerino.osuApiModel.OsuApiUser;
+import javax.inject.Inject;
 
-import com.google.inject.Inject;
+import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserException;
