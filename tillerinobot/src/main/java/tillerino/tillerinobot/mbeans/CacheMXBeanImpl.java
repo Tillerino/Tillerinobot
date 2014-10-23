@@ -2,10 +2,13 @@ package tillerino.tillerinobot.mbeans;
 
 import com.google.common.cache.Cache;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class CacheMXBeanImpl extends AbstractMBeanRegistration implements CacheMXBean {
  
 	private final Cache<?, ?> cache;
  
+	@SuppressFBWarnings(value = "NP", justification = "false positive")
 	public <K, V> CacheMXBeanImpl(Cache<K, V> cache) {
 		this(cache, null, null);
     }

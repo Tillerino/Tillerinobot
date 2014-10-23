@@ -2,14 +2,20 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.meta.TypeQualifier;
 
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.osuApiModel.types.BeatmapId;
+import org.tillerino.osuApiModel.types.BitwiseMods;
+import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
@@ -18,6 +24,12 @@ import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.lang.Language;
 
 public interface BotBackend {
+	@TypeQualifier(applicableTo = String.class)
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface IRCName {
+
+	}
+
 	/**
 	 * @param beatmapid
 	 * @param mods mods for {@link PercentageEstimates}. These might be ignored if they can't be satisfied
@@ -26,14 +38,14 @@ public interface BotBackend {
 	 * @throws IOException 
 	 * @throws UserException 
 	 */
-	public BeatmapMeta loadBeatmap(int beatmapid, long mods, Language lang) throws SQLException, IOException, UserException;
+	public BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException;
 
-	public void saveGivenRecommendation(int userid, int beatmapid, long mods) throws SQLException;
+	public void saveGivenRecommendation(@UserId int userid, @BeatmapId int beatmapid, @BitwiseMods long mods) throws SQLException;
 
 	/**
 	 * @return the last version of the bot that was visited by this user. -1 if no information available.
 	 */
-	public int getLastVisitedVersion(@Nonnull String nick) throws SQLException, UserException;
+	public int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
 	
 	/**
 	 * recommendations from the last two weeks
@@ -41,9 +53,9 @@ public interface BotBackend {
 	 * @return ordered by date given from newest to oldest
 	 * @throws SQLException
 	 */
-	List<GivenRecommendation> loadGivenRecommendations(int userid) throws SQLException;
+	List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) throws SQLException;
 
-	public void setLastVisitedVersion(@Nonnull String nick, int version) throws SQLException;
+	public void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
 
 	/**
 	 * get a user's information
@@ -54,9 +66,9 @@ public interface BotBackend {
 	 * @throws IOException API exception
 	 */
 	@CheckForNull
-	public OsuApiUser getUser(int userid, long maxAge) throws SQLException, IOException;
+	public OsuApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException;
 	
-	public void registerActivity(int userid) throws SQLException;
+	public void registerActivity(@UserId int userid) throws SQLException;
 	
 	public long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
 
@@ -69,8 +81,9 @@ public interface BotBackend {
 	 * @throws SQLException
 	 * @throws IOException API exception
 	 */
-	@CheckForNull
-	public Integer resolveIRCName(@Nonnull String ircName) throws SQLException, IOException;
+	@CheckForNull @UserId
+	public Integer resolveIRCName(@IRCName @Nonnull String ircName)
+			throws SQLException, IOException;
 
 	/**
 	 * will load a sampler
@@ -84,15 +97,15 @@ public interface BotBackend {
 	 * @throws IOException
 	 * @throws UserException
 	 */
-	public Collection<BareRecommendation> loadRecommendations(int userid, @Nonnull Collection<Integer> exclude,
-			@Nonnull Model model, boolean nomod, long requestMods) throws SQLException, IOException, UserException;
+	public Collection<BareRecommendation> loadRecommendations(@UserId int userid, @Nonnull Collection<Integer> exclude,
+			@Nonnull Model model, boolean nomod, @BitwiseMods long requestMods) throws SQLException, IOException, UserException;
 	
 	/**
 	 * gets the userid which belogs to the given key
 	 * @param key 
 	 * @return null if key not found
 	 */
-	public Integer resolveUserKey(String key) throws SQLException;
+	public @UserId Integer resolveUserKey(String key) throws SQLException;
 	
 	/**
 	 * verifies a key for general data queries
@@ -104,14 +117,14 @@ public interface BotBackend {
 	
 	/**
 	 * retreives options for this user as saved through the
-	 * {@link #saveOptions(OsuApiUser, String)} method.
+	 * {@link #saveOptions(int, String)} method.
 	 * 
 	 * @param user
 	 * @return may be null or empty string.
 	 * @throws SQLException
 	 */
 	@CheckForNull
-	public String getOptions(int user) throws SQLException;
+	public String getOptions(@UserId int user) throws SQLException;
 	
 	/**
 	 * saves options for this user. options should be saved in a human-readable
@@ -122,7 +135,7 @@ public interface BotBackend {
 	 * @param options
 	 * @throws SQLException
 	 */
-	public void saveOptions(int user, String options) throws SQLException;
+	public void saveOptions(@UserId int user, String options) throws SQLException;
 
 	/**
 	 * forgets all given recommendations of the past for a single user
@@ -130,5 +143,5 @@ public interface BotBackend {
 	 * @param user
 	 * @throws SQLException
 	 */
-	public void forgetRecommendations(int user) throws SQLException;
+	public void forgetRecommendations(@UserId int user) throws SQLException;
 }

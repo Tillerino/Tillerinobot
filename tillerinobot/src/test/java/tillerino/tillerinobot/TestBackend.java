@@ -180,7 +180,7 @@ public class TestBackend implements BotBackend {
 		OsuApiBeatmap beatmap = database.beatmaps.get(beatmapid);
 		if (beatmap == null) {
 			beatmap = new OsuApiBeatmap();
-			beatmap.setId(beatmapid);
+			beatmap.setBeatmapId(beatmapid);
 			{
 				// ARTIST
 				String[] artists = { "Hatsune Miku", "IOSYS", "Nightcore",
@@ -217,7 +217,7 @@ public class TestBackend implements BotBackend {
 
 			user.isDonator = isDonator;
 			user.apiUser = new OsuApiUser();
-			user.apiUser.setUsername(username);
+			user.apiUser.setUserName(username);
 			user.apiUser.setUserId(userid);
 			user.apiUser.setPp(pp);
 			user.apiUser.setRank(rank);
@@ -347,7 +347,7 @@ public class TestBackend implements BotBackend {
 				
 				@Override
 				public int getBeatmapId() {
-					return meta.getBeatmap().getId();
+					return meta.getBeatmap().getBeatmapId();
 				}
 			});
 		}

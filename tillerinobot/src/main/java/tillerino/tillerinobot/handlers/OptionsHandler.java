@@ -19,11 +19,12 @@ public class OptionsHandler implements CommandHandler {
 			IOException, SQLException {
 		boolean set = false;
 		
-		if(command.toLowerCase().startsWith("set ")) {
+		if (command.toLowerCase().startsWith("set")) {
 			set = true;
-			command = command.substring("set ".length());
-		} else if(command.toLowerCase().startsWith("show ") || command.toLowerCase().startsWith("view ")) {
-			command = command.substring("show ".length());
+			command = command.substring("set".length()).trim();
+		} else if (command.toLowerCase().startsWith("show")
+				|| command.toLowerCase().startsWith("view")) {
+			command = command.substring("show".length()).trim();
 		} else {
 			return false;
 		}
@@ -32,8 +33,8 @@ public class OptionsHandler implements CommandHandler {
 			throw new UserException(userData.getLanguage().setFormat());
 		}
 
-		String option = set ? command.substring(0, command.indexOf(" "))
-				.toLowerCase() : command;
+		String option = set ? command.substring(0, command.indexOf(' '))
+				.toLowerCase() : command.toLowerCase();
 		String value = set ? command.substring(option.length() + 1) : null;
 
 		if (option.equals("lang") || option.equals("language")) {
@@ -43,7 +44,7 @@ public class OptionsHandler implements CommandHandler {
 					ident = LanguageIdentifier.valueOf(value);
 				} catch (IllegalArgumentException e) {
 					throw new UserException(userData.getLanguage().invalidChoice(value,
-							StringUtils.join(LanguageIdentifier.values())));
+							StringUtils.join(LanguageIdentifier.values(), ", ")));
 				}
 
 				userData.setLanguage(ident);
@@ -51,7 +52,7 @@ public class OptionsHandler implements CommandHandler {
 				userData.getLanguage().optionalCommentOnLanguage(ircUser,
 						apiUser);
 			} else {
-				ircUser.message(userData.getLanguageIdentifier().toString());
+				ircUser.message("Language: " + userData.getLanguageIdentifier().toString());
 			}
 		} else {
 			throw new UserException(userData.getLanguage().invalidChoice(option, "Language"));

@@ -76,7 +76,7 @@ public class IRCBotTest {
 		BotBackend backend = mock(BotBackend.class);
 		
 		OsuApiUser osuApiUser = mock(OsuApiUser.class);
-		when(osuApiUser.getUsername()).thenReturn("TheDonator");
+		when(osuApiUser.getUserName()).thenReturn("TheDonator");
 
 		when(backend.resolveIRCName(anyString())).thenReturn(1);
 		when(backend.getUser(eq(1), anyLong())).thenReturn(osuApiUser);
@@ -228,7 +228,8 @@ public class IRCBotTest {
 
 		bot.processPrivateMessage(mockBotUser("user"), "!R");
 
-		verify(backend).loadRecommendations(anyInt(), anyCollection(),
+		verify(backend).loadRecommendations(anyInt(),
+				anyCollectionOf(Integer.class),
 				eq(Model.GAMMA), anyBoolean(), anyLong());
 	}
 
@@ -240,7 +241,8 @@ public class IRCBotTest {
 
 		bot.processPrivateMessage(mockBotUser("user"), "!R");
 
-		verify(backend).loadRecommendations(anyInt(), anyCollection(),
+		verify(backend).loadRecommendations(anyInt(),
+				anyCollectionOf(Integer.class),
 				eq(Model.BETA), anyBoolean(), anyLong());
 	}
 }

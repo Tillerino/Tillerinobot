@@ -41,9 +41,9 @@ public class Default implements Language {
 		if(inactiveTime < 60 * 1000) {
 			user.message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Welcome back, " + apiUser.getUsername() + ".");
+			user.message("Welcome back, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUsername() + "...");
+			user.message(apiUser.getUserName() + "...");
 			user.message("...is that you? It's been so long!");
 			user.message("It's good to have you back. Can I interest you in a recommendation?");
 		} else {
@@ -60,7 +60,7 @@ public class Default implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUsername() + ", " + message);
+			user.message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class Default implements Language {
 	 * @param exceptionMarker
 	 *            a marker to reference the created log entry. six or eight
 	 *            characters.
-	 * @param ircNick
+	 * @param name
 	 *            the irc nick which could not be resolved
 	 * @return
 	 */
@@ -124,7 +124,7 @@ public class Default implements Language {
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
 		user.message("Come here, you!");
-		user.action("hugs " + apiUser.getUsername());
+		user.action("hugs " + apiUser.getUserName());
 	}
 
 	@Override

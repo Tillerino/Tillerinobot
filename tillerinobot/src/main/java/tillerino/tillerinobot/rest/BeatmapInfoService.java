@@ -21,7 +21,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.tillerino.osuApiModel.types.BeatmapId;
+import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import static org.tillerino.osuApiModel.Mods.*;
 
@@ -34,6 +35,7 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
@@ -49,21 +51,21 @@ public class BeatmapInfoService {
 
 	ExecutorService executorService = Executors.newFixedThreadPool(2);
 	
-	LoadingCache<Pair<Integer, Long>, Future<BeatmapMeta>> cache = CacheBuilder
+	LoadingCache<BeatmapWithMods, Future<BeatmapMeta>> cache = CacheBuilder
 			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).softValues()
-			.build(new CacheLoader<Pair<Integer, Long>, Future<BeatmapMeta>>() {
+			.build(new CacheLoader<BeatmapWithMods, Future<BeatmapMeta>>() {
 				@Override
-				public Future<BeatmapMeta> load(final Pair<Integer, Long> key) {
+				public Future<BeatmapMeta> load(final BeatmapWithMods key) {
 					return executorService.submit(new Callable<BeatmapMeta>() {
 						@Override
 						public BeatmapMeta call() throws SQLException {
 							try {
 								BeatmapMeta beatmap = backend.loadBeatmap(
-										key.getKey(), key.getValue(),
+										key.getBeatmap(), key.getMods(),
 										new Default());
 								
 								if(beatmap == null) {
-									throw BotAPIServer.getNotFound("Beatmap " + key.getKey() + " not found.");
+									throw BotAPIServer.getNotFound("Beatmap " + key.getBeatmap() + " not found.");
 								}
 								
 								return beatmap;
@@ -86,7 +88,7 @@ public class BeatmapInfoService {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") int beatmapid, @QueryParam("mods") long mods, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
+	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
 		BotAPIServer.throwUnautorized(backend.verifyGeneralKey(key));
 		
 		mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
@@ -94,7 +96,7 @@ public class BeatmapInfoService {
 		BeatmapMeta beatmapMeta;
 
 		try {
-			Future<BeatmapMeta> future = cache.getUnchecked(Pair.of(beatmapid, mods));
+			Future<BeatmapMeta> future = cache.getUnchecked(new BeatmapWithMods(beatmapid, mods));
 			beatmapMeta = wait < 0 ? future.get() : future.get(wait, TimeUnit.MILLISECONDS);
 			
 			if (beatmapMeta.getEstimates() instanceof PercentageEstimates) {

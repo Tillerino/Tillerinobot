@@ -15,7 +15,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
@@ -39,16 +38,16 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
-import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
+import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.handlers.AccHandler;
+import tillerino.tillerinobot.handlers.NPHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
+import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.lang.Default;
@@ -60,6 +59,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
@@ -67,7 +68,7 @@ public class IRCBot extends CoreHooks {
 		/**
 		 * @return the user's IRC nick, not their actual user name.
 		 */
-		String getNick();
+		@IRCName String getNick();
 		/**
 		 * 
 		 * @param msg
@@ -110,6 +111,7 @@ public class IRCBot extends CoreHooks {
 		commandHandlers.add(new OptionsHandler());
 		commandHandlers.add(new AccHandler(backend));
 		commandHandlers.add(new WithHandler(backend));
+		commandHandlers.add(new RecommendHandler(backend, manager));
 	}
 
 	@Override
@@ -128,13 +130,6 @@ public class IRCBot extends CoreHooks {
 		}
 	}
 
-	static final Pattern npPattern = Pattern
-			.compile("(?:is listening to|is watching|is playing) \\[http://osu.ppy.sh/b/(\\d+).*\\]((?: "
-					+ "(?:"
-					+ "-Easy|-NoFail|-HalfTime"
-					+ "|\\+HardRock|\\+SuddenDeath|\\+Perfect|\\+DoubleTime|\\+Nightcore|\\+Hidden|\\+Flashlight"
-					+ "|~Relax~|~AutoPilot~|-SpunOut|\\|Autoplay\\|" + "))*)");
-	
 	/**
 	 * additional locks to avoid users causing congestion in the fair locks by queuing commands in multiple threads
 	 */
@@ -164,49 +159,7 @@ public class IRCBot extends CoreHooks {
 			
 			checkVersionInfo(user);
 
-			Matcher m = npPattern.matcher(message);
-
-			if (!m.matches()) {
-				log.error("no match: " + message);
-				return;
-			}
-
-			int beatmapid = Integer.valueOf(m.group(1));
-
-			long mods = 0;
-
-			Pattern words = Pattern.compile("\\w+");
-
-			Matcher mWords = words.matcher(m.group(2));
-
-			while(mWords.find()) {
-				Mods mod = Mods.valueOf(mWords.group());
-
-				if(mod.isEffective())
-					mods |= Mods.getMask(mod);
-			}
-
-			BeatmapMeta beatmap = backend.loadBeatmap(beatmapid, mods, lang);
-
-			if (beatmap == null) {
-				user.message(lang.unknownBeatmap());
-				return;
-			}
-			
-			String addition = null;
-			if (beatmap.getEstimates() instanceof PercentageEstimates) {
-				PercentageEstimates estimates = (PercentageEstimates) beatmap.getEstimates();
-				
-				if(estimates.getMods() != mods) {
-					addition = "(" + lang.noInformationForModsShort() + ")";
-				}
-			}
-
-			if(user.message(beatmap.formInfoMessage(false, addition, userData.getHearts(), null))) {
-				userData.setLastSongInfo(new BeatmapWithMods(beatmapid, beatmap.getMods()));
-				
-				lang.optionalCommentOnNP(user, apiUser, beatmap);
-			}
+			new NPHandler(backend).handle(message, user, apiUser, userData);
 		} catch (Throwable e) {
 			handleException(user, e, lang);
 		} finally {
@@ -310,6 +263,8 @@ public class IRCBot extends CoreHooks {
 			}
 			
 			@Override
+			@IRCName
+			@SuppressFBWarnings(value = "TQ", justification = "producer")
 			public String getNick() {
 				return user.getNick();
 			}
@@ -345,69 +300,21 @@ public class IRCBot extends CoreHooks {
 			if (!originalMessage.startsWith("!")) {
 				return;
 			}
-			originalMessage = originalMessage.substring(1);
+			originalMessage = originalMessage.substring(1).trim();
 
 			checkVersionInfo(user);
-
-			String message = originalMessage.trim().toLowerCase();
 			
-			boolean isRecommend = false;
-			
-			if(message.equals("r")) {
-				isRecommend = true;
-				message = "";
-			}
-			if(getLevenshteinDistance(message, "recommend") <= 2) {
-				isRecommend = true;
-				message = "";
-			}
-			if(message.startsWith("r ")) {
-				isRecommend = true;
-				message = message.substring(2);
-			}
-			if(message.contains(" ")) {
-				int pos = message.indexOf(' ');
-				if(getLevenshteinDistance(message.substring(0, pos), "recommend") <= 2) {
-					isRecommend = true;
-					message = message.substring(pos + 1);
-				}
-			}
-			
-			if(getLevenshteinDistance(message, "help") <= 1) {
+			if(getLevenshteinDistance(originalMessage.toLowerCase(), "help") <= 1) {
 				user.message(lang.help());
-			} else if(getLevenshteinDistance(message, "faq") <= 1) {
+			} else if(getLevenshteinDistance(originalMessage.toLowerCase(), "faq") <= 1) {
 				user.message(lang.faq());
-			} else if(getLevenshteinDistance(message.substring(0, Math.min("complain".length(), message.length())), "complain") <= 2) {
+			} else if(getLevenshteinDistance(originalMessage.toLowerCase().substring(0, Math.min("complain".length(), originalMessage.length())), "complain") <= 2) {
 				Recommendation lastRecommendation = manager
 						.getLastRecommendation(apiUser.getUserId());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
-					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.getCauses())));
+					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getBeatmapId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.getCauses())));
 					user.message(lang.complaint());
 				}
-			} else if(isRecommend) {
-				Recommendation recommendation = manager.getRecommendation(apiUser, message, lang);
-				BeatmapMeta beatmap = recommendation.beatmap;
-				
-				if(beatmap == null) {
-					user.message(lang.excuseForError());
-					log.error("unknow recommendation occurred");
-					return;
-				}
-				String addition = null;
-				if(recommendation.bareRecommendation.getMods() < 0) {
-					addition = lang.tryWithMods();
-				}
-				if(recommendation.bareRecommendation.getMods() > 0 && beatmap.getMods() == 0) {
-					addition = lang.tryWithMods(Mods.getMods(recommendation.bareRecommendation.getMods()));
-				}
-				
-				if(user.message(beatmap.formInfoMessage(true, addition, userData.getHearts(), null))) {
-					userData.setLastSongInfo(new BeatmapWithMods(beatmap.getBeatmap().getId(), beatmap.getMods()));
-					backend.saveGivenRecommendation(apiUser.getUserId(), beatmap.getBeatmap().getId(), recommendation.bareRecommendation.getMods());
-					
-					lang.optionalCommentOnRecommendation(user, apiUser, recommendation);
-				}
-
 			} else {
 				boolean handled = false;
 				for (CommandHandler handler : commandHandlers) {
@@ -416,7 +323,7 @@ public class IRCBot extends CoreHooks {
 					}
 				}
 				if (!handled) {
-					throw new UserException(lang.unknownCommand(message));
+					throw new UserException(lang.unknownCommand(originalMessage));
 				}
 			}
 		} catch (Throwable e) {
@@ -564,7 +471,7 @@ public class IRCBot extends CoreHooks {
 		}
 	}
 
-	private void registerActivity(final String fNick) {
+	private void registerActivity(final @IRCName String fNick) {
 		try {
 			Integer userid = backend.resolveIRCName(fNick);
 			

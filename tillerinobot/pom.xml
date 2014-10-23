@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.9</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -32,13 +32,29 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<phase>test</phase>
+						<configuration>
+							<maxRank>15</maxRank>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>osuApiConnector</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pircbotx</groupId>
@@ -69,6 +85,11 @@
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
 			<version>3.0.0</version>
 		</dependency>
 		<!-- test dependencies -->
@@ -109,4 +130,41 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>linux-windows</id>
+			<activation>
+				<file>
+					<exists>${java.home}/../lib/tools.jar</exists>
+				</file>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>sun.jdk</groupId>
+					<artifactId>jconsole</artifactId>
+					<version>jdk</version>
+					<scope>system</scope>
+					<systemPath>${java.home}/../lib/jconsole.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>os-x</id>
+			<activation>
+				<file>
+					<exists>${java.home}/bundle/Classes/classes.jar</exists>
+				</file>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>sun.jdk</groupId>
+					<artifactId>jconsole</artifactId>
+					<version>jdk</version>
+					<scope>system</scope>
+					<systemPath>${java.home}/bundle/Classes/jconsole.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

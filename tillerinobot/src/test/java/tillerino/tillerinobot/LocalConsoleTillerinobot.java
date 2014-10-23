@@ -146,12 +146,11 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				when(event.getBot()).thenReturn(pircBot);
 				dispatch(event);
 
-				Scanner scanner = new Scanner(System.in);
-				
-				for (; running.get() && userLoop(scanner);)
-					;
-
-				return null;
+				try (Scanner scanner = new Scanner(System.in)) {
+					for (; running.get() && userLoop(scanner);)
+						;
+					return null;
+				}
 			}
 
 			private boolean userLoop(Scanner scanner) throws Exception {

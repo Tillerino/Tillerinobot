@@ -22,10 +22,15 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.osuApiModel.types.BeatmapId;
+import org.tillerino.osuApiModel.types.BitwiseMods;
+import org.tillerino.osuApiModel.types.UserId;
 
+import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
@@ -50,12 +55,14 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	 * @author Tillerino
 	 */
 	public interface BareRecommendation {
+		@BeatmapId
 		int getBeatmapId();
 		
 		/**
 		 * mods for this recommendation
 		 * @return 0 for no mods, -1 for unknown mods, any other long for mods according to {@link Mods}
 		 */
+		@BitwiseMods
 		long getMods();
 		
 		long[] getCauses();
@@ -123,21 +130,23 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	 * @author Tillerino
 	 */
 	public static class Sampler {
+		@EqualsAndHashCode
+		public static class Settings {
+			public boolean nomod;
+			public Model model;
+			@BitwiseMods
+			public long requestedMods;
+		}
 		final SortedMap<Double, BareRecommendation> distribution = new TreeMap<>();
 		double sum = 0;
 		final Random random = new Random();
-		public final boolean nomod;
-		public final Model type;
-		public final long requestedMods;
-		public Sampler(Collection<BareRecommendation> recommendations, Model type, boolean nomod, long requestedMods) {
+		final Settings settings;
+		public Sampler(Collection<BareRecommendation> recommendations, Settings settings) {
 			for (BareRecommendation bareRecommendation : recommendations) {
 				sum += bareRecommendation.getProbability();
 				distribution.put(sum, bareRecommendation);
 			}
-			
-			this.nomod = nomod;
-			this.type = type;
-			this.requestedMods = requestedMods;
+			this.settings = settings;
 		}
 		public boolean isEmpty() {
 			return distribution.isEmpty();
@@ -195,7 +204,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 	public LoadingCache<Integer, List<Integer>> givenRecomendations =  CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).recordStats().build(new CacheLoader<Integer, List<Integer>>() {
 		@Override
-		public List<Integer> load(Integer key) throws Exception {
+		public List<Integer> load(@UserId Integer key) throws Exception {
 			List<Integer> list = new ArrayList<>();
 			for (GivenRecommendation recommendation : backend.loadGivenRecommendations(key)) {
 				list.add(recommendation.getBeatmapid());
@@ -242,7 +251,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		 * log activity making sure that we can resolve the user's IRC name
 		 */
 		
-		Integer userid = apiUser.getUserId();
+		int userid = apiUser.getUserId();
 		
 		backend.registerActivity(userid);
 		
@@ -250,14 +259,87 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		 * parse arguments
 		 */
 		
+		Settings settings = getSamplerSettings(apiUser, message, lang);
+
+		/*
+		 * load sampler
+		 */
+
+		Sampler sampler = samplers.getIfPresent(userid);
+
+		if (sampler == null || !sampler.settings.equals(settings)) {
+			Collection<BareRecommendation> recommendations = backend
+					.loadRecommendations(userid,
+							givenRecomendations.getUnchecked(userid),
+							settings.model, settings.nomod,
+							settings.requestedMods);
+
+			// only keep the 1k most probable recommendations to save some
+			// memory
+			recommendations = getTopRecommendations(recommendations);
+
+			sampler = new Sampler(recommendations, settings);
+
+			samplers.put(userid, sampler);
+		}
+
+		if (sampler.isEmpty()) {
+			samplers.invalidate(userid);
+			throw new UserException(lang.outOfRecommendations());
+		}
+
+		/*
+		 * sample and load meta data
+		 */
+
+		BareRecommendation sample = sampler.sample();
+
+		int beatmapid = sample.getBeatmapId();
+
+		Recommendation recommendation = new Recommendation();
+
+		recommendation.bareRecommendation = sample;
+
+		BeatmapMeta loadBeatmap;
+		try {
+			if (sample.getMods() < 0) {
+				loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
+			} else {
+				loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods(),
+						lang);
+				if (loadBeatmap == null)
+					loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
+			}
+		} catch (NotRankedException e) {
+			throw new UserException(lang.excuseForError());
+		}
+		if (loadBeatmap == null) {
+			throw new UserException(lang.excuseForError());
+		}
+		recommendation.beatmap = loadBeatmap;
+
+		loadBeatmap.setPersonalPP(sample.getPersonalPP());
+
+		/*
+		 * save recommendation internally
+		 */
+
+		givenRecomendations.getUnchecked(userid).add(beatmapid);
+		lastRecommendation.put(userid, recommendation);
+
+		return recommendation;
+	}
+
+	public Settings getSamplerSettings(OsuApiUser apiUser, String message,
+			Language lang) throws UserException, SQLException, IOException {
 		String[] remaining = message.split(" ");
 		
-		boolean nomod = false;
-		Model model = Model.BETA;
-		long requestMods = 0;
+		Settings settings = new Settings();
 		
 		if (apiUser.getRank() <= 100_000) {
-			model = Model.GAMMA;
+			settings.model = Model.GAMMA;
+		} else {
+			settings.model = Model.BETA;
 		}
 
 		for (int i = 0; i < remaining.length; i++) {
@@ -265,27 +347,27 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			if(param.length() == 0)
 				continue;
 			if(getLevenshteinDistance(param, "nomod") <= 2) {
-				nomod = true;
+				settings.nomod = true;
 				continue;
 			}
 			if(getLevenshteinDistance(param, "relax") <= 2) {
-				model = Model.ALPHA;
+				settings.model = Model.ALPHA;
 				continue;
 			}
 			if(getLevenshteinDistance(param, "beta") <= 1) {
-				model = Model.BETA;
+				settings.model = Model.BETA;
 				continue;
 			}
 			if(getLevenshteinDistance(param, "gamma") <= 2) {
-				model = Model.GAMMA;
+				settings.model = Model.GAMMA;
 				continue;
 			}
-			if(model == Model.GAMMA && param.equals("dt")) {
-				requestMods |= Mods.getMask(Mods.DoubleTime);
+			if(settings.model == Model.GAMMA && param.equals("dt")) {
+				settings.requestedMods = Mods.add(settings.requestedMods, Mods.DoubleTime);
 				continue;
 			}
-			if(model == Model.GAMMA &&  param.equals("hr")) {
-				requestMods |= Mods.getMask(Mods.HardRock);
+			if(settings.model == Model.GAMMA &&  param.equals("hr")) {
+				settings.requestedMods = Mods.add(settings.requestedMods, Mods.HardRock);
 				continue;
 			}
 			throw new UserException(lang.invalidChoice(param, "[nomod] [relax|beta|gamma] [dt|hr]"));
@@ -295,17 +377,18 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		 * verify the arguments
 		 */
 		
-		if(nomod && requestMods != 0) {
+		if(settings.nomod && settings.requestedMods != 0) {
 			throw new UserException(lang.mixedNomodAndMods());
 		}
 		
-		if(model == Model.GAMMA) {
+		if(settings.model == Model.GAMMA) {
 			int minRank = 100000;
 			if(apiUser.getRank() > minRank) {
-				apiUser = backend.getUser(userid, 1);
+				int id = apiUser.getUserId();
+				apiUser = backend.getUser(id, 1);
 				
 				if(apiUser == null) {
-					throw new RuntimeException("trolled by the API? " + userid);
+					throw new RuntimeException("trolled by the API? " + id);
 				}
 				
 				if(apiUser.getRank() > minRank) {
@@ -313,65 +396,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				}
 			}
 		}
-		
-		/*
-		 * load sampler
-		 */
-		
-		Sampler sampler = samplers.getIfPresent(userid);
-		
-		if(sampler == null || sampler.nomod != nomod || sampler.type != model || sampler.requestedMods != requestMods) {
-			Collection<BareRecommendation> recommendations = backend.loadRecommendations(userid, givenRecomendations.getUnchecked(userid), model, nomod, requestMods);
-			
-			// only keep the 1k most probable recommendations to save some memory
-			recommendations = getTopRecommendations(recommendations);
-			
-			sampler = new Sampler(recommendations, model, nomod, requestMods);
-			
-			samplers.put(userid, sampler);
-		}
-		
-		if(sampler.isEmpty()) {
-			samplers.invalidate(userid);
-			throw new UserException(lang.outOfRecommendations());
-		}
-		
-		/*
-		 * sample and load meta data
-		 */
-		
-		BareRecommendation sample = sampler.sample();
-		
-		int beatmapid = sample.getBeatmapId();
-		
-		Recommendation recommendation = new Recommendation();
-		
-		recommendation.bareRecommendation = sample;
-		
-		BeatmapMeta loadBeatmap;
-		try {
-			if(sample.getMods() < 0) {
-				loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
-			} else {
-				loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods(), lang);
-				if(loadBeatmap == null)
-					loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
-			}
-		} catch (NotRankedException e) {
-			throw new UserException(lang.excuseForError());
-		}
-		recommendation.beatmap = loadBeatmap;
-		
-		loadBeatmap.setPersonalPP(sample.getPersonalPP());
-		
-		/*
-		 * save recommendation internally
-		 */
-		
-		givenRecomendations.getUnchecked(userid).add(beatmapid);
-		lastRecommendation.put(userid, recommendation);
-		
-		return recommendation;
+		return settings;
 	}
 
 	/**
@@ -396,7 +421,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		return arrayList;
 	}
 
-	public void forgetRecommendations(int userid) throws SQLException {
+	public void forgetRecommendations(@UserId int userid) throws SQLException {
 		givenRecomendations.getUnchecked(userid).clear();
 		backend.forgetRecommendations(userid);
 	}

@@ -4,10 +4,10 @@ import java.text.DecimalFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
 import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.types.BitwiseMods;
 
 @Data
 @AllArgsConstructor
@@ -29,6 +29,7 @@ public class BeatmapMeta {
 	public interface PercentageEstimates extends Estimates {
 		double getPPForAcc(double acc);
 		
+		@BitwiseMods
 		long getMods();
 		
 		boolean isShaky();
@@ -49,7 +50,7 @@ public class BeatmapMeta {
 		String beatmapName = getBeatmap().getArtist() + " - " + getBeatmap().getTitle()
 				+ " [" + getBeatmap().getVersion() + "]";
 		if(formLink) {
-			beatmapName = "[http://osu.ppy.sh/b/" + getBeatmap().getId() + " " + beatmapName + "]";
+			beatmapName = "[http://osu.ppy.sh/b/" + getBeatmap().getBeatmapId() + " " + beatmapName + "]";
 		}
 		
 		long mods = 0;
@@ -58,10 +59,10 @@ public class BeatmapMeta {
 			PercentageEstimates percentageEstimates = (PercentageEstimates) getEstimates();
 			mods = percentageEstimates.getMods();
 			if(percentageEstimates.getMods() != 0) {
-				String modsString = "";
+				StringBuilder modsString = new StringBuilder();
 				for(Mods mod : Mods.getMods(percentageEstimates.getMods())) {
 					if(mod.isEffective()) {
-						modsString += mod.getShortName();
+						modsString.append(mod.getShortName());
 					}
 				}
 				beatmapName += " " + modsString;
@@ -79,7 +80,7 @@ public class BeatmapMeta {
 			OldEstimates oldEstimates = (OldEstimates) estimates;
 			
 			double community = oldEstimates.getCommunityPP();
-			community = Math.round(community * 2) / 2;
+			community = Math.round(community * 2) / 2d;
 			String ppestimate = community % 1 == 0 ? "" + (int) community : "" + format.format(community);
 
 			String cQ = oldEstimates.isTrustCommunity() ? "" : "??";
@@ -124,6 +125,7 @@ public class BeatmapMeta {
 	 * Mods presented by this meta
 	 * @return 0 if estimates are old style
 	 */
+	@BitwiseMods
 	public long getMods() {
 		if (estimates instanceof PercentageEstimates) {
 			PercentageEstimates percentageEstimates = (PercentageEstimates) estimates;
