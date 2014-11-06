@@ -25,6 +25,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.tillerino.osuApiModel.Mods;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -36,6 +37,8 @@ import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
 import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
 import tillerino.tillerinobot.mbeans.RecommendationsManagerMXBean;
+import tillerino.tillerinobot.predicates.PredicateParser;
+import tillerino.tillerinobot.predicates.RecommendationPredicate;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -136,6 +139,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			public Model model;
 			@BitwiseMods
 			public long requestedMods;
+			public List<RecommendationPredicate> predicates = new ArrayList<>();
 		}
 		final SortedMap<Double, BareRecommendation> distribution = new TreeMap<>();
 		double sum = 0;
@@ -184,6 +188,8 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	}
 	
 	BotBackend backend;
+
+	PredicateParser parser = new PredicateParser();
 
 	@Inject
 	public RecommendationsManager(BotBackend backend) {
@@ -239,8 +245,11 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 	/**
 	 * get an ready-to-display recommendation
-	 * @param message the remaining arguments ("r" or "recommend" were removed)
-	 * @param lang 
+	 * 
+	 * @param apiUser
+	 * @param message
+	 *            the remaining arguments ("r" or "recommend" were removed)
+	 * @param lang
 	 * @return
 	 * @throws UserException
 	 * @throws SQLException
@@ -259,7 +268,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		 * parse arguments
 		 */
 		
-		Settings settings = getSamplerSettings(apiUser, message, lang);
+		Settings settings = parseSamplerSettings(apiUser, message, lang);
 
 		/*
 		 * load sampler
@@ -276,7 +285,8 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 			// only keep the 1k most probable recommendations to save some
 			// memory
-			recommendations = getTopRecommendations(recommendations);
+			recommendations = getTopRecommendations(recommendations,
+					settings.predicates);
 
 			sampler = new Sampler(recommendations, settings);
 
@@ -330,7 +340,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		return recommendation;
 	}
 
-	public Settings getSamplerSettings(OsuApiUser apiUser, String message,
+	public Settings parseSamplerSettings(OsuApiUser apiUser, String message,
 			Language lang) throws UserException, SQLException, IOException {
 		String[] remaining = message.split(" ");
 		
@@ -344,33 +354,51 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
-			if(param.length() == 0)
+			String lowerCase = param.toLowerCase();
+			if(lowerCase.length() == 0)
 				continue;
-			if(getLevenshteinDistance(param, "nomod") <= 2) {
+			if(getLevenshteinDistance(lowerCase, "nomod") <= 2) {
 				settings.nomod = true;
 				continue;
 			}
-			if(getLevenshteinDistance(param, "relax") <= 2) {
+			if(getLevenshteinDistance(lowerCase, "relax") <= 2) {
 				settings.model = Model.ALPHA;
 				continue;
 			}
-			if(getLevenshteinDistance(param, "beta") <= 1) {
+			if(getLevenshteinDistance(lowerCase, "beta") <= 1) {
 				settings.model = Model.BETA;
 				continue;
 			}
-			if(getLevenshteinDistance(param, "gamma") <= 2) {
+			if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
 				settings.model = Model.GAMMA;
 				continue;
 			}
-			if(settings.model == Model.GAMMA && param.equals("dt")) {
+			if(settings.model == Model.GAMMA && lowerCase.equals("dt")) {
 				settings.requestedMods = Mods.add(settings.requestedMods, Mods.DoubleTime);
 				continue;
 			}
-			if(settings.model == Model.GAMMA &&  param.equals("hr")) {
+			if(settings.model == Model.GAMMA &&  lowerCase.equals("hr")) {
 				settings.requestedMods = Mods.add(settings.requestedMods, Mods.HardRock);
 				continue;
 			}
-			throw new UserException(lang.invalidChoice(param, "[nomod] [relax|beta|gamma] [dt|hr]"));
+			if (backend.getDonator(apiUser) > 0) {
+				RecommendationPredicate predicate = parser.tryParse(param, lang);
+				if (predicate != null) {
+					for (RecommendationPredicate existingPredicate : settings.predicates) {
+						if (existingPredicate.contradicts(predicate)) {
+							throw new UserException(lang.invalidChoice(
+									existingPredicate.getOriginalArgument() + " with "
+											+ predicate.getOriginalArgument(),
+									"either " + existingPredicate.getOriginalArgument() + " or "
+											+ predicate.getOriginalArgument()));
+						}
+					}
+					settings.predicates.add(predicate);
+					continue;
+				}
+			}
+			throw new UserException(lang.invalidChoice(param,
+					"[nomod] [relax|beta|gamma] [dt|hr]"));
 		}
 		
 		/*
@@ -401,11 +429,30 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 	/**
 	 * returns
+	 * 
 	 * @param recommendations
+	 * @param predicates
 	 * @return
+	 * @throws IOException
+	 * @throws SQLException
 	 */
-	public static List<BareRecommendation> getTopRecommendations(Collection<BareRecommendation> recommendations) {
-		List<BareRecommendation> list = new ArrayList<>(recommendations);
+	public List<BareRecommendation> getTopRecommendations(
+			Collection<BareRecommendation> recommendations,
+			List<RecommendationPredicate> predicates) throws SQLException, IOException {
+		List<BareRecommendation> list = new ArrayList<>();
+
+		recommendationsLoop: for (BareRecommendation bareRecommendation : recommendations) {
+			OsuApiBeatmap beatmap = null;
+			for (RecommendationPredicate predicate : predicates) {
+				if (beatmap == null) {
+					beatmap = backend.getBeatmap(bareRecommendation.getBeatmapId());
+				}
+				if (!predicate.test(bareRecommendation, beatmap)) {
+					continue recommendationsLoop;
+				}
+			}
+			list.add(bareRecommendation);
+		}
 		
 		Collections.sort(list, new Comparator<BareRecommendation>() {
 			@Override

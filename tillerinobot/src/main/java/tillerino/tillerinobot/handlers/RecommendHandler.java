@@ -41,27 +41,27 @@ public class RecommendHandler implements CommandHandler {
 			IOException, SQLException {
 		Language lang = userData.getLanguage();
 
-		String message = command.toLowerCase();
+		String lowerCase = command.toLowerCase();
 
 		boolean isRecommend = false;
 
-		if (message.equals("r")) {
+		if (lowerCase.equals("r")) {
 			isRecommend = true;
-			message = "";
+			command = "";
 		}
-		if (getLevenshteinDistance(message, "recommend") <= 2) {
+		if (getLevenshteinDistance(lowerCase, "recommend") <= 2) {
 			isRecommend = true;
-			message = "";
+			command = "";
 		}
-		if (message.startsWith("r ")) {
+		if (lowerCase.startsWith("r ")) {
 			isRecommend = true;
-			message = message.substring(2);
+			command = command.substring(2);
 		}
-		if (message.contains(" ")) {
-			int pos = message.indexOf(' ');
-			if (getLevenshteinDistance(message.substring(0, pos), "recommend") <= 2) {
+		if (lowerCase.contains(" ")) {
+			int pos = lowerCase.indexOf(' ');
+			if (getLevenshteinDistance(lowerCase.substring(0, pos), "recommend") <= 2) {
 				isRecommend = true;
-				message = message.substring(pos + 1);
+				command = command.substring(pos + 1);
 			}
 		}
 		if (!isRecommend) {
@@ -69,7 +69,7 @@ public class RecommendHandler implements CommandHandler {
 		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,
-				message, lang);
+				command, lang);
 		BeatmapMeta beatmap = recommendation.beatmap;
 
 		if (beatmap == null) {

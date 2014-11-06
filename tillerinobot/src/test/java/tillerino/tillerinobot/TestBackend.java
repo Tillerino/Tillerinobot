@@ -2,6 +2,7 @@ package tillerino.tillerinobot;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
@@ -117,6 +119,8 @@ public class TestBackend implements BotBackend {
 
 	boolean serialize;
 	
+	List<Integer> beatmapIds = new ArrayList<>();
+
 	@Inject
 	public TestBackend(
 			@Named("tillerinobot.test.persistentBackend") boolean serialize) {
@@ -128,6 +132,15 @@ public class TestBackend implements BotBackend {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+				TestBackend.class.getResourceAsStream("/beatmapIds.txt")))) {
+			for (String line; (line = reader.readLine()) != null;) {
+				beatmapIds.add(Integer.parseInt(line));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -175,7 +188,7 @@ public class TestBackend implements BotBackend {
 		return new BeatmapMeta(beatmap, null, estimates);
 	}
 
-	OsuApiBeatmap getBeatmap(int beatmapid) {
+	public OsuApiBeatmap getBeatmap(int beatmapid) {
 		Random rand = new Random(beatmapid);
 		OsuApiBeatmap beatmap = database.beatmaps.get(beatmapid);
 		if (beatmap == null) {
@@ -206,7 +219,7 @@ public class TestBackend implements BotBackend {
 		return beatmap;
 	}
 
-	void hintUser(String username, boolean isDonator, int rank, double pp)
+	public void hintUser(String username, boolean isDonator, int rank, double pp)
 			throws SQLException, IOException {
 		if (!database.userNames.containsKey(username)) {
 			database.userNames.put(username, database.userNames.size() + 1);
@@ -313,7 +326,7 @@ public class TestBackend implements BotBackend {
 		}
 		OsuApiUser user = getUser(userid, 0);
 		final double equivalent = user.getPp() / 20;
-		for (int i = 1; i <= 1000; i++) {
+		for (int i : beatmapIds) {
 			for(long m : mods) {
 				BeatmapMeta meta = loadBeatmap(i, m, null);
 				if(Math.abs(1 - ((PercentageEstimates) meta.getEstimates()).getPPForAcc(.98) / equivalent) < .15) {

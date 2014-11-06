@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot</artifactId>
-	<version>0.9</version>
+	<version>0.9.1</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>osuApiConnector</artifactId>
-			<version>0.9</version>
+			<version>0.9.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pircbotx</groupId>
@@ -79,7 +79,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.14.2</version>
+			<version>1.14.8</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

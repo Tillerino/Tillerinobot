@@ -44,7 +44,10 @@ public class WithHandler implements CommandHandler {
 				throw new UserException(lang.malformattedMods(message));
 			}
 			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), mods, lang);
-			if(beatmap.getMods() == 0) {
+			if (beatmap == null) {
+				throw new UserException(lang.excuseForError());
+			}
+			if (beatmap.getMods() == 0) {
 				throw new UserException(lang.noInformationForMods());
 			}
 			

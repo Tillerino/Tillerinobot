@@ -12,6 +12,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifier;
 
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -32,18 +33,27 @@ public interface BotBackend {
 
 	/**
 	 * @param beatmapid
-	 * @param mods mods for {@link PercentageEstimates}. These might be ignored if they can't be satisfied
-	 * @param lang TODO
+	 * @param mods
+	 *            mods for {@link PercentageEstimates}. These might be ignored
+	 *            if they can't be satisfied
+	 * @param lang
+	 *            TODO
 	 * @return null if not found
-	 * @throws IOException 
-	 * @throws UserException 
+	 * @throws SQLException
+	 * @throws IOException
+	 * @throws UserException
 	 */
+	@CheckForNull
 	public BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException;
 
 	public void saveGivenRecommendation(@UserId int userid, @BeatmapId int beatmapid, @BitwiseMods long mods) throws SQLException;
 
 	/**
-	 * @return the last version of the bot that was visited by this user. -1 if no information available.
+	 * @param nick
+	 * @return the last version of the bot that was visited by this user. -1 if
+	 *         no information available.
+	 * @throws SQLException
+	 * @throws UserException
 	 */
 	public int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
 	
@@ -102,8 +112,10 @@ public interface BotBackend {
 	
 	/**
 	 * gets the userid which belogs to the given key
-	 * @param key 
+	 * 
+	 * @param key
 	 * @return null if key not found
+	 * @throws SQLException
 	 */
 	public @UserId Integer resolveUserKey(String key) throws SQLException;
 	
@@ -144,4 +156,15 @@ public interface BotBackend {
 	 * @throws SQLException
 	 */
 	public void forgetRecommendations(@UserId int user) throws SQLException;
+
+	/**
+	 * Retreives beatmap. Implementation hint: this might be called a *lot* when
+	 * checking recommendation predicates and should probably be cached.
+	 * 
+	 * @param beatmapId
+	 * @return null if not found
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public @CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId) throws SQLException, IOException;
 }
