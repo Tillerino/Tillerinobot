@@ -1,0 +1,12 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	
+	</ui:style>
+	<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE" horizontalAlignment="ALIGN_RIGHT" spacing="10">
+		<g:InlineLabel ui:field="userNameLabel" text="..."/>
+		<g:Button ui:field="settingsButton" visible="false">Settings</g:Button>
+		<g:Button ui:field="logButton" enabled="false">Login</g:Button>
+	</g:HorizontalPanel>
+</ui:UiBinder> 

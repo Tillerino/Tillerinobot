@@ -1,0 +1,3 @@
+[submodule "Tillerinobot"]
+	path = Tillerinobot
+	url = https://github.com/Tillerino/Tillerinobot.git

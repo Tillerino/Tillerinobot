@@ -1,0 +1,24 @@
+package org.tillerino.ppaddict.client.services;
+
+import javax.annotation.CheckForNull;
+
+import org.tillerino.ppaddict.shared.ClientUserData;
+import org.tillerino.ppaddict.shared.InitialData;
+import org.tillerino.ppaddict.shared.Settings;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+public interface UserDataServiceAsync {
+
+  void getStatus(AsyncCallback<ClientUserData> callback);
+
+  void saveSettings(Settings s, AsyncCallback<Void> callback);
+
+  void saveComment(int beatmapid, @CheckForNull String mods, String comment,
+      AsyncCallback<Void> callback);
+
+  void getInitialData(AsyncCallback<InitialData> callback);
+
+  void getLinkString(AsyncCallback<String> callback);
+
+}

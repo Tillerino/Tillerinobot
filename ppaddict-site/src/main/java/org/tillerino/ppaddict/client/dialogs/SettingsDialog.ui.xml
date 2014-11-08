@@ -1,0 +1,13 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<g:VerticalPanel spacing="10" width="350px">
+		<g:Label text="Settings"></g:Label>
+		<g:CheckBox ui:field="checkAutoOpenDirect">Open map in osu!direct when selected</g:CheckBox>
+		<g:CheckBox ui:field="otherFiltersWithText">Apply other filters when searching in name or notes</g:CheckBox>
+		<g:Button ui:field="linkOsuAccount">Link to osu! account</g:Button>
+		<g:HorizontalPanel verticalAlignment="MIDDLE" ui:field="recommendationsSettingsRow"><g:Label>Recommendations settings: </g:Label><g:TextBox ui:field="recommendationsParameters">*</g:TextBox></g:HorizontalPanel>
+		<g:HorizontalPanel verticalAlignment="MIDDLE"><g:Label>Accuracy (%) low:&nbsp;</g:Label><g:TextBox ui:field="lowAcc" width="100px">*</g:TextBox><g:Label>&nbsp;high:&nbsp;</g:Label><g:TextBox ui:field="highAcc" width="100px">*</g:TextBox></g:HorizontalPanel>
+		<g:Button ui:field="buttonSave">Save</g:Button>
+	</g:VerticalPanel>
+</ui:UiBinder> 

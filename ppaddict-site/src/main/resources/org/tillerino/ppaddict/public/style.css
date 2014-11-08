@@ -1,0 +1,140 @@
+@import url(//fonts.googleapis.com/css?family=Cabin:semibold);
+
+:FOCUS {
+	outline: none;
+}
+
+body,table td,input,.gwt-Button,button {
+	font-size: 16px;
+	font-family: Cabin, "Gill Sans", Calibri, "DejaVu Sans", sans-serif;
+}
+
+.comments {
+	padding-top: 5px;
+	margin-left: 15px;
+	font-size: 13px;
+}
+
+.commentsdate {
+	margin-left: 15px;
+/* 	font-style: italic; */
+}
+
+.title, .title a {
+	font-size: 36pt;
+	color: #000;
+	text-decoration: none;
+	font-weight: normal;
+}
+
+a {
+	color: rgb(222, 51, 151);
+	text-decoration: none;
+	cursor: pointer;
+}
+
+a:VISITED {
+	color: rgb(255, 91, 172);
+}
+
+a:HOVER {
+	color: rgb(255, 91, 172);
+	text-decoration: none;
+}
+
+.mainpanel {
+	margin: 20px; 
+}
+
+.onecharminmaxcell {
+	width: 20px;
+	text-align: right;
+}
+
+.threecharminmaxcell {
+	width: 35px;
+	text-align: right;
+}
+
+.fivecharminmaxcell {
+	width: 45px;
+	text-align: right;
+}
+
+.chillinput {
+	color: rgb(158, 160, 182);
+	text-decoration: underline;
+	border: none;
+	cursor: pointer;
+}
+
+.chillinput:FOCUS {
+	color: black;
+	text-decoration: none;
+	border: solid 1px rgb(158, 160, 182);
+	cursor: text;
+}
+
+.alignright {
+	text-align: right;
+}
+
+.tablealignright {
+	margin-left: auto;
+}
+
+.alignleft {
+	text-align: left;
+}
+
+button,.gwt-Button {
+	background: none;
+	border: none;
+	padding: 0px;
+	margin: 0px;
+	text-decoration: underline;
+	color: rgb(158, 160, 182);
+	cursor: pointer;
+	text-align: inherit;
+	outline-style: none;
+}
+
+button:HOVER,.gwt-Button:HOVER {
+	color: rgb(198, 199, 210);
+}
+
+button:ACTIVE,.gwt-Button:ACTIVE {
+	padding: 0px;
+	border: none;
+}
+button[disabled], .gwt-Button[disabled] {
+	text-decoration: line-through;
+	border: none;
+}
+button[disabled], .gwt-Button[disabled]:hover {
+	border: none;
+}
+
+.gwt-PopupPanel {
+	border: solid 1px #000;
+	padding: 10px;
+	background: white;
+}
+
+.helppopup {
+	width: 150px;
+	/* 	height: 1px; */
+	overflow: visible;
+	border: solid 1px #000;
+	font-size: small;
+	margin-left: 20px;
+	padding: 5px;
+}
+
+.helppopuptitle {
+	font-size: medium;
+}
+
+.gwt-SuggestBox {
+  padding: 0px;
+}
