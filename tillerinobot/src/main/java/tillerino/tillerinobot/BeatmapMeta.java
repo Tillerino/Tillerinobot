@@ -2,8 +2,11 @@ package tillerino.tillerinobot;
 
 import java.text.DecimalFormat;
 
+import javax.annotation.CheckForNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
@@ -19,6 +22,9 @@ public class BeatmapMeta {
 		long getMods();
 		
 		boolean isShaky();
+
+		@CheckForNull
+		Double getStarDiff();
 	}
 	
 	OsuApiBeatmap beatmap;
@@ -71,8 +77,17 @@ public class BeatmapMeta {
 		}
 		
 		estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(mods));
-		if(mods == 0)
-			estimateMessage += " ★ " + format.format(getBeatmap().getStarDifficulty());
+
+		Double starDiff = null;
+		if (mods == 0) {
+			starDiff = beatmap.getStarDifficulty();
+		} else if (estimates instanceof PercentageEstimates) {
+			starDiff = ((PercentageEstimates) estimates).getStarDiff();
+		}
+		if (starDiff != null) {
+			estimateMessage += " ★ " + format.format(starDiff);
+		}
+
 		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(mods));
 		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(mods));
 

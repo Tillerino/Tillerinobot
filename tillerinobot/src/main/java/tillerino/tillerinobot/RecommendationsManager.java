@@ -23,6 +23,8 @@ import javax.management.ObjectName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
@@ -39,6 +41,7 @@ import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
 import tillerino.tillerinobot.mbeans.RecommendationsManagerMXBean;
 import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
+import tillerino.tillerinobot.UserException.RareUserException;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -84,9 +87,30 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	
 	@Data
 	public static class GivenRecommendation {
+		public GivenRecommendation(@UserId int userid, @BeatmapId int beatmapid, long date, @BitwiseMods long mods) {
+			super();
+			this.userid = userid;
+			this.beatmapid = beatmapid;
+			this.date = date;
+			this.mods = mods;
+		}
+
+		protected GivenRecommendation() {
+
+		}
+
+		@UserId
+		@Getter(onMethod = @__(@UserId))
+		@Setter(onParam = @__(@UserId))
 		public int userid;
+		@BeatmapId
+		@Getter(onMethod = @__(@BeatmapId))
+		@Setter(onParam = @__(@BeatmapId))
 		public int beatmapid;
 		public long date;
+		@BitwiseMods
+		@Getter(onMethod = @__(@BitwiseMods))
+		@Setter(onParam = @__(@BitwiseMods))
 		public long mods;
 	}
 	
@@ -248,14 +272,16 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	 * 
 	 * @param apiUser
 	 * @param message
-	 *            the remaining arguments ("r" or "recommend" were removed)
+	 *            the remaining arguments ("r" or "recommend" were removed).
+	 *            null if an existing sampler should be reused.
 	 * @param lang
 	 * @return
 	 * @throws UserException
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	public Recommendation getRecommendation(@Nonnull OsuApiUser apiUser, String message, Language lang) throws UserException, SQLException, IOException {
+	public Recommendation getRecommendation(@Nonnull OsuApiUser apiUser, @CheckForNull String message, Language lang)
+			throws UserException, SQLException, IOException {
 		/*
 		 * log activity making sure that we can resolve the user's IRC name
 		 */
@@ -265,32 +291,31 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		backend.registerActivity(userid);
 		
 		/*
-		 * parse arguments
-		 */
-		
-		Settings settings = parseSamplerSettings(apiUser, message, lang);
-
-		/*
 		 * load sampler
 		 */
 
 		Sampler sampler = samplers.getIfPresent(userid);
 
-		if (sampler == null || !sampler.settings.equals(settings)) {
-			Collection<BareRecommendation> recommendations = backend
-					.loadRecommendations(userid,
-							givenRecomendations.getUnchecked(userid),
-							settings.model, settings.nomod,
-							settings.requestedMods);
+		if (sampler == null || message != null) {
+			/*
+			 * parse arguments
+			 */
 
-			// only keep the 1k most probable recommendations to save some
-			// memory
-			recommendations = getTopRecommendations(recommendations,
-					settings.predicates);
+			Settings settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
 
-			sampler = new Sampler(recommendations, settings);
+			if (sampler == null || !sampler.settings.equals(settings)) {
+				Collection<BareRecommendation> recommendations = backend.loadRecommendations(userid,
+						givenRecomendations.getUnchecked(userid), settings.model, settings.nomod,
+						settings.requestedMods);
 
-			samplers.put(userid, sampler);
+				// only keep the 1k most probable recommendations to save some
+				// memory
+				recommendations = getTopRecommendations(recommendations, settings.predicates);
+
+				sampler = new Sampler(recommendations, settings);
+
+				samplers.put(userid, sampler);
+			}
 		}
 
 		if (sampler.isEmpty()) {
@@ -321,10 +346,10 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 					loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
 			}
 		} catch (NotRankedException e) {
-			throw new UserException(lang.excuseForError());
+			throw new RareUserException(lang.excuseForError());
 		}
 		if (loadBeatmap == null) {
-			throw new UserException(lang.excuseForError());
+			throw new RareUserException(lang.excuseForError());
 		}
 		recommendation.beatmap = loadBeatmap;
 
@@ -340,7 +365,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		return recommendation;
 	}
 
-	public Settings parseSamplerSettings(OsuApiUser apiUser, String message,
+	public Settings parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message,
 			Language lang) throws UserException, SQLException, IOException {
 		String[] remaining = message.split(" ");
 		

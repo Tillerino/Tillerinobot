@@ -21,6 +21,7 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
 
 @Slf4j
@@ -73,9 +74,8 @@ public class RecommendHandler implements CommandHandler {
 		BeatmapMeta beatmap = recommendation.beatmap;
 
 		if (beatmap == null) {
-			user.message(lang.excuseForError());
 			log.error("unknow recommendation occurred");
-			return true;
+			throw new RareUserException(lang.excuseForError());
 		}
 		String addition = null;
 		if (recommendation.bareRecommendation.getMods() < 0) {

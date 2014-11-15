@@ -111,15 +111,6 @@ public interface BotBackend {
 			@Nonnull Model model, boolean nomod, @BitwiseMods long requestMods) throws SQLException, IOException, UserException;
 	
 	/**
-	 * gets the userid which belogs to the given key
-	 * 
-	 * @param key
-	 * @return null if key not found
-	 * @throws SQLException
-	 */
-	public @UserId Integer resolveUserKey(String key) throws SQLException;
-	
-	/**
 	 * verifies a key for general data queries
 	 * @param key
 	 * @return

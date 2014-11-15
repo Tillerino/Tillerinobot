@@ -15,6 +15,7 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
 
 public class WithHandler implements CommandHandler {
@@ -45,7 +46,7 @@ public class WithHandler implements CommandHandler {
 			}
 			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), mods, lang);
 			if (beatmap == null) {
-				throw new UserException(lang.excuseForError());
+				throw new RareUserException(lang.excuseForError());
 			}
 			if (beatmap.getMods() == 0) {
 				throw new UserException(lang.noInformationForMods());

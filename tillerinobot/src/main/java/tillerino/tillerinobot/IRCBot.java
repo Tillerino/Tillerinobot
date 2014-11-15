@@ -38,6 +38,7 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
+import org.slf4j.Logger;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BotBackend.IRCName;
@@ -179,18 +180,23 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				}
 				user.message(e.getMessage());
 			} else {
-				String string = getRandomString(6);
+				String string = logException(e, log);
 
 				if (e instanceof IOException) {
 					user.message(lang.externalException(string));
 				} else {
 					user.message(lang.internalException(string));
 				}
-				log.error(string + ": fucked up", e);
 			}
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
 		}
+	}
+
+	public static String logException(Throwable e, Logger logger) {
+		String string = getRandomString(6);
+		logger.error(string + ": fucked up", e);
+		return string;
 	}
 
 	public static String getRandomString(int length) {

@@ -11,7 +11,6 @@ import javax.ws.rs.core.Response.Status;
 
 import tillerino.tillerinobot.rest.BeatmapInfoService;
 import tillerino.tillerinobot.rest.BotInfoService;
-import tillerino.tillerinobot.rest.RecommendationHistoryService;
 
 /**
  * @author Tillerino
@@ -21,12 +20,10 @@ public class BotAPIServer extends Application {
 
 	@Inject
 	public BotAPIServer(BotRunner bot, BotBackend backend,
-			BotInfoService botInfo, RecommendationHistoryService history,
-			BeatmapInfoService beatmapInfo) {
+ BotInfoService botInfo, BeatmapInfoService beatmapInfo) {
 		super();
 
 		resourceInstances.add(botInfo);
-		resourceInstances.add(history);
 		resourceInstances.add(beatmapInfo);
 	}
 
