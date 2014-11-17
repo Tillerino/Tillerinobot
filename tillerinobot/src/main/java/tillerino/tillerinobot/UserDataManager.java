@@ -165,6 +165,14 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 				return 0;
 			return backend.getDonator(user);
 		}
+
+		@Getter
+		boolean showWelcomeMessage = true;
+
+		public void setShowWelcomeMessage(boolean welcomeMessage) {
+			changed |= welcomeMessage != this.showWelcomeMessage;
+			this.showWelcomeMessage = welcomeMessage;
+		}
 	}
 	
 	BotBackend backend;

@@ -413,10 +413,14 @@ public class IRCBot extends CoreHooks {
 			
 			if(backend.getDonator(apiUser) > 0) {
 				// this is a donator, let's welcome them!
+				UserData data = userDataManager.getData(userid);
 				
+				if (!data.isShowWelcomeMessage())
+					return;
+
 				long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
 				
-				userDataManager.getData(userid).getLanguage()
+				data.getLanguage()
 						.welcomeUser(user, apiUser, inactiveTime);
 				
 				checkVersionInfo(user);

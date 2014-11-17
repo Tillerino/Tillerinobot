@@ -82,7 +82,7 @@ public class RecommendHandler implements CommandHandler {
 			addition = lang.tryWithMods();
 		}
 		if (recommendation.bareRecommendation.getMods() > 0
-				&& beatmap.getMods() == 0) {
+				&& beatmap.getMods() != recommendation.bareRecommendation.getMods()) {
 			addition = lang.tryWithMods(Mods
 					.getMods(recommendation.bareRecommendation.getMods()));
 		}
