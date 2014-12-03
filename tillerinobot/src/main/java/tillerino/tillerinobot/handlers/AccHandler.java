@@ -49,10 +49,6 @@ public class AccHandler implements CommandHandler {
 			acc = Math.round(acc * 100) / 10000d;
 			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
 
-			if (!(beatmap.getEstimates() instanceof PercentageEstimates)) {
-				throw new UserException(lang.noPercentageEstimates());
-			}
-
 			user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc));
 			return true;
 		}

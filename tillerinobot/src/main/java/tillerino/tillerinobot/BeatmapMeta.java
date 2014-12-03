@@ -12,21 +12,7 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 @Data
 @AllArgsConstructor
 public class BeatmapMeta {
-	public interface Estimates {
-		
-	}
-	
-	public interface OldEstimates extends Estimates {
-		Integer getMaxPP();
-		
-		double getCommunityPP();
-		
-		boolean isTrustCommunity();
-
-		boolean isTrustMax();
-	}
-	
-	public interface PercentageEstimates extends Estimates {
+	public interface PercentageEstimates {
 		double getPPForAcc(double acc);
 		
 		@BitwiseMods
@@ -39,7 +25,7 @@ public class BeatmapMeta {
 
 	Integer personalPP;
 	
-	Estimates estimates;
+	PercentageEstimates estimates;
 
 	static DecimalFormat format = new DecimalFormat("#.##");
 
@@ -53,20 +39,16 @@ public class BeatmapMeta {
 			beatmapName = "[http://osu.ppy.sh/b/" + getBeatmap().getBeatmapId() + " " + beatmapName + "]";
 		}
 		
-		long mods = 0;
-		
-		if(getEstimates() instanceof PercentageEstimates) {
-			PercentageEstimates percentageEstimates = (PercentageEstimates) getEstimates();
-			mods = percentageEstimates.getMods();
-			if(percentageEstimates.getMods() != 0) {
-				StringBuilder modsString = new StringBuilder();
-				for(Mods mod : Mods.getMods(percentageEstimates.getMods())) {
-					if(mod.isEffective()) {
-						modsString.append(mod.getShortName());
-					}
+		PercentageEstimates percentageEstimates = getEstimates();
+		long mods = percentageEstimates.getMods();
+		if (percentageEstimates.getMods() != 0) {
+			StringBuilder modsString = new StringBuilder();
+			for (Mods mod : Mods.getMods(percentageEstimates.getMods())) {
+				if (mod.isEffective()) {
+					modsString.append(mod.getShortName());
 				}
-				beatmapName += " " + modsString;
 			}
+			beatmapName += " " + modsString;
 		}
 
 		String estimateMessage = "";
@@ -74,36 +56,18 @@ public class BeatmapMeta {
 			estimateMessage += "future you: " + getPersonalPP() + "pp | ";
 		}
 		
-		Estimates estimates = getEstimates();
-		
-		if (estimates instanceof OldEstimates) {
-			OldEstimates oldEstimates = (OldEstimates) estimates;
-			
-			double community = oldEstimates.getCommunityPP();
-			community = Math.round(community * 2) / 2d;
-			String ppestimate = community % 1 == 0 ? "" + (int) community : "" + format.format(community);
 
-			String cQ = oldEstimates.isTrustCommunity() ? "" : "??";
-			String bQ = oldEstimates.isTrustMax() ? "" : "??";
-			
-			estimateMessage += "community: " + ppestimate + cQ + "pp";
-			if(oldEstimates.getMaxPP() != null)
-				estimateMessage += " | best: " + oldEstimates.getMaxPP() + bQ + "pp";
-		} else if (estimates instanceof PercentageEstimates) {
-			PercentageEstimates percentageEstimates = (PercentageEstimates) estimates;
-
-			if(acc != null) {
-				estimateMessage += format.format(acc * 100) + "%: "
-						+ noDecimalsFormat.format(percentageEstimates.getPPForAcc(acc)) + "pp";
-			} else {
-				estimateMessage += "95%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.95)) + "pp";
-				estimateMessage += " | 98%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.98)) + "pp";
-				estimateMessage += " | 99%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.99)) + "pp";
-				estimateMessage += " | 100%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(1)) + "pp";
-			}
-			if(percentageEstimates.isShaky()) {
-				estimateMessage += " (rough estimates)";
-			}
+		if (acc != null) {
+			estimateMessage += format.format(acc * 100) + "%: "
+					+ noDecimalsFormat.format(percentageEstimates.getPPForAcc(acc)) + "pp";
+		} else {
+			estimateMessage += "95%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.95)) + "pp";
+			estimateMessage += " | 98%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.98)) + "pp";
+			estimateMessage += " | 99%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.99)) + "pp";
+			estimateMessage += " | 100%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(1)) + "pp";
+		}
+		if (percentageEstimates.isShaky()) {
+			estimateMessage += " (rough estimates)";
 		}
 		
 		estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(mods));
@@ -127,12 +91,6 @@ public class BeatmapMeta {
 	 */
 	@BitwiseMods
 	public long getMods() {
-		if (estimates instanceof PercentageEstimates) {
-			PercentageEstimates percentageEstimates = (PercentageEstimates) estimates;
-			
-			return percentageEstimates.getMods();
-		}
-		
-		return 0;
+		return estimates.getMods();
 	}
 }

@@ -59,14 +59,11 @@ public class NPHandler implements CommandHandler {
 			return true;
 		}
 
-		String addition = null;
-		if (beatmap.getEstimates() instanceof PercentageEstimates) {
-			PercentageEstimates estimates = (PercentageEstimates) beatmap
-					.getEstimates();
+		PercentageEstimates estimates = beatmap.getEstimates();
 
-			if (estimates.getMods() != pair.getMods()) {
-				addition = "(" + lang.noInformationForModsShort() + ")";
-			}
+		String addition = null;
+		if (estimates.getMods() != pair.getMods()) {
+			addition = "(" + lang.noInformationForModsShort() + ")";
 		}
 
 		if (user.message(beatmap.formInfoMessage(false, addition,

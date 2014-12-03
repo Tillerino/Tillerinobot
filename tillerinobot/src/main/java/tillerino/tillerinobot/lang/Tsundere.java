@@ -521,10 +521,10 @@ public class Tsundere implements Language {
 
 	@Override
 	public void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta) {
-		if (Math.random() > 0.25 || !(meta.getEstimates() instanceof PercentageEstimates)) {
+		if (Math.random() > 0.25) {
 			return;
 		}
-		PercentageEstimates estimates = (PercentageEstimates) meta.getEstimates();
+		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20.0);
 		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
 			user.message("Are you serious!? If that map doesn't kill you, I will.");
@@ -536,10 +536,10 @@ public class Tsundere implements Language {
 	@Override
 	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta) {
 		//The following checks are probably redundant, but they don't hurt anyone either.
-		if (Math.random() > 0.25 || !(meta.getEstimates() instanceof PercentageEstimates)) {
+		if (Math.random() > 0.25) {
 			return;
 		}
-		PercentageEstimates estimates = (PercentageEstimates) meta.getEstimates();
+		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20);
 		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
 			user.message("You idiot! You're going to get hurt trying mods like that!");
