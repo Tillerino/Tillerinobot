@@ -81,8 +81,8 @@ public class BeatmapMeta {
 		Double starDiff = null;
 		if (mods == 0) {
 			starDiff = beatmap.getStarDifficulty();
-		} else if (estimates instanceof PercentageEstimates) {
-			starDiff = ((PercentageEstimates) estimates).getStarDiff();
+		} else {
+			starDiff = estimates.getStarDiff();
 		}
 		if (starDiff != null) {
 			estimateMessage += " ★ " + format.format(starDiff);

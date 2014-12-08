@@ -410,4 +410,9 @@ public class TestBackend implements BotBackend {
 			}
 		}
 	}
+
+	@Override
+	public String tryLinkToPpaddict(String token, OsuApiUser user) throws SQLException {
+		return null;
+	}
 }

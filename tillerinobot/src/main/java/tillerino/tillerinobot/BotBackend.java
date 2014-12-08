@@ -158,4 +158,14 @@ public interface BotBackend {
 	 * @throws SQLException
 	 */
 	public @CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId) throws SQLException, IOException;
+	
+	/**
+	 * links the given user to a ppaddict account using a token string.
+	 * 
+	 * @param token a token that was given to the user by the ppaddict website.
+	 * @return the name of the ppaddict account that current user was linked to, or null if the token was not valid
+	 * @throws SQLException
+	 */
+	@CheckForNull
+	public String tryLinkToPpaddict(String token, OsuApiUser user) throws SQLException;
 }

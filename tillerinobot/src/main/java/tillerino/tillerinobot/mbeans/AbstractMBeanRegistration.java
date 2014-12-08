@@ -83,8 +83,12 @@ public class AbstractMBeanRegistration implements MBeanRegistration {
 		instanceNumbers.put(name, ++x);
 		return x;
 	}
+	
+	public static ObjectName getObjectName(AbstractMBeanRegistration.WithNotifications t) throws MalformedObjectNameException {
+		return getObjectName(t.inner);
+	}
 
-	static ObjectName getObjectName(AbstractMBeanRegistration t)
+	public static ObjectName getObjectName(AbstractMBeanRegistration t)
 			throws MalformedObjectNameException {
 		if (t.objectName != null) {
 			return t.objectName;

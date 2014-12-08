@@ -47,6 +47,7 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.handlers.AccHandler;
+import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
 import tillerino.tillerinobot.handlers.NPHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
 import tillerino.tillerinobot.handlers.RecommendHandler;
@@ -304,6 +305,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				}
 			}
 			
+			if(new LinkPpaddictHandler(backend).handle(originalMessage, user, apiUser, userData)) {
+				return;
+			}
 			if (!originalMessage.startsWith("!")) {
 				return;
 			}
