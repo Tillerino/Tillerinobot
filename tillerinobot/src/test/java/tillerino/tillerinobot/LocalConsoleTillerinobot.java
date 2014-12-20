@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Singleton;
+
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.pircbotx.Configuration;
@@ -30,6 +31,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 
+import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.rest.BotInfoService;
 
 /**
@@ -40,7 +42,7 @@ import tillerino.tillerinobot.rest.BotInfoService;
  * 
  */
 public class LocalConsoleTillerinobot extends AbstractModule {
-	static class PircBotX extends org.pircbotx.PircBotX {
+	static class PircBotX extends CloseableBot {
 		public PircBotX(
 				Configuration<? extends org.pircbotx.PircBotX> configuration) {
 			super(configuration);

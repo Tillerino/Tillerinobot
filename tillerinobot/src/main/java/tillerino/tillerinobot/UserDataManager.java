@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Singleton
-public class UserDataManager extends AbstractMBeanRegistration implements UserDataManagerMXBean {
+public class UserDataManager extends AbstractMBeanRegistration implements UserDataManagerMXBean, TidyObject {
 	/**
 	 * Bot-specific user data. It is only saved when changed and responsible for
 	 * determining if it has been changed. Manual getters and setters must be
@@ -175,19 +175,16 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		}
 	}
 	
-	BotBackend backend;
+	final BotBackend backend;
+	
+	final ShutdownHook hook = new ShutdownHook(this);
 	
 	@Inject
 	public UserDataManager(BotBackend backend) {
 		super();
 		this.backend = backend;
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				cache.invalidateAll();
-			}
-		});
+		Runtime.getRuntime().addShutdownHook(hook);
 	}
 
 	@Override
@@ -276,5 +273,16 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 	
 	private void postSerialization(UserData options) {
 		options.serializedLanguage = null;
+	}
+
+	@Override
+	public void tidyUp(boolean fromShutdownHook) {
+		log.info("tidyUp({})", fromShutdownHook);
+		
+		cache.invalidateAll();
+		
+		if(!fromShutdownHook) {
+			Runtime.getRuntime().removeShutdownHook(hook);
+		}
 	}
 }

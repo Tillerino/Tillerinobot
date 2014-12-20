@@ -11,10 +11,10 @@ import javax.inject.Singleton;
 import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
 
-import org.pircbotx.PircBotX;
 import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.UnknownEvent;
 
+import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.PingerMXBean;
 import tillerino.tillerinobot.rest.BotInfoService;
@@ -94,10 +94,14 @@ public class Pinger {
 	/*
 	 * this method is synchronized through the sender semaphore
 	 */
-	void ping(PircBotX bot) throws IOException, InterruptedException {
+	void ping(CloseableBot bot) throws IOException, InterruptedException {
 		try {
 			if(quit.get()) {
 				throw new IOException("ping gate closed");
+			}
+			
+			if(!bot.isConnected()) {
+				throw new IOException("bot is no longer connected");			
 			}
 
 			if (bean.isPingDeathPending()) {
@@ -130,10 +134,15 @@ public class Pinger {
 			}
 		} catch(IOException e) {
 			if (lastquit < System.currentTimeMillis() - 1000 || !quit.get()) {
+				quit.set(true);
 				bot.sendIRC().quitServer();
+				try {
+					bot.getSocket().close();
+				} catch (IOException e1) {
+					// swallow
+				}
 				lastquit = System.currentTimeMillis();
 			}
-			quit.set(true);
 			throw e;
 		}
 	}

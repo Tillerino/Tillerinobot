@@ -1,5 +1,7 @@
 package tillerino.tillerinobot;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.nio.charset.Charset;
 
 import javax.annotation.CheckForNull;
@@ -16,8 +18,19 @@ import org.pircbotx.PircBotX;
 
 @Slf4j
 @Singleton
-public class BotRunnerImpl implements BotRunner {
-	PircBotX bot = null;
+public class BotRunnerImpl implements BotRunner, TidyObject {
+	public static class CloseableBot extends PircBotX {
+		public CloseableBot(Configuration<? extends PircBotX> configuration) {
+			super(configuration);
+		}
+		
+		@Override
+		public Socket getSocket() {
+			return super.getSocket();
+		}
+	}
+
+	volatile CloseableBot bot = null;
 
 	@Inject
 	public BotRunnerImpl(Provider<IRCBot> tillerinoBot,
@@ -45,42 +58,72 @@ public class BotRunnerImpl implements BotRunner {
 
 	@Override
 	@CheckForNull
-	public PircBotX getBot() {
+	public CloseableBot getBot() {
 		return bot;
 	}
 
-	private boolean reconnect = true;
+	private volatile boolean reconnect = true;
 	private int reconnectTimeout = 10000;
 
+	IRCBot listener;
+	
 	@Override
 	public void run() {
-		for (; reconnect;) {
-			@SuppressWarnings("unchecked")
-			Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-					.setServer(server, port).setMessageDelay(1000)
-					.setName(nickname).addListener(tillerinoBot.get())
-					.setEncoding(Charset.forName("UTF-8"))
-					.setAutoReconnect(false);
-			if (password != null) {
-				configurationBuilder.setServerPassword(password);
-			}
-			if (autojoinChannel != null) {
-				configurationBuilder.addAutoJoinChannel(autojoinChannel);
+		for (; ;) {
+			if(!reconnect) {
+				break;
 			}
 			try {
+				listener = tillerinoBot.get();
 				try {
-					(bot = new PircBotX(configurationBuilder.buildConfiguration())).startBot();
+					@SuppressWarnings("unchecked")
+					Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
+							.setServer(server, port).setMessageDelay(1000)
+							.setName(nickname).addListener(listener)
+							.setEncoding(Charset.forName("UTF-8"))
+							.setAutoReconnect(false);
+					if (password != null && !password.isEmpty()) {
+						configurationBuilder.setServerPassword(password);
+					}
+					if (autojoinChannel != null && !autojoinChannel.isEmpty()) {
+						configurationBuilder.addAutoJoinChannel(autojoinChannel);
+					}
+					if(reconnect) {
+						(bot = new CloseableBot(configurationBuilder.buildConfiguration())).startBot();
+					}
 				} finally {
 					bot = null;
+					listener.tidyUp(false);
+					listener = null;
 				}
 			} catch (Exception e) {
 				log.error("exception running IRC bot", e);
 			} finally {
 				try {
-					Thread.sleep(reconnectTimeout);
+					if(reconnect) {
+						Thread.sleep(reconnectTimeout);
+					}
 				} catch (InterruptedException e1) {
 					return;
 				}
+			}
+		}
+	}
+	
+	@Override
+	public void tidyUp(boolean fromShutdownHook) {
+		synchronized (this) {
+			reconnect = false;
+			if(bot != null && bot.isConnected()) {
+				bot.sendIRC().quitServer();
+				try {
+					bot.getSocket().close();
+				} catch (IOException e) {
+					log.error("error closing socket", e);
+				}
+			}
+			if(listener != null) {
+				listener.tidyUp(fromShutdownHook);
 			}
 		}
 	}

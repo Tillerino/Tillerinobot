@@ -41,6 +41,7 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BotBackend.IRCName;
+import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
@@ -63,7 +64,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
-public class IRCBot extends CoreHooks {
+public class IRCBot extends CoreHooks implements TidyObject {
 	public interface IRCBotUser {
 		/**
 		 * @return the user's IRC nick, not their actual user name.
@@ -226,7 +227,7 @@ public class IRCBot extends CoreHooks {
 					return false;
 				}
 				try {
-					pinger.ping(user.getBot());
+					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().message(msg);
 					log.info("sent: " + msg);
@@ -249,7 +250,7 @@ public class IRCBot extends CoreHooks {
 					return false;
 				}
 				try {
-					pinger.ping(user.getBot());
+					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().action(msg);
 					log.info("sent action: " + msg);
@@ -344,8 +345,8 @@ public class IRCBot extends CoreHooks {
 	
 	@Override
 	public void onDisconnect(DisconnectEvent event) throws Exception {
-		log.info("disconnected");
-		exec.shutdown();
+		log.info("received DisconnectEvent");
+		tidyUp(false);
 	}
 	
 	AtomicLong lastSerial = new AtomicLong(System.currentTimeMillis());
@@ -507,5 +508,13 @@ public class IRCBot extends CoreHooks {
 		}
 		
 		return apiUser;
+	}
+
+	@Override
+	public void tidyUp(boolean fromShutdownHook) {
+		log.info("tidyUp({})", fromShutdownHook);
+		if(!exec.isShutdown()) {
+			exec.shutdownNow();
+		}
 	}
 }

@@ -4,7 +4,7 @@ import javax.annotation.CheckForNull;
 
 import org.pircbotx.PircBotX;
 
-public interface BotRunner {
+public interface BotRunner extends TidyObject {
 	@CheckForNull
 	PircBotX getBot();
 
