@@ -381,8 +381,10 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		pinger.handleUnknownEvent(event);
 	}
 	
-	static final int currentVersion = 8;
-	static final String versionMessage = "Gamma recommendations are now available and the default engine for players upward of rank 100k. You can now check pp for custom accuracies with the !acc command. See !help for more information.";
+	static final int currentVersion = 9;
+	static final String versionMessage = "Quick announcement: [http://ppaddict.tillerino.org ppaddict] has been updated with fresh data, mods, and you can now get recommendations right on the website."
+			+ " And did you know that electrolytes [https://github.com/Tillerino/Tillerinobot/wiki/Settings extended my language module]?"
+			+ " Oh and there are [https://github.com/Tillerino/Tillerinobot/wiki/Recommendations new options for recommendations].";
 	
 	long lastListTime = System.currentTimeMillis();
 	

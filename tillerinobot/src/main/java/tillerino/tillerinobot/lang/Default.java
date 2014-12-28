@@ -27,7 +27,8 @@ public class Default implements Language {
 	@Override
 	public String externalException(String marker) {
 		return "What's going on? I'm only getting nonsense from the osu server. Can you tell me what this is supposed to mean? 0011101001010000"
-				+ " I can try again if you like, but if this doesn't go away, could you inform human Tillerino? @Tillerino or /u/Tillerino? (reference "
+				+ " Human Tillerino says that this is nothing to worry about, and that we should try again."
+				+ " If you're super worried for some reason, you can tell him about it @Tillerino or /u/Tillerino. (reference "
 				+ marker + ")";
 	}
 
