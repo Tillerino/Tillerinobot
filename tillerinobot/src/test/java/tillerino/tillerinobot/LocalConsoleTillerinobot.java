@@ -3,6 +3,7 @@ package tillerino.tillerinobot;
 import static org.mockito.Mockito.*;
 
 import java.lang.management.ManagementFactory;
+import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -70,6 +71,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	@Singleton
 	public BotRunner getRunner(final IRCBot bot, final BotBackend backend) throws Exception {
 		final PircBotX pircBot = mock(PircBotX.class);
+		when(pircBot.isConnected()).thenReturn(true);
+		when(pircBot.getSocket()).thenReturn(mock(Socket.class));
 
 		doAnswer(new Answer<Void>() {
 			@Override
