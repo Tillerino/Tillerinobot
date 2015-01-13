@@ -30,7 +30,7 @@ public class AccHandler implements CommandHandler {
 	@Override
 	public boolean handle(String message, IRCBotUser user,
 			OsuApiUser apiUser, UserData userData) throws UserException,
-			IOException, SQLException {
+			IOException, SQLException, InterruptedException {
 		if (message.toLowerCase().startsWith("acc")) {
 			BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 			Language lang = userData.getLanguage();

@@ -43,7 +43,7 @@ public class NPHandler implements CommandHandler {
 
 	@Override
 	public boolean handle(String message, IRCBotUser user, OsuApiUser apiUser,
-			UserData userData) throws UserException, IOException, SQLException {
+			UserData userData) throws UserException, IOException, SQLException, InterruptedException {
 		Language lang = userData.getLanguage();
 
 		BeatmapWithMods pair = parseNP(message);

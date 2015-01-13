@@ -58,7 +58,7 @@ public class BeatmapInfoService {
 				public Future<BeatmapMeta> load(final BeatmapWithMods key) {
 					return executorService.submit(new Callable<BeatmapMeta>() {
 						@Override
-						public BeatmapMeta call() throws SQLException {
+						public BeatmapMeta call() throws SQLException, InterruptedException {
 							try {
 								BeatmapMeta beatmap = backend.loadBeatmap(
 										key.getBeatmap(), key.getMods(),

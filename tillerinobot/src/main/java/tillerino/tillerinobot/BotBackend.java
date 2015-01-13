@@ -42,9 +42,10 @@ public interface BotBackend {
 	 * @throws SQLException
 	 * @throws IOException
 	 * @throws UserException
+	 * @throws InterruptedException 
 	 */
 	@CheckForNull
-	public BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException;
+	public BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException, InterruptedException;
 
 	public void saveGivenRecommendation(@UserId int userid, @BeatmapId int beatmapid, @BitwiseMods long mods) throws SQLException;
 

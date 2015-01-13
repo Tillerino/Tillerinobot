@@ -184,7 +184,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		super();
 		this.backend = backend;
 
-		Runtime.getRuntime().addShutdownHook(hook);
+		hook.add();
 	}
 
 	@Override
@@ -281,8 +281,6 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		
 		cache.invalidateAll();
 		
-		if(!fromShutdownHook) {
-			Runtime.getRuntime().removeShutdownHook(hook);
-		}
+		hook.remove(fromShutdownHook);
 	}
 }

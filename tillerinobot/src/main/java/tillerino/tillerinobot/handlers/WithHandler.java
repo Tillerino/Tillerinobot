@@ -30,7 +30,7 @@ public class WithHandler implements CommandHandler {
 	@Override
 	public boolean handle(String message, IRCBotUser user,
 			OsuApiUser apiUser, UserData userData) throws UserException,
-			IOException, SQLException {
+			IOException, SQLException, InterruptedException {
 		if (message.toLowerCase().startsWith("with")) {
 			Language lang = userData.getLanguage();
 			

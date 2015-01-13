@@ -39,7 +39,7 @@ public class RecommendHandler implements CommandHandler {
 	@Override
 	public boolean handle(String command, IRCBotUser user,
 			OsuApiUser apiUser, UserData userData) throws UserException,
-			IOException, SQLException {
+			IOException, SQLException, InterruptedException {
 		Language lang = userData.getLanguage();
 
 		String lowerCase = command.toLowerCase();
