@@ -12,6 +12,9 @@ import tillerino.tillerinobot.lang.Default;
 public class ExceptionsUtil {
 
   public static PpaddictException getLoggedWrappedException(Logger logger, Throwable exception) {
+    if (exception instanceof InterruptedException) {
+      return new PpaddictException.Interruped();
+    }
     if (exception instanceof UserException) {
       return new PpaddictException(exception.getMessage());
     }

@@ -37,6 +37,14 @@ public class PpaddictException extends Exception {
     }
   }
 
+  public static class Interruped extends PpaddictException {
+    private static final long serialVersionUID = 1L;
+
+    public Interruped() {
+      super("The server is restarting for maintenance. Please try in a bit!");
+    }
+  }
+
   public static class OutOfBoundsException extends PpaddictException {
     private static final long serialVersionUID = 1L;
 

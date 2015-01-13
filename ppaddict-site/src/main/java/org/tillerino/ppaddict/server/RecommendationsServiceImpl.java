@@ -69,7 +69,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
         meta =
             botBackend.loadBeatmap(givenRecommendation.getBeatmapid(),
                 givenRecommendation.getMods(), new Default());
-      } catch (SQLException | IOException e) {
+      } catch (SQLException | IOException | InterruptedException e) {
         throw ExceptionsUtil.getLoggedWrappedException(log, e);
       } catch (UserException e) {
         continue;
@@ -112,7 +112,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
           continue;
         }
       }
-    } catch (SQLException | IOException | UserException e) {
+    } catch (SQLException | IOException | UserException | InterruptedException e) {
       throw ExceptionsUtil.getLoggedWrappedException(log, e);
     }
 
@@ -151,7 +151,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
       botBackend.saveGivenRecommendation(osuId, recommendation.bareRecommendation.getBeatmapId(),
           recommendation.bareRecommendation.getMods());
       return beatmapTableService.makeBeatmap(linkedData, recommendation.beatmap);
-    } catch (SQLException | UserException | IOException e) {
+    } catch (SQLException | UserException | IOException | InterruptedException e) {
       throw ExceptionsUtil.getLoggedWrappedException(log, e);
     }
   }
