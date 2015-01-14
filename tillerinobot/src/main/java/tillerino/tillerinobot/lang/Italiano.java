@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -215,10 +216,14 @@ public class Italiano implements Language {
 	public String setFormat() {
 		return "La sintassi per impostare un parametro è !set opzione valore. Usa !help se ti servono più indicazioni.";
 	}
-
 	
 	@Override
 	public String apiTimeoutException() {
 		return new Default().apiTimeoutException();
+	}
+	
+	@Override
+	public String noRecentPlays() {
+		return new Default().noRecentPlays();
 	}
 }

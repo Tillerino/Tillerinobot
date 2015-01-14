@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -204,5 +205,10 @@ public class Hebrew implements Language {
 	@Override
 	public String apiTimeoutException() {
 		return new Default().apiTimeoutException();
+	}
+	
+	@Override
+	public String noRecentPlays() {
+		return new Default().noRecentPlays();
 	}
 }

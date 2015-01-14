@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import com.google.gson.Gson;
@@ -419,5 +421,10 @@ public class TestBackend implements BotBackend {
 	@Override
 	public String tryLinkToPpaddict(String token, OsuApiUser user) throws SQLException {
 		return null;
+	}
+
+	@Override
+	public List<OsuApiScore> getRecentPlays(int userid) throws IOException {
+		return Collections.emptyList();
 	}
 }

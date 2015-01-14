@@ -12,6 +12,8 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
+import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+
 @Data
 @AllArgsConstructor
 public class BeatmapMeta {
@@ -114,5 +116,9 @@ public class BeatmapMeta {
 	@BitwiseMods
 	public long getMods() {
 		return estimates.getMods();
+	}
+	
+	public BeatmapWithMods getBeatmapWithMods() {
+		return new BeatmapWithMods(beatmap.getBeatmapId(), estimates.getMods());
 	}
 }

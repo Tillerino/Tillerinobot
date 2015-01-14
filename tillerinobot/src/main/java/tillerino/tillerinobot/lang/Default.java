@@ -268,4 +268,9 @@ public class Default implements Language {
 				"You can go do something else or we can just stare into each others eyes. Silently."
 				);
 	}
+
+	@Override
+	public String noRecentPlays() {
+		return "I haven't seen you play lately.";
+	}
 }

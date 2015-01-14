@@ -289,4 +289,11 @@ public interface Language {
 	 * @return this message should indicate that this is nothing serious and should be back to normal soon.
 	 */
 	String apiTimeoutException();
+
+	/**
+	 * There are no recent plays to display.
+	 * 
+	 * @return
+	 */
+	String noRecentPlays();
 }

@@ -634,4 +634,9 @@ public class Tsundere implements Language {
 	public String apiTimeoutException() {
 		return new Default().apiTimeoutException();
 	}
+	
+	@Override
+	public String noRecentPlays() {
+		return new Default().noRecentPlays();
+	}
 }

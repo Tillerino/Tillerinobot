@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -267,5 +268,10 @@ public class Romana implements Language {
 				"Deci... Ai încercat vreodată [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge provocarea de flotări Sally]?",
 				"Poți merge să faci altceva sau am putea să... ne uităm unul în ochii celuilalt, în liniște."
 				);
+	}
+	
+	@Override
+	public String noRecentPlays() {
+		return new Default().noRecentPlays();
 	}
 }
