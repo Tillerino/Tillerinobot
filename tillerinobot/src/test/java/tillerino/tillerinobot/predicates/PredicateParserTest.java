@@ -13,7 +13,7 @@ public class PredicateParserTest {
 		RecommendationPredicate predicate = parser.tryParse("AR=9", null);
 
 		assertEquals(new NumericPropertyPredicate<>(
-				"AR=9", new ApproachRate(), 9, 9), predicate);
+				"AR=9", new ApproachRate(), 9, true, 9, true), predicate);
 	}
 
 	@Test
@@ -21,8 +21,8 @@ public class PredicateParserTest {
 		RecommendationPredicate predicate = parser.tryParse("BPM>=9000", null);
 
 		assertEquals(new NumericPropertyPredicate<>(
-				"BPM>=9000", new BeatsPerMinute(), 9000,
-				Double.POSITIVE_INFINITY),
+				"BPM>=9000", new BeatsPerMinute(), 9000, true,
+				Double.POSITIVE_INFINITY, true),
 				predicate);
 	}
 

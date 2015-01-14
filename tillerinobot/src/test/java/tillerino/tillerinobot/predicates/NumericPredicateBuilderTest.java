@@ -17,7 +17,7 @@ public class NumericPredicateBuilderTest {
 				.build("tl=12", null);
 
 		assertEquals(new NumericPropertyPredicate<>(
-				"tl=12", new TitleLength(), 12, 12), build);
+				"tl=12", new TitleLength(), 12, true, 12, true), build);
 	}
 
 	@Test
@@ -26,7 +26,17 @@ public class NumericPredicateBuilderTest {
 				.build("tl>=12", null);
 
 		assertEquals(new NumericPropertyPredicate<>(
-				"tl>=12", new TitleLength(), 12, Double.POSITIVE_INFINITY),
+				"tl>=12", new TitleLength(), 12, true, Double.POSITIVE_INFINITY, true),
+				build);
+	}
+
+	@Test
+	public void testG() throws Exception {
+		NumericPropertyPredicate<TitleLength> build = builder
+				.build("tl>12", null);
+
+		assertEquals(new NumericPropertyPredicate<>(
+				"tl>12", new TitleLength(), 12, false, Double.POSITIVE_INFINITY, true),
 				build);
 	}
 
@@ -36,7 +46,17 @@ public class NumericPredicateBuilderTest {
 				.build("tl<=12", null);
 
 		assertEquals(new NumericPropertyPredicate<>(
-				"tl<=12", new TitleLength(), Double.NEGATIVE_INFINITY, 12),
+				"tl<=12", new TitleLength(), Double.NEGATIVE_INFINITY, true, 12, true),
+				build);
+	}
+
+	@Test
+	public void testL() throws Exception {
+		NumericPropertyPredicate<TitleLength> build = builder
+				.build("tl<12", null);
+
+		assertEquals(new NumericPropertyPredicate<>(
+				"tl<12", new TitleLength(), Double.NEGATIVE_INFINITY, true, 12, false),
 				build);
 	}
 
