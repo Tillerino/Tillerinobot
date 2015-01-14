@@ -595,11 +595,6 @@ public class Tsundere implements Language {
 		);
 	}
 
-	@Override
-	public String noPercentageEstimates() {
-		return "I don't know. I'm not your personal genie. You probably don't even have a lamp for me!";
-	}
-
 	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(rnd);
 
 	@Override
@@ -636,4 +631,8 @@ public class Tsundere implements Language {
 		return "Three words: !set option_name value_to_set. Try !help if three word sentences are too much for you.";
 	}
 
+	@Override
+	public String noRecentPlays() {
+		return new Default().noRecentPlays();
+	}
 }

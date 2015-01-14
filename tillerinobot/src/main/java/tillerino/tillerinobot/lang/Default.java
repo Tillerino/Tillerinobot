@@ -195,11 +195,6 @@ public class Default implements Language {
 	}
 
 	@Override
-	public String noPercentageEstimates() {
-		return "Sorry, I can't that information at this time.";
-	}
-
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("So you like me just the way I am :)");
 	}
@@ -213,5 +208,10 @@ public class Default implements Language {
 	@Override
 	public String setFormat() {
 		return "The syntax to set a parameter is !set option value. Try !help if you need more pointers.";
+	}
+
+	@Override
+	public String noRecentPlays() {
+		return "I haven't seen you play lately.";
 	}
 }

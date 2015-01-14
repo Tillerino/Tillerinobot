@@ -50,6 +50,7 @@ import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
 import tillerino.tillerinobot.handlers.NPHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
+import tillerino.tillerinobot.handlers.RecentHandler;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.handlers.WithHandler;
@@ -115,6 +116,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		commandHandlers.add(new AccHandler(backend));
 		commandHandlers.add(new WithHandler(backend));
 		commandHandlers.add(new RecommendHandler(backend, manager));
+		commandHandlers.add(new RecentHandler(backend));
 	}
 
 	@Override

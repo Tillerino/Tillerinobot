@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifier;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -169,4 +170,12 @@ public interface BotBackend {
 	 */
 	@CheckForNull
 	public String tryLinkToPpaddict(String token, OsuApiUser user) throws SQLException;
+	
+	/**
+	 * Retrieves the last plays from this user. These don't have pp and might be failed attempts.
+	 * @param userid
+	 * @return sorted from most recent to oldest
+	 * @throws IOException
+	 */
+	@Nonnull public List<OsuApiScore> getRecentPlays(@UserId int userid) throws IOException;
 }
