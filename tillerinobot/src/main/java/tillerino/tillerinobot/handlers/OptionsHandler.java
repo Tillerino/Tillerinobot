@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.*;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.UserException;
@@ -40,14 +40,14 @@ public class OptionsHandler implements CommandHandler {
 				.toLowerCase() : command.toLowerCase();
 		String value = set ? command.substring(option.length() + 1) : null;
 
-		if (option.equals("lang") || option.equals("language")) {
+		if (option.equals("lang") || getLevenshteinDistance(option, "language") <= 1) {
 			if (set) {
 				LanguageIdentifier ident;
 				try {
-					ident = LanguageIdentifier.valueOf(value);
+					ident = find(LanguageIdentifier.values(), value);
 				} catch (IllegalArgumentException e) {
 					throw new UserException(userData.getLanguage().invalidChoice(value,
-							StringUtils.join(LanguageIdentifier.values(), ", ")));
+							join(LanguageIdentifier.values(), ", ")));
 				}
 
 				userData.setLanguage(ident);
@@ -57,7 +57,7 @@ public class OptionsHandler implements CommandHandler {
 			} else {
 				ircUser.message("Language: " + userData.getLanguageIdentifier().toString());
 			}
-		} else if (option.equals("welcome") && userData.getHearts() > 0) {
+		} else if (getLevenshteinDistance(option, "welcome") <= 1 && userData.getHearts() > 0) {
 			if (set) {
 				userData.setShowWelcomeMessage(parseBoolean(value, userData.getLanguage()));
 			} else {
@@ -80,5 +80,26 @@ public class OptionsHandler implements CommandHandler {
 			return false;
 		}
 		throw new UserException(lang.invalidChoice(original, "on|true|yes|1|off|false|no|0"));
+	}
+	
+	public static @Nonnull <E extends Enum<E>> E find(@Nonnull E[] haystack, @Nonnull String needle) {
+		needle = needle.toLowerCase();
+		
+		E found = null;
+		
+		for (int i = 0; i < haystack.length; i++) {
+			if(getLevenshteinDistance(haystack[i].toString().toLowerCase(), needle) <= 1) {
+				if(found != null) {
+					throw new IllegalArgumentException();
+				}
+				found = haystack[i];
+			}
+		}
+		
+		if(found == null) {
+			throw new IllegalArgumentException();
+		}
+		
+		return found;
 	}
 }
