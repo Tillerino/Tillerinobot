@@ -19,6 +19,7 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.lang.Francais;
 import tillerino.tillerinobot.lang.Italiano;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.Tsundere;
@@ -64,7 +65,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		public enum LanguageIdentifier {
 			Default(Default.class),
 			Tsundere(Tsundere.class),
-			Italiano(Italiano.class);
+			Italiano(Italiano.class),
+			Français(Francais.class);
 			
 			Class<? extends Language> cls;
 
