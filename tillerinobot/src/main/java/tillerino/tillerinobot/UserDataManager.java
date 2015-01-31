@@ -68,7 +68,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Tsundere(Tsundere.class),
 			Italiano(Italiano.class),
 			Français(Francais.class),
-			Polski(Polski.class);
+			Polski(Polski.class),
+			Nederlands(Nederlands.class);
 			
 			Class<? extends Language> cls;
 
