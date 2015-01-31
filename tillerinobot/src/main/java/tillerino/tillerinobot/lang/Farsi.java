@@ -201,7 +201,7 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Pas modeli ke hastam doost daari, haan? :)");
+		user.message("This slutty translation has been approved over 69 times by the Guardians of the Islamic Revolution Leasure Time Dept."); 
 	}
 
 	@Override
