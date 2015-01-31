@@ -23,6 +23,7 @@ import tillerino.tillerinobot.lang.Francais;
 import tillerino.tillerinobot.lang.Italiano;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.Polski;
+import tillerino.tillerinobot.lang.Nederlands;
 import tillerino.tillerinobot.lang.Tsundere;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
@@ -68,7 +69,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Tsundere(Tsundere.class),
 			Italiano(Italiano.class),
 			Français(Francais.class),
-			Polski(Polski.class);
+			Polski(Polski.class),
+			Nederlands(Nederlands.class);
 			
 			Class<? extends Language> cls;
 
