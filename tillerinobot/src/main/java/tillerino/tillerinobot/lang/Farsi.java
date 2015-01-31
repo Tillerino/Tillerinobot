@@ -14,7 +14,7 @@ public class Default implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Bebaghshid, wali man in map-o nemishnaasam. Mitoone hamin alan daroomade baashe, besiaar sakht baashe, yaa shaayad ham asan ranked ya wase standard mode nabaashe!;
+		return "Bebaghshid, wali man in map-o nemishnaasam. Mitoone hamin alan daroomade baashe, besiaar sakht baashe, yaa shaayad ham asan ranked ya wase standard mode nabaashe!";
 	}
 
 	@Override
