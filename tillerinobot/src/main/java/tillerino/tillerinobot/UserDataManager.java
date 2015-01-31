@@ -18,14 +18,7 @@ import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
-import tillerino.tillerinobot.lang.Default;
-import tillerino.tillerinobot.lang.Francais;
-import tillerino.tillerinobot.lang.Hebrew;
-import tillerino.tillerinobot.lang.Italiano;
-import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.lang.Polski;
-import tillerino.tillerinobot.lang.Nederlands;
-import tillerino.tillerinobot.lang.Tsundere;
+import tillerino.tillerinobot.lang.*;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
 import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
@@ -72,7 +65,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Français(Francais.class),
 			Polski(Polski.class),
 			Nederlands(Nederlands.class),
-			עברית(Hebrew.class);
+			עברית(Hebrew.class),
+			Farsi(Farsi.class);
 			
 			Class<? extends Language> cls;
 
