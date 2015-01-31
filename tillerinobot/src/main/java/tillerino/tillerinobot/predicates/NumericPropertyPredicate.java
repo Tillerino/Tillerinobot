@@ -12,13 +12,28 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 	String originalArgument;
 	T property;
 	double min;
+	boolean includeMin;
 	double max;
+	boolean includeMax;
 
 	@Override
 	public boolean test(BareRecommendation r, OsuApiBeatmap beatmap) {
 		double value = property.getValue(beatmap, r.getMods());
 
-		return value >= min && value <= max;
+		if(value < min) {
+			return false;
+		}
+		if(value <= min && !includeMin) {
+			return false;
+		}
+		if(value > max) {
+			return false;
+		}
+		if(value >= max && !includeMax) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	@Override
@@ -28,6 +43,12 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 
 			if (predicate.property.getClass() == property.getClass()) {
 				if (predicate.min > max || min > predicate.max) {
+					return true;
+				}
+				if(predicate.min >= max && predicate.includeMin != includeMax) {
+					return true;
+				}
+				if(min >= predicate.max && includeMin != predicate.includeMax) {
 					return true;
 				}
 			}

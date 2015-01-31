@@ -16,6 +16,9 @@ public interface TidyObject {
 	public static class ShutdownHook extends Thread {
 		WeakReference<TidyObject> ref;
 
+		private boolean added = false;
+		private boolean removed = false;
+
 		public ShutdownHook(TidyObject obj) {
 			super();
 			this.ref = new WeakReference<>(obj);
@@ -26,6 +29,26 @@ public interface TidyObject {
 			TidyObject now = ref.get();
 			if (now != null) {
 				now.tidyUp(true);
+			}
+		}
+
+		public void add() {
+			if (!added) {
+				Runtime.getRuntime().addShutdownHook(this);
+				added = true;
+			}
+		}
+
+		public void remove(boolean fromShutdownHook) {
+			if (fromShutdownHook) {
+				/*
+				 * calling this method during a shutdown, so we'll set removed
+				 * to true if this method gets called again during the shutdown
+				 */
+				removed = true;
+			} else if (!added && !removed) {
+				Runtime.getRuntime().removeShutdownHook(this);
+				removed = true;
 			}
 		}
 	}

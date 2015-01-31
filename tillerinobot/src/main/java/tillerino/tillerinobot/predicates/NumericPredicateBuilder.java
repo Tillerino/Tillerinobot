@@ -19,7 +19,7 @@ public class NumericPredicateBuilder<T extends NumericBeatmapProperty>
 	T property;
 
 	enum Relation {
-		EQ, GEQ, LEQ
+		EQ, GEQ, LEQ, G, L
 	}
 
 	@Override
@@ -39,9 +39,19 @@ public class NumericPredicateBuilder<T extends NumericBeatmapProperty>
 			rest = rest.substring(2);
 		}
 
+		if (rest.startsWith("<")) {
+			relation = Relation.L;
+			rest = rest.substring(1);
+		}
+
 		if (rest.startsWith(">=")) {
 			relation = Relation.GEQ;
 			rest = rest.substring(2);
+		}
+
+		if (rest.startsWith(">")) {
+			relation = Relation.G;
+			rest = rest.substring(1);
 		}
 
 		if (rest.startsWith("=")) {
@@ -62,16 +72,17 @@ public class NumericPredicateBuilder<T extends NumericBeatmapProperty>
 					correctFormat()));
 		}
 
-		double max = relation == Relation.EQ || relation == Relation.LEQ ? d
+		double max = relation == Relation.EQ || relation == Relation.LEQ || relation == Relation.L ? d
 				: Double.POSITIVE_INFINITY;
-		double min = relation == Relation.EQ || relation == Relation.GEQ ? d
+		double min = relation == Relation.EQ || relation == Relation.GEQ || relation == Relation.G ? d
 				: Double.NEGATIVE_INFINITY;
 
-		return new NumericPropertyPredicate<T>(argument, property, min, max);
+		return new NumericPropertyPredicate<T>(argument, property,
+				min, relation != Relation.G,
+				max, relation != Relation.L);
 	}
 
 	public String correctFormat() {
-		return property.getName() + ">X | " + property.getName() + "<X | "
-				+ property.getName() + "=X where X is a number";
+		return String.format("%s<X | %<s<=X | %<s=X | %<s>=X | %<s>X where X is a number", property.getName());
 	}
 }

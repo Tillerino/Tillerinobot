@@ -19,7 +19,10 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.lang.Francais;
+import tillerino.tillerinobot.lang.Italiano;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.lang.Polski;
 import tillerino.tillerinobot.lang.Tsundere;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
@@ -62,7 +65,10 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 	public static class UserData {
 		public enum LanguageIdentifier {
 			Default(Default.class),
-			Tsundere(Tsundere.class);
+			Tsundere(Tsundere.class),
+			Italiano(Italiano.class),
+			Français(Francais.class),
+			Polski(Polski.class);
 			
 			Class<? extends Language> cls;
 
@@ -184,7 +190,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		super();
 		this.backend = backend;
 
-		Runtime.getRuntime().addShutdownHook(hook);
+		hook.add();
 	}
 
 	@Override
@@ -281,8 +287,6 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		
 		cache.invalidateAll();
 		
-		if(!fromShutdownHook) {
-			Runtime.getRuntime().removeShutdownHook(hook);
-		}
+		hook.remove(fromShutdownHook);
 	}
 }

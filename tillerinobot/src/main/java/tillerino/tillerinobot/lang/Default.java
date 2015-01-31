@@ -20,7 +20,7 @@ public class Default implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Ugh... Looks like human Tillerino screwed up my wiring."
-				+ "If he doesn't notice soon, could you inform him? @Tillerino or /u/Tillerino? (reference "
+				+ " If he doesn't notice soon, could you inform him? @Tillerino or /u/Tillerino? (reference "
 				+ marker + ")";
 	}
 
@@ -68,7 +68,7 @@ public class Default implements Language {
 	@Override
 	public String unknownCommand(String command) {
 		return "unknown command \"" + command
-				+ "\". type !help if you need help!";
+				+ "\". Type !help if you need help!";
 	}
 
 	@Override

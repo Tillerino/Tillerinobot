@@ -89,7 +89,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	
 	public interface CommandHandler {
 		public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
-				throws UserException, IOException, SQLException;
+				throws UserException, IOException, SQLException, InterruptedException;
 	}
 	
 	final BotBackend backend;
@@ -163,7 +163,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			checkVersionInfo(user);
 
 			new NPHandler(backend).handle(message, user, apiUser, userData);
-		} catch (Throwable e) {
+		} catch (RuntimeException | Error | UserException | IOException | SQLException | InterruptedException e) {
 			handleException(user, e, lang);
 		} finally {
 			semaphore.release();
@@ -174,6 +174,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		try {
 			if(e instanceof ExecutionException) {
 				e = e.getCause();
+			}
+			if(e instanceof InterruptedException) {
+				return;
 			}
 			if(e instanceof UserException) {
 				if(e instanceof QuietException) {
@@ -230,7 +233,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				try {
 					senderSemaphore.acquire();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
 					return false;
 				}
 				try {
@@ -253,7 +255,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				try {
 					senderSemaphore.acquire();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
 					return false;
 				}
 				try {
@@ -337,7 +338,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					throw new UserException(lang.unknownCommand(originalMessage));
 				}
 			}
-		} catch (Throwable e) {
+		} catch (RuntimeException | Error | UserException | IOException | SQLException | InterruptedException e) {
 			handleException(user, e, lang);
 		} finally {
 			semaphore.release();
