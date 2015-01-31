@@ -1,0 +1,8 @@
+language: java
+jdk:
+  - openjdk7
+before_install:
+  - git submodule init
+  - git submodule update
+  - mvn -fosuApiConnector/osuApiConnector/pom.xml -DskipTests=true install
+  - cd tillerinobot
