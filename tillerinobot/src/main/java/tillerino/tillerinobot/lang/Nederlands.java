@@ -31,7 +31,7 @@ public class Nederlands implements Language {
 	public String externalException(String marker) {
 		return "Wat gebeurt er? Ik krijg alleen maar onzin van de osu server. Kan je me vertellen wat dit betekent? 00111010 01011110 00101001"
 				+ " De menselijke Tillerino zegt dat we ons er geen zorgen over hoeven te maken en dat we het opnieuw moeten proberen."
-				+ " Als je je heel erg zorgen maakt hierover kan je het aan Tillerino vertellen @Tillerino of /u/Tillerino. (reference "
+				+ " Als je je heel erg zorgen maakt hierover, kan je het aan Tillerino vertellen @Tillerino of /u/Tillerino. (reference "
 				+ marker + ")";
 	}
 
@@ -52,7 +52,7 @@ public class Nederlands implements Language {
 			user.message("Het is goed om je weer te zien. Kan ik je wellicht een recommandatie geven?");
 		} else {
 			String[] messages = {
-					"jij ziet er uit alsof je een recommandatie wil.",
+					"jij ziet er uit alsof je een recommandatie wilt.",
 					"leuk om je te zien! :)",
 					"mijn favoriete mens. (Vertel het niet aan de andere mensen!)",
 					"wat een leuke verrassing! ^.^",
@@ -71,7 +71,7 @@ public class Nederlands implements Language {
 	@Override
 	public String unknownCommand(String command) {
 		return "onbekend commando \"" + command
-				+ "\". Type !help als je hulp nodig hebt!";
+				+ "\". Typ !help als je hulp nodig hebt!";
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class Nederlands implements Language {
 
 	@Override
 	public String noLastSongInfo() {
-		return "Ik herinner me niet dat je al een map had opgevraagd...";
+		return "Ik kan me niet herinneren dat je me al een map had opgevraagd...";
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class Nederlands implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Je naam verwart me. Ben je geband? Zo niet, neem contact op met @Tillerino of /u/Tillerino (reference "
+		return "Je naam verwart me. Ben je geband? Zoniet, neem contact op met @Tillerino of /u/Tillerino (reference "
 				+ exceptionMarker + ")";
 	}
 
@@ -150,7 +150,7 @@ public class Nederlands implements Language {
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "Hoe bedoel je nomod met mods?";
+		return "Hoe bedoel je, nomod met mods?";
 	}
 	
 	@Override
@@ -161,7 +161,7 @@ public class Nederlands implements Language {
 
 	@Override
 	public String notRanked() {
-		return "Lijkt er op dat die beatmap niet ranked is.";
+		return "Lijkt erop dat die beatmap niet ranked is.";
 	}
 
 	@Override
@@ -199,12 +199,12 @@ public class Nederlands implements Language {
 
 	@Override
 	public String noPercentageEstimates() {
-		return "Sorry, ik heb die informatie niet op het moment.";
+		return "Sorry, ik heb die informatie nu niet paraat.";
 	}
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Dus je vind me leuk zoals ik ben :)");
+		user.message("Dus je vindt me leuk zoals ik ben :)");
 	}
 
 	@Override
