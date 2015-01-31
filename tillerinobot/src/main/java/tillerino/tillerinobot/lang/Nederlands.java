@@ -11,7 +11,7 @@ import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 /**
- * Dutch language implementation by https://osu.ppy.sh/u/PudiPudi
+ * Dutch language implementation by https://osu.ppy.sh/u/PudiPudi and https://github.com/notadecent
  */
 public class Nederlands implements Language {
 
@@ -215,6 +215,6 @@ public class Nederlands implements Language {
 
 	@Override
 	public String setFormat() {
-		return "De syntax om een parameter in te stellen is '!set optie waarde'. Type !help als je meer aanwijzingen nodig hebt.";
+		return "De syntax om een parameter in te stellen is '!set optie waarde'. Typ !help als je meer aanwijzingen nodig hebt.";
 	}
 }

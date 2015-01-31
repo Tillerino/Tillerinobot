@@ -23,6 +23,7 @@ import tillerino.tillerinobot.lang.Francais;
 import tillerino.tillerinobot.lang.Italiano;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.Polski;
+import tillerino.tillerinobot.lang.Nederlands;
 import tillerino.tillerinobot.lang.Tsundere;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
