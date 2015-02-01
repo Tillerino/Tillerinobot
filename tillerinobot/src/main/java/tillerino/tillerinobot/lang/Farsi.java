@@ -10,7 +10,7 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
-public class Default implements Language {
+public class Farsi implements Language {
 
 	@Override
 	public String unknownBeatmap() {
@@ -73,7 +73,7 @@ public class Default implements Language {
 
 	@Override
 	public String noInformationForMods() {
-		return "Bebaghshid, wali man alan nemitoonam info-i bedam waase in mod-ha.;
+		return "Bebaghshid, wali man alan nemitoonam info-i bedam waase in mod-ha.";
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class Default implements Language {
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
 		user.message("Bia injaa binam!");
-		user.action("ra " + apiUser.getUserName() + " baghal mikone);
+		user.action("ra " + apiUser.getUserName() + " baghal mikone");
 	}
 
 	@Override
@@ -201,7 +201,7 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("This slutty translation has been approved over 69 times by the Guardians of the Islamic Revolution Leasure Time Dept."); 
+		user.message("ikhebepicmuis learned me to talk Farsi!"); 
 	}
 
 	@Override
