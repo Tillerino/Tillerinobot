@@ -37,7 +37,7 @@ public class Nederlands implements Language {
 
 	@Override
 	public String noInformationForModsShort() {
-		return "Geen informatie voor opgevraagde mods";
+		return "Geen informatie beschikbaar voor opgevraagde mods";
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class Nederlands implements Language {
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Die mods zien er niet goed uit. Mods kunnen elke combinatie zijn van DT HR HD HT EZ NC FL SO NF. Combineer ze zonder spaties of speciale tekens, bijvoorbeeld: !with HDHR, !with DTEZ";
+		return "Die mods zien er niet goed uit. Mods kunnen elke combinatie zijn van DT HR HD HT EZ NC FL SO NF. Combineer ze zonder spaties of speciale tekens, bijvoorbeeld: '!with HDHR' of '!with DTEZ'";
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class Nederlands implements Language {
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Sorry, " + feature + " is op het moment alleen beschikbaar voor spelers die boven rank " + minRank + " zijn.";
+		return "Sorry, " + feature + " is op het moment alleen beschikbaar voor spelers boven rank " + minRank ;
 	}
 	
 	@Override
