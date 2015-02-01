@@ -201,7 +201,7 @@ public class Farsi implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("ikhebepicmuis-jan learned me to talk Farsi!"); 
+		user.message("ikhebepicmuis Farsi-harfzadano yaadamdaad!"); 
 	}
 
 	@Override
