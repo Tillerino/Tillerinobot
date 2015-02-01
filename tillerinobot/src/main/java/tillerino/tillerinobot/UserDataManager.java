@@ -20,6 +20,7 @@ import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Francais;
+import tillerino.tillerinobot.lang.Hebrew;
 import tillerino.tillerinobot.lang.Italiano;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.Polski;
@@ -70,7 +71,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Italiano(Italiano.class),
 			Français(Francais.class),
 			Polski(Polski.class),
-			Nederlands(Nederlands.class);
+			Nederlands(Nederlands.class),
+			עברית(Hebrew.class);
 			
 			Class<? extends Language> cls;
 
