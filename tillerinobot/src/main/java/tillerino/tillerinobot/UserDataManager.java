@@ -66,7 +66,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Polski(Polski.class),
 			Nederlands(Nederlands.class),
 			עברית(Hebrew.class),
-			Farsi(Farsi.class);
+			Farsi(Farsi.class),
+			Português(Portuguese.class);
 			
 			Class<? extends Language> cls;
 
