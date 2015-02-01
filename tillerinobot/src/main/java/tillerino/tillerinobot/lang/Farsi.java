@@ -14,12 +14,12 @@ public class Farsi implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Bebaghshid, wali man in map-o nemishnaasam. Mitoone hamin alan daroomade baashe, besiaar sakht baashe, yaa shaayad ham asan ranked ya wase standard mode nabaashe!";
+		return "Bebaghshid, wali man in map-o nemishnaasam. Mitoone hamin alaan daroomade baashe, besiaar sakht baashe, yaa shaayad ham asan ranked ya wase standard mode nabaashe!";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Mesike Tillerino man-o ghati kard."
+		return "Mesike Tillerino man-o ghaati kard."
 				+ " Age foori nafahmid, mitooni behesh begi? @Tillerino ya /u/Tillerino? (reference "
 				+ marker + ")";
 	}
@@ -83,7 +83,7 @@ public class Farsi implements Language {
 
 	@Override
 	public String noLastSongInfo() {
-		return "Man yadam nist info-i behet bedam...";
+		return "Man yaadam nist info-i behet bedam...";
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class Farsi implements Language {
 
 	@Override
 	public String help() {
-		return "Bedrood~ Man aankesiam ke Tillerino-ro kosht wa account-esho dozdid. Shookhi kardam, wali maan hanooz account-amo estefaade mikonam."
+		return "Bedrood~ Man aankesiam ke Tillerino-ro kosht wa account-esho dozdid. Shookhi kardam, wali man hanooz account-amo estefaade mikonam."
 				+ " https://twitter.com/Tillerinobot ro check kon waase status-o updates!"
 				+ " https://github.com/Tillerino/Tillerinobot/wiki ro bebin waase command-ha!";
 	}
@@ -147,13 +147,13 @@ public class Farsi implements Language {
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "Hawaaseto jam kon, nomod ba mods yani chi?";
+		return "Hawaaseto jam kon, nomod ba mods yani chi~?";
 	}
 	
 	@Override
 	public String outOfRecommendations() {
 		return "Man dige fekram nemirese, harchi toonestam recommend kardam."
-				+ " Age mikhai, option-haye digei estefaade kon, ya type kon !reset. Nemidooni chekaar koni, daad bezan !help";
+				+ " Age mikhaai, option-haye digei estefaade kon, yaa type kon !reset. Nemidooni chekaar koni, daad bezan !help";
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class Farsi implements Language {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		return "Accuracy-ro eshtebaa type nakard? \"" + acc + "\" yani chi?";
+		return "Accuracy-ro eshtebaa type nakardi? \"" + acc + "\" yani chi?";
 	}
 
 	@Override
@@ -201,17 +201,17 @@ public class Farsi implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("ikhebepicmuis learned me to talk Farsi!"); 
+		user.message("ikhebepicmuis-jan learned me to talk Farsi!"); 
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		return "Bebaghshid, wali natoonestam ino darbiaram: \"" + invalid
+		return "Bebaghshid, wali natoonestam ino darbiaaram: \"" + invalid
 				+ "\". Inaaro estefaade kon: " + choices + "!";
 	}
 
 	@Override
 	public String setFormat() {
-		return "Age mikhai ye setting-io awaz koni, syntax-esh ine: !set option value. Age nemidooni chekhabare, daad bezan !help.";
+		return "Age mikhaai ye setting-io awaz koni, syntax-esh ine: !set option value. Age nemidooni chekhabare, daad bezan !help.";
 	}
 }
