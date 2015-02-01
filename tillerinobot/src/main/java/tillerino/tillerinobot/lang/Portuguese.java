@@ -14,7 +14,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Desulpe, não conheço este mapa. Ele pode ser muito novo, muito dificl, não ranqueado ou não é um mapa do modo osu.";
+		return "Desculpe, não conheço este mapa. Ele pode ser muito novo, muito dificl, não ranqueado ou não é um mapa do modo osu.";
 	}
 
 	@Override
@@ -73,12 +73,12 @@ public class Portuguese implements Language {
 
 	@Override
 	public String noInformationForMods() {
-		return "Desculpe, não posso providenciar as informações para esses mods no momento.";
+		return "Desculpe, mas não posso providenciar as informações para esses mods no momento.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Esses mods não parecem estar certos. Mods podem ser uma combinação de DT, HR, HD, HT, EZ, NC, FL, SO e NF. Combine eles sem espaços ou caracteres especiais. Exemplo: !com HDHR, !com DTEZ";
+		return "Esses mods não parecem estar certos. Mods podem ser uma combinação de DT, HR, HD, HT, EZ, NC, FL, SO e NF. Combine eles sem espaços ou caracteres especiais. Exemplo: !with HDHR, !with DTEZ";
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public String excuseForError() {
-		return "Desculpe, mas tinah esse sequência linda de uns e zeros e eu me distraí. O que você queria mesmo?";
+		return "Desculpe, mas eu vi uma sequência linda de uns e zeros e eu me distraí. O que você queria mesmo?";
 	}
 
 	@Override
@@ -130,9 +130,9 @@ public class Portuguese implements Language {
 
 	@Override
 	public String help() {
-		return "Olá! Sou o robô que matou o Tillerino e está usando a conta dele. Brincadeira, mas ainda estou usando a conta."
+		return "Olá! Sou o robô que matou o Tillerino de verdade e está usando a conta dele. Brincadeira, mas ainda estou usando a conta."
 				+ " Dê uma olhada em https://twitter.com/Tillerinobot para novidades e status atual."
-				+ " Veja https://github.com/Tillerino/Tillerinobot/wiki para comandos!";
+				+ " Veja https://github.com/Tillerino/Tillerinobot/wiki para ver os comandos!";
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public String notRanked() {
-		return "Parece que este mana não está ranqueado.";
+		return "Parece que este mapa não está ranqueado.";
 	}
 
 	@Override
