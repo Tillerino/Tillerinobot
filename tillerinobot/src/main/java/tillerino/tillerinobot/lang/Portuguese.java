@@ -10,7 +10,7 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
-public class Default implements Language {
+public class Portuguese implements Language {
 
 	@Override
 	public String unknownBeatmap() {
@@ -201,7 +201,7 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Então você gosta de mim do jeito como eu sou :)");
+		user.message("RagingAlien me ajudou a aprender português! :D");
 	}
 
 	@Override
