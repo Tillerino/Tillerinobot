@@ -203,12 +203,6 @@ public class HebrewTest {
 	}
 
 	@Test
-	public void testNoPercentageEstimates() throws Exception {
-		System.out.println("noPercentageEstimates");
-		System.out.println(lang.noPercentageEstimates());
-	}
-
-	@Test
 	public void testOptionalCommentOnLanguage() throws Exception {
 		System.out.println("optionalCommentOnLanguage");
 		lang.optionalCommentOnLanguage(user, apiUser);

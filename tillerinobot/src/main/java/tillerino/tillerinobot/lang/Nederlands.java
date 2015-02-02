@@ -198,11 +198,6 @@ public class Nederlands implements Language {
 	}
 
 	@Override
-	public String noPercentageEstimates() {
-		return "Sorry, ik heb die informatie nu niet paraat.";
-	}
-
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("PudiPudi heeft me geleerd Nederlands te spreken.");
 	}

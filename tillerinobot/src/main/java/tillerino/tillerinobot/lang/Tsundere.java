@@ -595,11 +595,6 @@ public class Tsundere implements Language {
 		);
 	}
 
-	@Override
-	public String noPercentageEstimates() {
-		return "I don't know. I'm not your personal genie. You probably don't even have a lamp for me!";
-	}
-
 	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(rnd);
 
 	@Override

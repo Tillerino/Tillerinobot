@@ -2,10 +2,13 @@ package tillerino.tillerinobot.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
 import static org.apache.commons.lang3.StringUtils.*;
+
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.UserException;
@@ -46,8 +49,15 @@ public class OptionsHandler implements CommandHandler {
 				try {
 					ident = find(LanguageIdentifier.values(), value);
 				} catch (IllegalArgumentException e) {
+					LanguageIdentifier[] values = LanguageIdentifier.values();
+					Arrays.sort(values, new Comparator<LanguageIdentifier>() {
+						@Override
+						public int compare(LanguageIdentifier o1, LanguageIdentifier o2) {
+							return o1.toString().compareTo(o2.toString());
+						}
+					});
 					throw new UserException(userData.getLanguage().invalidChoice(value,
-							join(LanguageIdentifier.values(), ", ")));
+							join(values, ", ")));
 				}
 
 				userData.setLanguage(ident);

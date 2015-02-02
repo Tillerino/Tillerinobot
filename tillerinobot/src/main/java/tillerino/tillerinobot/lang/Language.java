@@ -250,13 +250,6 @@ public interface Language {
 	public String invalidAccuracy(String acc);
 
 	/**
-	 * Can't find percentage estimates and fallback is not an option.
-	 * 
-	 * @return
-	 */
-	public String noPercentageEstimates();
-
-	/**
 	 * The user has chosen this language. Say something to acknowledge that!
 	 */
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser);

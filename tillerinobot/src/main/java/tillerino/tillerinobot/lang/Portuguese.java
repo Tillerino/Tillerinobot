@@ -195,11 +195,6 @@ public class Portuguese implements Language {
 	}
 
 	@Override
-	public String noPercentageEstimates() {
-		return "Desculpe, não posso acessar esta informação no momento.";
-	}
-
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("RagingAlien me ajudou a aprender português! :D");
 	}

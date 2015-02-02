@@ -202,11 +202,6 @@ public class Italiano implements Language {
 	}
  
 	@Override
-	public String noPercentageEstimates() {
-		return "Spiacente, non ho quelle informazioni per ora.";
-	}
- 
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("marcostudios e Howl mi hanno insegnato l'italiano <3");
 	}

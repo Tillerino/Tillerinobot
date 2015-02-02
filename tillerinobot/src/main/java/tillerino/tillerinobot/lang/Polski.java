@@ -201,11 +201,6 @@ public class Polski implements Language {
 	}
 
 	@Override
-	public String noPercentageEstimates() {
-		return "Wybacz, nie mogę uzyskać takiej informacji w tym momencie.";
-	}
-
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("Pawwit nauczył mnie jak mówić po polsku, jeśli uważasz, że gdzieś się pomylił napisz do niego na osu!");
 	}

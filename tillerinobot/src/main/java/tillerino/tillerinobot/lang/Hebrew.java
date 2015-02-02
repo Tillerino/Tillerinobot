@@ -188,11 +188,6 @@ public class Hebrew implements Language {
 	}
 
 	@Override
-	public String noPercentageEstimates() {
-		return ".מצטער, אני לא יכול לבדוק כלום לפי המידע הזה כרגע";
-	}
-
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message(".עזר לי ללמוד עברית shavitush");
 	}

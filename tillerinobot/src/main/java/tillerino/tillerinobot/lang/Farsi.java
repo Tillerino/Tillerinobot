@@ -195,11 +195,6 @@ public class Farsi implements Language {
 	}
 
 	@Override
-	public String noPercentageEstimates() {
-		return "Bebaghshid, wali endafe nemitoonam begam in chie.";
-	}
-
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("ikhebepicmuis Farsi-harfzadano yaadamdaad!"); 
 	}

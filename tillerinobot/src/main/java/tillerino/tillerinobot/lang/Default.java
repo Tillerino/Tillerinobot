@@ -20,7 +20,7 @@ public class Default implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Ugh... Looks like human Tillerino screwed up my wiring."
-				+ " If he doesn't notice soon, could you inform him? @Tillerino or /u/Tillerino? (reference "
+				+ " If he doesn't notice soon, could you [https://github.com/Tillerino/Tillerinobot/wiki/Contact inform him]? (reference "
 				+ marker + ")";
 	}
 
@@ -28,7 +28,7 @@ public class Default implements Language {
 	public String externalException(String marker) {
 		return "What's going on? I'm only getting nonsense from the osu server. Can you tell me what this is supposed to mean? 0011101001010000"
 				+ " Human Tillerino says that this is nothing to worry about, and that we should try again."
-				+ " If you're super worried for some reason, you can tell him about it @Tillerino or /u/Tillerino. (reference "
+				+ " If you're super worried for some reason, you can [https://github.com/Tillerino/Tillerinobot/wiki/Contact tell him] about it. (reference "
 				+ marker + ")";
 	}
 
@@ -108,7 +108,7 @@ public class Default implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls contact @Tillerino or /u/Tillerino (reference "
+		return "Your name is confusing me. Are you banned? If not, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
 				+ exceptionMarker + ")";
 	}
 
@@ -130,14 +130,16 @@ public class Default implements Language {
 
 	@Override
 	public String help() {
-		return "Hi! I'm the robot who killed Tillerino and took over his account. Jk, but I'm still using the account."
-				+ " Check https://twitter.com/Tillerinobot for status and updates!"
-				+ " See https://github.com/Tillerino/Tillerinobot/wiki for commands!";
+		return "Hi! I'm the robot who killed Tillerino and took over his account. Just kidding, but I do use the account a lot."
+				+ " [https://twitter.com/Tillerinobot status and updates]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki commands]"
+				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact]";
 	}
 
 	@Override
 	public String faq() {
-		return "See https://github.com/Tillerino/Tillerinobot/wiki/FAQ for FAQ!";
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Frequently asked questions]";
 	}
 	
 	@Override
@@ -192,11 +194,6 @@ public class Default implements Language {
 	@Override
 	public String invalidAccuracy(String acc) {
 		return "Invalid accuracy: \"" + acc + "\"";
-	}
-
-	@Override
-	public String noPercentageEstimates() {
-		return "Sorry, I can't that information at this time.";
 	}
 
 	@Override

@@ -201,11 +201,6 @@ public class Francais implements Language {
 	}
 
 	@Override
-	public String noPercentageEstimates() {
-		return "Désolé, évaluer ces informations pour le moment.";
-	}
-
-	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("Howaitorufu m'a appris à parler français :D");
 	}
