@@ -19,14 +19,14 @@ public class Portuguese implements Language {
 
 	@Override
 	public String internalException(String marker) {
-		return "Aff... Parece que o Tillerino de verdade ferrou com minha programação."
+		return "Aff... Parece que o Tillerino de verdade bagunçou com minha programação."
 				+ " Se ele não perceber logo, poderia por favor informá-lo? @Tillerino ou /u/Tillerino? (referência "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "O que é isso? Só estou conseguindo bobagens do servidor do osu. Você pode me dizer o que isso significa? 0011101001010000"
+		return "O que é isso? Só estou recebendo bobagens do servidor do osu. Você pode me dizer o que isso significa? 0011101001010000"
 				+ " O Tillerino de verdade disse que isso não é nada preocupante e que a gente devia tentar de novo."
 				+ "Se por algum motivo você está muito preocupado, você pode dizer pra ele @Tillerino ou /u/Tillerino. (referência "
 				+ marker + ")";
@@ -130,7 +130,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public String help() {
-		return "Olá! Sou o robô que matou o Tillerino de verdade e está usando a conta dele. Brincadeira, mas ainda estou usando a conta."
+		return "Olá! Sou o robô que matou o Tillerino de verdade e estou usando a conta dele. Brincadeira, mas ainda estou usando a conta."
 				+ " Dê uma olhada em https://twitter.com/Tillerinobot para novidades e status atual."
 				+ " Veja https://github.com/Tillerino/Tillerinobot/wiki para ver os comandos!";
 	}
@@ -201,7 +201,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("RagingAlien me ajudou a aprender português! :D");
+		user.message("RagingAlien e wow me ajudaram a aprender português! :D");
 	}
 
 	@Override
