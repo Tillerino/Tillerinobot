@@ -20,15 +20,15 @@ public class Default implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Εχ... μάλλον φαίνεται ότι ο ανθρώπινος Tillerino έκανε μαντάρα την σύνδεσή μου."
-				+" Εάν δεν το παρατηρήσει σύντομα, μπορείς [https://github.com/Tillerino/Tillerinobot/wiki/Contact να τον ενημερώσεις];" (reference "
+				+" Εάν δεν το παρατηρήσει σύντομα, μπορείς [https://github.com/Tillerino/Tillerinobot/wiki/Contact να τον ενημερώσεις]; (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "Τί συμβαίνει; Παίρνω μονο παραλογίες από τον server του osu. Μπορείς να μου πείς τι σημαίνει αυτο;" 0011101001010000"
+		return "Τί συμβαίνει; Παίρνω μονο παραλογίες από τον server του osu. Μπορείς να μου πείς τι σημαίνει αυτο; 0011101001010000"
 				+ " Ο ανθρώπινος Tillerino λέει ότι δεν υπάρχει κάτι για να ανησυχείς, και ότι πρέπει να ξαναπροσπαθήσουμε."
-				+ " Εάν ανησυχείς πάρα  πολύ για κάποιο λογο, μπορείς να [https://github.com/Tillerino/Tillerinobot/wiki/Contact του το πείς]." (reference "
+				+ " Εάν ανησυχείς πάρα  πολύ για κάποιο λογο, μπορείς να [https://github.com/Tillerino/Tillerinobot/wiki/Contact του το πείς]. (reference "
 				+ marker + ")";
 	}
 
