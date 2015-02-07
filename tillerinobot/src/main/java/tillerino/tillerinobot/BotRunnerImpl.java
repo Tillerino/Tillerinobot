@@ -78,7 +78,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 				try {
 					@SuppressWarnings("unchecked")
 					Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-							.setServer(server, port).setMessageDelay(600)
+							.setServer(server, port).setMessageDelay(1000)
 							.setName(nickname).addListener(listener)
 							.setEncoding(Charset.forName("UTF-8"))
 							.setAutoReconnect(false);
