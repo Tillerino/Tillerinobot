@@ -215,16 +215,25 @@ public interface Language {
 
 	/**
 	 * Comment after beatmap info was sent in response to /np
+	 * @param user 
+	 * @param apiUser 
+	 * @param meta 
 	 */
 	void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta);
 
 	/**
 	 * Comment after beatmap info was sent in response to !with
+	 * @param user 
+	 * @param apiUser 
+	 * @param meta 
 	 */
 	void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta);
 	
 	/**
 	 * Comment after beatmap info was sent in response to !recommend
+	 * @param user 
+	 * @param apiUser 
+	 * @param recommendation 
 	 */
 	void optionalCommentOnRecommendation(IRCBotUser user, OsuApiUser apiUser, Recommendation recommendation);
 	
@@ -244,6 +253,7 @@ public interface Language {
 
 	/**
 	 * The given accuracy is invalid.
+	 * @param acc 
 	 * 
 	 * @return
 	 */
@@ -251,6 +261,8 @@ public interface Language {
 
 	/**
 	 * The user has chosen this language. Say something to acknowledge that!
+	 * @param user 
+	 * @param apiUser 
 	 */
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser);
 
@@ -261,6 +273,7 @@ public interface Language {
 	 *            The choice that the user was trying to make
 	 * @param choices
 	 *            The available choices.
+	 * @return 
 	 */
 	public String invalidChoice(String invalid, String choices);
 

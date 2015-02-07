@@ -17,6 +17,14 @@ public class PredicateParserTest {
 	}
 
 	@Test
+	public void testOverallDifficulty() throws Exception {
+		RecommendationPredicate predicate = parser.tryParse("OD=9", null);
+
+		assertEquals(new NumericPropertyPredicate<>(
+				"OD=9", new OverallDifficulty(), 9, true, 9, true), predicate);
+	}
+
+	@Test
 	public void testBPM() throws Exception {
 		RecommendationPredicate predicate = parser.tryParse("BPM>=9000", null);
 

@@ -14,7 +14,6 @@ import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.lang.Language;
 

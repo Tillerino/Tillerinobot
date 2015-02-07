@@ -164,6 +164,7 @@ public interface BotBackend {
 	 * links the given user to a ppaddict account using a token string.
 	 * 
 	 * @param token a token that was given to the user by the ppaddict website.
+	 * @param user 
 	 * @return the name of the ppaddict account that current user was linked to, or null if the token was not valid
 	 * @throws SQLException
 	 */
