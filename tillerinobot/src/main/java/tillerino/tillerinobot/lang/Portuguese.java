@@ -14,19 +14,19 @@ public class Portuguese implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Desulpe, não conheço este mapa. Ele pode ser muito novo, muito dificl, não ranqueado ou não é um mapa do modo osu.";
+		return "Desculpe, não conheço este mapa. Ele pode ser muito novo, muito dificl, não ranqueado ou não é um mapa do modo osu.";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Aff... Parece que o Tillerino de verdade ferrou com minha programação."
+		return "Aff... Parece que o Tillerino de verdade bagunçou com minha programação."
 				+ " Se ele não perceber logo, poderia por favor informá-lo? @Tillerino ou /u/Tillerino? (referência "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "O que é isso? Só estou conseguindo bobagens do servidor do osu. Você pode me dizer o que isso significa? 0011101001010000"
+		return "O que é isso? Só estou recebendo bobagens do servidor do osu. Você pode me dizer o que isso significa? 0011101001010000"
 				+ " O Tillerino de verdade disse que isso não é nada preocupante e que a gente devia tentar de novo."
 				+ "Se por algum motivo você está muito preocupado, você pode dizer pra ele @Tillerino ou /u/Tillerino. (referência "
 				+ marker + ")";
@@ -73,12 +73,12 @@ public class Portuguese implements Language {
 
 	@Override
 	public String noInformationForMods() {
-		return "Desculpe, não posso providenciar as informações para esses mods no momento.";
+		return "Desculpe, mas não posso providenciar as informações para esses mods no momento.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Esses mods não parecem estar certos. Mods podem ser uma combinação de DT, HR, HD, HT, EZ, NC, FL, SO e NF. Combine eles sem espaços ou caracteres especiais. Exemplo: !com HDHR, !com DTEZ";
+		return "Esses mods não parecem estar certos. Mods podem ser uma combinação de DT, HR, HD, HT, EZ, NC, FL, SO e NF. Combine eles sem espaços ou caracteres especiais. Exemplo: !with HDHR, !with DTEZ";
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public String excuseForError() {
-		return "Desculpe, mas tinah esse sequência linda de uns e zeros e eu me distraí. O que você queria mesmo?";
+		return "Desculpe, mas eu vi uma sequência linda de uns e zeros e eu me distraí. O que você queria mesmo?";
 	}
 
 	@Override
@@ -130,9 +130,9 @@ public class Portuguese implements Language {
 
 	@Override
 	public String help() {
-		return "Olá! Sou o robô que matou o Tillerino e está usando a conta dele. Brincadeira, mas ainda estou usando a conta."
+		return "Olá! Sou o robô que matou o Tillerino de verdade e estou usando a conta dele. Brincadeira, mas ainda estou usando a conta."
 				+ " Dê uma olhada em https://twitter.com/Tillerinobot para novidades e status atual."
-				+ " Veja https://github.com/Tillerino/Tillerinobot/wiki para comandos!";
+				+ " Veja https://github.com/Tillerino/Tillerinobot/wiki para ver os comandos!";
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public String notRanked() {
-		return "Parece que este mana não está ranqueado.";
+		return "Parece que este mapa não está ranqueado.";
 	}
 
 	@Override
@@ -196,7 +196,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("RagingAlien me ajudou a aprender português! :D");
+		user.message("RagingAlien e wow me ajudaram a aprender português! :D");
 	}
 
 	@Override
