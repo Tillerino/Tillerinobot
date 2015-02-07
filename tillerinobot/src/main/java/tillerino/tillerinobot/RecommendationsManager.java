@@ -407,6 +407,10 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				settings.requestedMods = Mods.add(settings.requestedMods, Mods.HardRock);
 				continue;
 			}
+			if(settings.model == Model.GAMMA &&  lowerCase.equals("hd")) {
+				settings.requestedMods = Mods.add(settings.requestedMods, Mods.Hidden);
+				continue;
+			}
 			if (backend.getDonator(apiUser) > 0) {
 				RecommendationPredicate predicate = parser.tryParse(param, lang);
 				if (predicate != null) {
@@ -424,7 +428,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				}
 			}
 			throw new UserException(lang.invalidChoice(param,
-					"[nomod] [relax|beta|gamma] [dt|hr]"));
+					"[nomod] [relax|beta|gamma] [dt] [hr] [hd]"));
 		}
 		
 		/*
