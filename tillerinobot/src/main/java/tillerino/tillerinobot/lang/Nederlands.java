@@ -37,7 +37,7 @@ public class Nederlands implements Language {
 
 	@Override
 	public String noInformationForModsShort() {
-		return "geen informatie voor opgevraagde mods";
+		return "Geen informatie beschikbaar voor opgevraagde mods";
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class Nederlands implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "onbekend commando \"" + command
+		return "Ik snap niet helemaal wat je bedoelt met \"" + command
 				+ "\". Typ !help als je hulp nodig hebt!";
 	}
 
@@ -81,12 +81,12 @@ public class Nederlands implements Language {
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Die mods zien er niet goed uit. Mods kunnen elke combinatie zijn van DT HR HD HT EZ NC FL SO NF. Combineer ze zonder spaties of speciale tekens. Bijvoorbeeld: !with HDHR, !with DTEZ";
+		return "Die mods zien er niet goed uit. Mods kunnen elke combinatie zijn van DT HR HD HT EZ NC FL SO NF. Combineer ze zonder spaties of speciale tekens, bijvoorbeeld: '!with HDHR' of '!with DTEZ'";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "Ik kan me niet herinneren dat je me al een map had opgevraagd...";
+		return "Ik kan me niet herinneren dat je al een map had opgevraagd...";
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class Nederlands implements Language {
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Probeer deze map met " + Mods.toShortNamesContinuous(mods);
+		return "Probeer deze map eens met " + Mods.toShortNamesContinuous(mods);
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class Nederlands implements Language {
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Sorry, " + feature + " is op het moment alleen beschikbaar voor spelers die boven rank " + minRank + " zijn.";
+		return "Sorry, " + feature + " is op het moment alleen beschikbaar voor spelers boven rank " + minRank ;
 	}
 	
 	@Override
