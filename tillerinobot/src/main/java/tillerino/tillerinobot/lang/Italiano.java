@@ -118,7 +118,7 @@ public class Italiano implements Language {
  
 	@Override
 	public String excuseForError() {
-		return "Scusa, c'era una bellissima sequenza di uni e zeri e mi sono distratto. Puoi ripetermi che cosa volevi?";
+		return "Scusa, c'era una bellissima sequenza di uno e zero e mi sono distratto. Puoi ripetermi che cosa volevi?";
 	}
  
 	@Override
