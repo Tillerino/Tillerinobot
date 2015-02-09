@@ -10,7 +10,7 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
-public class Default implements Language {
+public class Greek implements Language {
 
 	@Override
 	public String unknownBeatmap() {
