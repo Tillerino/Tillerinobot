@@ -70,7 +70,9 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Português(Portuguese.class),
 			Deutsch(Deutsch.class),
 			Čeština(Czech.class),
-			한국어(Korean.class);
+			한국어(Korean.class),
+			Dansk(Dansk.class),
+			; // please end identifier entries with a comma and leave this semicolon here
 			
 			Class<? extends Language> cls;
 
