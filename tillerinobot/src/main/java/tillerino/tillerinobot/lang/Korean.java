@@ -198,7 +198,7 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("제가 당신을 좋아하듯 당신도 절 좋아하는군요.:)");
+		user.message("언어가 한국어로 전환되었습니다.:)");
 	}
 
 	@Override
