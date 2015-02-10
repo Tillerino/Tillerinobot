@@ -212,4 +212,3 @@ public class Default implements Language {
 		return "Komanda, kuri nustato parametrą yra !set nustatymo reikšmė. Pabandyk !help, jeigu tau reikia daugiau patarimų. ";
 	}
 }
-// Please contact www.reddit.com/u/peraz if I missed something or any questions regarding my translation :)
