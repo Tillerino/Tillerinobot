@@ -131,10 +131,10 @@ public class Default implements Language {
 	@Override
 	public String help() {
 		return "私はTillerinoをこの世から消し去ったロボットです。大嘘です。でもこのアカウントは私が良く使っています。"
-				+ " [https://twitter.com/Tillerinobot status and updates]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki commands]"
+				+ " [https://twitter.com/Tillerinobot ステータス・更新情報]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki コマンド]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact]";
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact コンタクト]";
 	}
 
 	@Override
