@@ -209,6 +209,6 @@ public class Default implements Language {
 
 	@Override
 	public String setFormat() {
-		return "正しいパラメータの設定の仕方は!set option valueです。ヘルプが必要なら!helpを使いましょう。";
+		return "正しいパラメータの設定の仕方は!set option value（数値）です。ヘルプが必要なら!helpを使いましょう。";
 	}
 }
