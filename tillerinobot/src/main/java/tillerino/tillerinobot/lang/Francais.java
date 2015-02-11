@@ -11,35 +11,35 @@ import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 /**
- * French Language implementation. Thx to https://osu.ppy.sh/u/Howaitorufu for
+ * French Language implementation. Thx to https://osu.ppy.sh/u/Howaitorufu & https://osu.ppy.sh/u/ThePooN for
  * this.
  */
 public class Francais implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Je suis désolé, je trouve pas la map. Il pourrait que celle-ci sois nouvelle,"
-				+ " très dure, non classée ou alors n'est pas un mode standard d'osu.";
+		return "Je suis désolé, je ne trouve pas la map... Il se pourrait que celle-ci soit nouvelle,"
+				+ " très compliquée, non classée ou alors n'est pas un mode standard d'osu!.";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Ugh... On dirait que l'humain Tillerino à Fail sa programmation."
-				+ " S'il ne s'en aperçoit pas, ou si ce n'est pas corriger, fais lui savoir S'il te plaît? @Tillerino or /u/Tillerino? (reference "
+		return "Ugh... On dirait que l'humain Tillerino a foiré dans sa programmation."
+				+ " S'il ne s'en rend pas compte, [https://github.com/Tillerino/Tillerinobot/wiki/Contact peux-tu lui en informer] ? (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "Qu'est-ce qui se passe? J'ai seulement obtenu pour le serveur osu. Peutu me dire ce que cela signifie? 0011101001010000"
-				+ " L'humain Tillerino dit ce n'est rien il ne faut pas s'inquiéter, il faut encore essayer."
-					+ " Si tu es inquiet pour n'importe quelle raison, contactez-moi @Tillerino or /u/Tillerino. (reference "
+		return "Qu'est-ce qui se passe ? Les serveurs d'osu! m'ont dit n'importe quoi... Peux-tu me dire ce que cela signifie ? 0011101001010000"
+				+ " L'humain Tillerino dit que ce n'est rien, il ne faut pas s'inquiéter, il faut réessayer."
+					+ " Si tu es très inquiet pour n'importe quelle raison, [https://github.com/Tillerino/Tillerinobot/wiki/Contact tu peux le contacter]. (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "aucune donnée pour le mode demandé";
+		return "aucune donnée pour le mod demandé.";
 	}
 
 	@Override
@@ -47,18 +47,18 @@ public class Francais implements Language {
 		if(inactiveTime < 60 * 1000) {
 			user.message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Re Salut :)");
+			user.message("Re ! :)");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			user.message(apiUser.getUserName() + "...");
-			user.message("...c'est vraiment toi? Tu étais si long :o");
-			user.message("Heureux de te revoir " + apiUser.getUserName() + ". Je peux vous proposer des choses intéressantes?");
+			user.message("...c'est vraiment toi ? Cela fait si longtemps ! :o");
+			user.message("Heureux de te revoir " + apiUser.getUserName() + ". Puis-je te recommander quelques maps ?");
 		} else {
 			String[] messages = {
-					"si tu veux des propositions de maps hésitent pas à me demander.",
-					"tu es mon humain favori. (Dit le à personne c'est un secret!)",
-					"quelle agréable surprise! ^.^",
-					"j'espère  que tu vas me montrer ton niveau. Tous les autres joueurs sont faibles, mais ne leur dis pas que je l'ai dit! :3",
-					"tu veux faire quoi aujourd'hui?",
+					"tu as l'air de vouloir quelques recommandations !",
+					"tu es mon humain favori (mais ne le dit à personne, c'est un secret !)",
+					"quelle agréable surprise ! ^.^",
+					"j'espère  que tu vas me montrer ton niveau. Tous les autres joueurs sont faibles, mais ne leur dit pas que j'ai dit ça ! :3",
+					"comment vas-tu aujourd'hui?",
 			};
 			
 			Random random = new Random();
@@ -73,27 +73,27 @@ public class Francais implements Language {
 	public String unknownCommand(String command) {
 		return "commande inconnue \"" + command
 			// "  "
-				+ "\". Ecrit !help si tu as besoin d'aide!";
+				+ "\". Tu peux écrire !help si tu as besoin d'aide !";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return "Désolé, je ne peux pas donner d'informations pour ces mods en ce moment.";
+		return "Désolé, je ne peux pas donner d'informations pour ces mods actuellement.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Certains mods ne sont pas corrects. Les modes peuvent être : DT HR HD HT EZ NC FL SO NF. Combinez-les sans aucun espace. Exemple: !with HDHR, !with DTEZ";
+		return "Certains mods ne sont pas corrects. Les modes peuvent être : DT HR HD HT EZ NC FL SO NF. Combinez-les sans aucun espace. Exemple : !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "Je me rappelle pas, tu n'as eu aucune info sur les chansons...";
+		return "Je ne me souviens pas que tu m'ais demandé des infos sur une map...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Essaye cette map avec un mod!";
+		return "Essaye cette map avec des mods !";
 	}
 
 	@Override
@@ -113,58 +113,60 @@ public class Francais implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Ton nom m'embrouille. Es-tu banni? Sinon, contactez @Tillerino or /u/Tillerino (reference "
+		return "Ton nom m'embrouille. T'es banni ? Sinon, [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacte Tillerino] (reference "
 				+ exceptionMarker + ")";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "Je suis désolé, il y avait cette belle séquence des 1 et des 0 mais j'ai était distrait. Que veux-tu à nouveau?";
+		return "Je suis désolé, il y avait cette belle séquence de 1 et de 0 et j'ai était distrait. Que veux-tu à nouveau ?";
 				// " "
 	}
 
 	@Override
 	public String complaint() {
-		return "Ta plainte a été transmise. Tillerino s'en occupera quand il le peut.";
+		return "Ta plainte a été transmise. Tillerino s'en occupera quand il le pourra.";
 	}
 
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
 		user.message("Hey toi, viens ici!");
-		user.action("étreint " + apiUser.getUserName());
+		user.action("câline " + apiUser.getUserName());
 	}
 
 	@Override
 	public String help() {
-		return "Hey! Je suis le robot qui à tuer Tillerino et qui a récupéré son compte. Je rigole :p, mais j'utilise ce compte."
-				+ " Vérifie sûr https://twitter.com/Tillerinobot pour le status et les mises à jour!"
-				+ " Regarde là https://github.com/Tillerino/Tillerinobot/wiki pour les commandes!";
+		return "Hey! Je suis le robot qui a tué Tillerino et qui a récupéré son compte. Je rigole :P, mais j'utilise beaucoup ce compte quand même."
+				+ " [https://twitter.com/Tillerinobot Statut et mises à jours]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki Toutes les commandes]"
+				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact Contacter Tillerino]";
 	}
 
 	@Override
 	public String faq() {
-		return "Regarde https://github.com/Tillerino/Tillerinobot/wiki/FAQ pour FAQ!";
+		return "Va voir [https://github.com/Tillerino/Tillerinobot/wiki/FAQ la FAQ] !";
 	}
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Désolé, à ce point " + feature + " est seulement disponible pour les joueurs qui ont depasser le rank " + minRank + ".";
+		return "Désolé, mais actuellement " + feature + " est seulement disponible pour les joueurs qui ont depassé le rank " + minRank + ".";
 	}
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "Que veux-tu dire NoMod avec Mods?";
+		return "Euh... NoMods avec des mods ? Y a pas un petit problème par ici ?";
 	}
 	
 	@Override
 	public String outOfRecommendations() {
-		return "J'ai recommendé tout ce que j'ai pensé."
-				+ " Essaye d'autres options de recommandation ou l'utilisation. Si tu n'es pas sûr, tape !help.";
+		return "J'ai recommendé tout ce que j'ai pu..."
+				+ " Essaye d'autres options de recommandation, ou utilise !reset. Si tu n'es pas sûr, tape !help !";
 	}
 
 	@Override
 	public String notRanked() {
-		return "Cette beatmap est pas classé.";
+		return "Cette beatmap n'est pas classé.";
 	}
 
 	@Override
@@ -197,18 +199,18 @@ public class Francais implements Language {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		return "Précision non valide: \"" + acc + "\"";
+		return "Accuracy non valide : \"" + acc + "\"";
 	}
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Howaitorufu m'a appris à parler français :D");
+		user.message("Howaitorufu et ThePooN m'ont appris à parler Français ! :D");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
 		return "Je suis désolé, mais \"" + invalid
-				+ "\" ne calcule pas. Essaye ça " + choices + "!";
+				+ "\" ne fonctionne pas. Essaye ça : " + choices + " !";
 	}
 
 	@Override
