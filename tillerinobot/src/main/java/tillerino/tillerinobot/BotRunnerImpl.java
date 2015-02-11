@@ -3,6 +3,7 @@ package tillerino.tillerinobot;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
@@ -12,8 +13,18 @@ import javax.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
+import org.pircbotx.InputParser;
+import org.pircbotx.User;
+import org.pircbotx.UserChannelDao;
+import org.pircbotx.Configuration.BotFactory;
 import org.pircbotx.Configuration.Builder;
+import org.pircbotx.hooks.events.PartEvent;
+import org.pircbotx.hooks.events.QuitEvent;
+import org.pircbotx.snapshot.ChannelSnapshot;
+import org.pircbotx.snapshot.UserChannelDaoSnapshot;
+import org.pircbotx.snapshot.UserSnapshot;
 import org.pircbotx.PircBotX;
 
 @Slf4j
@@ -29,7 +40,86 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 			return super.getSocket();
 		}
 	}
+	
+	static class CustomBotFactory extends BotFactory {
+		@Override
+		public InputParser createInputParser(PircBotX bot) {
+			return new CustomInputParser(bot);
+		}
+		
+		@Override
+		public UserChannelDao<User, Channel> createUserChannelDao(PircBotX bot) {
+			return new CustomUserChannelDao(bot, this);
+		}
+	}
+	
+	/**
+	 * This class is just there to adjust visibility
+	 */
+	static class CustomUserChannelDao extends UserChannelDao<User, Channel> {
+		public CustomUserChannelDao(PircBotX bot, BotFactory botFactory) {
+			super(bot, botFactory);
+		}
+		
+		@Override
+		protected void removeChannel(Channel channel) {
+			super.removeChannel(channel);
+		}
+		
+		@Override
+		protected void removeUserFromChannel(User user, Channel channel) {
+			super.removeUserFromChannel(user, channel);
+		}
+		
+		@Override
+		protected void removeUser(User user) {
+			super.removeUser(user);
+		}
+	}
 
+	/**
+	 * This class is here to avoid the immense garbage and CPU time that is
+	 * caused by {@link UserChannelDao#createSnapshot()}.
+	 */
+	static class CustomInputParser extends InputParser {
+		public CustomInputParser(PircBotX bot) {
+			super(bot);
+		}
+		
+		final UserChannelDaoSnapshot userDaoSnapshot = new UserChannelDaoSnapshot(null, null, null, null, null, null, null);
+
+		@Override
+		public void processCommand(String target, String sourceNick, String sourceLogin, String sourceHostname, String command, String line, List<String> parsedLine) throws IOException {
+			if (command.equals("PART")) {
+				Channel channel = (target.length() != 0 && configuration.getChannelPrefixes().indexOf(target.charAt(0)) >= 0) ? bot.getUserChannelDao().getChannel(target) : null;
+				if(channel == null)
+					return;
+				
+				User source = bot.getUserChannelDao().getUser(sourceNick);
+
+				if (sourceNick.equals(bot.getNick())) {
+					((CustomUserChannelDao) bot.getUserChannelDao()).removeChannel(channel);
+				} else {
+					((CustomUserChannelDao) bot.getUserChannelDao()).removeUserFromChannel(source, channel);
+				}
+				
+				final UserSnapshot sourceSnapshot = source.createSnapshot();
+				configuration.getListenerManager().dispatchEvent(new PartEvent<PircBotX>(bot, userDaoSnapshot, channel.createSnapshot(), sourceSnapshot, ""));
+			} else if (command.equals("QUIT")) {
+				User source = bot.getUserChannelDao().getUser(sourceNick);
+				
+				if (!sourceNick.equals(bot.getNick())) {
+					((CustomUserChannelDao) bot.getUserChannelDao()).removeUser(source);
+				}
+				
+				final UserSnapshot sourceSnapshot = source.createSnapshot();
+				configuration.getListenerManager().dispatchEvent(new QuitEvent<PircBotX>(bot, userDaoSnapshot, sourceSnapshot, ""));
+			} else {
+				super.processCommand(target, sourceNick, sourceLogin, sourceHostname, command, line, parsedLine);
+			}
+		}
+	}
+	
 	volatile CloseableBot bot = null;
 
 	@Inject
@@ -81,7 +171,8 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 							.setServer(server, port).setMessageDelay(1000)
 							.setName(nickname).addListener(listener)
 							.setEncoding(Charset.forName("UTF-8"))
-							.setAutoReconnect(false);
+							.setAutoReconnect(false)
+							.setBotFactory(new CustomBotFactory());
 					if (password != null && !password.isEmpty()) {
 						configurationBuilder.setServerPassword(password);
 					}
