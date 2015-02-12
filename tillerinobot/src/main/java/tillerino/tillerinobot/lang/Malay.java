@@ -14,27 +14,27 @@ public class Default implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "I'm sorry, I don't know that map. It might be very new, very hard, unranked or not standard osu mode.";
+		return "Maaf, tetapi aku tidak tahu beatmap tersebut. Ia mungkin baru, terlalu susah, belum dikemukakan ataupun bukan mod standard osu.";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Ugh... Looks like human Tillerino screwed up my wiring."
-				+ " If he doesn't notice soon, could you [https://github.com/Tillerino/Tillerinobot/wiki/Contact inform him]? (reference "
+		return "Alamak... Tillerino versi manusia mengacau pendawaian aku."
+				+ " Jika dia tidak tahu, bolehkah anda [https://github.com/Tillerino/Tillerinobot/wiki/Contact beritahu dia]? (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "What's going on? I'm only getting nonsense from the osu server. Can you tell me what this is supposed to mean? 0011101001010000"
-				+ " Human Tillerino says that this is nothing to worry about, and that we should try again."
-				+ " If you're super worried for some reason, you can [https://github.com/Tillerino/Tillerinobot/wiki/Contact tell him] about it. (reference "
+		return "Apa terjadi ini? Aku hanya dapat pengangguan dari pelayan osu. Bolehkah kamu beritahu aku maksud semuanya ini? 0011101001010000"
+				+ " Tillerino versi manusia beritahu, anda tidak perlu risau tentang apa-apa, dan kita hanya perlu mencuba sekali lagi."
+				+ " Jika anda terlalu risau, anda boleh [https://github.com/Tillerino/Tillerinobot/wiki/Contact beritahu dia] tentang perkara tersebut. (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "no data for requested mods";
+		return "Tiada data untuk mod yang diminta.";
 	}
 
 	@Override
@@ -42,19 +42,19 @@ public class Default implements Language {
 		if(inactiveTime < 60 * 1000) {
 			user.message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Welcome back, " + apiUser.getUserName() + ".");
+			user.message("Selamat datang kembali, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			user.message(apiUser.getUserName() + "...");
-			user.message("...is that you? It's been so long!");
-			user.message("It's good to have you back. Can I interest you in a recommendation?");
+			user.message("...adakah itu kamu? Wah, memang lama sudah!");
+			user.message("Memang baguslah jumpa kamu lagi. Adakah anda berminat untuk mendengar cadangan aku?");
 		} else {
 			String[] messages = {
-					"you look like you want a recommendation.",
-					"how nice to see you! :)",
-					"my favourite human. (Don't tell the other humans!)",
-					"what a pleasant surprise! ^.^",
-					"I was hoping you'd show up. All the other humans are lame, but don't tell them I said that! :3",
-					"what do you feel like doing today?",
+					"Anda kelihatan untuk hendak cadangan.",
+					"Memang baiklah berjumpa dengan kamu! :)",
+					"Manusia kegemaran aku. (Jangan beritahu manusia yang lain!)",
+					"Ini adalah kejutan yang menyenangkan! ^.^",
+					"Aku memang berharap yang anda datang. Manusia-manusia yang lain terlalu membosankan saya, tetapi jangan beritahu yang lain yang aku cakap begini! :3",
+					"Apakah anda mahu buat hari ini?",
 			};
 			
 			Random random = new Random();
@@ -68,32 +68,32 @@ public class Default implements Language {
 	@Override
 	public String unknownCommand(String command) {
 		return "unknown command \"" + command
-				+ "\". Type !help if you need help!";
+				+ "\". Taip !help jika anda mahu bantuan!";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return "Sorry, I can't provide information for those mods at this time.";
+		return "Maaf, aku tidak boleh menyediakan maklumat untuk mod tersebut untuk masa sekarang.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Those mods don't look right. Mods can be any combination of DT HR HD HT EZ NC FL SO NF. Combine them without any spaces or special chars. Example: !with HDHR, !with DTEZ";
+		return "Kebanyakkan mod tersebut tidak nampak bagus. Mod-mod boleh dikombinasikan dengan DT HR HD HT EZ NC FL SO NF. Anda boleh menggabungkan mod-mod tanpa ruang atau karakter istimewa. Contoh: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "I don't remember you getting any song info...";
+		return "Aku tidak ingat anda memberi infomasi lagu tersebut...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Try this map with some mods!";
+		return "Cubalah map ini dengan mod tersebut!";
 	}
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Try this map with " + Mods.toShortNamesContinuous(mods);
+		return "Cubalah map ini dengan " + Mods.toShortNamesContinuous(mods);
 	}
 
 	/**
@@ -108,13 +108,13 @@ public class Default implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
+		return "Nama anda membuatkan saya keliru. Adakah kamu dilarangkan? Jika tidak : [https://github.com/Tillerino/Tillerinobot/wiki/Contact hubung Tillerino]. (reference "
 				+ exceptionMarker + ")";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?";
+		return "Maafkan saya, ada perkara urutan indah daripada kosong dan satu dan aku diganggu. Apa sudah yang anda mahu?";
 	}
 
 	@Override
