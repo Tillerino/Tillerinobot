@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
@@ -22,10 +23,12 @@ import org.pircbotx.Configuration.BotFactory;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.QuitEvent;
-import org.pircbotx.snapshot.ChannelSnapshot;
+import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.snapshot.UserChannelDaoSnapshot;
 import org.pircbotx.snapshot.UserSnapshot;
 import org.pircbotx.PircBotX;
+
+import com.google.common.collect.Lists;
 
 @Slf4j
 @Singleton
@@ -120,6 +123,32 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 		}
 	}
 	
+	static class CustomThreadedListenerManager extends ThreadedListenerManager<PircBotX> {
+		public CustomThreadedListenerManager() {
+			super();
+		}
+
+		public CustomThreadedListenerManager(ExecutorService pool) {
+			super(pool);
+		}
+		
+		@Override
+		public void shutdown(PircBotX bot) {
+			List<ManagedFutureTask> remainingTasks;
+			synchronized (runningListeners) {
+				remainingTasks = Lists.newArrayList(runningListeners.get(bot));
+			}
+
+			for (ManagedFutureTask curFuture : remainingTasks) {
+				try {
+					curFuture.cancel(true);
+				} catch (Exception e) {
+					log.error("exception cancelling future", e);
+				}
+			}
+		}
+	}
+	
 	volatile CloseableBot bot = null;
 
 	@Inject
@@ -166,10 +195,13 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 			try {
 				listener = tillerinoBot.get();
 				try {
-					@SuppressWarnings("unchecked")
+					final CustomThreadedListenerManager listenerManager = new CustomThreadedListenerManager();
+					listenerManager.addListener(listener);
+					
 					Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-							.setServer(server, port).setMessageDelay(1000)
-							.setName(nickname).addListener(listener)
+							.setServer(server, port).setMessageDelay(250)
+							.setListenerManager(listenerManager)
+							.setName(nickname)
 							.setEncoding(Charset.forName("UTF-8"))
 							.setAutoReconnect(false)
 							.setBotFactory(new CustomBotFactory());

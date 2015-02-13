@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
 
+import org.apache.log4j.MDC;
 import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.UnknownEvent;
 
@@ -119,10 +120,12 @@ public class Pinger {
 			Utils.sendRawLineToServer(bot, "PING " + pingMessage);
 
 			if(!pingLatch.await(10, TimeUnit.SECONDS)) {
+				MDC.put("ping", 10000);
 				throw new IOException("ping timed out");
 			}
 
 			bean.setLastPing(System.currentTimeMillis() - time);
+			MDC.put("ping", bean.getLastPing());
 
 			if (bean.getLastPing() > 1500) {
 				if (botInfoService != null) {

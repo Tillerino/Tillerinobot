@@ -26,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.MDC;
+import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.Event;
@@ -129,7 +130,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			return;
 		
 		if (event.getChannel() == null || event.getUser().getNick().equals("Tillerino")) {
-			processPrivateAction(fromIRC(event.getUser()), event.getMessage());
+			MDC.put("user", event.getUser().getNick());
+			try {
+				processPrivateAction(fromIRC(event.getUser(), event), event.getMessage());
+			} finally {
+				MDC.remove("user");
+			}
 		}
 	}
 
@@ -144,7 +150,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	});
 
 	void processPrivateAction(IRCBotUser user, String message) {
-		MDC.put("user", user.getNick());
 		log.info("action: " + message);
 		
 		Language lang = new Default();
@@ -218,14 +223,19 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		if(silent)
 			return;
 		
-		processPrivateMessage(fromIRC(event.getUser()), event.getMessage());
+		MDC.put("user", event.getUser().getNick());
+		try {
+			processPrivateMessage(fromIRC(event.getUser(), event), event.getMessage());
+		} finally {
+			MDC.remove("user");
+		}
 	}
 	
 	Semaphore senderSemaphore = new Semaphore(1, true);
 	
 	final Pinger pinger;
 	
-	IRCBotUser fromIRC(final User user) {
+	IRCBotUser fromIRC(final User user, final Event<PircBotX> event) {
 		return new IRCBotUser() {
 			
 			@Override
@@ -239,6 +249,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().message(msg);
+					MDC.put("duration", System.currentTimeMillis() - event.getTimestamp());
 					log.info("sent: " + msg);
 					botInfo.setLastSentMessage(System.currentTimeMillis());
 					return true;
@@ -247,6 +258,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					return false;
 				} finally {
 					senderSemaphore.release();
+					MDC.remove("ping");
+					MDC.remove("duration");
 				}
 			}
 			
@@ -268,6 +281,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					return false;
 				} finally {
 					senderSemaphore.release();
+					MDC.remove("ping");
 				}
 			}
 			
@@ -281,7 +295,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	}
 	
 	void processPrivateMessage(final IRCBotUser user, String originalMessage) {
-		MDC.put("user", user.getNick());
 		log.info("received: " + originalMessage);
 
 		Language lang = new Default();
@@ -365,16 +378,19 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	@Override
 	public void onEvent(Event event) throws Exception {
 		MDC.put("event", lastSerial.incrementAndGet());
-		
-		botInfo.setLastInteraction(System.currentTimeMillis());
-		
-		if(lastListTime < System.currentTimeMillis() - 60 * 60 * 1000) {
-			lastListTime = System.currentTimeMillis();
-			
-			event.getBot().sendRaw().rawLine("NAMES #osu");
+		try {
+			botInfo.setLastInteraction(System.currentTimeMillis());
+
+			if (lastListTime < System.currentTimeMillis() - 60 * 60 * 1000) {
+				lastListTime = System.currentTimeMillis();
+
+				event.getBot().sendRaw().rawLine("NAMES #osu");
+			}
+
+			super.onEvent(event);
+		} finally {
+			MDC.remove("event");
 		}
-		
-		super.onEvent(event);
 	}
 	
 	@Override
@@ -408,10 +424,14 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 
 		MDC.put("user", nick);
-		IRCBotUser user = fromIRC(event.getUser());
-		welcomeIfDonator(user);
-
-		scheduleRegisterActivity(nick);
+		try {
+			IRCBotUser user = fromIRC(event.getUser(), event);
+			welcomeIfDonator(user);
+	
+			scheduleRegisterActivity(nick);
+		} finally {
+			MDC.remove("user");
+		}
 	}
 	
 	void welcomeIfDonator(IRCBotUser user) {
