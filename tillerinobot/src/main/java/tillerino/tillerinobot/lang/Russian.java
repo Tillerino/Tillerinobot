@@ -201,7 +201,7 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Вы изъявили желание общаться на русском :)");
+		user.message("Вы изъявили желание общаться на русском (Перевод сделан https://osu.ppy.sh/u/firedigger)");
 	}
 
 	@Override
