@@ -14,27 +14,27 @@ public class Default implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "I'm sorry, I don't know that map. It might be very new, very hard, unranked or not standard osu mode.";
+		return "Desculpe, não conheço este mapa. Pode ser muito novo, muito difícil, não estar ranqueado ou não ser do modo Osu!Standard.";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Ugh... Looks like human Tillerino screwed up my wiring."
-				+ " If he doesn't notice soon, could you [https://github.com/Tillerino/Tillerinobot/wiki/Contact inform him]? (reference "
+		return "Ugh... Parece que o Tillerino humano trocou me os fios."
+				+ " se ele não reparar podes por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact informá-lo]? (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "What's going on? I'm only getting nonsense from the osu server. Can you tell me what this is supposed to mean? 0011101001010000"
-				+ " Human Tillerino says that this is nothing to worry about, and that we should try again."
-				+ " If you're super worried for some reason, you can [https://github.com/Tillerino/Tillerinobot/wiki/Contact tell him] about it. (reference "
+		return "O que se passa? Estou só a receber dados estranhos do servidor do Osu!. Consegues dizer me o que significa? 0011101001010000"
+				+ " O Tillerino humano disse que não é nada preocupante e que devíamos tentar outra vez."
+				+ " Se estás muito preocupado com algum problema, podes [https://github.com/Tillerino/Tillerinobot/wiki/Contact avisá-lo]. (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "no data for requested mods";
+		return "sem dados para os mods pedidos.";
 	}
 
 	@Override
@@ -42,19 +42,19 @@ public class Default implements Language {
 		if(inactiveTime < 60 * 1000) {
 			user.message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Welcome back, " + apiUser.getUserName() + ".");
+			user.message("Olá, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			user.message(apiUser.getUserName() + "...");
-			user.message("...is that you? It's been so long!");
-			user.message("It's good to have you back. Can I interest you in a recommendation?");
+			user.message("...és mesmo tu? Há quanto tempo!");
+			user.message("Que bom ter-te de volta! Interessado em alguma recomendação?");
 		} else {
 			String[] messages = {
-					"you look like you want a recommendation.",
-					"how nice to see you! :)",
-					"my favourite human. (Don't tell the other humans!)",
-					"what a pleasant surprise! ^.^",
-					"I was hoping you'd show up. All the other humans are lame, but don't tell them I said that! :3",
-					"what do you feel like doing today?",
+					"parece que queres uma recomendação.",
+					"Que bom ver-te! :)",
+					"o meu humano favorito. (Não digas aos outros humanos!)",
+					"que surpresa agradável! 😃",
+					"Estava na esperança que aparecesses. Todos os outros humanos são uma seca, mas não lhes digas que te disse isto! 😛",
+					"O que te apetece fazer hoje?",
 			};
 			
 			Random random = new Random();
@@ -67,33 +67,33 @@ public class Default implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "unknown command \"" + command
-				+ "\". Type !help if you need help!";
+		return "Comando Inválido \"" + command
+				+ "\". Digite !help se precisar de ajuda!";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return "Sorry, I can't provide information for those mods at this time.";
+		return "Desculpa mas de momento não posso providenciar informação para esses mods.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Those mods don't look right. Mods can be any combination of DT HR HD HT EZ NC FL SO NF. Combine them without any spaces or special chars. Example: !with HDHR, !with DTEZ";
+		return "Esses mods não parecem estar corretos. Os mods podem ser qualquer combinação de DT HR HD HT EZ NC FL SO NF. Combina os sem espaços ou caracteres especiais. Exemplo: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "I don't remember you getting any song info...";
+		return "Não me lembro de nenhuma informação da musica anterior...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Try this map with some mods!";
+		return "Tenta este mapa com alguns mods!";
 	}
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Try this map with " + Mods.toShortNamesContinuous(mods);
+		return "Tenta este mapa com " + Mods.toShortNamesContinuous(mods);
 	}
 
 	/**
@@ -108,59 +108,59 @@ public class Default implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
+		return "O teu nome está a confundir-me. Estás banido? Se não, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta o Tillerino]. (reference "
 				+ exceptionMarker + ")";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?";
+		return "Desculpa, havia uma sequência de uns e zeros e distrai-me. O que querias?";
 	}
 
 	@Override
 	public String complaint() {
-		return "Your complaint has been filed. Tillerino will look into it when he can.";
+		return "A tua reclamação foi enviada. O Tillerino irá vê-la assim que puder.";
 	}
 
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Come here, you!");
-		user.action("hugs " + apiUser.getUserName());
+		user.message("anda cá!");
+		user.action("abraça " + apiUser.getUserName());
 	}
 
 	@Override
 	public String help() {
-		return "Hi! I'm the robot who killed Tillerino and took over his account. Just kidding, but I do use the account a lot."
-				+ " [https://twitter.com/Tillerinobot status and updates]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki commands]"
+		return "Olá! Sou o robô que matou o Tillerino e roubou-lhe a conta. Nem por isso 😛, mas uso a conta bastante."
+				+ " [https://twitter.com/Tillerinobot status e atualizações]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki comandos]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact]";
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contactos]";
 	}
 
 	@Override
 	public String faq() {
-		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Frequently asked questions]";
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Perguntas frequentes]";
 	}
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Sorry, at this point " + feature + " is only available for players who have surpassed rank " + minRank + ".";
+		return "Desculpa, de momento" + feature + " só está disponível para jogadores de rank superior a " + minRank + ".";
 	}
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "What do you mean nomod with mods?";
+		return "O que queres dizer com nomod com mods?";
 	}
 	
 	@Override
 	public String outOfRecommendations() {
-		return "I've recommended everything that I can think of."
-				+ " Try other recommendation options or use !reset. If you're not sure, check !help.";
+		return "Já recomendei tudo o que consigo pensar."
+				+ " Tenta outra opção de recomendação ou usa !reset. Se não tens a certeza, experimenta !help.";
 	}
 
 	@Override
 	public String notRanked() {
-		return "Looks like that beatmap is not ranked.";
+		return "Parece que este mapa não está ranqueado.";
 	}
 
 	@Override
@@ -193,22 +193,22 @@ public class Default implements Language {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		return "Invalid accuracy: \"" + acc + "\"";
+		return "Precisão inválida: \"" + acc + "\"";
 	}
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("So you like me just the way I am :)");
+		user.message("O [HDHR] ensinou-me a falar Português (de Portugal)!");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		return "I'm sorry, but \"" + invalid
-				+ "\" does not compute. Try these: " + choices + "!";
+		return "Desculpa, mas \"" + invalid
+				+ "\" não funciona. Tenta: " + choices + "!";
 	}
 
 	@Override
 	public String setFormat() {
-		return "The syntax to set a parameter is !set option value. Try !help if you need more pointers.";
+		return "A sintaxe para definir um parametro é !set opção. Tenta !help se precisares de ajuda.";
 	}
 }
