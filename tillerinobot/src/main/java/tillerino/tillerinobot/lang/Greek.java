@@ -199,7 +199,7 @@ public class Greek implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Οπότε σου αρέσω ακριβώς όπως είμαι :)");
+		user.message("Ο N for Niko με βοήθησε να μάθω Ελληνικά");
 	}
 
 	@Override
