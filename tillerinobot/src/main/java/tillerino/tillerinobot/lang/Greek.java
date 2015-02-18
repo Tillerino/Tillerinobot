@@ -10,7 +10,7 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
-public class Default implements Language {
+public class Greek implements Language {
 
 	@Override
 	public String unknownBeatmap() {
@@ -199,7 +199,7 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Οπότε σου αρέσω ακριβώς όπως είμαι :)");
+		user.message("Ο N for Niko με βοήθησε να μάθω Ελληνικά");
 	}
 
 	@Override
