@@ -10,6 +10,15 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
+/**
+ * TRANSLATION NOTE:
+ * 
+ * Please put some contact data into the following tag. If any additional
+ * messages are required, I'll use the English version in all translations and
+ * notify the authors.
+ * 
+ * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
+ */
 public class Default implements Language {
 
 	@Override
@@ -39,11 +48,11 @@ public class Default implements Language {
 
 	@Override
 	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
-		if(inactiveTime < 60 * 1000) {
+		if (inactiveTime < 60 * 1000) {
 			user.message("beep boop");
-		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
+		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
 			user.message("Welcome back, " + apiUser.getUserName() + ".");
-		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			user.message(apiUser.getUserName() + "...");
 			user.message("...is that you? It's been so long!");
 			user.message("It's good to have you back. Can I interest you in a recommendation?");
@@ -56,18 +65,18 @@ public class Default implements Language {
 					"I was hoping you'd show up. All the other humans are lame, but don't tell them I said that! :3",
 					"what do you feel like doing today?",
 			};
-			
+
 			Random random = new Random();
-			
+
 			String message = messages[random.nextInt(messages.length)];
-			
+
 			user.message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
 	@Override
 	public String unknownCommand(String command) {
-		return "unknown command \"" + command
+		return "Unknown command \"" + command
 				+ "\". Type !help if you need help!";
 	}
 
@@ -83,7 +92,7 @@ public class Default implements Language {
 
 	@Override
 	public String noLastSongInfo() {
-		return "I don't remember you getting any song info...";
+		return "I don't remember giving you any song info...";
 	}
 
 	@Override
@@ -93,7 +102,7 @@ public class Default implements Language {
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Try this map with " + Mods.toShortNamesContinuous(mods);
+		return "Try this map with " + Mods.toShortNamesContinuous(mods) + "!";
 	}
 
 	/**
@@ -141,17 +150,17 @@ public class Default implements Language {
 	public String faq() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Frequently asked questions]";
 	}
-	
+
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
 		return "Sorry, at this point " + feature + " is only available for players who have surpassed rank " + minRank + ".";
 	}
-	
+
 	@Override
 	public String mixedNomodAndMods() {
 		return "What do you mean nomod with mods?";
 	}
-	
+
 	@Override
 	public String outOfRecommendations() {
 		return "I've recommended everything that I can think of."
@@ -180,7 +189,7 @@ public class Default implements Language {
 			OsuApiUser apiUser, Recommendation meta) {
 		// regular Tillerino doesn't comment on this
 	}
-	
+
 	@Override
 	public boolean isChanged() {
 		return false;
@@ -188,7 +197,7 @@ public class Default implements Language {
 
 	@Override
 	public void setChanged(boolean changed) {
-		
+
 	}
 
 	@Override
@@ -198,6 +207,31 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
+		/*
+		 * TRANSLATION NOTE: This line is sent to the user right after they have
+		 * chosen this Language implementation. The English version refers to
+		 * itself as the default version ("just the way I am"), so translating
+		 * the English message doesn't make any sense.
+		 * 
+		 * Instead, we've been using the line
+		 * "*Translator* helped me learn *Language*." in translations. Replace
+		 * *Translator* with your osu name and *Language* with the name of the
+		 * language that you are translating to, and translate the line into the
+		 * new language. This serves two purposes: It shows that the language
+		 * was changed and gives credit to the translator.
+		 * 
+		 * You don't need to use the line above, and you don't have have to give
+		 * yourself credit, but you should show that the language has changed.
+		 * For example, in the German translation, I just used the line
+		 * "Nichts leichter als das!", which translates literally to
+		 * "Nothing easier than that!", which refers to German being my first
+		 * language.
+		 * 
+		 * Tillerino
+		 * 
+		 * P.S. you can put a link to your profile into the line like this:
+		 * [https://osu.ppy.sh/u/2070907 Tillerino]
+		 */
 		user.message("So you like me just the way I am :)");
 	}
 
