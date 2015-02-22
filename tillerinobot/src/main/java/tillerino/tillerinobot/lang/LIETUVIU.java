@@ -204,7 +204,7 @@ public class Default implements Language {
 	@Override
 	public String invalidChoice(String invalid, String choices) {
 		return "Atleisk, bet \"" + invalid
-				+ "\" nesiskaičiuoja, pabandyk " + choices + "!";
+				+ "\" nesiskaito, pabandyk " + choices + "!";
 	}
 
 	@Override
