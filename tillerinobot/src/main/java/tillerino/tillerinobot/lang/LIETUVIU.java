@@ -198,7 +198,7 @@ public class Default implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Tai aš tau patinku toks, koks esu :)");
+		user.message("Haganenno išmokė mane lietuvių kalbos :)");
 	}
 
 	@Override
