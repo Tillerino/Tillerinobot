@@ -14,7 +14,7 @@ public class Greek implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Συγνώμη, δεν γνωρίζω αυτό το τραγούδι. Ίσως είναι αρκετά νεο, πολυ δύσκολο, μη εγκεκριμένο ή να μην είναι για το osu standard mode." ;
+		return "Συγνώμη, δεν γνωρίζω αυτό το τραγούδι. Ίσως είναι αρκετά νεο, πολυ δύσκολο, μη εγκεκριμένο ή δεν είναι για το osu standard mode." ;
 	}
 
 	@Override
@@ -50,11 +50,11 @@ public class Greek implements Language {
 			user.message("Είναι ωραίο να σε έχουμε πίσω. Μπορώ να σε ενδιαφέρω με μια πρόταση;");
 		} else {
 			String[] messages = {
-				        "Φαίνεσαι σαν να θες μια πρόταση.",
+				        "Φαίνεται σαν να θες μια πρόταση.",
 					"Πόσο ωραίο να σε βλέπω :)",
 					"Ο αγαπημένος μου άνθρωπος. (Μην το πείς στούς άλλους!)",
 					"Τι ευχάριστη έκπληξη! ^.^",
-					"Περίμενα ότι θα εμφανιστείς. Όλοι οι άλλοι άνθρωποι ειναι μπούφοι, αλλα μην τους πείς ότι το ειπα! :3",
+					"Περίμενα ότι θα εμφανιστείς. Όλοι οι άλλοι άνθρωποι ειναι ασήμαντοι, αλλα μην τους πείς ότι το ειπα! :3",
 					"Τι έχεις την διάθεση να κάνεις σήμερα;",
 			};
 			
@@ -126,7 +126,7 @@ public class Greek implements Language {
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
 		user.message("Έλα εδώ εσυ!");
-		user.action("Αγκαλιάζει " + apiUser.getUserName());
+		user.action("αγκαλιάζει " + apiUser.getUserName());
 	}
 
 	@Override
@@ -201,11 +201,11 @@ public class Greek implements Language {
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
 		user.message("Ο N for Niko με βοήθησε να μάθω Ελληνικά");
 	}
-
+	
 	@Override
 	public String invalidChoice(String invalid, String choices) {
 		return "Συγνώμη, αλλά \"" + invalid
-				+ "\" δεν υπολογίζει. Προσπάθησε αυτά: " + choices + "!";
+				+ "\" δεν αναγνωρίζεται. Προσπάθησε αυτά: " + choices + "!";
 	}
 
 	@Override
