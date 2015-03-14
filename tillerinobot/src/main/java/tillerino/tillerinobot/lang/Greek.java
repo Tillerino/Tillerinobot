@@ -156,7 +156,7 @@ public class Greek implements Language {
 	@Override
 	public String outOfRecommendations() {
 		return "Έχω προτίνει ό,τι μπορώ να σκεφτώ. "
-				+ " Προσπάθησε άλλες επιλογές προτάσεων ή χρησιμοποίησε το  !rest. Εάν δεν είσαι σίγουρος, έλεγξε το !help.";
+				+ " Προσπάθησε άλλες επιλογές προτάσεων ή χρησιμοποίησε το !rest. Εάν δεν είσαι σίγουρος, έλεγξε το !help.";
 	}
 
 	@Override
