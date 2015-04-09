@@ -17,21 +17,21 @@ public class Spanish implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Lo siento, no conozco ese mapa. Es muy reciente, muy difícil, unranked o modo de osu! no estándar.";
+		return "Lo siento, no conozco ese mapa. Es muy reciente, muy difÃ­cil, unranked o modo de osu! no estÃ¡ndar.";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Ehh... Parece que Tillerino humano estropeó mi cableado."
-		                + " Si no se da cuenta pronto, ¿podrías [https://github.com/Tillerino/Tillerinobot/wiki/Contact informarle]? (código de referencia "
+		return "Ehh... Parece que Tillerino humano estropeÃ³ mi cableado."
+		                + " Si no se da cuenta pronto, Â¿podrÃ­as [https://github.com/Tillerino/Tillerinobot/wiki/Contact informarle]? (cÃ³digo de referencia "
 		                + marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "¿Qué está pasando? Solo recibo disparates del servidor de osu. ¿Podrías decirme que se supone que significa esto? 0011101001010000"
-		                + " Tillerino humano dice que no hay nada por qué preocuparse y que deberíamos intentarlo de nuevo."
-		                + " Si estás preocupado por alguna razón, puedes [https://github.com/Tillerino/Tillerinobot/wiki/Contact comunicárselo]. (código de referencia "
+		return "Â¿QuÃ© estÃ¡ pasando? Solo recibo disparates del servidor de osu. Â¿PodrÃ­as decirme que se supone que significa esto? 0011101001010000"
+		                + " Tillerino humano dice que no hay nada por quÃ© preocuparse y que deberÃ­amos intentarlo de nuevo."
+		                + " Si estÃ¡s preocupado por alguna razÃ³n, puedes [https://github.com/Tillerino/Tillerinobot/wiki/Contact comunicÃ¡rselo]. (cÃ³digo de referencia "
 		                + marker + ")";
 	}
 
@@ -48,16 +48,16 @@ public class Spanish implements Language {
 			user.message("Bienvenid@, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			user.message(apiUser.getUserName() + "...");
-			user.message("...¿eres tú? ¡Ha pasado tanto tiempo!");
-			user.message("Es genial tenerte de vuelta. ¿Puedo ofrecerte una recomendación?");
+			user.message("...Â¿eres tÃº? Â¡Ha pasado tanto tiempo!");
+			user.message("Es genial tenerte de vuelta. Â¿Puedo ofrecerte una recomendaciÃ³n?");
 		} else {
 			String[] messages = {
-					"me parece que necesitas una recomendación.",
-					"¡cómo me alegro de verte! :)",
-					"mi humano favorito. (¡No se lo digas a los otros humanos!)",
-					"¡que agradable sorpresa! ^.^",
-					"Tenía la esperanza de que te dejarías ver. Todos los demás humanos son patéticos, ¡pero no les cuentes lo que dije! :3",
-					"¿qué te apetece hacer hoy?",
+					"me parece que necesitas una recomendaciÃ³n.",
+					"Â¡cÃ³mo me alegro de verte! :)",
+					"mi humano favorito. (Â¡No se lo digas a los otros humanos!)",
+					"Â¡que agradable sorpresa! ^.^",
+					"TenÃ­a la esperanza de que te dejarÃ­as ver. Todos los demÃ¡s humanos son patÃ©ticos, Â¡pero no les cuentes lo que dije! :3",
+					"Â¿quÃ© te apetece hacer hoy?",
 			};
 			
 			Random random = new Random();
@@ -71,27 +71,27 @@ public class Spanish implements Language {
 	@Override
 	public String unknownCommand(String command) {
 		return "comando desconocido \"" + command
-				+ "\". ¡Escribe !help si necesitas ayuda!";
+				+ "\". Â¡Escribe !help si necesitas ayuda!";
 	}
 
 	@Override
 	public String noInformationForMods() {
-	    return "Lo siento, no puedo proporcionar información sobre esos mods ahora mismo.";
+	    return "Lo siento, no puedo proporcionar informaciÃ³n sobre esos mods ahora mismo.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-	    return "Esos mods no parecen correctos. Los mods pueden ser cualquier combinación de DT HR HD HT EZ NC FL SO NF. Combínalos sin espacios o carácteres especiales. Ejemplo: !with HDHR, !with DTEZ";
+	    return "Esos mods no parecen correctos. Los mods pueden ser cualquier combinaciÃ³n de DT HR HD HT EZ NC FL SO NF. CombÃ­nalos sin espacios o carÃ¡cteres especiales. Ejemplo: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-	    return "No recuerdo haberte dado información sobre alguna canción...";
+	    return "No recuerdo haberte dado informaciÃ³n sobre alguna canciÃ³n...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "¡Prueba con algunos mods!";
+		return "Â¡Prueba con algunos mods!";
 	}
 
 	@Override
@@ -111,29 +111,29 @@ public class Spanish implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Tu nombre me esta confundiendo. ¿Estás baneado? Si no, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta con Tillerino]. (código de referencia "
+		return "Tu nombre me esta confundiendo. Â¿EstÃ¡s baneado? Si no, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta con Tillerino]. (cÃ³digo de referencia "
 				+ exceptionMarker + ")";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "Lo siento, había una hermosa secuencia de unos y ceros y me distraí. ¿Qué es lo que querías?";
+		return "Lo siento, habÃ­a una hermosa secuencia de unos y ceros y me distraÃ­. Â¿QuÃ© es lo que querÃ­as?";
 	}
 
 	@Override
 	public String complaint() {
-		return "Tu queja se ha archivado. Tillerino le hechará un vistazo cuando pueda.";
+		return "Tu queja se ha archivado. Tillerino le hecharÃ¡ un vistazo cuando pueda.";
 	}
 
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("¡Ven aquí!");
+		user.message("Â¡Ven aquÃ­!");
 		user.action("Abraza a " + apiUser.getUserName());
 	}
 
 	@Override
 	public String help() {
-		return "¡Hola! Soy el robot que mató a Tillerino y tomó el control de su cuenta. Estoy bromeando, uso la cuenta muy a menudo."
+		return "Â¡Hola! Soy el robot que matÃ³ a Tillerino y tomÃ³ el control de su cuenta. Estoy bromeando, uso la cuenta muy a menudo."
 				+ " [https://twitter.com/Tillerinobot estado y actualizaciones]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki comandos]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
@@ -152,13 +152,13 @@ public class Spanish implements Language {
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "¿A qué te refieres con nomod y mods?";
+		return "Â¿A quÃ© te refieres con nomod y mods?";
 	}
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Te he recomendado todo lo que sé."
-				+ " Prueba otras opciones de recomendación o usa !reset. Si no estás seguro, prueba con !help.";
+		return "Te he recomendado todo lo que sÃ©."
+				+ " Prueba otras opciones de recomendaciÃ³n o usa !reset. Si no estÃ¡s seguro, prueba con !help.";
 	}
 
 	@Override
@@ -196,12 +196,12 @@ public class Spanish implements Language {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		return "Precisión inválida: \"" + acc + "\"";
+		return "PrecisiÃ³n invÃ¡lida: \"" + acc + "\"";
 	}
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("sasakura me ayudó a aprender Español :3");
+		user.message("sasakura me ayudÃ³ a aprender EspaÃ±ol :3");
 	}
 
 	@Override
@@ -212,6 +212,6 @@ public class Spanish implements Language {
 
 	@Override
 	public String setFormat() {
-		return "El sintaxis para establecer un parámetro es !set opción valor. Prueba !help si necesitas más indicaciones.";
+		return "El sintaxis para establecer un parÃ¡metro es !set opciÃ³n valor. Prueba !help si necesitas mÃ¡s indicaciones.";
 	}
 }
