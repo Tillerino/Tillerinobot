@@ -77,13 +77,13 @@ public class Tsundere implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Huh? Why isn't this working? I can't imagine this being anything other than your fault."
-		+ " Mention incident " + marker + " to @Tillerino or /u/Tillerino if this keeps happening.";
+		+ " Mention incident " + marker + " to [https://twitter.com/Tillerinobot @Tillerinobot] or [http://www.reddit.com/user/tillerino /u/Tillerino] if this keeps happening.";
 	}
 
 	@Override
 	public String externalException(String marker) {
 		return "Sorry, the osu! server was saying some idiotic nonsense and I felt like slapping them instead of you. Try asking whatever it was again."
-		+ " If the server doesn't shut up, ask @Tillerino or /u/Tillerino (reference " + marker + ") to take care of it.";
+		+ " If the server doesn't shut up, ask [https://twitter.com/Tillerinobot @Tillerinobot] or [http://www.reddit.com/user/tillerino /u/Tillerino] (reference " + marker + ") to take care of it.";
 	}
 
 	StringShuffler noInformationForModsShortShuffler = new StringShuffler(rnd);
