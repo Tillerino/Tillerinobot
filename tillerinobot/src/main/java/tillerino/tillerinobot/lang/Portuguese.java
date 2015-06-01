@@ -14,13 +14,13 @@ public class Portuguese implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Desculpe, não conheço este mapa. Ele pode ser muito novo, muito dificl, não ranqueado ou não é um mapa do modo osu.";
+		return "Desculpe, não conheço este mapa. Ele pode ser muito novo, muito difícil, não ranqueado ou não é um mapa do modo osu!standard.";
 	}
 
 	@Override
 	public String internalException(String marker) {
 		return "Aff... Parece que o Tillerino de verdade bagunçou com minha programação."
-				+ " Se ele não perceber logo, poderia por favor informá-lo? @Tillerino ou /u/Tillerino? (referência "
+				+ " Se ele não perceber logo, poderia por favor informá-lo? [https://twitter.com/Tillerinobot @Tillerinobot] ou [http://www.reddit.com/message/compose/?to=Tillerino /u/Tillerino]? (referência "
 				+ marker + ")";
 	}
 
@@ -28,13 +28,13 @@ public class Portuguese implements Language {
 	public String externalException(String marker) {
 		return "O que é isso? Só estou recebendo bobagens do servidor do osu. Você pode me dizer o que isso significa? 0011101001010000"
 				+ " O Tillerino de verdade disse que isso não é nada preocupante e que a gente devia tentar de novo."
-				+ "Se por algum motivo você está muito preocupado, você pode dizer pra ele @Tillerino ou /u/Tillerino. (referência "
+				+ "Se por algum motivo você está muito preocupado, você pode dizer pra ele? [https://twitter.com/Tillerinobot @Tillerinobot] ou [http://www.reddit.com/message/compose/?to=Tillerino /u/Tillerino]. (referência "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "Sem dados para os mods requisitados.";
+		return "Sem dados para os mods pedidos.";
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class Portuguese implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Seu nome está me confundindo. Você está banido? Se não, por favor contate @Tillerino ou /u/Tillerino (referência "
+		return "Seu nome está me confundindo. Você está banido? Se não, por favor contate [https://twitter.com/Tillerinobot @Tillerinobot] ou [http://www.reddit.com/message/compose/?to=Tillerino /u/Tillerino] (referência "
 				+ exceptionMarker + ")";
 	}
 
@@ -119,7 +119,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public String complaint() {
-		return "Sua reclamação foi arquivada. Tillerino vai dar uma olhada no problema quando puder.";
+		return "Sua reclamação foi arquivada. O Tillerino vai dar uma olhada no problema quando puder.";
 	}
 
 	@Override
@@ -196,7 +196,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("RagingAlien e wow me ajudaram a aprender português! :D");
+		user.message("[https://osu.ppy.sh/u/ragingalien RagingAlien] e [https://osu.ppy.sh/u/wow wow] me ajudaram a aprender português! :D");
 	}
 
 	@Override
