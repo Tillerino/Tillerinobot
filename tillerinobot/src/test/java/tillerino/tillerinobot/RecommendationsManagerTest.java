@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import org.junit.Test;
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
@@ -28,6 +29,12 @@ public class RecommendationsManagerTest {
 		Settings samplerSettings = manager.parseSamplerSettings(user, "gamma AR=9", new Default());
 
 		assertEquals(1, samplerSettings.predicates.size());
+
+		// Test "nc" alias for nightcore
+		// Gives double-time recommendations
+		samplerSettings = manager.parseSamplerSettings(user, "nc", new Default());
+
+		assertTrue(Mods.DoubleTime.is(samplerSettings.requestedMods));
 	}
 
 	@Test(expected = UserException.class)

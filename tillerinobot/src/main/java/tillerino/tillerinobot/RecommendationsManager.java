@@ -399,7 +399,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				settings.model = Model.GAMMA;
 				continue;
 			}
-			if(settings.model == Model.GAMMA && lowerCase.equals("dt")) {
+			if(settings.model == Model.GAMMA && (lowerCase.equals("dt") || lowerCase.equals("nc"))) {
 				settings.requestedMods = Mods.add(settings.requestedMods, Mods.DoubleTime);
 				continue;
 			}
