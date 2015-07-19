@@ -234,7 +234,7 @@ public class IRCBotTest {
 	}
 
 	@Test
-	public void testBetaDefaultSub100k() throws SQLException, IOException,
+	public void testGammaDefaultSub100k() throws SQLException, IOException,
 			UserException {
 		IRCBot bot = getTestBot(backend);
 		backend.hintUser("user", false, 125000, 1000);
@@ -243,6 +243,6 @@ public class IRCBotTest {
 
 		verify(backend).loadRecommendations(anyInt(),
 				anyCollectionOf(Integer.class),
-				eq(Model.BETA), anyBoolean(), anyLong());
+				eq(Model.GAMMA), anyBoolean(), anyLong());
 	}
 }

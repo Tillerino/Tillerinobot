@@ -372,11 +372,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		
 		Settings settings = new Settings();
 		
-		if (apiUser.getRank() <= 100_000) {
-			settings.model = Model.GAMMA;
-		} else {
-			settings.model = Model.BETA;
-		}
+		settings.model = Model.GAMMA;
 
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
@@ -439,21 +435,6 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			throw new UserException(lang.mixedNomodAndMods());
 		}
 		
-		if(settings.model == Model.GAMMA) {
-			int minRank = 100000;
-			if(apiUser.getRank() > minRank) {
-				int id = apiUser.getUserId();
-				apiUser = backend.getUser(id, 1);
-				
-				if(apiUser == null) {
-					throw new RuntimeException("trolled by the API? " + id);
-				}
-				
-				if(apiUser.getRank() > minRank) {
-					throw new UserException(lang.featureRankRestricted("gamma", minRank, apiUser));
-				}
-			}
-		}
 		return settings;
 	}
 
