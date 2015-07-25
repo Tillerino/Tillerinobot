@@ -1,5 +1,6 @@
 package tillerino.tillerinobot;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,8 +40,8 @@ public class BotAPIServer extends Application {
 		throw exceptionFor(Status.UNAUTHORIZED, "Your key is not authorized for this method.");
 	}
 	
-	public static WebApplicationException getBadGateway() {
-		return exceptionFor(Status.fromStatusCode(502), "Communication with the osu API server failed.");
+	public static WebApplicationException getBadGateway(IOException e) {
+		return exceptionFor(Status.fromStatusCode(502), e != null ? e.getMessage() : "Communication with the osu API server failed.");
 	}
 	
 	public static WebApplicationException getNotFound(String message) {

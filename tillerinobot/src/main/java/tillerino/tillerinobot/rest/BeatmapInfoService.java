@@ -70,7 +70,7 @@ public class BeatmapInfoService {
 								
 								return beatmap;
 							} catch (IOException e) {
-								throw BotAPIServer.getBadGateway();
+								throw BotAPIServer.getBadGateway(null);
 							} catch (UserException e) {
 								throw BotAPIServer.getUserMessage(e);
 							}
