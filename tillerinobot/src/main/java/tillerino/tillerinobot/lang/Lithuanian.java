@@ -13,7 +13,7 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 /**
  * @author Haganenno https://osu.ppy.sh/u/4692344 https://github.com/peraz
  */
-public class Latvian implements Language {
+public class Lithuanian implements Language {
 
 	@Override
 	public String unknownBeatmap() {
