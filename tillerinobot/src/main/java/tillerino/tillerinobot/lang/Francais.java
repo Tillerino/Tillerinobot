@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -216,5 +215,10 @@ public class Francais implements Language {
 	@Override
 	public String setFormat() {
 		return "La commande pour définir un paramètre est !set option valeur. Ecrit !help pour avoir de l'aide.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -213,5 +212,10 @@ public class Russian implements Language {
 	@Override
 	public String setFormat() {
 		return "Синтаксис для выставления параметров: !set option value. Воспользуйтесь справкой !help если вам нужны подсказки.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

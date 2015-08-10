@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -213,5 +212,10 @@ public class Korean implements Language {
 	@Override
 	public String setFormat() {
 		return "파라미터를 설정하기 위한 방법은 !set 옵션 값 이에요. !help로 자세한 정보를 확인하세요.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

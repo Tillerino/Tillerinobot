@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -213,5 +212,10 @@ public class Japanese implements Language {
 	@Override
 	public String setFormat() {
 		return "正しいパラメータの設定の仕方は!set option value（数値）です。ヘルプが必要なら!helpを使いましょう。";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
@@ -630,5 +629,9 @@ public class Tsundere implements Language {
 	public String setFormat() {
 		return "Three words: !set option_name value_to_set. Try !help if three word sentences are too much for you.";
 	}
-
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
+	}
 }

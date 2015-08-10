@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -213,5 +212,10 @@ public class Spanish implements Language {
 	@Override
 	public String setFormat() {
 		return "El sintaxis para establecer un parámetro es !set opción valor. Prueba !help si necesitas más indicaciones.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -284,4 +283,10 @@ public interface Language {
 	 *         value
 	 */
 	String setFormat();
+
+	/**
+	 * A call to the osu! api timed out.
+	 * @return this message should indicate that this is nothing serious and should be back to normal soon.
+	 */
+	String apiTimeoutException();
 }

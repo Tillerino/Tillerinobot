@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -213,5 +212,10 @@ public class Turkish implements Language {
 	@Override
 	public String setFormat() {
 		return "Syntaxı ayarlamak için gerekli parametre kod ayarı !set. Eğer daha fazla yardıma ihtiyacın varsa !help dene.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

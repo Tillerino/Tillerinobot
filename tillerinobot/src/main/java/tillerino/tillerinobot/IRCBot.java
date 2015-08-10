@@ -2,6 +2,7 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,6 @@ import javax.inject.Named;
 
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.*;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.MDC;
 import org.pircbotx.PircBotX;
@@ -41,7 +41,6 @@ import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.slf4j.Logger;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -57,12 +56,10 @@ import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BotInfoService;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @Slf4j
@@ -189,12 +186,17 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				}
 				user.message(e.getMessage());
 			} else {
-				String string = logException(e, log);
-
-				if (e instanceof IOException) {
-					user.message(lang.externalException(string));
+				if (e instanceof SocketTimeoutException) {
+					user.message(lang.apiTimeoutException());
+					log.warn("osu api timeout");
 				} else {
-					user.message(lang.internalException(string));
+					String string = logException(e, log);
+	
+					if (e instanceof IOException) {
+						user.message(lang.externalException(string));
+					} else {
+						user.message(lang.internalException(string));
+					}
 				}
 			}
 		} catch (Throwable e1) {
@@ -436,12 +438,24 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	
 	void welcomeIfDonator(IRCBotUser user) {
 		try {
-			Integer userid = backend.resolveIRCName(user.getNick());
+			Integer userid;
+			try {
+				userid = backend.resolveIRCName(user.getNick());
+			} catch (SocketTimeoutException e1) {
+				log.warn("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
+				return;
+			}
 			
 			if(userid == null)
 				return;
 			
-			OsuApiUser apiUser = backend.getUser(userid, 0);
+			OsuApiUser apiUser;
+			try {
+				apiUser = backend.getUser(userid, 0);
+			} catch (SocketTimeoutException e) {
+				log.warn("osu api timeout while getting user {} (welcomeIfDonator)", userid);
+				return;
+			}
 			
 			if(apiUser == null)
 				return;
@@ -519,6 +533,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			}
 			
 			backend.registerActivity(userid);
+		} catch (SocketTimeoutException e) {
+			log.warn("osu api timeout while logging activity of user {}", fNick);
 		} catch (Exception e) {
 			log.error("error logging activity", e);
 		}

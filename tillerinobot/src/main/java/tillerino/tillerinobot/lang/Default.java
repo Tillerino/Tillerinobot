@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -20,6 +19,7 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
  * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
  */
 public class Default implements Language {
+	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
@@ -244,5 +244,28 @@ public class Default implements Language {
 	@Override
 	public String setFormat() {
 		return "The syntax to set a parameter is !set option value. Try !help if you need more pointers.";
+	}
+	
+	StringShuffler doSomething = new StringShuffler(rnd);
+	
+	@Override
+	public String apiTimeoutException() {
+		final String message = "The osu! servers are super slow right now, so there's nothing I can do for you at this moment. ";
+		return message + doSomething.get(
+				"Say... When was the last time you talked to your grandmother?",
+				"How about you clean your room and then ask again?",
+				"I bet you'd love to take a walk right now. You know... outside?",
+				"I just know that you have a bunch of other things to do. How about just doing them now?",
+				"You look like you need a nap anyway.",
+				"But check out this super interesting page on [https://en.wikipedia.org/wiki/Special:Random wikipedia]!",
+				"Let's check if anybody good is [http://www.twitch.tv/directory/game/Osu! streaming] right now!",
+				"Look, here is another [http://dagobah.net/flash/Cursor_Invisible.swf game] that you probably suck at!",
+				"This should give you plenty of time to study [https://github.com/Tillerino/Tillerinobot/wiki my manual].",
+				"Don't worry, these [https://www.reddit.com/r/osugame dank memes] should pass the time.",
+				"While you're bored, give [http://gabrielecirulli.github.io/2048/ 2048] a try!",
+				"Fun question: If your harddrive crashed right now, how much of your personal data would be lost forever?",
+				"So... Have you ever tried the [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
+				"You can go do something else or we can just stare into each others eyes. Silently."
+				);
 	}
 }

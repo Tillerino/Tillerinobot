@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -214,5 +213,10 @@ public class Polski implements Language {
 	@Override
 	public String setFormat() {
 		return "Składnia polecenia \"!set\" jest następująca \"!set opcja wartość\". Wpisz !help jeśli potrzebujesz więcej wskazówek.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

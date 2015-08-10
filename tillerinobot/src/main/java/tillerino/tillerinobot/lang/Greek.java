@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -214,5 +213,10 @@ public class Greek implements Language {
 	@Override
 	public String setFormat() {
 		return "Η σύνταξη για να ρυθμιστεί η παράμετρος είναι !set ρύθμιση ποσού. Δοκίμασε !help εάν χρειάζεσαι περισσότερες υποδείξεις.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -210,5 +209,10 @@ public class Deutsch implements Language {
 	@Override
 	public String setFormat() {
 		return "Das Format um eine Einstellung zu setzen ist !set option value. Schreib mir !help falls du Hilfe benötigst.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return "Sieht so aus als seien die osu! server momentan etwas langsam. Probier es spaeter noch einmal!";
 	}
 }

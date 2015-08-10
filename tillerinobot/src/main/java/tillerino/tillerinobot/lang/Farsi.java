@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -208,5 +207,10 @@ public class Farsi implements Language {
 	@Override
 	public String setFormat() {
 		return "Age mikhaai ye setting-io awaz koni, syntax-esh ine: !set option value. Age nemidooni chekhabare, daad bezan !help.";
+	}
+	
+	@Override
+	public String apiTimeoutException() {
+		return new Default().apiTimeoutException();
 	}
 }

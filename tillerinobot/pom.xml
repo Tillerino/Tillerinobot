@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>osuApiConnector</artifactId>
-			<version>0.9.2</version>
+			<version>0.9.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pircbotx</groupId>
