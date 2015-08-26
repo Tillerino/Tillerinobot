@@ -81,6 +81,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Lietuvių(Lithuanian.class),
 			Português_PT(PortuguesePortugal.class),
 			Svenska(Svenska.class),
+			Romana(Romana.class),
 			; // please end identifier entries with a comma and leave this semicolon here
 			
 			Class<? extends Language> cls;
