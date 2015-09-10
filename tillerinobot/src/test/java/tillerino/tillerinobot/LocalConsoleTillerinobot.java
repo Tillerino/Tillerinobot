@@ -183,8 +183,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				System.out.println("Welcome to the Tillerinobot simulator");
 				System.out.println("To quit, send /q");
 				System.out.println("To change users, send /r");
-				System.out
-						.println("To fake an /np command, type /np <beatmapid>");
+				System.out.println("To fake an /np command, type /np <beatmapid>");
+				System.out.println("Use /nps to send the np with an https url instead of an http url");
 				System.out.println("-----------------");
 
 				{
@@ -213,6 +213,13 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 						when(event.getUser()).thenReturn(user);
 						when(event.getBot()).thenReturn(pircBot);
 						when(event.getMessage()).thenReturn("is listening to [http://osu.ppy.sh/b/" + line.substring(4) + " title]");
+						dispatch(event);
+					} else if(line.startsWith("/nps ")) {
+						@SuppressWarnings("unchecked")
+						ActionEvent<PircBotX> event = mock(ActionEvent.class);
+						when(event.getUser()).thenReturn(user);
+						when(event.getBot()).thenReturn(pircBot);
+						when(event.getMessage()).thenReturn("is listening to [https://osu.ppy.sh/b/" + line.substring(5) + " title]");
 						dispatch(event);
 					} else if(line.startsWith("/q")) {
 						pircBot.sendIRC().quitServer();

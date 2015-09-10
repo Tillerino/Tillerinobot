@@ -27,7 +27,7 @@ import tillerino.tillerinobot.lang.Language;
 @Slf4j
 public class NPHandler implements CommandHandler {
 	static final Pattern npPattern = Pattern
-			.compile("(?:is listening to|is watching|is playing) \\[http://osu.ppy.sh/b/(\\d+).*\\]((?: "
+			.compile("(?:is listening to|is watching|is playing) \\[https?://osu.ppy.sh/b/(\\d+).*\\]((?: "
 					+ "(?:"
 					+ "-Easy|-NoFail|-HalfTime"
 					+ "|\\+HardRock|\\+SuddenDeath|\\+Perfect|\\+DoubleTime|\\+Nightcore|\\+Hidden|\\+Flashlight"
