@@ -10,6 +10,7 @@ import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 public class Portuguese implements Language {
+	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
