@@ -195,7 +195,7 @@ public class Portuguese implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("[https://osu.ppy.sh/u/ragingalien RagingAlien] e [https://osu.ppy.sh/u/wow wow] me ajudaram a aprender português! :D");
+		user.message("[https://osu.ppy.sh/u/ragingalien RagingAlien], [https://osu.ppy.sh/u/wow wow] e [https://osu.ppy.sh/u/Kanegae Kanegae] me ajudaram a aprender português! :D");
 	}
 
 	@Override
@@ -211,6 +211,22 @@ public class Portuguese implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		final String message = "O servidor do osu! está muito lento, não há nada que posso fazer no momento.";
+		return message + doSomething.get(
+				"Então... Quando foi a última vez que você falou com a sua avó?",
+				"Que tal você ir limpar seu quarto e depois tentar de novo?",
+				"Aposto que você adoraria ir caminhar agora. Sabe... lá fora?",
+				"Eu sei que você tem um monte de coisas pra fazer. Que tal fazê-las agora?",
+				"Você parece precisar de uma soneca.",
+				"Mas dê uma olhada nesse artigo super interessante na [https://pt.wikipedia.org/wiki/Special:Random wikipédia]!",
+				"Vamos ver se tem alguém bom fazendo uma [http://www.twitch.tv/directory/game/Osu! livestream] agora!",
+				"Olha, um outro [http://dagobah.net/flash/Cursor_Invisible.swf game] que você provavelmente não vai conseguir jogar bem!",
+				"Isso deve te dar um tempo pra dar uma olhada no [https://github.com/Tillerino/Tillerinobot/wiki meu manual].",
+				"Relaxa, tenho uns [https://www.reddit.com/r/osugame dank memes] pra você passar o tempo.",
+				"Enquanto você está aí, entediado, tente jogar [http://gabrielecirulli.github.io/2048/ 2048]!",
+				"Perguntinha: se seu disco rígido bugasse nesse exato momento, você iria perder muita coisa importante?",
+				"Então... por acaso você já tentou o [https://www.google.com.br/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
+				"Você pode ir tentar fazer outra coisa, ou podemos ficar olhando um nos olhos do outro. Em silêncio..."
+				);
 	}
 }
