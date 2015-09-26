@@ -2,6 +2,8 @@ package tillerino.tillerinobot.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -25,35 +27,56 @@ public class AccHandler implements CommandHandler {
 		super();
 		this.backend = backend;
 	}
+	
+	static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)\\s+(\\d+)x\\s+(\\d)+m", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public boolean handle(String message, IRCBotUser user,
 			OsuApiUser apiUser, UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
-		if (message.toLowerCase().startsWith("acc")) {
-			BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
-			Language lang = userData.getLanguage();
-			if (lastSongInfo == null) {
-				throw new UserException(lang.noLastSongInfo());
-			}
-			message = message.substring(3).trim().replace(',', '.');
-			Double acc = null;
-			try {
-				acc = Double.parseDouble(message);
-			} catch (Exception e) {
-				throw new UserException(lang.invalidAccuracy(message));
-			}
-			if (!(acc >= 0 && acc <= 100)) {
-				throw new UserException(lang.invalidAccuracy(message));
-			}
-			acc = Math.round(acc * 100) / 10000d;
+		if (!message.toLowerCase().startsWith("acc")) {
+			return false;
+		}
+		
+		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
+		Language lang = userData.getLanguage();
+		if (lastSongInfo == null) {
+			throw new UserException(lang.noLastSongInfo());
+		}
+		message = message.substring(3).trim().replace(',', '.');
+		Matcher extendedMatcher = extended.matcher(message);
+		if(extendedMatcher.matches()) {
+			double acc = parseAcc(extendedMatcher.group(1), lang);
+			int combo = Integer.parseInt(extendedMatcher.group(2));
+			int misses = Integer.parseInt(extendedMatcher.group(3));
+			
 			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
 			if (beatmap == null) {
 				throw new RareUserException(lang.excuseForError());
 			}
-			user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc));
-			return true;
+			user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
+		} else {
+			double acc = parseAcc(message, lang);
+			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
+			if (beatmap == null) {
+				throw new RareUserException(lang.excuseForError());
+			}
+			user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, null, null));
 		}
-		return false;
+		return true;
+	}
+
+	public static double parseAcc(String accString, Language lang) throws UserException {
+		double acc;
+		try {
+			acc = Double.parseDouble(accString);
+		} catch (Exception e) {
+			throw new UserException(lang.invalidAccuracy(accString));
+		}
+		if (!(acc >= 0 && acc <= 100)) {
+			throw new UserException(lang.invalidAccuracy(accString));
+		}
+		acc = Math.round(acc * 100) / 10000d;
+		return acc;
 	}
 }

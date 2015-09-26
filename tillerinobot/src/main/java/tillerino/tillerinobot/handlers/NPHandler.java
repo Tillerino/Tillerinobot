@@ -67,7 +67,7 @@ public class NPHandler implements CommandHandler {
 		}
 
 		if (user.message(beatmap.formInfoMessage(false, addition,
-				userData.getHearts(), null))) {
+				userData.getHearts(), null, null, null))) {
 			userData.setLastSongInfo(new BeatmapWithMods(pair.getBeatmap(),
 					beatmap
 					.getMods()));

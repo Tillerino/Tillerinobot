@@ -52,7 +52,7 @@ public class WithHandler implements CommandHandler {
 				throw new UserException(lang.noInformationForMods());
 			}
 			
-			if(user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), null))) {
+			if(user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), null, null, null))) {
 				lang.optionalCommentOnWith(user, apiUser, beatmap);
 
 				userData.setLastSongInfo(new BeatmapWithMods(beatmap.getBeatmap().getBeatmapId(), beatmap.getMods()));

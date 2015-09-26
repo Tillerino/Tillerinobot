@@ -88,7 +88,7 @@ public class RecommendHandler implements CommandHandler {
 		}
 
 		if (user.message(beatmap.formInfoMessage(true, addition,
-				userData.getHearts(), null))) {
+				userData.getHearts(), null, null, null))) {
 			userData.setLastSongInfo(new BeatmapWithMods(beatmap.getBeatmap()
 					.getBeatmapId(), beatmap.getMods()));
 			backend.saveGivenRecommendation(apiUser.getUserId(), beatmap

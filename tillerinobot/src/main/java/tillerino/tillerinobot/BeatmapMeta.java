@@ -18,6 +18,8 @@ public class BeatmapMeta {
 	public interface PercentageEstimates {
 		double getPPForAcc(double acc);
 		
+		double getPP(double acc, int combo, int misses);
+		
 		@BitwiseMods
 		long getMods();
 		
@@ -37,7 +39,7 @@ public class BeatmapMeta {
 
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#");
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc) {
+	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) {
 		
 		String beatmapName = getBeatmap().getArtist() + " - " + getBeatmap().getTitle()
 				+ " [" + getBeatmap().getVersion() + "]";
@@ -64,8 +66,13 @@ public class BeatmapMeta {
 		
 
 		if (acc != null) {
-			estimateMessage += format.format(acc * 100) + "%: "
-					+ noDecimalsFormat.format(percentageEstimates.getPPForAcc(acc)) + "pp";
+			estimateMessage += format.format(acc * 100) + "%";
+			if(combo != null && misses != null) {
+				estimateMessage += " " + combo + "x " + misses + "miss: ";
+				estimateMessage += ": " + noDecimalsFormat.format(percentageEstimates.getPP(acc, combo, misses)) + "pp";
+			} else {
+				estimateMessage += ": " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(acc)) + "pp";
+			}
 		} else {
 			estimateMessage += "95%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.95)) + "pp";
 			estimateMessage += " | 98%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.98)) + "pp";

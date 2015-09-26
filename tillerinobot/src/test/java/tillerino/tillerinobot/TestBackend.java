@@ -92,6 +92,11 @@ public class TestBackend implements BotBackend {
 		public Double getStarDiff() {
 			return Math.log(fPp / 8) / Math.log(2);
 		}
+
+		@Override
+		public double getPP(double acc, int combo, int misses) {
+			return getPPForAcc(acc);
+		}
 	}
 
 	static class User {
