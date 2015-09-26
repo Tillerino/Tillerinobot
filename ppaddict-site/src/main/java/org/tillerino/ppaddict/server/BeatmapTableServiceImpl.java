@@ -141,25 +141,27 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
       if (useRangeFilters) {
         if (request.aR.min != null
-            && apiBeatmap.getApproachRate(estimate.getMods()) < request.aR.min) {
+            && apiBeatmap.getApproachRate(estimate.getMods()) * 100 < request.aR.min) {
           continue;
         }
         if (request.aR.max != null
-            && apiBeatmap.getApproachRate(estimate.getMods()) > request.aR.max) {
+            && apiBeatmap.getApproachRate(estimate.getMods()) * 100 > request.aR.max) {
           continue;
         }
         if (request.oD.min != null
-            && apiBeatmap.getOverallDifficulty(estimate.getMods()) < request.oD.min) {
+            && apiBeatmap.getOverallDifficulty(estimate.getMods()) * 100 < request.oD.min) {
           continue;
         }
         if (request.oD.max != null
-            && apiBeatmap.getOverallDifficulty(estimate.getMods()) > request.oD.max) {
+            && apiBeatmap.getOverallDifficulty(estimate.getMods()) * 100 > request.oD.max) {
           continue;
         }
-        if (request.cS.min != null && apiBeatmap.getCircleSize(estimate.getMods()) < request.cS.min) {
+        if (request.cS.min != null
+            && apiBeatmap.getCircleSize(estimate.getMods()) * 100 < request.cS.min) {
           continue;
         }
-        if (request.cS.max != null && apiBeatmap.getCircleSize(estimate.getMods()) > request.cS.max) {
+        if (request.cS.max != null
+            && apiBeatmap.getCircleSize(estimate.getMods()) * 100 > request.cS.max) {
           continue;
         }
         if (request.perfectPP.min != null

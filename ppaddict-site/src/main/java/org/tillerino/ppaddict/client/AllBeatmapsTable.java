@@ -384,7 +384,8 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
 
   private TextColumn<Beatmap> addCSColumn() {
     Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("onecharminmaxcell", "0", "10", NumberType.INTEGER)) {
+        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0", "10",
+            NumberType.DECIMAL)) {
           @Override
           public MinMax getValue() {
             return provider.getRequest().cS.getCopy();
@@ -403,7 +404,8 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
 
   private TextColumn<Beatmap> addARColumn() {
     Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("onecharminmaxcell", "0", "10", NumberType.INTEGER)) {
+        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0", "12",
+            NumberType.DECIMAL)) {
           @Override
           public MinMax getValue() {
             return provider.getRequest().aR.getCopy();
@@ -422,7 +424,8 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
 
   private TextColumn<Beatmap> addODColumn() {
     Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("onecharminmaxcell", "0", "10", NumberType.INTEGER)) {
+        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0", "12",
+            NumberType.DECIMAL)) {
           @Override
           public MinMax getValue() {
             return provider.getRequest().oD.getCopy();
