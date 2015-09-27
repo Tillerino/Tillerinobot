@@ -84,7 +84,7 @@ public class BeatmapRangeRequest implements Serializable {
   public String toString() {
     return start + " " + length + " " + sortBy + " " + direction + " "
         + getSearches().getSearchText() + " AR " + aR + " CS " + cS + " expected " + expectedPP
-        + " perfect " + perfectPP + " mapLength " + mapLength;
+        + " perfect " + perfectPP + " mapLength " + mapLength + " " + searches;
   }
 
 }

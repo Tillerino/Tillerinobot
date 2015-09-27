@@ -82,16 +82,18 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
   }
 
   @Override
-  public InitialData getInitialData() throws PpaddictException {
+  public InitialData getInitialData(BeatmapRangeRequest request) throws PpaddictException {
     Credentials credentials = getCredentials(getThreadLocalRequest());
 
     UserData userDataWithPersistentUserData = createUserData(getThreadLocalRequest(), credentials);
 
     ClientUserData userData = userDataWithPersistentUserData.userData;
 
-    BeatmapRangeRequest request =
-        userDataWithPersistentUserData.persistentUserData != null ? userDataWithPersistentUserData.persistentUserData
-            .getLastRequest() : null;
+    if (request == null) {
+      request =
+          userDataWithPersistentUserData.persistentUserData != null ? userDataWithPersistentUserData.persistentUserData
+              .getLastRequest() : null;
+    }
     if (request == null) {
       request = new BeatmapRangeRequest();
     }

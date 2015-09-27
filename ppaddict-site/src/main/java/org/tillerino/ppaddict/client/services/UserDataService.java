@@ -1,5 +1,8 @@
 package org.tillerino.ppaddict.client.services;
 
+import javax.annotation.CheckForNull;
+
+import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
 import org.tillerino.ppaddict.shared.ClientUserData;
 import org.tillerino.ppaddict.shared.InitialData;
 import org.tillerino.ppaddict.shared.PpaddictException;
@@ -14,7 +17,7 @@ public interface UserDataService extends RemoteService {
 
   void saveSettings(Settings s) throws PpaddictException;
 
-  InitialData getInitialData() throws PpaddictException;
+  InitialData getInitialData(@CheckForNull BeatmapRangeRequest request) throws PpaddictException;
 
   String getLinkString() throws PpaddictException;
 

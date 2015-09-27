@@ -11,7 +11,9 @@ import org.tillerino.ppaddict.client.dialogs.WelcomeDialog;
 import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
 import org.tillerino.ppaddict.client.services.UserDataService;
 import org.tillerino.ppaddict.client.services.UserDataServiceAsync;
+import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
 import org.tillerino.ppaddict.shared.InitialData;
+import org.tillerino.ppaddict.shared.Searches;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Position;
@@ -85,7 +87,9 @@ public class Main extends Composite implements HasHelpElements {
 
     System.out.println("requesting initial data");
 
-    userDataService.getInitialData(new AbstractAsyncCallback<InitialData>() {
+    BeatmapRangeRequest request = createRequest();
+
+    userDataService.getInitialData(request, new AbstractAsyncCallback<InitialData>() {
       @Override
       public void process(InitialData result) {
         beatmapsTable = new AllBeatmapsTable(result);
@@ -104,6 +108,33 @@ public class Main extends Composite implements HasHelpElements {
         maindock.add(beatmapsTable);
       }
     });
+  }
+
+  @CheckForNull
+  private BeatmapRangeRequest createRequest() {
+    if (Window.Location.getParameter("s") != null) {
+      try {
+        int s = Integer.parseInt(Window.Location.getParameter("s"));
+        BeatmapRangeRequest request = new BeatmapRangeRequest();
+        request.getSearches().setSetId(s);
+        return request;
+      } catch (NumberFormatException e) {
+        // okay, try something else
+      }
+    }
+
+    if (Window.Location.getParameter("b") != null) {
+      try {
+        int b = Integer.parseInt(Window.Location.getParameter("b"));
+        BeatmapRangeRequest request = new BeatmapRangeRequest();
+        request.getSearches().setBeatmapId(b);
+        return request;
+      } catch (NumberFormatException e) {
+        // okay, try something else
+      }
+    }
+
+    return null;
   }
 
   public static final int VERSION = 1;
@@ -154,6 +185,11 @@ public class Main extends Composite implements HasHelpElements {
       maindock.remove(recommendations);
 
       maindock.add(beatmapsTable);
+    } else {
+      Searches searches = beatmapsTable.provider.getRequest().getSearches();
+      if (searches.getBeatmapId() != null || searches.getSetId() != null) {
+        Window.Location.assign("/");
+      }
     }
   }
 

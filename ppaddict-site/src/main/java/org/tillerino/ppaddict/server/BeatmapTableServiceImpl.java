@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
 import javax.annotation.CheckForNull;
@@ -78,6 +79,17 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
       @CheckForNull Credentials credentials, PersistentUserData userData) throws PpaddictException {
     System.out.println("server got request: " + request);
     Settings settings = userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS;
+
+    Collection<Predicate<BeatmapData>> predicates = new ArrayList<>();
+    if (request.getSearches().getBeatmapId() != null) {
+      int beatmapId = request.getSearches().getBeatmapId();
+      predicates.add(x -> x.getBeatmap().getBeatmapId() == beatmapId);
+    }
+    if (request.getSearches().getSetId() != null) {
+      int setId = request.getSearches().getSetId();
+      predicates.add(x -> x.getBeatmap().getSetId() == setId);
+    }
+
     /*
      * prepare search objects
      */
@@ -104,10 +116,15 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     if (beatmaps == null) {
       throw new PpaddictException("The server is restarting or something.");
     }
-    for (Entry<BeatmapWithMods, BeatmapData> data : beatmaps.entrySet()) {
-      OsuApiBeatmap apiBeatmap = data.getValue().getBeatmap();
-      PercentageEstimates estimate = data.getValue().getEstimates();
+    beatmaps: for (BeatmapData data : beatmaps.values()) {
+      OsuApiBeatmap apiBeatmap = data.getBeatmap();
+      PercentageEstimates estimate = data.getEstimates();
 
+      for (Predicate<BeatmapData> predicate : predicates) {
+        if (!predicate.test(data)) {
+          continue beatmaps;
+        }
+      }
       /*
        * search in name
        */
@@ -209,12 +226,13 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         }
       }
 
-      selection.add(data.getValue());
+      selection.add(data);
     }
 
     selection = sort(request, selection, settings);
 
-    if (request.loadedUserRequest) {
+    if (request.loadedUserRequest && request.getSearches().getBeatmapId() == null
+        && request.getSearches().getSetId() == null) {
       if (userData != null) {
         System.out.println("persisting " + request);
         userData.setLastRequest(request);

@@ -2,7 +2,11 @@ package org.tillerino.ppaddict.shared;
 
 import java.io.Serializable;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+
+import org.tillerino.osuApiModel.types.BeatmapId;
+import org.tillerino.osuApiModel.types.BeatmapSetId;
 
 public class Searches implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -16,6 +20,12 @@ public class Searches implements Serializable {
 
   private String searchText = "";
   private String searchComment = "";
+  @CheckForNull
+  @BeatmapId
+  private Integer beatmapId;
+  @CheckForNull
+  @BeatmapSetId
+  private Integer setId;
 
   public Searches getCopy() {
     Searches copy = new Searches();
@@ -25,8 +35,9 @@ public class Searches implements Serializable {
   }
 
   public static String nonNullTrimmed(String string) {
-    if (string == null)
+    if (string == null) {
       return "";
+    }
     return string.trim();
   }
 
@@ -52,5 +63,31 @@ public class Searches implements Serializable {
 
   public void setSearchComment(String searchComment) {
     this.searchComment = searchComment;
+  }
+
+  @CheckForNull
+  @BeatmapId
+  public Integer getBeatmapId() {
+    return beatmapId;
+  }
+
+  public void setBeatmapId(@CheckForNull @BeatmapId Integer beatmapId) {
+    this.beatmapId = beatmapId;
+  }
+
+  @CheckForNull
+  @BeatmapSetId
+  public Integer getSetId() {
+    return setId;
+  }
+
+  public void setSetId(@CheckForNull @BeatmapSetId Integer setId) {
+    this.setId = setId;
+  }
+
+  @Override
+  public String toString() {
+    return "Searches [searchText=" + searchText + ", searchComment=" + searchComment
+        + ", beatmapId=" + beatmapId + ", beatmapSetId=" + setId + "]";
   }
 }

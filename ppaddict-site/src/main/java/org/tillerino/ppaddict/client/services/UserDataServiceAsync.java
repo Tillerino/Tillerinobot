@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.client.services;
 
 import javax.annotation.CheckForNull;
 
+import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
 import org.tillerino.ppaddict.shared.ClientUserData;
 import org.tillerino.ppaddict.shared.InitialData;
 import org.tillerino.ppaddict.shared.Settings;
@@ -17,7 +18,7 @@ public interface UserDataServiceAsync {
   void saveComment(int beatmapid, @CheckForNull String mods, String comment,
       AsyncCallback<Void> callback);
 
-  void getInitialData(AsyncCallback<InitialData> callback);
+  void getInitialData(@CheckForNull BeatmapRangeRequest request, AsyncCallback<InitialData> callback);
 
   void getLinkString(AsyncCallback<String> callback);
 
