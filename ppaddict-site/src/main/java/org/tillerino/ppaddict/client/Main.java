@@ -96,6 +96,7 @@ public class Main extends Composite implements HasHelpElements {
 
         help.addElement(beatmapsTable);
 
+        userBox.addLoadHandler(recommendations);
         userBox.setData(result.userData);
 
         /*
@@ -103,7 +104,6 @@ public class Main extends Composite implements HasHelpElements {
          * would be double loading
          */
         userBox.addLoadHandler(beatmapsTable);
-        userBox.addLoadHandler(recommendations);
         beatmapsTable.addBundleHandler(userBox.getBundleHandler());
         maindock.add(beatmapsTable);
       }
