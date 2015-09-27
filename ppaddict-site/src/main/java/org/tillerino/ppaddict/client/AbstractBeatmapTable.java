@@ -5,7 +5,9 @@ package org.tillerino.ppaddict.client;
 import org.tillerino.ppaddict.client.HelpElements.E;
 import org.tillerino.ppaddict.client.HelpElements.HasHelpElements;
 import org.tillerino.ppaddict.client.UserBox.UserDataHandler;
+import org.tillerino.ppaddict.client.dialogs.AbstractSettingsDialog;
 import org.tillerino.ppaddict.client.dialogs.EditBeatmapDialog;
+import org.tillerino.ppaddict.client.dialogs.MoreDialog;
 import org.tillerino.ppaddict.client.dialogs.Side;
 import org.tillerino.ppaddict.client.theTable.CustomDataGrid;
 import org.tillerino.ppaddict.client.theTable.CustomDataGrid.MyDataGridResources;
@@ -119,7 +121,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
     } else {
       table.addColumn(column, header);
     }
-    table.setColumnWidth(column, 120, Unit.PX);
+    table.setColumnWidth(column, 115, Unit.PX);
     setAlignLeft(column);
     return column;
   }
@@ -139,7 +141,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       table.addColumn(column, header);
     }
     setAlignRight(column);
-    table.setColumnWidth(column, 100, Unit.PX);
+    table.setColumnWidth(column, 90, Unit.PX);
     return column;
   }
 
@@ -158,7 +160,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       table.addColumn(column, header);
     }
     setAlignRight(column);
-    table.setColumnWidth(column, 70, Unit.PX);
+    table.setColumnWidth(column, 55, Unit.PX);
     return column;
   }
 
@@ -297,7 +299,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       table.addColumn(perfectPPColumn, header);
     }
     setAlignRight(perfectPPColumn);
-    table.setColumnWidth(perfectPPColumn, 75, Unit.PX);
+    table.setColumnWidth(perfectPPColumn, 73, Unit.PX);
     return perfectPPColumn;
   }
 
@@ -321,7 +323,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       table.addColumn(expectedPPColumn, header);
     }
     setAlignRight(expectedPPColumn);
-    table.setColumnWidth(expectedPPColumn, 75, Unit.PX);
+    table.setColumnWidth(expectedPPColumn, 73, Unit.PX);
     return expectedPPColumn;
   }
 
@@ -340,6 +342,19 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
     TableRowElement rowElement = table.getRowElement(index - table.getVisibleRange().getStart());
     dialog.show(rowElement.getChild(table.getColumnIndex(nameColumn)).<Element>cast(),
         Side.BELOW_RIGHT);
+  }
+
+  /**
+   * 
+   * @param index index in visible elements
+   * @param object
+   * @param column TODO
+   */
+  protected void showMoreDialog(final int index, Beatmap object, Column<Beatmap, ?> column) {
+    MoreDialog dialog = new MoreDialog(object);
+    TableRowElement rowElement = table.getRowElement(index - table.getVisibleRange().getStart());
+    AbstractSettingsDialog.popupNextTo(dialog, rowElement.getChild(table.getColumnIndex(column))
+        .<Element>cast(), Side.BELOW_LEFT);
   }
 
   protected Column<Beatmap, String> addEditColumn() {
@@ -372,7 +387,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     });
     table.addColumn(column);
-    table.setColumnWidth(column, 55, Unit.PX);
+    table.setColumnWidth(column, 48, Unit.PX);
     column.setFieldUpdater(new FieldUpdater<Beatmap, String>() {
       @Override
       public void update(final int index, Beatmap object, String value) {
@@ -381,6 +396,37 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
 
     });
     setAlignRight(column);
+    return column;
+  }
+
+  protected Column<Beatmap, String> addMoreColumn() {
+    final Column<Beatmap, String> column = new Column<Beatmap, String>(new ButtonCell()) {
+      @Override
+      public String getValue(Beatmap object) {
+        /*
+         * leave cell empty until hovered over
+         */
+        return "";
+      }
+    };
+    table.addRowHoverHandler(new RowHoverEvent.Handler() {
+      @Override
+      public void onRowHover(RowHoverEvent event) {
+        Element button =
+            event.getHoveringRow().getChild(table.getColumnIndex(column)).<TableCellElement>cast()
+                .getChild(0).<DivElement>cast().getChild(0).<ButtonElement>cast();
+
+        button.setInnerText(event.isUnHover() ? "" : "...");
+      }
+    });
+    table.addColumn(column);
+    table.setColumnWidth(column, 30, Unit.PX);
+    column.setFieldUpdater(new FieldUpdater<Beatmap, String>() {
+      @Override
+      public void update(final int index, Beatmap object, String value) {
+        showMoreDialog(index, object, column);
+      }
+    });
     return column;
   }
 

@@ -191,6 +191,7 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
 
     addNameColumn();
     addEditColumn();
+    addMoreColumn();
     addARColumn();
     addODColumn();
     addCSColumn();

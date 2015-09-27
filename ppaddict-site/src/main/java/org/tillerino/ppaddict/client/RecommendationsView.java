@@ -55,6 +55,7 @@ public class RecommendationsView extends AbstractBeatmapTable {
     addNameColumn(null);
     addHideColumn();
     addEditColumn();
+    addMoreColumn();
     addARColumn(null);
     addODColumn(null);
     addCSColumn(null);
