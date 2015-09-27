@@ -3,6 +3,8 @@ package tillerino.tillerinobot.handlers;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.regex.Matcher;
+
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
@@ -19,6 +21,12 @@ public class AccHandlerTest {
 	@Test
 	public void testExtendedPattern() throws Exception {
 		assertTrue(AccHandler.extended.matcher("97.2 800x 1m").matches());
+	}
+	@Test
+	public void testExtendedPattern2() throws Exception {
+		Matcher matcher = AccHandler.extended.matcher("97.2% 800x 11m");
+		assertTrue(matcher.matches());
+		assertEquals("11", matcher.group(3));
 	}
 	
 	@Test

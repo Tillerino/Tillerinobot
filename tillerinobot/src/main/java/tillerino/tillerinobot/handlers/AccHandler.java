@@ -28,7 +28,7 @@ public class AccHandler implements CommandHandler {
 		this.backend = backend;
 	}
 	
-	static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)\\s+(\\d+)x\\s+(\\d)+m", Pattern.CASE_INSENSITIVE);
+	static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public boolean handle(String message, IRCBotUser user,
@@ -56,6 +56,9 @@ public class AccHandler implements CommandHandler {
 			}
 			user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
 		} else {
+			if(message.endsWith("%")) {
+				message = message.substring(0, message.length() - 1);
+			}
 			double acc = parseAcc(message, lang);
 			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
 			if (beatmap == null) {
