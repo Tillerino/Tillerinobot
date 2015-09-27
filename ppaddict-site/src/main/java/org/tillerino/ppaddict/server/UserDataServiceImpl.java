@@ -35,6 +35,8 @@ import org.tillerino.ppaddict.shared.PpaddictException.NotLoggedIn;
 import org.tillerino.ppaddict.shared.Settings;
 
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.RecommendationsManager;
+import tillerino.tillerinobot.lang.Default;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -64,6 +66,9 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
   @Inject
   @AuthenticatorServices
   Map<String, AuthenticatorService> authServices;
+
+  @Inject
+  RecommendationsManager recommendationsManager;
 
   public static final String CREDENTIALS_SESSION_KEY = "ppaddict.auth.credentials";
   public static final String CREDENTIALS_COOKIE_KEY = "ppaddict.auth.cookie";
@@ -212,6 +217,15 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
   public void saveSettings(@Nonnull Settings s) throws PpaddictException {
     Credentials credentials = getCredentialsOrThrow();
     PersistentUserData data = getServerUserData(credentials);
+    if (s.getRecommendationsParameters() != null) {
+      try {
+        recommendationsManager.parseSamplerSettings(
+            botBackend.getUser(data.getLinkedOsuIdOrThrow(), 0), s.getRecommendationsParameters(),
+            new Default());
+      } catch (Exception e) {
+        throw ExceptionsUtil.getLoggedWrappedException(log, e);
+      }
+    }
     data.setSettings(s);
     saveUserData(credentials, data);
   }
