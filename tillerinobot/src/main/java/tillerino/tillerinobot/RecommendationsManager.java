@@ -373,8 +373,14 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		Settings settings = new Settings();
 		
 		settings.model = Model.GAMMA;
+		
+		
 
 		for (int i = 0; i < remaining.length; i++) {
+			if (userData.nomodoption)
+		settings.nomod = true;
+		else
+		settings.nomod = false;
 			String param = remaining[i];
 			String lowerCase = param.toLowerCase();
 			if(lowerCase.length() == 0)
