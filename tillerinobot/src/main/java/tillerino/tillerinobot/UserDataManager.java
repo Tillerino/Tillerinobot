@@ -112,6 +112,11 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		}
 
 		transient boolean changed = false;
+		transient boolean nomodoption = false;
+		
+		public void setNoModOption(boolean bool){
+			this.nomodoption = bool;
+		}
 
 		public void setChanged(boolean changed) {
 			this.changed = changed;
