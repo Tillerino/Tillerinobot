@@ -137,10 +137,10 @@ public class Main extends Composite implements HasHelpElements {
     return null;
   }
 
-  public static final int VERSION = 1;
+  public static final int VERSION = 2;
   public static final String VERSION_MESSAGE =
-      "<ul><li>Data for all ranked beatmaps with current pp and difficulty. Bonus: mods.</li>"
-          + "<li>Log in, link your account to osu! and click r! to get recommendations.</li></ul>";
+      "<ul><li>AR, CS, and OD filters now support decimals. This might have messed up your saved filter settings. If your beatmap table is suddenly empty, check your AR/CS/OD settings!</li>"
+          + "<li>You can now jump directly to specific beatmaps or beatmap sets by adding ?b=beatmapid or ?s=setid to the URL.</li></ul>";
 
   @Override
   protected void onLoad() {
