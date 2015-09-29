@@ -79,6 +79,7 @@ public class OptionsHandler implements CommandHandler {
 		}
 		
 		if (option.equals("recommendmods")){
+if (set){
 			if (value == null){
 				ircUser.message("Please specify an option: mods/nomods");
 			}else{
@@ -90,7 +91,7 @@ public class OptionsHandler implements CommandHandler {
 				icrUser.message("Invalid value!");
 			}
 			
-		}
+		}}
 
 		return true;
 	}
