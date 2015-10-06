@@ -11,13 +11,13 @@ import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 /**
- * Hebrew translations by http://reddit.com/u/shavitush
+ * @author https://github.com/shavitush https://reddit.com/u/shavitush
  */
 public class Hebrew implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "אני מצטער, אני לא מכיר המפה הזו. כנראה שהיא ממש חדשה, ממש קשה, לא מדורגת או לא של אוסו";
+		return "המפה לא נמצאה במערכת. נסה שנית. יתכן והמפה קשה מדי או חדשה מדי.";
 	}
 
 	@Override
