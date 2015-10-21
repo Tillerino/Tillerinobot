@@ -37,35 +37,34 @@ public class RecommendHandler implements CommandHandler {
 	}
 
 	@Override
-	public boolean handle(String command, IRCBotUser user,
+	public boolean handle(final String originalCommand, IRCBotUser user,
 			OsuApiUser apiUser, UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
 		Language lang = userData.getLanguage();
 
-		String lowerCase = command.toLowerCase();
+		String lowerCase = originalCommand.toLowerCase();
 
-		boolean isRecommend = false;
-
-		if (lowerCase.equals("r")) {
-			isRecommend = true;
-			command = "";
-		}
-		if (getLevenshteinDistance(lowerCase, "recommend") <= 2) {
-			isRecommend = true;
-			command = "";
-		}
-		if (lowerCase.startsWith("r ")) {
-			isRecommend = true;
-			command = command.substring(2);
-		}
-		if (lowerCase.contains(" ")) {
-			int pos = lowerCase.indexOf(' ');
-			if (getLevenshteinDistance(lowerCase.substring(0, pos), "recommend") <= 2) {
-				isRecommend = true;
-				command = command.substring(pos + 1);
+		final String command;
+		searchRecommend: {
+			if (lowerCase.equals("r")) {
+				command = "";
+				break searchRecommend;
 			}
-		}
-		if (!isRecommend) {
+			if (getLevenshteinDistance(lowerCase, "recommend") <= 2) {
+				command = "";
+				break searchRecommend;
+			}
+			if (lowerCase.startsWith("r ")) {
+				command = originalCommand.substring(2);
+				break searchRecommend;
+			}
+			if (lowerCase.contains(" ")) {
+				int pos = lowerCase.indexOf(' ');
+				if (getLevenshteinDistance(lowerCase.substring(0, pos), "recommend") <= 2) {
+					command = originalCommand.substring(pos + 1);
+					break searchRecommend;
+				}
+			}
 			return false;
 		}
 
