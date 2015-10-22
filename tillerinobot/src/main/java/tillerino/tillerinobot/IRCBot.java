@@ -486,7 +486,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			exec.submit(new Runnable() {
 				@Override
 				public void run() {
-					registerActivity(nick);
+					MDC.put("user", nick);
+					try {
+						registerActivity(nick);
+					} finally {
+						MDC.remove("user");
+					}
 				}
 			});
 		} catch (RejectedExecutionException e) {
