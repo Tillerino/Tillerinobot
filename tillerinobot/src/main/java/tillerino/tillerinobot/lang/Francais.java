@@ -227,4 +227,9 @@ public class Francais implements Language {
 	public String noRecentPlays() {
 		return new Default().noRecentPlays();
 	}
+	
+	@Override
+	public String isSetId() {
+		return new Default().isSetId();
+	}
 }

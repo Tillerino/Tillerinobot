@@ -24,10 +24,9 @@ import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.lang.Language;
 
-@Slf4j
 public class NPHandler implements CommandHandler {
 	static final Pattern npPattern = Pattern
-			.compile("(?:is listening to|is watching|is playing|is editing) \\[https?://osu.ppy.sh/b/(\\d+).*\\]((?: "
+			.compile("(?:is listening to|is watching|is playing|is editing) \\[https?://osu.ppy.sh/(?<idtype>b|s)/(?<id>\\d+).*\\](?<mods>(?: "
 					+ "(?:"
 					+ "-Easy|-NoFail|-HalfTime"
 					+ "|\\+HardRock|\\+SuddenDeath|\\+Perfect|\\+DoubleTime|\\+Nightcore|\\+Hidden|\\+Flashlight"
@@ -46,7 +45,7 @@ public class NPHandler implements CommandHandler {
 			UserData userData) throws UserException, IOException, SQLException, InterruptedException {
 		Language lang = userData.getLanguage();
 
-		BeatmapWithMods pair = parseNP(message);
+		BeatmapWithMods pair = parseNP(message, lang);
 
 		if (pair == null)
 			return false;
@@ -80,21 +79,24 @@ public class NPHandler implements CommandHandler {
 
 	@CheckForNull
 	@SuppressFBWarnings(value = "TQ", justification = "parser")
-	public BeatmapWithMods parseNP(String message) {
+	public BeatmapWithMods parseNP(String message, Language lang) throws UserException {
 		Matcher m = npPattern.matcher(message);
 
 		if (!m.matches()) {
-			log.error("no match: " + message);
 			return null;
 		}
+		
+		if(m.group("idtype").equals("s")) {
+			throw new UserException(lang.isSetId());
+		}
 
-		int beatmapid = Integer.parseInt(m.group(1));
+		int beatmapid = Integer.parseInt(m.group("id"));
 
 		long mods = 0;
 
 		Pattern words = Pattern.compile("\\w+");
 
-		Matcher mWords = words.matcher(m.group(2));
+		Matcher mWords = words.matcher(m.group("mods"));
 
 		while (mWords.find()) {
 			Mods mod = Mods.valueOf(mWords.group());

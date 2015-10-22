@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -272,5 +273,10 @@ public class Default implements Language {
 	@Override
 	public String noRecentPlays() {
 		return "I haven't seen you play lately.";
+	}
+	
+	@Override
+	public String isSetId() {
+		return "This references a set of beatmaps, not a single beatmap.";
 	}
 }

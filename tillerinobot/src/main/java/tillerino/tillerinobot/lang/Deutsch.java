@@ -221,4 +221,9 @@ public class Deutsch implements Language {
 	public String noRecentPlays() {
 		return "Du solltest erst einmal etwas spielen.";
 	}
+	
+	@Override
+	public String isSetId() {
+		return "Das bezieht sich auf ein Set von Beatmaps statt auf eine einzelne Beatmap.";
+	}
 }

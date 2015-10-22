@@ -296,4 +296,12 @@ public interface Language {
 	 * @return
 	 */
 	String noRecentPlays();
+
+	/**
+	 * User sent a link to a beatmap set when they should have sent a link to a
+	 * single beatmap.
+	 * 
+	 * @return
+	 */
+	String isSetId();
 }

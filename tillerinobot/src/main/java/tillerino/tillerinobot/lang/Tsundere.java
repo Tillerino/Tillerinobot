@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
@@ -638,5 +639,10 @@ public class Tsundere implements Language {
 	@Override
 	public String noRecentPlays() {
 		return new Default().noRecentPlays();
+	}
+	
+	@Override
+	public String isSetId() {
+		return new Default().isSetId();
 	}
 }
