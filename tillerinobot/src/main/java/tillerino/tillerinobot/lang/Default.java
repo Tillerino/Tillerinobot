@@ -279,4 +279,9 @@ public class Default implements Language {
 	public String isSetId() {
 		return "This references a set of beatmaps, not a single beatmap.";
 	}
+	
+	@Override
+	public String getPatience() {
+		return "Just a second...";
+	}
 }

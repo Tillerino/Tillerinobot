@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
@@ -304,4 +305,11 @@ public interface Language {
 	 * @return
 	 */
 	String isSetId();
+
+	/**
+	 * Bot is doing things. Please have patience.
+	 * 
+	 * @return
+	 */
+	String getPatience();
 }

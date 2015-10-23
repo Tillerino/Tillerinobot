@@ -227,4 +227,9 @@ public class Nederlands implements Language {
 	public String isSetId() {
 		return new Default().isSetId();
 	}
+	
+	@Override
+	public String getPatience() {
+		return new Default().getPatience();
+	}
 }

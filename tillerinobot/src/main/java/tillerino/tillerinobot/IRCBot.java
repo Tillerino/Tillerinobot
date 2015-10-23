@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -144,12 +145,16 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	
 	/**
 	 * This wrapper around a Semaphore keeps track of when it was last acquired
-	 * via {@link #tryAcquire()}.
+	 * via {@link #tryAcquire()} and what happened since.
 	 */
 	public static class TimingSemaphore {
 		private long lastAcquired = 0;
 		
 		private Thread lastAcquiredThread = null;
+		
+		private int attemptsSinceLastAcquired = 0;
+		
+		private boolean sentWarning = false;
 		
 		private final Semaphore semaphore;
 		
@@ -163,6 +168,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			}
 			lastAcquired = System.currentTimeMillis();
 			lastAcquiredThread = Thread.currentThread();
+			attemptsSinceLastAcquired = 0;
+			sentWarning = false;
 			return true;
 		}
 		
@@ -177,6 +184,18 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		public void release() {
 			semaphore.release();
 		}
+		
+		public int getAttemptsSinceLastAcquired() {
+			return ++attemptsSinceLastAcquired;
+		}
+		
+		public boolean isSentWarning() {
+			if(!sentWarning) {
+				sentWarning = true;
+				return false;
+			}
+			return true;
+		}
 	}
 
 	/**
@@ -189,12 +208,25 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 	});
 	
-	void handleSemaphoreInUse(String purpose, TimingSemaphore semaphore) {
+	void handleSemaphoreInUse(String purpose, TimingSemaphore semaphore, Language lang, IRCBotUser user) {
 		double processing = (System.currentTimeMillis() - semaphore.getLastAcquired()) / 1000d;
-		StackTraceElement[] stackTrace = semaphore.getLastAcquiredThread().getStackTrace();
-		Throwable t = new Throwable("Processing thread's stack trace");
-		t.setStackTrace(stackTrace);
-		log.warn(purpose + " - request has been processing for " + processing, t);
+		if(processing > 5) {
+			StackTraceElement[] stackTrace = semaphore.getLastAcquiredThread().getStackTrace();
+			stackTrace = Stream.of(stackTrace)
+					.filter(elem -> elem.getClassName().contains("tillerino"))
+					.toArray(StackTraceElement[]::new);
+			Throwable t = new Throwable("Processing thread's stack trace");
+			t.setStackTrace(stackTrace);
+			log.warn(purpose + " - request has been processing for " + processing, t);
+			if(!semaphore.isSentWarning()) {
+				user.message(lang.getPatience());
+			}
+		} else {
+			log.debug(purpose);
+		}
+		if(semaphore.getAttemptsSinceLastAcquired() >= 3 && !semaphore.isSentWarning()) {
+			user.message("[http://i.imgur.com/Ykfua8r.png ...]");
+		}
 	}
 
 	void processPrivateAction(IRCBotUser user, String message) {
@@ -204,7 +236,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
-			handleSemaphoreInUse("concurrent action", semaphore);
+			handleSemaphoreInUse("concurrent action", semaphore, lang, user);
 			return;
 		}
 
@@ -354,7 +386,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
-			handleSemaphoreInUse("concurrent message", semaphore);
+			handleSemaphoreInUse("concurrent message", semaphore, lang, user);
 			return;
 		}
 
