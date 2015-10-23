@@ -212,6 +212,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 						configurationBuilder.addAutoJoinChannel(autojoinChannel);
 					}
 					if(reconnect) {
+						log.info("Connecting");
 						(bot = new CloseableBot(configurationBuilder.buildConfiguration())).startBot();
 					}
 				} finally {
@@ -231,10 +232,13 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 				}
 			}
 		}
+		log.info("Exiting");
 	}
 	
 	@Override
 	public void tidyUp(boolean fromShutdownHook) {
+		log.info("tidyUp({})", fromShutdownHook);
+		
 		synchronized (this) {
 			reconnect = false;
 			if(bot != null && bot.isConnected()) {

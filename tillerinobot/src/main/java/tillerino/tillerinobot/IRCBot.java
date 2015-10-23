@@ -149,7 +149,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	});
 
 	void processPrivateAction(IRCBotUser user, String message) {
-		log.info("action: " + message);
+		log.debug("action: " + message);
 		
 		Language lang = new Default();
 
@@ -254,7 +254,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					
 					user.send().message(msg);
 					MDC.put("duration", System.currentTimeMillis() - event.getTimestamp());
-					log.info("sent: " + msg);
+					log.debug("sent: " + msg);
 					botInfo.setLastSentMessage(System.currentTimeMillis());
 					return true;
 				} catch (IOException | InterruptedException e) {
@@ -278,7 +278,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().action(msg);
-					log.info("sent action: " + msg);
+					log.debug("sent action: " + msg);
 					return true;
 				} catch (IOException | InterruptedException e) {
 					log.error("action not sent: " + e.getMessage());
@@ -299,7 +299,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	}
 	
 	void processPrivateMessage(final IRCBotUser user, String originalMessage) {
-		log.info("received: " + originalMessage);
+		log.debug("received: " + originalMessage);
 
 		Language lang = new Default();
 
