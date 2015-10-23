@@ -6,14 +6,17 @@ import static org.mockito.Mockito.*;
 import java.util.regex.Matcher;
 
 import org.junit.Test;
+import org.mockito.internal.matchers.Contains;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 
 
@@ -42,5 +45,19 @@ public class AccHandlerTest {
 		accHandler.handle("acc 97.5 800x 1m", user, null, userData);
 		
 		verify(user).message(contains("800x"));
+	}
+	
+	@Test(expected=UserException.class)
+	public void testLargeNumber() throws Exception {
+		UserData userData = mock(UserData.class);
+		when(userData.getLanguage()).thenReturn(new Default());
+		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
+		try {
+			new AccHandler(null).handle("acc 99 80000000000000000000x 1m", null, null, userData);
+			fail();
+		} catch (Exception e) {
+			assertThat(e.getMessage(), new Contains("800000000000"));
+			throw e;
+		}
 	}
 }

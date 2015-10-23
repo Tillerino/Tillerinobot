@@ -47,8 +47,8 @@ public class AccHandler implements CommandHandler {
 		Matcher extendedMatcher = extended.matcher(message);
 		if(extendedMatcher.matches()) {
 			double acc = parseAcc(extendedMatcher.group(1), lang);
-			int combo = Integer.parseInt(extendedMatcher.group(2));
-			int misses = Integer.parseInt(extendedMatcher.group(3));
+			int combo = parseInt(extendedMatcher.group(2), lang);
+			int misses = parseInt(extendedMatcher.group(3), lang);
 			
 			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
 			if (beatmap == null) {
@@ -81,5 +81,13 @@ public class AccHandler implements CommandHandler {
 		}
 		acc = Math.round(acc * 100) / 10000d;
 		return acc;
+	}
+	
+	public static int parseInt(String string, Language lang) throws UserException {
+		try {
+			return Integer.parseInt(string);
+		} catch(NumberFormatException e) {
+			throw new UserException(lang.invalidChoice(string, "1, 2, 3, ..."));
+		}
 	}
 }
