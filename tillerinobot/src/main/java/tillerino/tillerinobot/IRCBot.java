@@ -137,14 +137,44 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			}
 		}
 	}
+	
+	/**
+	 * This wrapper around a Semaphore keeps track of when it was last acquired
+	 * via {@link #tryAcquire()}.
+	 */
+	public static class TimingSemaphore {
+		private long lastAcquired = 0;
+		
+		private final Semaphore semaphore;
+		
+		public TimingSemaphore(int permits, boolean fair) {
+			semaphore = new Semaphore(permits, fair);
+		}
+		
+		public boolean tryAcquire() {
+			if(!semaphore.tryAcquire()) {
+				return false;
+			}
+			lastAcquired = System.currentTimeMillis();
+			return true;
+		}
+		
+		public long getLastAcquired() {
+			return lastAcquired;
+		}
+
+		public void release() {
+			semaphore.release();
+		}
+	}
 
 	/**
 	 * additional locks to avoid users causing congestion in the fair locks by queuing commands in multiple threads
 	 */
-	LoadingCache<String, Semaphore> perUserLock = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<String, Semaphore>() {
+	LoadingCache<String, TimingSemaphore> perUserLock = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<String, TimingSemaphore>() {
 		@Override
-		public Semaphore load(String arg0) throws Exception {
-			return new Semaphore(1);
+		public TimingSemaphore load(String arg0) throws Exception {
+			return new TimingSemaphore(1, false);
 		}
 	});
 
@@ -153,9 +183,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		
 		Language lang = new Default();
 
-		Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
+		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
-			log.warn("concurrent action");
+			log.warn("concurrent action - request has been processing for " + (System.currentTimeMillis() - semaphore.getLastAcquired()) / 1000d);
 			return;
 		}
 
@@ -303,9 +333,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 		Language lang = new Default();
 
-		Semaphore semaphore = perUserLock.getUnchecked(user.getNick());
+		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
-			log.warn("concurrent message");
+			log.warn("concurrent message - request has been processing for " + (System.currentTimeMillis() - semaphore.getLastAcquired()) / 1000d);
 			return;
 		}
 
