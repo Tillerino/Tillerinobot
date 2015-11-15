@@ -4,5 +4,15 @@ jdk:
 before_install:
   - git submodule init
   - git submodule update
-  - mvn -fosuApiConnector/osuApiConnector/pom.xml -DskipTests=true install
+  - mvn -fosuApiConnector/osuApiConnector/pom.xml -DskipTests=true -Dmaven.javadoc.skip=true -Dlombok.delombok.skip=true -Dfindbugs.skip=true install
   - cd tillerinobot
+
+# we're not installing anything
+install: true
+
+script:
+  - mvn verify -Dmaven.javadoc.skip=true -B -V
+  
+cache:
+  directories:
+    - $HOME/.m2/repository
