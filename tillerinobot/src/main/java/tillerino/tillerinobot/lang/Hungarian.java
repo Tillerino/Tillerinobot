@@ -118,8 +118,8 @@ public class Default implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "A neved összezavar. Kibannoltak? Ha nem, légyszives írj [https://github.com/Tillerino/Tillerinobot/wiki/Contact Tillerino]-nak. ("+ exceptionMarker +" "
-				+ "referencia)";
+		return "A neved összezavar. Kibannoltak? Ha nem, légyszives írj [https://github.com/Tillerino/Tillerinobot/wiki/Contact Tillerino]-nak. ("+ exceptionMarker +
+				+ " referencia)";
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class Default implements Language {
 
 	@Override
 	public String mixedNomodAndMods() {
-		return "Mit akartál mondani a nomoddal és a modokkal? (/O.O/)";
+		return "Mit akartál mondani a nomoddal és a modokkal?";
 	}
 
 	@Override
