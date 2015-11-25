@@ -244,7 +244,7 @@ public class Hungarian implements Language {
 
 	@Override
 	public String setFormat() {
-		return "A parancs a paraméter meghatározására a !set. Kukkantsd meg a !help-et.";
+		return "A parancs a paraméter meghatározására a !set. Példa: !set Language Hungarian. Kukkantsd meg a !help-et.";
 	}
 	
 	StringShuffler doSomething = new StringShuffler(rnd);
