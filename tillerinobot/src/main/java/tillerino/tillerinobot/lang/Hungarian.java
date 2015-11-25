@@ -11,13 +11,7 @@ import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 /**
- * TRANSLATION NOTE:
- * 
- * Please put some contact data into the following tag. If any additional
- * messages are required, I'll use the English version in all translations and
- * notify the authors.
- * 
- * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
+ * @author https://github.com/ApeConfirmed https://osu.ppy.sh/u/BakaHarcos
  */
 public class Hungarian implements Language {
 	static final Random rnd = new Random();
