@@ -38,7 +38,7 @@ public class Default implements Language {
 	public String externalException(String marker) {
 		return "Mi történik? Idétlen kódokat kapok az osu! szerveréről. Megmondanád, hogy ez mit jelentene? 0011101001010000"
 				+ " Az ember Tillerino aztmondja, hogy semmi baj nincs, próbáld meg újra."
-				+ " Ha nagyon megijedtél valamiért, [https://github.com/Tillerino/Tillerinobot/wiki/Contact mondd el neki]." + marker +"
+				+ " Ha nagyon megijedtél valamiért, [https://github.com/Tillerino/Tillerinobot/wiki/Contact mondd el neki]." + marker +
 				+ " referencia)";
 	}
 
