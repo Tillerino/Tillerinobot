@@ -71,6 +71,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Português_BR(Portuguese.class),
 			Deutsch(Deutsch.class),
 			Čeština(Czech.class),
+			Magyar(Hungarian.class),
 			한국어(Korean.class),
 			Dansk(Dansk.class),
 			Türkçe(Turkish.class),
