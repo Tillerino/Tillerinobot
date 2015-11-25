@@ -19,6 +19,12 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
  * 
  * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
  */
+ 
+ /**
+  * TRANSLATORS NOTE:
+  * PLEASE NEVERMIND THIS FORK, I KNOW IT'S NOT WORKS
+  */
+  
 public class Hungarian implements Language {
 	static final Random rnd = new Random();
 
