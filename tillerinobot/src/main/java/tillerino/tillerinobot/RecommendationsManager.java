@@ -179,7 +179,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		public boolean isEmpty() {
 			return distribution.isEmpty();
 		}
-		public BareRecommendation sample() {
+		public synchronized BareRecommendation sample() {
 			double x = random.nextDouble() * sum;
 			
 			SortedMap<Double, BareRecommendation> rest = distribution.tailMap(x);
