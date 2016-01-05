@@ -17,7 +17,7 @@ public class Spanish implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Lo siento, no conozco ese mapa. Es muy reciente, muy difícil, unranked o modo de osu! no estándar.";
+		return "Lo siento, no conozco ese mapa. Es muy reciente, muy difícil, no rankeado o modo de osu! no estándar.";
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class Spanish implements Language {
 
 	@Override
 	public String noInformationForMods() {
-	    return "Lo siento, no puedo proporcionar información sobre esos mods ahora mismo.";
+	    return "Lo siento, pero no puedo proporcionar información sobre esos mods ahora mismo.";
 	}
 
 	@Override
@@ -111,13 +111,13 @@ public class Spanish implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Tu nombre me esta confundiendo. ¿Estás baneado? Si no, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta con Tillerino]. (código de referencia "
+		return "Tu nombre me esta confundiendo. ¿Estás eliminado? Si no es así, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta con Tillerino]. (código de referencia "
 				+ exceptionMarker + ")";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "Lo siento, había una hermosa secuencia de unos y ceros y me distraí. ¿Qué es lo que querías?";
+		return "Lo siento, había una hermosa secuencia de unos y ceros y me distraje. ¿Qué es lo que querías?";
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class Spanish implements Language {
 
 	@Override
 	public String help() {
-		return "¡Hola! Soy el robot que mató a Tillerino y tomó el control de su cuenta. Estoy bromeando, uso la cuenta muy a menudo."
+		return "¡Hola! Soy el robot que mató a Tillerino y tomó el control de su cuenta. Es broma, pero uso su cuenta muy a menudo."
 				+ " [https://twitter.com/Tillerinobot estado y actualizaciones]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki comandos]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
@@ -152,7 +152,7 @@ public class Spanish implements Language {
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "¿A qué te refieres con nomod y mods?";
+		return "¿A qué te refieres con sin mods y con mods?";
 	}
 	
 	@Override
@@ -163,7 +163,7 @@ public class Spanish implements Language {
 
 	@Override
 	public String notRanked() {
-		return "Parece que el mapa no esta clasificado.";
+		return "Parece que el mapa no esta rankeado.";
 	}
 
 	@Override
@@ -201,7 +201,7 @@ public class Spanish implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("sasakura me ayudó a aprender Español :3");
+		user.message("sasakura y Underforest me ayudaron a aprender Español :3");
 	}
 
 	@Override
