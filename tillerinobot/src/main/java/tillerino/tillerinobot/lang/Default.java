@@ -164,7 +164,8 @@ public class Default implements Language {
 
 	@Override
 	public String outOfRecommendations() {
-		return "I've recommended everything that I can think of."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " I've recommended everything that I can think of]."
 				+ " Try other recommendation options or use !reset. If you're not sure, check !help.";
 	}
 
