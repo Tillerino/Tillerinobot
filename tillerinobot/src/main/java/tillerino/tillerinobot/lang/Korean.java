@@ -157,7 +157,8 @@ public class Korean implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "제가 추천드릴 수 있는 모든 곡을 추천드렸어요."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " 제가 추천드릴 수 있는 모든 곡을 추천드렸어요]."
 				+ " 다른 옵션이나 !reset을 시도해보세요. 확실하지 않다면, !help를 쳐주세요.";
 	}
 

@@ -157,7 +157,8 @@ public class Russian implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Я уже порекомендовал все, что знал."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Я уже порекомендовал все, что знал]."
 				+ " Попробуйте другие опции рекомендаций или используйте !reset. Если вы не уверены, что делать, посмотрите справку !help.";
 	}
 

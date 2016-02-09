@@ -152,7 +152,8 @@ public class Farsi implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Man dige fekram nemirese, harchi toonestam recommend kardam."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Man dige fekram nemirese, harchi toonestam recommend kardam]."
 				+ " Age mikhaai, option-haye digei estefaade kon, yaa type kon !reset. Nemidooni chekaar koni, daad bezan !help";
 	}
 

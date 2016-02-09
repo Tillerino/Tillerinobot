@@ -154,7 +154,8 @@ public class Deutsch implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Ich habe leider keine Empfehlungen mehr."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Ich habe leider keine Empfehlungen mehr]."
 				+ " Versuch es mit anderen [https://github.com/Tillerino/Tillerinobot/wiki/Recommendations Parametern] oder !reset. Falls du dir nicht sicher bist, schreib mir !help.";
 	}
 

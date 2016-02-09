@@ -156,7 +156,8 @@ public class Italiano implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Ti ho raccomandato tutte le mappe che so."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Ti ho raccomandato tutte le mappe che so]."
 				+ " Prova altre opzioni o usa !reset. Se non sei sicuro, usa !help.";
 	}
  

@@ -157,7 +157,8 @@ public class Turkish implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Elimde olan tüm şarkıları sana tavsiye etmiş bulunmaktayım."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Elimde olan tüm şarkıları sana tavsiye etmiş bulunmaktayım]."
 				+ " Başka tavsiye seçeneklerini kullan,yada sıfırlamak için !reset yaz. Eğer emin değilsen, !help yazıp göz atıver.";
 	}
 

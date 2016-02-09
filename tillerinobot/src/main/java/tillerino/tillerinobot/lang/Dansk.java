@@ -157,7 +157,8 @@ public class Dansk implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Jeg har anbefalet alt jeg kan komme i tanke om."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Jeg har anbefalet alt jeg kan komme i tanke om]."
 				+ " Prøv en anden anbefaling eller brug !reset. Hvis du ikke er sikker, tjek !help.";
 	}
 

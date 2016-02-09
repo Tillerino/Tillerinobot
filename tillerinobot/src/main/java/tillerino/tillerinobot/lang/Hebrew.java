@@ -146,6 +146,9 @@ public class Hebrew implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
+		// someone with knowledge of this language please insert a link to
+		// "https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+		// somewhere in this text where it makes sense (go look at Default.java)
 		return ".!help אם אתה לא בטוח, רשום ,!reset הצעתי לך כל מה שאפשר. נסה אופציות אחרות או";
 	}
 

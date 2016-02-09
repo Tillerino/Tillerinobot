@@ -155,7 +155,8 @@ public class Nederlands implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Ik heb je alles wat ik me kan bedenken al aanbevolen."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Ik heb je alles wat ik me kan bedenken al aanbevolen]."
 				+ " Probeer andere aanbevelingsopties of gebruik !reset. Als je het niet zeker weet, check !help.";
 	}
 

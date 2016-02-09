@@ -157,7 +157,8 @@ public class Svenska implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Jag har rekommenderat allt jag kan tänka mig."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Jag har rekommenderat allt jag kan tänka mig]."
 				+ " Testa andra rekommendationsinställningar eller använd !reset. Om du är osäker, kolla !help.";
 	}
 

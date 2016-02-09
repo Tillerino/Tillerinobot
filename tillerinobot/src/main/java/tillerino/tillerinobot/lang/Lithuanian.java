@@ -157,7 +157,8 @@ public class Lithuanian implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Aš pasiūliau, viską, ką galiu."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Aš pasiūliau, viską, ką galiu]."
 				+ " Pabandyk kitus pasiūlų pasirinkimus arba naudok !reset funkciją. Jei neesi tikras, rašyk !help.";
 	}
 
