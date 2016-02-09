@@ -1,19 +1,19 @@
 package tillerino.tillerinobot.lang;
 
-import java.util.List;
-import java.util.Random;
-
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
+import java.util.List;
+import java.util.Random;
+
 /**
- * Dutch language implementation by https://osu.ppy.sh/u/PudiPudi and https://github.com/notadecent
+ * Dutch language implementation by https://osu.ppy.sh/u/PudiPudi and https://github.com/notadecent and https://osu.ppy.sh/u/2756335
  */
 public class Nederlands implements Language {
+	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
@@ -23,7 +23,7 @@ public class Nederlands implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Ugh... Lijkt er op dat Tillerino een oelewapper is geweest en mijn bedrading kapot heeft gemaakt."
-				+ " Als hij het zelf niet merkt, kan je hem er dan een berichtje over sturen? @Tillerino of /u/Tillerino? (reference "
+				+ " Als hij het zelf niet merkt, kan je hem dan [https://github.com/Tillerino/Tillerinobot/wiki/Contact op de hoogte stellen]? (reference "
 				+ marker + ")";
 	}
 
@@ -31,7 +31,7 @@ public class Nederlands implements Language {
 	public String externalException(String marker) {
 		return "Wat gebeurt er? Ik krijg alleen maar onzin van de osu server. Kan je me vertellen wat dit betekent? 00111010 01011110 00101001"
 				+ " De menselijke Tillerino zegt dat we ons er geen zorgen over hoeven te maken en dat we het opnieuw moeten proberen."
-				+ " Als je je heel erg zorgen maakt hierover, kan je het aan Tillerino vertellen @Tillerino of /u/Tillerino. (reference "
+				+ " Als je je heel erg zorgen maakt hierover, kan je het aan Tillerino [https://github.com/Tillerino/Tillerinobot/wiki/Contact vertellen]. (reference "
 				+ marker + ")";
 	}
 
@@ -111,7 +111,7 @@ public class Nederlands implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Je naam verwart me. Ben je geband? Zoniet, neem contact op met @Tillerino of /u/Tillerino (reference "
+		return "Je naam verwart me. Ben je geband? Zoniet, neem [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact op met Tillerino] (reference "
 				+ exceptionMarker + ")";
 	}
 
@@ -214,23 +214,41 @@ public class Nederlands implements Language {
 		return "De syntax om een parameter in te stellen is '!set optie waarde'. Typ !help als je meer aanwijzingen nodig hebt.";
 	}
 	
+	StringShuffler doSomething = new StringShuffler(rnd);
+
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		final String message = "De osu! servers zijn nu heel erg traag, dus ik kan op dit moment niets voor je doen. ";
+		return message + doSomething.get(
+				"Zeg... Wanneer heb je voor het laatst met je oma gesproken?",
+				"Wat dacht je ervan om je kamer eens op te ruimen en dan nog eens te proberen?",
+				"Ik weet zeker dat je vast erg zin hebt in een wandeling. Jeweetwel... daarbuiten?",
+				"Ik weet gewoon zeker dat er een helehoop andere dingen zijn die je nog moet doen. Wat dacht je ervan om ze nu te doen?",
+				"Je ziet eruit alsof je wel wat slaap kan gebruiken...",
+				"Maat moet je deze superinteressante pagina op [https://nl.wikipedia.org/wiki/Special:Random wikipedia] eens zien!",
+				"Laten we eens kijken of er een goed iemand aan het [http://www.twitch.tv/directory/game/Osu! streamen] is!",
+				"Kijk, hier is een ander [http://dagobah.net/flash/Cursor_Invisible.swf spel] waar je waarschijnlijk superslecht in bent!",
+				"Dit moet je tijd zat geven om [https://github.com/Tillerino/Tillerinobot/wiki mijn handleiding] te bestuderen.",
+				"Geen zorgen, met deze [https://www.reddit.com/r/osugame dank memes] kun je de tijd dooden.",
+				"Terwijl je je verveelt, probeer [http://gabrielecirulli.github.io/2048/ 2048] eens een keer!",
+				"Leuke vraag: Als je harde schijf op dit moment zou crashen, hoeveel van je persoonlijke gegevens ben je dan voor eeuwig kwijt?",
+				"Dus... Heb je wel eens de [https://www.google.nl/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge] geprobeerd?",
+				"Je kunt wat anders gaan doen of we kunnen elkaar in de ogen gaan staren. In stilte."
+				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Ik heb je de afgelopen tijd niet zien spelen.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Dit refereerd naar een beatmap-verzameling in plaats van een beatmap zelf.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Momentje geduld asjeblieft...";
 	}
 }
