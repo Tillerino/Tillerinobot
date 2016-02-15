@@ -158,7 +158,8 @@ public class Hungarian implements Language {
 
 	@Override
 	public String outOfRecommendations() {
-		return "Mindend elmondtam amire tudok gondolni."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Mindend elmondtam amire tudok gondolni]."
 				+ " Ha új listát akarsz keérni használd a \"!reset\" parancsot. Ha nem vagy biztos benne, csekkold le a \"!help\"-et.";
 	}
 

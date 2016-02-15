@@ -158,7 +158,8 @@ public class Greek implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Έχω προτίνει ό,τι μπορώ να σκεφτώ. "
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Έχω προτίνει ό,τι μπορώ να σκεφτώ]. "
 				+ " Προσπάθησε άλλες επιλογές προτάσεων ή χρησιμοποίησε το  !rest. Εάν δεν είσαι σίγουρος, έλεγξε το !help.";
 	}
 

@@ -153,7 +153,8 @@ public class Portuguese implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Eu já recomendei tudo que eu consigo pensar."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Eu já recomendei tudo que eu consigo pensar]."
 				+ " Tente outras opções de recomendação ou use !reset. Se você não tem certeza, digite !help.";
 	}
 

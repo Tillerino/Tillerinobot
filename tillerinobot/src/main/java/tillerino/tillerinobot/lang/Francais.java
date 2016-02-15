@@ -160,7 +160,8 @@ public class Francais implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "J'ai recommendé tout ce que j'ai pu..."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " J'ai recommendé tout ce que j'ai pu...]"
 				+ " Essaye d'autres options de recommandation, ou utilise !reset. Si tu n'es pas sûr, tape !help !";
 	}
 

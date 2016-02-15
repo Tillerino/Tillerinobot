@@ -157,7 +157,8 @@ public class Spanish implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Te he recomendado todo lo que sé."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Te he recomendado todo lo que sé]."
 				+ " Prueba otras opciones de recomendación o usa !reset. Si no estás seguro, prueba con !help.";
 	}
 

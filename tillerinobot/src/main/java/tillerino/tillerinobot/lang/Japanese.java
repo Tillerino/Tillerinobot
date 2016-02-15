@@ -157,7 +157,8 @@ public class Japanese implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "おすすめできる譜面のストックが底をつきました。"
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " おすすめできる譜面のストックが底をつきました]。"
 				+ "おすすめ設定を変えてみるか、!resetで全てリセットして最初からにしてみてください。何かわからない事があったら!helpと送信してみてください。";
 	}
 

@@ -164,7 +164,8 @@ public class Romana implements Language {
 
 	@Override
 	public String outOfRecommendations() {
-		return "Am recomandat tot ce mi-a trecut prin cap."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Am recomandat tot ce mi-a trecut prin cap]."
 				+ " Încearcă alte opțiuni de recomandări sau încearcă !reset. Dacă nu ești sigur, verifică !help.";
 	}
 

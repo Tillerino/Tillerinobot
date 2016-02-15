@@ -157,7 +157,8 @@ public class Czech implements Language {
 	
 	@Override
 	public String outOfRecommendations() {
-		return "Doporučil jsem vše, co jsem vymyslel."
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " Doporučil jsem vše, co jsem vymyslel]."
 				+ " Zkus ostatní možnosti doporučení nebo použij !reset. Pokud si nejsi jistý koukni na !help.";
 	}
 

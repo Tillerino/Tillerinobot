@@ -508,7 +508,7 @@ public class Tsundere implements Language {
 
 	@Override
 	public String outOfRecommendations() {
-		return "WHAT!? Did you seriously go through every recommendation I have? I c-can't believe you... Well, let's run through it again. It's not like you have anything else to do.";
+		return "WHAT!? [https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do Did you seriously go through every recommendation I have?] I c-can't believe you... Well, let's run through it again. It's not like you have anything else to do.";
 	}
 
 	@Override

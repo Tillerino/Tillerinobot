@@ -158,7 +158,8 @@ public class ChineseTraditional implements Language {
 
 	@Override
 	public String outOfRecommendations() {
-		return "我會推薦所有想得到合適你的譜面。"
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
+				+ " 我會推薦所有想得到合適你的譜面]。"
 				+ " 試試看其他推薦譜面的方法或是用 !reset 來重置推薦的譜面難度。如果你不確定功能該如何使用，可以輸入 !help來幫助你。";
 	}
 
