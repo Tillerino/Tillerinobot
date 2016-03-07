@@ -24,21 +24,21 @@ public class Default implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return " Съжалявам, не познавам тази карта. Може да е нова, трудна, неодобрена или не направена за стандартен осу! мод. ";
+		return "Съжалявам, не познавам тази карта. Може да е нова, трудна, неодобрена или не направена за стандартен осу! мод. ";
 	}
 
 	@Override
 	public String internalException(String marker) {
 		return " Ах... Явно човешкият Тилерино ми скапа мрежата."
-				+ "Ако той не забележи скоро, би ли му се [https://github.com/Tillerino/Tillerinobot/wiki/Contact обадил]? (препратка "
+				+ " Ако той не забележи скоро, би ли му се [https://github.com/Tillerino/Tillerinobot/wiki/Contact обадил]? (препратка "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "Какво става? Сървърът на осу ми говори глупости. Може ли да ми обясниш какво значи това? 0011101001010000"
-				+ " Човешкият Тилерино казва да не се притесняваш и че ще опитаме пак."
-				+ " Ако още се притесняваш, можеш да [https://github.com/Tillerino/Tillerinobot/wiki/Contact му кажеш] за това. (reference "
+		return "Какво става? Сървърът на осу! ми говори глупости. Може ли да ми обясниш какво значи това? 0011101001010000"
+				+ " Човешкият Тилерино казва да не се тревожиш и да опитаме пак."
+				+ " Ако още се притесняваш, можеш да [https://github.com/Tillerino/Tillerinobot/wiki/Contact му кажеш] за това. (препратка "
 				+ marker + ")";
 	}
 
@@ -55,7 +55,7 @@ public class Default implements Language {
 			user.message("Хей, " + apiUser.getUserName() + ".");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			user.message(apiUser.getUserName() + "...");
-			user.message("...ти ли си? Здравей!");
+			user.message("... ти ли си? Здрасти!");
 			user.message("Радвам се да те видя пак. Една препоръка ще те заинтересува ли?");
 		} else {
 			String[] messages = {
@@ -63,8 +63,8 @@ public class Default implements Language {
 					"Радвам се да те видя! :)",
 					"Любимият ми човек. (Не казвай на останалите човеци!)",
 					"Каква изненада! ^.^",
-					"Надявах се да се покажеш. Всички останали хора са скучни, ама не им споменавай, че съм го казал! :3",
-					"Какво ти се прави днес?",
+					"Надявах се да се покажеш. Останалите са скучни, ама не им споменавай, че съм го казал! :3",
+					"Какво ти се прави?",
 			};
 
 			Random random = new Random();
@@ -77,13 +77,13 @@ public class Default implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "Unknown command \"" + command
-				+ "\". Напиши !help , ако се нуждаеш от помощ!";
+		return "Непозната команда \"" + command
+				+ "\". Напиши !help , в случай че ти трябва помощ!";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return "Съжалявам, не мога да предложа информация за тези модове в момента.";
+		return "Съжалявам, но не мога да покажа информация за тези модове в момента.";
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class Default implements Language {
 
 	@Override
 	public String tryWithMods() {
-		return "Опитай тази карта с малко модове!";
+		return "Опитай картата с малко модове!";
 	}
 
 	@Override
@@ -118,13 +118,13 @@ public class Default implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Името ти ме обърква? Баннат ли си? Ако не, моля [https://github.com/Tillerino/Tillerinobot/wiki/Contact свържи се с Тилерино]. (reference "
+		return "Името ти ме обърква? Баннат ли си? Ако не си, моля, [https://github.com/Tillerino/Tillerinobot/wiki/Contact обади се на Тилерино]. (reference "
 				+ exceptionMarker + ")";
 	}
 
 	@Override
 	public String excuseForError() {
-		return " Прощавай, разсеях се от една прекрасна поредица от нули и единици. Какво казваше пак? ";
+		return "Прощавай, разсеях се от една прекрасна поредица от нули и единици. Какво казваше пак? ";
 	}
 
 	@Override
@@ -134,17 +134,17 @@ public class Default implements Language {
 
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Ела насам!");
-		user.action("гушкам" + apiUser.getUserName());
+		user.message("Ела тук!");
+		user.action("Прегръдка за " + apiUser.getUserName());
 	}
 
 	@Override
 	public String help() {
-		return "Ехо! Аз съм роботът, който уби Тилерино и превзе акаунта му. Шегувам се естествено, но наистина използвам този акаунт доста."
-				+ " [https://twitter.com/Tillerinobot status and updates]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki commands]"
-				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact]";
+		return "Ехо! Аз съм роботът, който уби Тилерино и превзе акаунта му. Шегувам се, разбира се, но наистина използвам този акаунт доста."
+				+ " [https://twitter.com/Tillerinobot за статус и ъпдейти]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki за команди]"
+				+ " - [http://ppaddict.tillerino.org/ ppaddict за още карти!]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact за връзка]";
 	}
 
 	@Override
@@ -154,19 +154,19 @@ public class Default implements Language {
 
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Съжалявам, в момента " + feature + " е достъпно само за играчи над ранг " + minRank + ".";
+		return "Съжалявам, но в момента " + feature + " е достъпно само за играчи над ранг " + minRank + ".";
 	}
 
 	@Override
 	public String mixedNomodAndMods() {
-		return "Какво имаш предвид с 'без модове с модове'?";
+		return "Какви ги дрънкаш? 'Без модове с модове'?";
 	}
 
 	@Override
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
-				+ "Препоръчах ти всичко, за което се сетих]."
-				+ "Опитай други опции или използвай !reset. Ако не си сигурен, опитай с !help.";
+				+ " Препоръчах ти всичко, за което се сетих]."
+				+ " Опитай други препоръчителни опции или използвай !reset. Ако не си сигурен, пробвай с !help.";
 	}
 
 	@Override
@@ -234,13 +234,13 @@ public class Default implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		user.message("Хей, благодаря, че смени на български :)");
+		user.message("Йо, благодаря, че смени езика! ^.^");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
 		return "Съжаляам, но \"" + invalid
-				+ "\" не се изпълнява. Опитай: " + choices + "!";
+				+ "\" не може да се изпълни. Опитай: " + choices + "!";
 	}
 
 	@Override
@@ -256,24 +256,24 @@ public class Default implements Language {
 		return message + doSomething.get(
 				"Хм... Кога за последно говори с баба си?",
 				"Защо първо не си изчистиш стаята и после да опиташ пак?",
-				"Обзалагам се, че сега кипиш от желание са се разходиш. Знаеш... навън?",
-				"Знам, че имаш куп други работи да правиш. Не мислиш ли, че сега им е времето?",
-				"Очевидно ти се иска да подремнеш.",
+				"Обзалагам се, че сега кипиш от желание да се разходиш. Знаеш... навън?",
+				"Знам, че имаш куп други работи да правиш. Не е ли сега времето?",
+				"Очевидно искаш да подремнеш.",
 				"Но я виж тази супер интересна страница в [https://en.wikipedia.org/wiki/Special:Random Уикипедия]!",
 				"Да проверим дали има някой добър [http://www.twitch.tv/directory/game/Osu! стрийм] сега!",
 				"Виж, ето още една [http://dagobah.net/flash/Cursor_Invisible.swf игра], на която сигурно ще се издъниш!",
 				"Сега би трябвало да имаш време да погледнеш [https://github.com/Tillerino/Tillerinobot/wiki наръчника ми].",
-				"Не се тревожи, тези [https://www.reddit.com/r/osugame dank мемета] времето ще мине.",
+				"Не се тревожи, с тези [https://www.reddit.com/r/osugame данк-мемета] времето ще мине.",
 				"Докато скучаеш, опитай [http://gabrielecirulli.github.io/2048/ 2048]!",
-				"Смешен въпрос: Ако хард драйвът ти се счупеше сега, колко твоя лична информация би била загубена завинаги?",
+				"Смешен въпрос: Ако хард драйвът ти се счупеше сега, колко лична информация би била загубена завинаги?",
 				"Така... Опитвал ли си [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge това предизвикателство]?",
-				"Може да правиш нещо друго или просто да се взираме един в друг. Тихо."
+				"Можеш да правиш нещо друго или просто да се гледаме един-друг. Мълчаливо."
 				);
 	}
 
 	@Override
 	public String noRecentPlays() {
-		return "Не съм те виждал да играеш наскоро.";
+		return "Не съм те виждал да играеш скоро.";
 	}
 	
 	@Override
