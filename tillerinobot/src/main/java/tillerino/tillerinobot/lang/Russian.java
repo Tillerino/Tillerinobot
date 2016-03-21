@@ -233,7 +233,7 @@ public class Russian implements Language {
 				"Не грустите, возможно, вы сможете скоротать время за чтением новой интересной темы в [https://www.reddit.com/r/osugame Reddit-сообществе] osu!.",
 				"Если скучно, попробуйте игру [http://gabrielecirulli.github.io/2048/ 2048]!",
 				"Шуточный вопрос: если ваш жесткий диск сломается прямо сейчас, сколько ваших данных будет потеряно навсегда?",
-				"Так... А вы когда-нибудь учавствовали в [https://www.google.ru/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
+				"Так... А вы когда-нибудь участвовали в [https://www.google.ru/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
 				"Вы можете поделать ещё что-нибудь, или мы можем просто смотреть в глаза друг другу. Молча."
 				);
 	}
