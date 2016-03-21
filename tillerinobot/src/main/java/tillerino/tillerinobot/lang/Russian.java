@@ -14,7 +14,7 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
  * @author https://github.com/firedigger https://osu.ppy.sh/u/firedigger
  */
 public class Russian implements Language {
-
+	static final Random rnd = new Random();
 	@Override
 	public String unknownBeatmap() {
 		return "Не могу распознать карту. Возможные причины: она слишком новая, очень сложная, еще не ранкнута или использует не osu!standard режим.";
