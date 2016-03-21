@@ -14,7 +14,7 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
  * @author https://github.com/firedigger https://osu.ppy.sh/u/firedigger
  */
 public class Russian implements Language {
-
+	static final Random rnd = new Random();
 	@Override
 	public String unknownBeatmap() {
 		return "Не могу распознать карту. Возможные причины: она слишком новая, очень сложная, еще не ранкнута или использует не osu!standard режим.";
@@ -54,10 +54,10 @@ public class Russian implements Language {
 			String[] messages = {
 					"Полагаю, вы хотите рекомендацию",
 					"Как приятно снова видеть вас! :)",
-					"мой любимый пользователь. (Только никому не говорите!)",
-					"какой приятный сюрприз! ^.^",
+					"Мой любимый пользователь. (Только никому не говорите!)",
+					"Какой приятный сюрприз! ^.^",
 					"Я надеялся, что вы появитесь. Все остальные пользователи не настолько классные, только не говорите им, что я это сказал. :3",
-					"на что вы сегодня настроены?",
+					"На что вы сегодня настроены?",
 			};
 			
 			Random random = new Random();
@@ -70,7 +70,7 @@ public class Russian implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "неизвестная команда \"" + command
+		return "Неизвестная команда \"" + command
 				+ "\". Введите !help для помощи";
 	}
 
@@ -202,7 +202,7 @@ public class Russian implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Вы изъявили желание общаться на русском (Перевод сделан [https://osu.ppy.sh/u/firedigger firedigger])");
+		user.message("Вы изъявили желание общаться на русском (Перевод сделан [https://osu.ppy.sh/u/firedigger firedigger] и [https://osu.ppy.sh/u/a1mighty a1mighty])");
 	}
 
 	@Override
@@ -213,26 +213,43 @@ public class Russian implements Language {
 
 	@Override
 	public String setFormat() {
-		return "Синтаксис для выставления параметров: !set option value. Воспользуйтесь справкой !help если вам нужны подсказки.";
+		return "Синтаксис для выставления параметров: !set option value. Воспользуйтесь справкой !help, если вам нужны подсказки.";
 	}
+	
+	StringShuffler doSomething = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		final String message = "Сервера osu! сейчас работают очень медленно, и пока что я вряд ли смогу что-то сделать. ";
+		return message + doSomething.get(
+				"Послушайте... А когда вы последний раз разговаривали со своей бабушкой?",
+				"Как насчет убраться у себя в комнате, а потом попробовать ещё раз?",
+				"Готов поспорить, что вам сейчас хочется прогуляться. Вы понимаете... по улице?",
+				"Мне кажется, что у вас есть какие-то дела? Почему бы не заняться ими сейчас?",
+				"Почему бы вам не вздремнуть?",
+				"Как насчет того, чтобы взглянуть на эту очень интересную страницу в [https://ru.wikipedia.org/wiki/Special:Random Википедии]?",
+				"Давайте лучше посмотрим, вдруг кто-то крутой сейчас [http://www.twitch.tv/directory/game/Osu! стримит]!",
+				"Зато у вас есть время изучить [https://github.com/Tillerino/Tillerinobot/wiki мою инструкцию].",
+				"Не грустите, возможно, вы сможете скоротать время за чтением новой интересной темы в [https://www.reddit.com/r/osugame Reddit-сообществе] osu!.",
+				"Если скучно, попробуйте игру [http://gabrielecirulli.github.io/2048/ 2048]!",
+				"Шуточный вопрос: если ваш жесткий диск сломается прямо сейчас, сколько ваших данных будет потеряно навсегда?",
+				"Так... А вы когда-нибудь участвовали в [https://www.google.ru/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
+				"Вы можете поделать ещё что-нибудь, или мы можем просто смотреть в глаза друг другу. Молча."
+				);
 	}
-	
+
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "В последнее время вы не играли.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Эта ссылка указывает на всю карту, а не на какую-либо отдельную сложность.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Секундочку...";
 	}
 }
