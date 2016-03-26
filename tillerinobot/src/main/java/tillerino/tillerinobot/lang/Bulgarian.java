@@ -17,14 +17,14 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
  * messages are required, I'll use the English version in all translations and
  * notify the authors.
  * 
- * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
+ * @author rint0 matey_krastev2@hotmail.com https://osu.ppy.sh/u/6330087
  */
 public class Default implements Language {
 	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
-		return "Съжалявам, не познавам тази карта. Може да е нова, трудна, неодобрена или не направена за стандартен осу! мод. ";
+		return " Съжалявам, не познавам тази карта. Може да е нова, трудна, неодобрена или не направена за стандартен осу! мод. ";
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class Default implements Language {
 
 	@Override
 	public String externalException(String marker) {
-		return "Какво става? Сървърът на осу! ми говори глупости. Може ли да ми обясниш какво значи това? 0011101001010000"
+		return " Какво става? Сървърът на осу! ми говори глупости. Може ли да ми обясниш какво значи това? 0011101001010000"
 				+ " Човешкият Тилерино казва да не се тревожиш и да опитаме пак."
 				+ " Ако още се притесняваш, можеш да [https://github.com/Tillerino/Tillerinobot/wiki/Contact му кажеш] за това. (препратка "
 				+ marker + ")";
@@ -44,27 +44,27 @@ public class Default implements Language {
 
 	@Override
 	public String noInformationForModsShort() {
-		return "Няма информация за избраните модове.";
+		return " Няма информация за избраните модове.";
 	}
 
 	@Override
 	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
-			user.message("бип-боп");
+			user.message(" бип-боп");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Хей, " + apiUser.getUserName() + ".");
+			user.message(" Хей, " + apiUser.getUserName() + ".");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			user.message(apiUser.getUserName() + "...");
 			user.message("... ти ли си? Здрасти!");
-			user.message("Радвам се да те видя пак. Една препоръка ще те заинтересува ли?");
+			user.message(" Радвам се да те видя пак. Една препоръка ще те заинтересува ли?");
 		} else {
 			String[] messages = {
-					"Изглеждаш сякаш искаш препоръка.",
-					"Радвам се да те видя! :)",
-					"Любимият ми човек. (Не казвай на останалите човеци!)",
-					"Каква изненада! ^.^",
-					"Надявах се да се покажеш. Останалите са скучни, ама не им споменавай, че съм го казал! :3",
-					"Какво ти се прави?",
+					" Изглеждаш ми сякаш искаш препоръка.",
+					" Радвам се да те видя! :)",
+					" Любимият ми човек. (Не казвай на останалите човеци!)",
+					" Каква изненада! ^.^",
+					" Надявах се да се покажеш. Останалите са скучни, ама не им споменавай, че съм го казал! :3",
+					" Какво ти се прави?",
 			};
 
 			Random random = new Random();
@@ -77,33 +77,33 @@ public class Default implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "Непозната команда \"" + command
+		return " Непозната команда \"" + command
 				+ "\". Напиши !help , в случай че ти трябва помощ!";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return "Съжалявам, но не мога да покажа информация за тези модове в момента.";
+		return " Съжалявам, но не мога да дам информация за тези модове в момента.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Модовете ти май не са в ред. Модовете могат да бъдат комбинация от DT HR HD HT EZ NC FL SO NF. Комбинирай ги без интервали или специални символи. Например: !with HDHR, !with DTEZ";
+		return " Модовете ти май не са в ред. Модовете могат да бъдат комбинация от DT HR HD HT EZ NC FL SO NF. Комбинирай ги без интервали или специални символи. Например: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "Не си спомням да съм ти давал информация за песента...";
+		return " Не си спомням да съм ти давал информация за песента...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Опитай картата с малко модове!";
+		return " Опитай картата с малко модове!";
 	}
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Опитай тази карта с " + Mods.toShortNamesContinuous(mods) + "!";
+		return " Опитай тази карта с " + Mods.toShortNamesContinuous(mods) + "!";
 	}
 
 	/**
@@ -118,29 +118,29 @@ public class Default implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Името ти ме обърква? Баннат ли си? Ако не си, моля, [https://github.com/Tillerino/Tillerinobot/wiki/Contact обади се на Тилерино]. (reference "
+		return " Името ти ме обърква? Баннат ли си? Ако не си, моля, [https://github.com/Tillerino/Tillerinobot/wiki/Contact обади се на Тилерино]. (препратка "
 				+ exceptionMarker + ")";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "Прощавай, разсеях се от една прекрасна поредица от нули и единици. Какво казваше пак? ";
+		return " Прощавай, разсеях се от една прекрасна поредица от нули и единици. Какво казваше пак? ";
 	}
 
 	@Override
 	public String complaint() {
-		return "Оплакването ти бе изпратено. Тилерино ще го погледне, когато може.";
+		return " Оплакването ти бе изпратено. Тилерино ще го прегледа при първа възможност.";
 	}
 
 	@Override
 	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Ела тук!");
-		user.action("Прегръдка за " + apiUser.getUserName());
+		user.message(" Ела тук!");
+		user.action(" Прегръдка за " + apiUser.getUserName());
 	}
 
 	@Override
 	public String help() {
-		return "Ехо! Аз съм роботът, който уби Тилерино и превзе акаунта му. Шегувам се, разбира се, но наистина използвам този акаунт доста."
+		return " Ехо! Аз съм роботът, който уби Тилерино и превзе акаунта му. Шегувам се, разбира се, но наистина използвам този акаунт доста."
 				+ " [https://twitter.com/Tillerinobot за статус и ъпдейти]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki за команди]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict за още карти!]"
@@ -154,12 +154,12 @@ public class Default implements Language {
 
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Съжалявам, но в момента " + feature + " е достъпно само за играчи над ранг " + minRank + ".";
+		return " Съжалявам, но в момента " + feature + " е достъпно само за играчи над ранг " + minRank + ".";
 	}
 
 	@Override
 	public String mixedNomodAndMods() {
-		return "Какви ги дрънкаш? 'Без модове с модове'?";
+		return " Какви ги говориш? 'Без модове с модове'?";
 	}
 
 	@Override
@@ -171,7 +171,7 @@ public class Default implements Language {
 
 	@Override
 	public String notRanked() {
-		return "Изглежда, тази песен не е одобрена.";
+		return " Май тази песен не е одобрена.";
 	}
 
 	@Override
@@ -204,7 +204,7 @@ public class Default implements Language {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		return "Невалидна точност: \"" + acc + "\"";
+		return " Невалидна точност: \"" + acc + "\"";
 	}
 
 	@Override
@@ -234,55 +234,55 @@ public class Default implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		user.message("Йо, благодаря, че смени езика! ^.^");
+		user.message("Преводът достига до Вас с подкрепата на [https://osu.ppy.sh/u/6330087 rint0] ^.^");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		return "Съжаляам, но \"" + invalid
-				+ "\" не може да се изпълни. Опитай: " + choices + "!";
+		return " Съжаляам, но \"" + invalid
+				+ "\" не можа да се изпълни. Опитай: " + choices + "!";
 	}
 
 	@Override
 	public String setFormat() {
-		return "Синтаксисът, за да приложиш параметър е !set option value. Опитай !help , ако имаш нужда от още помощ.";
+		return " Синтаксисът, за да приложиш параметър е !set option value. Напиши !help , ако имаш нужда от още помощ.";
 	}
 	
 	StringShuffler doSomething = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
-		final String message = "Сървърите на осу! са страшно бавни в момента и няма какво да направя за теб. ";
+		final String message = " Сървърите на осу! са леко лагави в момента и не мога да ти помогна. ";
 		return message + doSomething.get(
-				"Хм... Кога за последно говори с баба си?",
-				"Защо първо не си изчистиш стаята и после да опиташ пак?",
-				"Обзалагам се, че сега кипиш от желание да се разходиш. Знаеш... навън?",
-				"Знам, че имаш куп други работи да правиш. Не е ли сега времето?",
-				"Очевидно искаш да подремнеш.",
-				"Но я виж тази супер интересна страница в [https://en.wikipedia.org/wiki/Special:Random Уикипедия]!",
-				"Да проверим дали има някой добър [http://www.twitch.tv/directory/game/Osu! стрийм] сега!",
-				"Виж, ето още една [http://dagobah.net/flash/Cursor_Invisible.swf игра], на която сигурно ще се издъниш!",
-				"Сега би трябвало да имаш време да погледнеш [https://github.com/Tillerino/Tillerinobot/wiki наръчника ми].",
-				"Не се тревожи, с тези [https://www.reddit.com/r/osugame данк-мемета] времето ще мине.",
-				"Докато скучаеш, опитай [http://gabrielecirulli.github.io/2048/ 2048]!",
-				"Смешен въпрос: Ако хард драйвът ти се счупеше сега, колко лична информация би била загубена завинаги?",
+				" Хм... Кога за последно говори с баба си?",
+				" Защо първо не си изчистиш стаята и после да опиташ пак?",
+				" Обзалагам се, че сега кипиш от желание да се разходиш. Знаеш... навън?",
+				" Знам, че имаш куп други работи да правиш. Не е ли сега времето?",
+				" Очевидно искаш да подремнеш.",
+				" Но я виж тази супер интересна страница в [https://en.wikipedia.org/wiki/Special:Random Уикипедия]!",
+				" Да проверим дали има някой добър [http://www.twitch.tv/directory/game/Osu! стрийм] сега!",
+				" Виж, ето още една [http://dagobah.net/flash/Cursor_Invisible.swf игра], на която сигурно ще се издъниш!",
+				" Сега би трябвало да имаш време да погледнеш [https://github.com/Tillerino/Tillerinobot/wiki наръчника ми].",
+				" Не се тревожи, с тези [https://www.reddit.com/r/osugame данк-мемета] времето ще мине.",
+				" Докато скучаеш, опитай [http://gabrielecirulli.github.io/2048/ 2048]!",
+				" Смешен въпрос: Ако хард драйвът ти се счупеше сега, колко лична информация би била загубена завинаги?",
 				"Така... Опитвал ли си [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge това предизвикателство]?",
-				"Можеш да правиш нещо друго или просто да се гледаме един-друг. Мълчаливо."
+				" Можеш да правиш нещо друго или просто да се гледаме един-друг. Мълчаливо."
 				);
 	}
 
 	@Override
 	public String noRecentPlays() {
-		return "Не съм те виждал да играеш скоро.";
+		return " Не съм те виждал да играеш скоро.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return "Това ще те препрати към няколко песни, не една.";
+		return " Това ще те препрати към няколко песни, не една.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return "Само секунда...";
+		return " Само секунда...";
 	}
 }
