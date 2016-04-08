@@ -218,21 +218,21 @@ public class Russian implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		return "Сервера осу сейчас довольно медленные, увы, я не могу ничем вам помочь в этот раз.";
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Давно не видел, как вы играли!";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Эта ссылка указывает на набор карт, а не одну конкретную.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Одну секундочку....";
 	}
 }
