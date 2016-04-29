@@ -96,7 +96,7 @@ public class Pinger {
 	 * this method is synchronized through the sender semaphore
 	 */
 	void ping(CloseableBot bot) throws IOException, InterruptedException {
-		try {
+		/*try {*/
 			if(quit.get()) {
 				throw new IOException("ping gate closed");
 			}
@@ -127,7 +127,7 @@ public class Pinger {
 			bean.setLastPing(System.currentTimeMillis() - time);
 			MDC.put("ping", bean.getLastPing());
 
-			if (bean.getLastPing() > 1500) {
+			/*if (bean.getLastPing() > 1500) {
 				if (botInfoService != null) {
 					bean.setLastPingDeath(System.currentTimeMillis());
 					botInfoService.setLastPingDeath(System
@@ -147,7 +147,7 @@ public class Pinger {
 				lastquit = System.currentTimeMillis();
 			}
 			throw e;
-		}
+		}*/
 	}
 	
 	void handleUnknownEvent(@SuppressWarnings("rawtypes") UnknownEvent event) {
