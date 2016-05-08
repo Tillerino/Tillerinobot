@@ -73,7 +73,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         if (settings.isOpenDirectOnMapSelect()) {
-          Window.Location.assign(AbstractBeatmapTable.directUrl(selectionModel.getSelectedObject().setid));
+          Window.Location.assign(AbstractBeatmapTable.directUrl(selectionModel.getSelectedObject()));
         }
       }
     });
@@ -109,7 +109,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
                 "<a href=\"http://osu.ppy.sh/d/" + object.setid + "\">"
                     + "<img src=\"//b.ppy.sh/thumb/" + object.setid
                     + ".jpg\" height=\"60\" style=\"vertical-align:middle\">" + "</a>"
-                    + "<a href=\"" + directUrl(object.setid) + "\">")
+                    + "<a href=\"" + directUrl(object) + "\">")
             .appendHtmlConstant(
                 " <img src=\"/osuDownloadDirect.png\" height=60 width=10 style=\"vertical-align:middle\">")
             .appendHtmlConstant("</a>").toSafeHtml();
@@ -437,8 +437,8 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
     return new TextHeader(text);
   }
 
-  public static String directUrl(int setid) {
-    return "osu://dl/" + setid;
+  public static String directUrl(Beatmap object) {
+    return "osu://b/" + object.beatmapid;
   }
 
   @Override
