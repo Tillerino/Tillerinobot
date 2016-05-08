@@ -271,7 +271,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			} else {
 				if (e instanceof SocketTimeoutException) {
 					user.message(lang.apiTimeoutException());
-					log.warn("osu api timeout");
+					log.debug("osu api timeout");
 				} else {
 					String string = logException(e, log);
 	
@@ -422,7 +422,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				Recommendation lastRecommendation = manager
 						.getLastRecommendation(apiUser.getUserId());
 				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
-					log.warn("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getBeatmapId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.getCauses())));
+					log.debug("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getBeatmapId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.getCauses())));
 					user.message(lang.complaint());
 				}
 			} else {
@@ -525,7 +525,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			try {
 				userid = backend.resolveIRCName(user.getNick());
 			} catch (SocketTimeoutException e1) {
-				log.warn("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
+				log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
 				return;
 			}
 			
@@ -536,7 +536,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			try {
 				apiUser = backend.getUser(userid, 0);
 			} catch (SocketTimeoutException e) {
-				log.warn("osu api timeout while getting user {} (welcomeIfDonator)", userid);
+				log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
 				return;
 			}
 			
@@ -622,7 +622,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			
 			backend.registerActivity(userid);
 		} catch (SocketTimeoutException e) {
-			log.warn("osu api timeout while logging activity of user {}", fNick);
+			log.debug("osu api timeout while logging activity of user {}", fNick);
 		} catch (Exception e) {
 			log.error("error logging activity", e);
 		}
