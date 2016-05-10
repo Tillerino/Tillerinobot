@@ -11,25 +11,33 @@ import tillerino.tillerinobot.lang.Language;
 
 public class PredicateParser {
 	public interface PredicateBuilder<T extends RecommendationPredicate> {
+		/**
+		 * Parses the given string.
+		 * 
+		 * @param argument
+		 *            doesn't contain spaces
+		 * @param lang
+		 *            for error messages
+		 * @return null if the argument cannot be parsed
+		 */
 		T build(String argument, Language lang) throws UserException;
 	}
 
 	List<PredicateBuilder<?>> builders = new ArrayList<>();
 
 	public PredicateParser() {
-		List<NumericBeatmapProperty> properties = Arrays.asList(
-				new ApproachRate(), new BeatsPerMinute(), new OverallDifficulty(), new MapLength());
+		List<NumericBeatmapProperty> properties = Arrays.asList(new ApproachRate(), new BeatsPerMinute(), new OverallDifficulty(), new MapLength());
 
 		for (NumericBeatmapProperty property : properties) {
 			builders.add(new NumericPredicateBuilder<>(property));
 		}
+
+		builders.add(new ExcludeMod.Builder());
 	}
 
-	public @CheckForNull RecommendationPredicate tryParse(String argument,
-			Language lang) throws UserException {
+	public @CheckForNull RecommendationPredicate tryParse(String argument, Language lang) throws UserException {
 		for (PredicateBuilder<?> predicateBuilder : builders) {
-			RecommendationPredicate predicate = predicateBuilder.build(
-					argument, lang);
+			RecommendationPredicate predicate = predicateBuilder.build(argument, lang);
 			if (predicate != null)
 				return predicate;
 		}

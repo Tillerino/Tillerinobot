@@ -3,6 +3,7 @@ package tillerino.tillerinobot.predicates;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.tillerino.osuApiModel.Mods;
 
 
 public class PredicateParserTest {
@@ -31,6 +32,14 @@ public class PredicateParserTest {
 		assertEquals(new NumericPropertyPredicate<>(
 				"BPM>=9000", new BeatsPerMinute(), 9000, true,
 				Double.POSITIVE_INFINITY, true),
+				predicate);
+	}
+
+	@Test
+	public void testExcludeMods() throws Exception {
+		RecommendationPredicate predicate = parser.tryParse("-hr", null);
+
+		assertEquals(new ExcludeMod(Mods.HardRock),
 				predicate);
 	}
 
