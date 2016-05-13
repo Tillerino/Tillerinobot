@@ -57,7 +57,7 @@ public class Spanish implements Language {
 					"¡cómo me alegro de verte! :)",
 					"mi humano favorito. (¡No se lo digas a los otros humanos!)",
 					"¡qué agradable sorpresa! ^.^",
-					"Estaba esprando que aparecieses. Todos los otros humanos son unos aburridos, ¡pero no les digas nada! :3",
+					"Estaba esperando que aparecieses. Todos los otros humanos son unos aburridos, ¡pero no les digas nada! :3",
 					"¿qué te apetece hacer hoy?",
 			};
 			
