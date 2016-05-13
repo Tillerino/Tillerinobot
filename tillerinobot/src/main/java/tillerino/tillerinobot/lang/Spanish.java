@@ -12,12 +12,13 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 /**
  * @author Sibchil https://osu.ppy.sh/u/3988045 https://github.com/sibchil
+ * @author Zarkinox arichtermohr@gmail.com https://osu.ppy.sh/u/2743036 https://github.com/zarkinox
  */
 public class Spanish implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Lo siento, no conozco ese mapa. Es muy reciente, muy difícil, no rankeado o modo de osu! no estándar.";
+		return "Lo siento, no conozco ese mapa. Tal vez es muy reciente, muy difícil, no está rankeado o el modo no es osu! estándar.";
 	}
 
 	@Override
@@ -29,9 +30,9 @@ public class Spanish implements Language {
 
 	@Override
 	public String externalException(String marker) {
-		return "¿Qué está pasando? Solo recibo disparates del servidor de osu. ¿Podrías decirme que se supone que significa esto? 0011101001010000"
-		                + " Tillerino humano dice que no hay nada por qué preocuparse y que deberíamos intentarlo de nuevo."
-		                + " Si estás preocupado por alguna razón, puedes [https://github.com/Tillerino/Tillerinobot/wiki/Contact comunicárselo]. (código de referencia "
+		return "¿Qué está pasando? Solo recibo disparates del servidor de osu. ¿Podrías decirme qué se supone que significa esto? 0011101001010000"
+		                + " Tillerino humano dice que esto no es nada de qué preocuparse y que deberíamos intentarlo de nuevo."
+		                + " Si por alguna razón estás realmente preocupado, puedes [https://github.com/Tillerino/Tillerinobot/wiki/Contact comunicárselo]. (código de referencia "
 		                + marker + ")";
 	}
 
@@ -55,8 +56,8 @@ public class Spanish implements Language {
 					"me parece que necesitas una recomendación.",
 					"¡cómo me alegro de verte! :)",
 					"mi humano favorito. (¡No se lo digas a los otros humanos!)",
-					"¡que agradable sorpresa! ^.^",
-					"Tenía la esperanza de que te dejarías ver. Todos los demás humanos son patéticos, ¡pero no les cuentes lo que dije! :3",
+					"¡qué agradable sorpresa! ^.^",
+					"Estaba esprando que aparecieses. Todos los otros humanos son unos aburridos, ¡pero no les digas nada! :3",
 					"¿qué te apetece hacer hoy?",
 			};
 			
@@ -81,17 +82,17 @@ public class Spanish implements Language {
 
 	@Override
 	public String malformattedMods(String mods) {
-	    return "Esos mods no parecen correctos. Los mods pueden ser cualquier combinación de DT HR HD HT EZ NC FL SO NF. Combínalos sin espacios o carácteres especiales. Ejemplo: !with HDHR, !with DTEZ";
+	    return "Esos mods no parecen correctos. Los mods pueden ser cualquier combinación de DT HR HD HT EZ NC FL SO NF. Combínalos sin espacios o caracteres especiales. Ejemplo: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-	    return "No recuerdo haberte dado información sobre alguna canción...";
+	    return "No recuerdo haberte dado información sobre ninguna canción...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "¡Prueba con algunos mods!";
+		return "¡Prueba este mapa con algunos mods!";
 	}
 
 	@Override
@@ -111,7 +112,7 @@ public class Spanish implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Tu nombre me esta confundiendo. ¿Estás eliminado? Si no es así, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta con Tillerino]. (código de referencia "
+		return "Tu nombre me está confundiendo. ¿Estás banneado? Si no es así, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta con Tillerino]. (código de referencia "
 				+ exceptionMarker + ")";
 	}
 
@@ -147,24 +148,24 @@ public class Spanish implements Language {
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Lo siento, actualmente " + feature + " es solo disponible para jugadores que hayan superado el rango" + minRank + ".";
+		return "Lo siento, actualmente " + feature + " está solo disponible para jugadores que hayan superado el rango" + minRank + ".";
 	}
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "¿A qué te refieres con sin mods y con mods?";
+		return "¿A qué te refieres con 'sin mods (nomod) y con mods'?";
 	}
 	
 	@Override
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
-				+ " Te he recomendado todo lo que sé]."
+				+ " Te he recomendado todo lo que se me ocurre]."
 				+ " Prueba otras opciones de recomendación o usa !reset. Si no estás seguro, prueba con !help.";
 	}
 
 	@Override
 	public String notRanked() {
-		return "Parece que el mapa no esta rankeado.";
+		return "Parece que este mapa no está rankeado.";
 	}
 
 	@Override
@@ -202,37 +203,57 @@ public class Spanish implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("sasakura y Underforest me ayudaron a aprender Español :3");
+		user.message("Sasakura, Underforest y [https://osu.ppy.sh/u/2743036 Zarkinox] me ayudaron a aprender español :3");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
 		return "Lo siento, pero \"" + invalid
-				+ "\" no computa. Pruebo estos: " + choices + "!";
+				+ "\" no computa. Prueba estos: " + choices + "!";
 	}
 
 	@Override
 	public String setFormat() {
-		return "El sintaxis para establecer un parámetro es !set opción valor. Prueba !help si necesitas más indicaciones.";
+		return "La sintaxis para establecer un parámetro es !set opción valor. Prueba !help si necesitas más indicaciones.";
 	}
 	
 	@Override
 	public String apiTimeoutException() {
 		return new Default().apiTimeoutException();
+		/* 
+		final String message = "Los servidores de osu! están muy lentos ahora mismo, por lo que no puedo ayudarte con nada en estos momentos. ";
+		return message + doSomething.get(
+				"Dime, ¿cuándo fue la última vez que hablaste con tu abuela?",
+				"¿Qué te parece si ordenas un poco tu habitación y luego me preguntas otra vez?",
+				"Apuesto a que te encantaría dar un paseo, ya sabes... fuera de casa y eso.",
+				"Estoy seguro de que tienes otras cosas que hacer. ¿Qué te parece hacerlas ahora mismo?",
+				"De todas formas, parece que necesitas una siesta.",
+				"¡Echemos un vistazo a esta página súper interesante en [https://es.wikipedia.org/wiki/Special:Random wikipedia]!",
+				"¡Vamos a ver si hay alguien bueno [http://www.twitch.tv/directory/game/Osu! en directo] ahora mismo!",
+				"¡Mira, aquí hay otro [http://dagobah.net/flash/Cursor_Invisible.swf juego] en el que probablemente seas malísimo!",
+				"Esto debería de darte tiempo más que suficiente para que te estudides [https://github.com/Tillerino/Tillerinobot/wiki mi manual].",
+				"No te preocupes, estos [https://www.reddit.com/r/osugame buenos memes] deberían ayudarte a pasar el rato.",
+				"Si te estás aburriendo, prueba [http://gabrielecirulli.github.io/2048/ 2048].",
+				"Pregunta curiosa: Si tu disco duro se rompiese ahora mismo, ¿qué cantidad de tus datos personales se perderían para siempre?",
+				"¿Has intentado alguna vez el [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge 'sally up push up challenge']?",
+				"Puedes ir a hacer otra cosa o nos podemos quedar mirándonos a los ojos. Uno al otro. En completo silencio.",
+				);
+		*/
+		
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "No te he visto jugar últimamente.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Esto hace referencia a un grupo de mapas, no a uno solo.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Un momento...";
 	}
 }
