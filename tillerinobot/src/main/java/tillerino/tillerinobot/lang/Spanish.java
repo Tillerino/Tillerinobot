@@ -15,6 +15,7 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
  * @author Zarkinox arichtermohr@gmail.com https://osu.ppy.sh/u/2743036 https://github.com/zarkinox
  */
 public class Spanish implements Language {
+	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
@@ -217,10 +218,10 @@ public class Spanish implements Language {
 		return "La sintaxis para establecer un parámetro es !set opción valor. Prueba !help si necesitas más indicaciones.";
 	}
 	
+	StringShuffler doSomething = new StringShuffler(rnd);
+
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
-		/* 
 		final String message = "Los servidores de osu! están muy lentos ahora mismo, por lo que no puedo ayudarte con nada en estos momentos. ";
 		return message + doSomething.get(
 				"Dime, ¿cuándo fue la última vez que hablaste con tu abuela?",
@@ -236,10 +237,8 @@ public class Spanish implements Language {
 				"Si te estás aburriendo, prueba [http://gabrielecirulli.github.io/2048/ 2048].",
 				"Pregunta curiosa: Si tu disco duro se rompiese ahora mismo, ¿qué cantidad de tus datos personales se perderían para siempre?",
 				"¿Has intentado alguna vez el [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge 'sally up push up challenge']?",
-				"Puedes ir a hacer otra cosa o nos podemos quedar mirándonos a los ojos. Uno al otro. En completo silencio.",
+				"Puedes ir a hacer otra cosa o nos podemos quedar mirándonos a los ojos. Uno al otro. En completo silencio."
 				);
-		*/
-		
 	}
 	
 	@Override
