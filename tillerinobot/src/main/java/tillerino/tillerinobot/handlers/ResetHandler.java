@@ -7,9 +7,9 @@ import javax.inject.Inject;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.IRCBot.CommandHandler;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 

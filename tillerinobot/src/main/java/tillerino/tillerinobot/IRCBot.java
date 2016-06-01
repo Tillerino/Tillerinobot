@@ -91,11 +91,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		boolean action(String msg);
 	}
 	
-	public interface CommandHandler {
-		public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
-				throws UserException, IOException, SQLException, InterruptedException;
-	}
-	
 	final BotBackend backend;
 	final private boolean silent;
 	final RecommendationsManager manager;

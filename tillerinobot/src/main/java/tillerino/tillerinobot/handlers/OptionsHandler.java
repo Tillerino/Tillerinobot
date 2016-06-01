@@ -11,8 +11,8 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.IRCBot.CommandHandler;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;

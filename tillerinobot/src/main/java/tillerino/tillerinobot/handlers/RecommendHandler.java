@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.IRCBot.CommandHandler;
+import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
