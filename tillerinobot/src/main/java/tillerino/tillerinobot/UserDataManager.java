@@ -128,6 +128,15 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			return changed || language.isChanged();
 		}
 		
+		@Getter
+		boolean allowedToDebug = false;
+		
+		public void setAllowedToDebug(boolean allowedToDebug) {
+			changed |= allowedToDebug != this.allowedToDebug;
+			
+			this.allowedToDebug = allowedToDebug;
+		}
+		
 		@Getter(onMethod = @__({ @Nonnull }))
 		LanguageIdentifier languageIdentifier = LanguageIdentifier.Default;
 		
