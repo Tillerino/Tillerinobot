@@ -427,4 +427,10 @@ public class TestBackend implements BotBackend {
 	public List<OsuApiScore> getRecentPlays(int userid) throws IOException {
 		return Collections.emptyList();
 	}
+
+	@Override
+	public OsuApiUser resolveManually(int userid) throws SQLException,
+			IOException {
+		return null;
+	}
 }

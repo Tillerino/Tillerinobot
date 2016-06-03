@@ -96,6 +96,19 @@ public interface BotBackend {
 	@CheckForNull @UserId
 	public Integer resolveIRCName(@IRCName @Nonnull String ircName)
 			throws SQLException, IOException;
+	
+	/**
+	 * Tries to resolve a user manually by checking their user id.
+	 * 
+	 * @param userid
+	 *            the user id to be checked. Information about this will be
+	 *            pulled from the osu api.
+	 * @return the resolved user or null if the user id does not exist in the
+	 *         API.
+	 */
+	@CheckForNull
+	public OsuApiUser resolveManually(@UserId int userid) throws SQLException,
+			IOException;
 
 	/**
 	 * will load a sampler
