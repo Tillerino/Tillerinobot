@@ -226,7 +226,7 @@ public class Francais implements Language {
 	
 	@Override
 	public String noRecentPlays() {
-		return "je n'ai pas vu que tu avais joué récemment.";
+		return "je ne t'ai pas vu beaucoup jouer ces derniers temps.";
 	}
 	
 	@Override
