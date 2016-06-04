@@ -221,7 +221,7 @@ public class Francais implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return "Les serveurs d'Osu! sont super lent ! Je ne peux rien faire pour toi en ce moment.";
+		return "Les serveurs d'osu! sont supers lents ! Je ne peux rien faire pour toi en ce moment.";
 	}
 	
 	@Override
