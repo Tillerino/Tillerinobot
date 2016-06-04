@@ -19,7 +19,7 @@ public class Francais implements Language {
 	@Override
 	public String unknownBeatmap() {
 		return "Je suis désolé, je ne trouve pas la map... Il se pourrait que celle-ci soit nouvelle,"
-				+ " très compliquée, non classée ou alors n'est pas un mode standard d'osu!.";
+				+ " très compliquée, non classée ou alors n'est pas un mode standard d'Osu!.";
 	}
 
 	@Override
