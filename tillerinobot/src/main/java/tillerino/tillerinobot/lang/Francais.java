@@ -19,7 +19,7 @@ public class Francais implements Language {
 	@Override
 	public String unknownBeatmap() {
 		return "Je suis désolé, je ne trouve pas la map... Il se pourrait que celle-ci soit nouvelle,"
-				+ " très compliquée, non classée ou alors n'est pas un mode standard d'Osu!.";
+				+ " très compliquée, non classée ou alors n'est pas un mode standard d'osu!.";
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class Francais implements Language {
 
 	@Override
 	public String externalException(String marker) {
-		return "Qu'est-ce qui se passe ? Les serveurs d'Osu! m'ont dit n'importe quoi... Peux-tu me dire ce que cela signifie ? 0011101001010000"
+		return "Qu'est-ce qui se passe ? Les serveurs d'osu! m'ont dit n'importe quoi... Peux-tu me dire ce que cela signifie ? 0011101001010000"
 				+ " L'humain Tillerino dit que ce n'est rien, il ne faut pas s'inquiéter, il faut réessayer."
 					+ " Si tu es très inquiet pour n'importe quelle raison, [https://github.com/Tillerino/Tillerinobot/wiki/Contact tu peux le contacter]. (reference "
 				+ marker + ")";
@@ -221,7 +221,7 @@ public class Francais implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return "Les serveurs d'Osu! sont supers lents ! Je ne peux rien faire pour toi en ce moment.";
+		return "Les serveurs d'osu! sont supers lents ! Je ne peux rien faire pour toi en ce moment.";
 	}
 	
 	@Override
