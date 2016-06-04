@@ -31,7 +31,7 @@ public class Francais implements Language {
 
 	@Override
 	public String externalException(String marker) {
-		return "Qu'est-ce qui se passe ? Les serveurs d'osu! m'ont dit n'importe quoi... Peux-tu me dire ce que cela signifie ? 0011101001010000"
+		return "Qu'est-ce qui se passe ? Les serveurs d'Osu! m'ont dit n'importe quoi... Peux-tu me dire ce que cela signifie ? 0011101001010000"
 				+ " L'humain Tillerino dit que ce n'est rien, il ne faut pas s'inquiéter, il faut réessayer."
 					+ " Si tu es très inquiet pour n'importe quelle raison, [https://github.com/Tillerino/Tillerinobot/wiki/Contact tu peux le contacter]. (reference "
 				+ marker + ")";
@@ -226,7 +226,7 @@ public class Francais implements Language {
 	
 	@Override
 	public String noRecentPlays() {
-		return "je ne t'ai pas vu beaucoup jouer ces derniers temps.";
+		return "Je ne t'ai pas vu beaucoup jouer ces derniers temps.";
 	}
 	
 	@Override
