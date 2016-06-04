@@ -42,6 +42,9 @@ import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.lang.Language;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * <p>
  * Backend implementation for the purposes of testing the Frontend.
@@ -431,6 +434,12 @@ public class TestBackend implements BotBackend {
 	@Override
 	public OsuApiUser resolveManually(int userid) throws SQLException,
 			IOException {
-		return null;
+		if(userid <= 0) {
+			return null;
+		}
+		OsuApiUser osuApiUser = mock(OsuApiUser.class);
+		when(osuApiUser.getUserName()).thenReturn("user with id " + userid);
+		when(osuApiUser.getUserId()).thenReturn(userid);
+		return osuApiUser;
 	}
 }

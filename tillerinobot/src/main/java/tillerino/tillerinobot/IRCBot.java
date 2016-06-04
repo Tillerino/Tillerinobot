@@ -58,6 +58,7 @@ import tillerino.tillerinobot.handlers.RecentHandler;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.handlers.WithHandler;
+import tillerino.tillerinobot.handlers.FixIDHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BotInfoService;
@@ -388,6 +389,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 
 		try {
+			if (new FixIDHandler(backend).handle(originalMessage, user, null, null)) {
+				return;
+			}
 			OsuApiUser apiUser = getUserOrThrow(user);
 			UserData userData = userDataManager.getData(apiUser.getUserId());
 			lang = userData.getLanguage();
