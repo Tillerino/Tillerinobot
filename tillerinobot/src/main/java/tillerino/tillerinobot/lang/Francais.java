@@ -205,7 +205,7 @@ public class Francais implements Language {
 
 	@Override
 	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Howaitorufu et ThePooN m'ont appris à parler Français ! :D");
+		user.message("Howaitorufu, ThePooN et Pweenzor m'ont appris à parler Français ! :D");
 	}
 
 	@Override
@@ -221,21 +221,21 @@ public class Francais implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		return "Les serveurs d'osu! sont supers lents ! Je ne peux rien faire pour toi en ce moment.";
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Je ne t'ai pas vu beaucoup jouer ces derniers temps.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Ce n'est pas une seule beatmap, mais un ensemble.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Attends un peu...";
 	}
 }
