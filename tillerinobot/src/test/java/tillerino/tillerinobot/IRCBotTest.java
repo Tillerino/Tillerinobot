@@ -1,4 +1,5 @@
 package tillerino.tillerinobot;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
-import tillerino.tillerinobot.rest.BotInfoService;
+import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 public class IRCBotTest {
 	@Test
@@ -106,7 +107,7 @@ public class IRCBotTest {
 	
 	IRCBot getTestBot(BotBackend backend) {
 		IRCBot ircBot = new IRCBot(backend, spy(new RecommendationsManager(
-				backend)), mock(BotInfoService.class), new UserDataManager(
+				backend)), new BotInfo(), new UserDataManager(
 				backend), mock(Pinger.class), false);
 		return ircBot;
 	}

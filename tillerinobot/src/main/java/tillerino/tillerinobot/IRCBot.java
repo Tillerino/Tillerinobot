@@ -61,7 +61,7 @@ import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.handlers.FixIDHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.rest.BotInfoService;
+import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -96,13 +96,13 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	final BotBackend backend;
 	final private boolean silent;
 	final RecommendationsManager manager;
-	final BotInfoService botInfo;
+	final BotInfo botInfo;
 	final UserDataManager userDataManager;
 	final List<CommandHandler> commandHandlers = new ArrayList<>();
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
-			BotInfoService botInfo, UserDataManager userDataManager,
+			BotInfo botInfo, UserDataManager userDataManager,
 			Pinger pinger, @Named("tillerinobot.ignore") boolean silent) {
 		this.backend = backend;
 		this.manager = manager;

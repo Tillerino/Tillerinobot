@@ -15,15 +15,17 @@ import tillerino.tillerinobot.BotRunner;
 @Singleton
 @Path("/botinfo")
 public class BotInfoService {
-	private BotRunner bot;
+	private final BotRunner bot;
 
 	@Inject
-	public BotInfoService(BotRunner bot) {
+	public BotInfoService(BotRunner bot, BotInfo botInfo) {
 		super();
 		this.bot = bot;
+		this.botInfo = botInfo;
 	}
 
 	@Data
+	@Singleton
 	public static class BotInfo {
 		boolean isConnected;
 		long runningSince;
@@ -32,7 +34,7 @@ public class BotInfoService {
 		long lastSentMessage;
 	}
 
-	public BotInfo botInfo = new BotInfo();
+	private final BotInfo botInfo;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -45,21 +47,4 @@ public class BotInfoService {
 		}
 		return botInfo;
 	}
-
-	public void setRunningSince(long runningSince) {
-		botInfo.runningSince = runningSince;
-	}
-
-	public void setLastPingDeath(long lastPingDeath) {
-		botInfo.lastPingDeath = lastPingDeath;
-	}
-
-	public void setLastInteraction(long lastInteraction) {
-		botInfo.lastInteraction = lastInteraction;
-	}
-
-	public void setLastSentMessage(long lastSentMessage) {
-		botInfo.lastSentMessage = lastSentMessage;
-	}
-
 }

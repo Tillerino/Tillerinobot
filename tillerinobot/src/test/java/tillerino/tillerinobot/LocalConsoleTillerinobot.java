@@ -1,17 +1,24 @@
 package tillerino.tillerinobot;
 
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.lang.management.ManagementFactory;
 import java.net.Socket;
+import java.net.URI;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import javax.inject.Singleton;
+import javax.ws.rs.core.UriBuilder;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.pircbotx.Configuration;
@@ -26,14 +33,13 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.output.OutputIRC;
 import org.pircbotx.output.OutputUser;
 
+import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
-
-import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
-import tillerino.tillerinobot.rest.BotInfoService;
 
 /**
  * The purpose of this class and its main function is to completely mock backend
@@ -59,8 +65,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	protected void configure() {
 		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore"))
 				.toInstance(false);
-		bind(BotInfoService.class).toInstance(mock(BotInfoService.class));
-
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
@@ -74,22 +78,19 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		when(pircBot.isConnected()).thenReturn(true);
 		when(pircBot.getSocket()).thenReturn(mock(Socket.class));
 
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				String message = (String) invocation.getArguments()[0];
+		doAnswer(invocation -> {
+			String message = (String) invocation.getArguments()[0];
 
-				@SuppressWarnings("unchecked")
-				UnknownEvent<PircBotX> event = mock(UnknownEvent.class);
+			@SuppressWarnings("unchecked")
+			UnknownEvent<PircBotX> event = mock(UnknownEvent.class);
 
-				Thread.sleep((long) (Math.random() * 1000));
+			Thread.sleep((long) (Math.random() * 1000));
 
-				when(event.getLine()).thenReturn(" PONG" + message.substring(4));
+			when(event.getLine()).thenReturn(" PONG" + message.substring(4));
 
-				bot.pinger.handleUnknownEvent(event);
+			bot.pinger.handleUnknownEvent(event);
 
-				return null;
-			}
+			return null;
 		}).when(pircBot).sendRawLineToServer(anyString());
 
 		final AtomicBoolean running = new AtomicBoolean(true);
@@ -97,16 +98,13 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		{
 			// QUITTING
     		OutputIRC outputIRC = mock(OutputIRC.class);
-    		doAnswer(new Answer<Void>() {
-    			@Override
-    			public Void answer(InvocationOnMock invocation) throws Throwable {
-    				@SuppressWarnings("unchecked")
-    				DisconnectEvent<PircBotX> event = mock(DisconnectEvent.class);
-    				bot.onEvent(event);
-					running.set(false);
-    				return null;
-    			}
-    		}).when(outputIRC).quitServer();
+			doAnswer(invocation -> {
+				@SuppressWarnings("unchecked")
+				DisconnectEvent<PircBotX> event = mock(DisconnectEvent.class);
+				bot.onEvent(event);
+				running.set(false);
+				return null;
+			}).when(outputIRC).quitServer();
     		when(pircBot.sendIRC()).thenReturn(outputIRC);
 		}
 		
@@ -117,33 +115,20 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 			// USER MESSAGES AND ACTIONS
     		OutputUser outputUser = mock(OutputUser.class);
     		when(user.send()).thenReturn(outputUser);
-    		doAnswer(new Answer<Void>() {
-    			@Override
-    			public Void answer(InvocationOnMock invocation) throws Throwable {
-    				System.out.println("*Tillerino " + invocation.getArguments()[0]);
-    				return null;
-    			}
-    		}).when(outputUser).action(anyString());
+			doAnswer(invocation -> {
+				System.out.println("*Tillerino " + invocation.getArguments()[0]);
+				return null;
+			}).when(outputUser).action(anyString());
     		
-    		doAnswer(new Answer<Void>() {
-    			@Override
-    			public Void answer(InvocationOnMock invocation) throws Throwable {
-    				System.out.println("Tillerino: " + invocation.getArguments()[0]);
-    				return null;
-    			}
-    		}).when(outputUser).message(anyString());
+			doAnswer(invocation -> {
+				System.out.println("Tillerino: " + invocation.getArguments()[0]);
+				return null;
+			}).when(outputUser).message(anyString());
 		}
 		
 		BotRunner runner = mock(BotRunner.class);
-		when(runner.getBot()).thenAnswer(new Answer<PircBotX>() {
-			@Override
-			public PircBotX answer(InvocationOnMock invocation)
-					throws Throwable {
-				return pircBot;
-			}
-		});
+		when(runner.getBot()).thenReturn(pircBot);
 		doAnswer(new Answer<Void>() {
-
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				@SuppressWarnings("unchecked")
@@ -237,30 +222,33 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				return true;
 			}
 			
-			ExecutorService exec = Executors.newCachedThreadPool(new ThreadFactory() {
-				@Override
-				public Thread newThread(Runnable r) {
-					Thread t = new Thread(r);
-					t.setDaemon(true);
-					return t;
-				}
+			ExecutorService exec = Executors.newCachedThreadPool(r -> {
+				Thread t = new Thread(r);
+				t.setDaemon(true);
+				return t;
 			});
 
 			void dispatch(@SuppressWarnings("rawtypes") final Event e) {
-				exec.submit(new Runnable() {
-					public void run() {
-						try {
-							bot.onEvent(e);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					};
+				exec.submit(() -> {
+					try {
+						bot.onEvent(e);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
 				});
 			}
 		}).when(runner).run();
 		return runner;
 	}
 
+	/**
+	 * This method will start a Tillerinobot instance, which communicates via
+	 * stdout, with a bogus backend and an API server.
+	 * 
+	 * @param args
+	 *            give a port number to start the API server on that port.
+	 *            Otherwise, a random, free port will be chosen.
+	 */
 	public static void main(String[] args) throws Exception {
 		Injector injector = Guice.createInjector(new LocalConsoleTillerinobot());
 
@@ -273,6 +261,15 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		ManagementFactory.getPlatformMBeanServer().registerMBean(
 				injector.getInstance(Pinger.MXBean.class), null);
 
+		URI baseUri = UriBuilder.fromUri("http://localhost/")
+				.port(Integer.parseInt(Stream.of(args).findAny().orElse("0"))).build();
+		Server apiServer = JettyHttpContainerFactory.createServer(baseUri, 
+				ResourceConfig.forApplication(injector.getInstance(BotAPIServer.class)));
+		((QueuedThreadPool) apiServer.getThreadPool()).setMaxThreads(32);
+		apiServer.start();
+
 		injector.getInstance(BotRunner.class).run();
+		
+		apiServer.stop();
 	}
 }
