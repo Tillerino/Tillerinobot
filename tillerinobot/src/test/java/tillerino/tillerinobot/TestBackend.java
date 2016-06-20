@@ -394,7 +394,7 @@ public class TestBackend implements BotBackend {
 
 	@Override
 	public boolean verifyGeneralKey(String key) throws SQLException {
-		return false;
+		return "testkey".equals(key);
 	}
 	
 	@Override
