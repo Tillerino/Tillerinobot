@@ -160,7 +160,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 			@Named("tillerinobot.irc.autojoin") String autojoinChannel) {
 		super();
 		this.tillerinoBot = tillerinoBot;
-		this.server = server;
+		this.server = server.split(",");
 		this.port = port;
 		this.nickname = nickname;
 		this.password = password;
@@ -169,7 +169,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 
 	private final Provider<IRCBot> tillerinoBot;
 
-	private final String server;
+	private final String[] server;
 	private final int port;
 	private final String nickname;
 	private final String password;
@@ -188,7 +188,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 	
 	@Override
 	public void run() {
-		for (; ;) {
+		for (int i = 0; ; i++) {
 			if(!reconnect) {
 				break;
 			}
@@ -199,7 +199,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 					listenerManager.addListener(listener);
 					
 					Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-							.setServer(server, port).setMessageDelay(250)
+							.setServer(server[i % server.length], port).setMessageDelay(250)
 							.setListenerManager(listenerManager)
 							.setName(nickname)
 							.setEncoding(Charset.forName("UTF-8"))
