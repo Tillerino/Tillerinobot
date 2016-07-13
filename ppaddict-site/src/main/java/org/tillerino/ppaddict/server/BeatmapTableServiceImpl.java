@@ -32,10 +32,10 @@ import org.tillerino.ppaddict.shared.PpaddictException;
 import org.tillerino.ppaddict.shared.Settings;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 

@@ -18,13 +18,13 @@ import org.tillerino.ppaddict.shared.Beatmap;
 import org.tillerino.ppaddict.shared.PpaddictException;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;

@@ -29,10 +29,10 @@ import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.types.PpaddictId;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
 import com.google.gson.Gson;

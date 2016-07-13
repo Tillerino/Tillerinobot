@@ -14,9 +14,9 @@ import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.types.PpaddictId;
 
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 
 
 
