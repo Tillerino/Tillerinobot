@@ -1,6 +1,8 @@
 package tillerino.tillerinobot;
 
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.SQLException;
@@ -24,10 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.extern.slf4j.Slf4j;
-import static org.apache.commons.lang3.StringUtils.*;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.MDC;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.CoreHooks;
@@ -42,6 +42,7 @@ import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BotBackend.IRCName;
@@ -332,7 +333,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().message(msg);
-					MDC.put("duration", System.currentTimeMillis() - event.getTimestamp());
+					MDC.put("duration", System.currentTimeMillis() - event.getTimestamp() + "");
 					log.debug("sent: " + msg);
 					botInfo.setLastSentMessage(System.currentTimeMillis());
 					return true;
@@ -463,7 +464,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	
 	@Override
 	public void onEvent(Event event) throws Exception {
-		MDC.put("event", lastSerial.incrementAndGet());
+		MDC.put("event", "" + lastSerial.incrementAndGet());
 		try {
 			botInfo.setLastInteraction(System.currentTimeMillis());
 
