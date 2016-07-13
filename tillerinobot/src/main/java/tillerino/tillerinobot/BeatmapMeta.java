@@ -2,8 +2,6 @@ package tillerino.tillerinobot;
 
 import java.text.DecimalFormat;
 
-import javax.annotation.CheckForNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,24 +11,11 @@ import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 
 @Data
 @AllArgsConstructor
 public class BeatmapMeta {
-	public interface PercentageEstimates {
-		double getPPForAcc(double acc);
-		
-		double getPP(double acc, int combo, int misses);
-		
-		@BitwiseMods
-		long getMods();
-		
-		boolean isShaky();
-
-		@CheckForNull
-		Double getStarDiff();
-	}
-	
 	OsuApiBeatmap beatmap;
 
 	Integer personalPP;

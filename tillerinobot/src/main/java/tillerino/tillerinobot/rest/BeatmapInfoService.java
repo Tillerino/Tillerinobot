@@ -36,7 +36,7 @@ import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
 @Singleton

@@ -35,13 +35,13 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.CBeatmap;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -101,6 +101,16 @@ public class TestBackend implements BotBackend {
 		@Override
 		public double getPP(double acc, int combo, int misses) {
 			return getPPForAcc(acc);
+		}
+		
+		@Override
+		public int getAllObjectsCount() {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public CBeatmap getBeatmap() {
+			throw new UnsupportedOperationException();
 		}
 	}
 

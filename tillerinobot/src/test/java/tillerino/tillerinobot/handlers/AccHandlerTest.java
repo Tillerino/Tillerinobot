@@ -11,11 +11,11 @@ import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.BeatmapMeta.PercentageEstimates;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 
