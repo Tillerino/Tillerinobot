@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
@@ -91,11 +92,16 @@ public class Pinger {
 	}
 
 	long lastquit = 0l;
+	
+	final AtomicInteger pingCalls = new AtomicInteger();
 
 	/*
 	 * this method is synchronized through the sender semaphore
 	 */
 	void ping(CloseableBot bot) throws IOException, InterruptedException {
+		if (pingCalls.incrementAndGet() % 10 != 0) {
+			return;
+		}
 		/*try {*/
 			if(quit.get()) {
 				throw new IOException("ping gate closed");
