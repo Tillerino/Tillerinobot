@@ -12,7 +12,7 @@ import org.tillerino.ppaddict.server.auth.AuthArriveService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorServices;
 
-import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.LocalConsoleTillerinobot;
 
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
@@ -31,10 +31,7 @@ public class PpaddictTestModule extends ServletModule {
 
     bind(PpaddictBackend.class).to(TestBackend.class).in(Singleton.class);
 
-    tillerino.tillerinobot.TestBackend botBackend = new tillerino.tillerinobot.TestBackend(true);
-
-    bind(BotBackend.class).toInstance(botBackend);
-    bind(tillerino.tillerinobot.TestBackend.class).toInstance(botBackend);
+    install(new LocalConsoleTillerinobot());
 
     serve(FakeAuthenticatorWebsite.PATH).with(FakeAuthenticatorWebsite.class);
 

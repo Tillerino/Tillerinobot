@@ -1,6 +1,9 @@
 package org.tillerino.ppaddict;
 
-import static org.tillerino.osuApiModel.Mods.*;
+import static org.tillerino.osuApiModel.Mods.DoubleTime;
+import static org.tillerino.osuApiModel.Mods.HardRock;
+import static org.tillerino.osuApiModel.Mods.Hidden;
+import static org.tillerino.osuApiModel.Mods.getMask;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -20,6 +23,7 @@ import java.util.Scanner;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityManagerFactory;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.OsuName;
@@ -29,9 +33,11 @@ import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.types.PpaddictId;
 
 import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
@@ -49,11 +55,21 @@ import com.google.gson.GsonBuilder;
 public class TestBackend implements PpaddictBackend {
   private final tillerino.tillerinobot.TestBackend botBackend;
 
+  private final IrcNameResolver resolver;
+
+  private final EntityManagerFactory emf;
+
+  private final ThreadLocalAutoCommittingEntityManager em;
+
   Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
   @Inject
-  public TestBackend(tillerino.tillerinobot.TestBackend backend) {
+  public TestBackend(tillerino.tillerinobot.TestBackend backend, IrcNameResolver resolver,
+      EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em) {
     this.botBackend = backend;
+    this.resolver = resolver;
+    this.emf = emf;
+    this.em = em;
 
     try (Reader reader =
         new InputStreamReader(new BufferedInputStream(new FileInputStream("ppaddict-db.json")))) {
@@ -124,10 +140,13 @@ public class TestBackend implements PpaddictBackend {
       @Override
       public void run() {
         String osuName = new Scanner(System.in).nextLine();
+        em.setThreadLocalEntityManager(emf.createEntityManager());
         try {
           link(ppaddictId, osuName);
         } catch (SQLException | IOException e) {
           e.printStackTrace();
+        } finally {
+          em.close();
         }
       }
     }.start();
@@ -142,7 +161,7 @@ public class TestBackend implements PpaddictBackend {
 
     botBackend.hintUser(osuName, false, 100, 1000);
 
-    int osuId = botBackend.resolveIRCName(osuName);
+    int osuId = resolver.resolveIRCName(osuName);
     @PpaddictId
     String forwardedId = "osu:" + osuId;
 
