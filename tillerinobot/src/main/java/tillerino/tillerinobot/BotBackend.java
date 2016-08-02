@@ -87,30 +87,6 @@ public interface BotBackend {
 	public int getDonator(@Nonnull OsuApiUser user) throws SQLException, IOException;
 	
 	/**
-	 * resolve an IRC username
-	 * @param ircName
-	 * @return null if the name could not be resolved
-	 * @throws SQLException
-	 * @throws IOException API exception
-	 */
-	@CheckForNull @UserId
-	public Integer resolveIRCName(@IRCName @Nonnull String ircName)
-			throws SQLException, IOException;
-	
-	/**
-	 * Tries to resolve a user manually by checking their user id.
-	 * 
-	 * @param userid
-	 *            the user id to be checked. Information about this will be
-	 *            pulled from the osu api.
-	 * @return the resolved user or null if the user id does not exist in the
-	 *         API.
-	 */
-	@CheckForNull
-	public OsuApiUser resolveManually(@UserId int userid) throws SQLException,
-			IOException;
-
-	/**
 	 * will load a sampler
 	 * @param userid
 	 * @param exclude these maps will be excluded (give top50 and previously given recommendations)
@@ -192,4 +168,7 @@ public interface BotBackend {
 	 * @throws IOException
 	 */
 	@Nonnull public List<OsuApiScore> getRecentPlays(@UserId int userid) throws IOException;
+
+	@CheckForNull
+	public OsuApiUser downloadUser(String userName) throws IOException, SQLException;
 }

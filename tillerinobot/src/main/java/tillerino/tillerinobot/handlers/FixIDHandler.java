@@ -5,26 +5,22 @@ import java.sql.SQLException;
 
 import javax.inject.Inject;
 
+import lombok.RequiredArgsConstructor;
+
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FixIDHandler implements CommandHandler {
 	private static final String COMMAND = "!fixid";
-	BotBackend backend;
-
-	@Inject
-	public FixIDHandler(BotBackend backend) {
-		super();
-		this.backend = backend;
-	}
+    private final IrcNameResolver resolver;
 
 	@Override
 	public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
@@ -37,7 +33,7 @@ public class FixIDHandler implements CommandHandler {
         String idStr = command.substring(COMMAND.length()).trim();
 		int id = parseId(idStr);
 
-		OsuApiUser user = backend.resolveManually(id);
+		OsuApiUser user = resolver.resolveManually(id);
 		if(user == null) {
 			ircUser.message("That user-id does not exist :(");
 		} else {

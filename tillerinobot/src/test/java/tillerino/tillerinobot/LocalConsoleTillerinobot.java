@@ -1,7 +1,9 @@
 package tillerino.tillerinobot;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.management.ManagementFactory;
 import java.net.Socket;
@@ -13,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import javax.inject.Singleton;
+import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.core.UriBuilder;
 
 import org.eclipse.jetty.server.Server;
@@ -32,8 +35,11 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.output.OutputIRC;
 import org.pircbotx.output.OutputUser;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
+import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -69,11 +75,26 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
+		bind(ThreadLocalAutoCommittingEntityManager.class).in(Singleton.class);
+		bind(EntityManagerFactory.class).toInstance(AbstractDatabaseTest.newEntityManagerFactory());
+	}
+	
+	@Provides
+	@Singleton
+	public UserNameMappingRepository repo(EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em) {
+		em.setThreadLocalEntityManager(emf.createEntityManager());
+		try {
+			return new JpaRepositoryFactory(em).getRepository(UserNameMappingRepository.class);
+		} finally {
+			em.close();
+		}
 	}
 
 	@Provides
 	@Singleton
-	public BotRunner getRunner(final IRCBot bot, final BotBackend backend) throws Exception {
+	public BotRunner getRunner(final IRCBot bot, final BotBackend backend,
+			final IrcNameResolver resolver, EntityManagerFactory emf,
+			ThreadLocalAutoCommittingEntityManager em) throws Exception {
 		final PircBotX pircBot = mock(PircBotX.class);
 		when(pircBot.isConnected()).thenReturn(true);
 		when(pircBot.getSocket()).thenReturn(mock(Socket.class));
@@ -148,7 +169,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				final String username = scanner.nextLine();
 				when(user.getNick()).thenReturn(username);
 
-				if (backend.resolveIRCName(username) == null
+				em.setThreadLocalEntityManager(emf.createEntityManager());
+				if (resolver.resolveIRCName(username) == null
 						&& backend instanceof TestBackend) {
 					System.out.println("you're new. I'll have to ask you a couple of questions.");
 
@@ -163,7 +185,9 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 					((TestBackend) backend).hintUser(username, donator, rank,
 							pp);
+					resolver.resolveManually(backend.downloadUser(username).getUserId());
 				}
+				em.close();
 
 				System.out.println("Welcome to the Tillerinobot simulator");
 				System.out.println("To quit, send /q");

@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManagerFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +51,7 @@ import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.DebugHandler;
 import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
@@ -93,6 +95,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		 */
 		boolean action(String msg);
 	}
+
+	public static final String MDC_HANDLER = "handler";
+	public static final String MDC_STATE = "state";
 	
 	final BotBackend backend;
 	final private boolean silent;
@@ -100,17 +105,25 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	final BotInfo botInfo;
 	final UserDataManager userDataManager;
 	final List<CommandHandler> commandHandlers = new ArrayList<>();
+	final ThreadLocalAutoCommittingEntityManager em;
+	final EntityManagerFactory emf;
+	final IrcNameResolver resolver;
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
 			BotInfo botInfo, UserDataManager userDataManager,
-			Pinger pinger, @Named("tillerinobot.ignore") boolean silent) {
+			Pinger pinger, @Named("tillerinobot.ignore") boolean silent,
+			ThreadLocalAutoCommittingEntityManager em,
+			EntityManagerFactory emf, IrcNameResolver resolver) {
 		this.backend = backend;
 		this.manager = manager;
 		this.botInfo = botInfo;
 		this.userDataManager = userDataManager;
 		this.pinger = pinger;
 		this.silent = silent;
+		this.em = em;
+		this.emf = emf;
+		this.resolver = resolver;
 		
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler());
@@ -118,7 +131,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		commandHandlers.add(new WithHandler(backend));
 		commandHandlers.add(new RecommendHandler(backend, manager));
 		commandHandlers.add(new RecentHandler(backend));
-		commandHandlers.add(new DebugHandler(backend));
+		commandHandlers.add(new DebugHandler(backend, resolver));
 	}
 
 	@Override
@@ -134,11 +147,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		
 		if (event.getChannel() == null || event.getUser().getNick().equals("Tillerino")) {
 			MDC.put("user", event.getUser().getNick());
-			try {
-				processPrivateAction(fromIRC(event.getUser(), event), event.getMessage());
-			} finally {
-				MDC.remove("user");
-			}
+			processPrivateAction(fromIRC(event.getUser(), event), event.getMessage());
 		}
 	}
 	
@@ -308,11 +317,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			return;
 		
 		MDC.put("user", event.getUser().getNick());
-		try {
-			processPrivateMessage(fromIRC(event.getUser(), event), event.getMessage());
-		} finally {
-			MDC.remove("user");
-		}
+		processPrivateMessage(fromIRC(event.getUser(), event), event.getMessage());
 	}
 	
 	Semaphore senderSemaphore = new Semaphore(1, true);
@@ -342,8 +347,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					return false;
 				} finally {
 					senderSemaphore.release();
-					MDC.remove("ping");
-					MDC.remove("duration");
 				}
 			}
 			
@@ -358,6 +361,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().action(msg);
+					MDC.put("duration", System.currentTimeMillis() - event.getTimestamp() + "");
 					log.debug("sent action: " + msg);
 					return true;
 				} catch (IOException | InterruptedException e) {
@@ -365,7 +369,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					return false;
 				} finally {
 					senderSemaphore.release();
-					MDC.remove("ping");
 				}
 			}
 			
@@ -379,6 +382,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	}
 	
 	void processPrivateMessage(final IRCBotUser user, String originalMessage) {
+		MDC.put(MDC_STATE, "msg");
 		log.debug("received: " + originalMessage);
 
 		Language lang = new Default();
@@ -390,7 +394,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 
 		try {
-			if (new FixIDHandler(backend).handle(originalMessage, user, null, null)) {
+			if (new FixIDHandler(resolver).handle(originalMessage, user, null, null)) {
 				return;
 			}
 			OsuApiUser apiUser = getUserOrThrow(user);
@@ -465,6 +469,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	@Override
 	public void onEvent(Event event) throws Exception {
 		MDC.put("event", "" + lastSerial.incrementAndGet());
+		em.setThreadLocalEntityManager(emf.createEntityManager());
 		try {
 			botInfo.setLastInteraction(System.currentTimeMillis());
 
@@ -476,7 +481,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 			super.onEvent(event);
 		} finally {
-			MDC.remove("event");
+			em.close();
+			MDC.clear();
 		}
 	}
 	
@@ -511,21 +517,17 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 
 		MDC.put("user", nick);
-		try {
-			IRCBotUser user = fromIRC(event.getUser(), event);
-			welcomeIfDonator(user);
-	
-			scheduleRegisterActivity(nick);
-		} finally {
-			MDC.remove("user");
-		}
+		IRCBotUser user = fromIRC(event.getUser(), event);
+		welcomeIfDonator(user);
+
+		scheduleRegisterActivity(nick);
 	}
 	
 	void welcomeIfDonator(IRCBotUser user) {
 		try {
 			Integer userid;
 			try {
-				userid = backend.resolveIRCName(user.getNick());
+				userid = resolver.resolveIRCName(user.getNick());
 			} catch (SocketTimeoutException e1) {
 				log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
 				return;
@@ -570,10 +572,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				@Override
 				public void run() {
 					MDC.put("user", nick);
+					em.setThreadLocalEntityManager(emf.createEntityManager());
 					try {
 						registerActivity(nick);
 					} finally {
-						MDC.remove("user");
+						em.close();
+						MDC.clear();
 					}
 				}
 			});
@@ -616,7 +620,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 	private void registerActivity(final @IRCName String fNick) {
 		try {
-			Integer userid = backend.resolveIRCName(fNick);
+			Integer userid = resolver.resolveIRCName(fNick);
 			
 			if(userid == null) {
 				return;
@@ -632,7 +636,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 	@Nonnull
 	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException {
-		Integer userId = backend.resolveIRCName(user.getNick());
+		Integer userId = resolver.resolveIRCName(user.getNick());
 		
 		if(userId == null) {
 			String string = IRCBot.getRandomString(8);

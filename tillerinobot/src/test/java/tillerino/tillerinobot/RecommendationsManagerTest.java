@@ -11,7 +11,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
 import tillerino.tillerinobot.lang.Default;
 
-public class RecommendationsManagerTest {
+public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	TestBackend backend = new TestBackend(false);
 
 	RecommendationsManager manager = new RecommendationsManager(backend);

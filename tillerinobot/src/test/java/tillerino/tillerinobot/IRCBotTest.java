@@ -22,13 +22,14 @@ import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
-public class IRCBotTest {
+public class IRCBotTest extends AbstractDatabaseTest {
 	@Test
 	public void testVersionMessage() throws IOException, SQLException, UserException {
 		IRCBot bot = getTestBot(backend);
 		
 		backend.hintUser("user", false, 0, 0);
-
+		backend.setLastVisitedVersion("user", 0);
+		
 		IRCBotUser user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("user");
 		when(user.message(anyString())).thenReturn(true);
@@ -79,8 +80,9 @@ public class IRCBotTest {
 		OsuApiUser osuApiUser = mock(OsuApiUser.class);
 		when(osuApiUser.getUserName()).thenReturn("TheDonator");
 
-		when(backend.resolveIRCName(anyString())).thenReturn(1);
-		when(backend.getUser(eq(1), anyLong())).thenReturn(osuApiUser);
+		this.backend.hintUser("TheDonator", true, 1, 1);
+		int userid = resolver.getIDByUserName("TheDonator");
+		when(backend.getUser(eq(userid), anyLong())).thenReturn(osuApiUser);
 		when(backend.getDonator(any(OsuApiUser.class))).thenReturn(1);
 		
 		IRCBotUser user = mock(IRCBotUser.class);
@@ -108,17 +110,21 @@ public class IRCBotTest {
 	IRCBot getTestBot(BotBackend backend) {
 		IRCBot ircBot = new IRCBot(backend, spy(new RecommendationsManager(
 				backend)), new BotInfo(), new UserDataManager(
-				backend), mock(Pinger.class), false);
+				backend), mock(Pinger.class), false, em, emf, resolver);
 		return ircBot;
 	}
 	
 	@Before
 	public void mockBackend() {
 		MockitoAnnotations.initMocks(this);
+		
+		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 	}
 	
 	@Spy
 	TestBackend backend = new TestBackend(false);
+	
+	IrcNameResolver resolver;
 	
 	@Test
 	public void testHugs() throws Exception {
@@ -161,7 +167,7 @@ public class IRCBotTest {
 
 		bot.processPrivateMessage(botUser, "!reset");
 
-		Integer id = backend.resolveIRCName("user");
+		Integer id = resolver.resolveIRCName("user");
 
 		verify(backend).forgetRecommendations(id);
 		verify(bot.manager).forgetRecommendations(id);

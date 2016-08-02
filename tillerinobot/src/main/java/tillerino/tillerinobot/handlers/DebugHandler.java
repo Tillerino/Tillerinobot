@@ -14,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 
@@ -21,7 +22,9 @@ import tillerino.tillerinobot.UserException;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 @SuppressFBWarnings("TQ")
 public class DebugHandler implements CommandHandler {
-	BotBackend backend;
+	private final BotBackend backend;
+	
+	private final IrcNameResolver resolver;
 
 	static final String DEBUG = "debug ";
 
@@ -40,7 +43,7 @@ public class DebugHandler implements CommandHandler {
 							"resolve ",
 							(command, ircUser, apiUser, userData) -> {
 								ircUser.message(command + " resolves to "
-										+ backend.resolveIRCName(command));
+										+ resolver.resolveIRCName(command));
 							})
 					.or(CommandHandler.alwaysHandling(
 							"getUserByIdCached ",

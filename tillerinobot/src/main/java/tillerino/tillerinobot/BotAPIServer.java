@@ -10,6 +10,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
 import tillerino.tillerinobot.rest.BeatmapInfoService;
 import tillerino.tillerinobot.rest.BotInfoService;
 import tillerino.tillerinobot.rest.UserByIdService;
@@ -21,13 +22,14 @@ public class BotAPIServer extends Application {
 	Set<Object> resourceInstances = new HashSet<>();
 
 	@Inject
-	public BotAPIServer(BotRunner bot, BotBackend backend,
-						BotInfoService botInfo, BeatmapInfoService beatmapInfo, UserByIdService userById) {
+	public BotAPIServer(BotInfoService botInfo, BeatmapInfoService beatmapInfo,
+			UserByIdService userById, EntityManagerProxyFeature proxyFeature) {
 		super();
 
 		resourceInstances.add(botInfo);
 		resourceInstances.add(beatmapInfo);
 		resourceInstances.add(userById);
+		resourceInstances.add(proxyFeature);
 	}
 
 	@Override

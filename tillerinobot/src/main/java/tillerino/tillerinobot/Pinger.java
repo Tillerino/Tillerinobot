@@ -19,7 +19,7 @@ import org.slf4j.MDC;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.PingerMXBean;
-import tillerino.tillerinobot.rest.BotInfoService;
+import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 public class Pinger {
 	@Singleton
@@ -82,12 +82,12 @@ public class Pinger {
 	volatile CountDownLatch pingLatch = null;
 	final AtomicBoolean quit = new AtomicBoolean(false);
 	
-	final BotInfoService botInfoService;
+	final BotInfo botInfo;
 	private Pinger.MXBean bean;
 
 	@Inject
-	public Pinger(BotInfoService infoService, Pinger.MXBean bean) {
-		this.botInfoService = infoService;
+	public Pinger(BotInfo infoService, Pinger.MXBean bean) {
+		this.botInfo = infoService;
 		this.bean = bean;
 	}
 

@@ -9,11 +9,15 @@ import org.mockito.MockitoAnnotations;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 
 public class DebugHandlerTest {
 	@Mock
 	BotBackend backend;
+	
+	@Mock
+	IrcNameResolver resolver;
 	
 	@Mock
 	IRCBotUser ircBotUser;
@@ -26,7 +30,7 @@ public class DebugHandlerTest {
 	public void initMocks() {
 		MockitoAnnotations.initMocks(this);
 		
-		handler = new DebugHandler(backend);
+		handler = new DebugHandler(backend, resolver);
 		userData.setAllowedToDebug(true);
 	}
 	

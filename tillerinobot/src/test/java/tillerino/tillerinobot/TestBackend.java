@@ -32,9 +32,6 @@ import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
@@ -42,8 +39,9 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.CBeatmap;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * <p>
@@ -177,7 +175,7 @@ public class TestBackend implements BotBackend {
 		}
 	}
 
-	Database database = new Database();
+	public static Database database = new Database();
 
 	@Override
 	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
@@ -246,21 +244,26 @@ public class TestBackend implements BotBackend {
 
 	public void hintUser(String username, boolean isDonator, int rank, double pp)
 			throws SQLException, IOException {
+		User user;
+		boolean write = false;
 		if (!database.userNames.containsKey(username)) {
-			database.userNames.put(username, database.userNames.size() + 1);
-
-			int userid = resolveIRCName(username);
-
-			User user = new User();
-
-			user.isDonator = isDonator;
+			write = true;
+			int userid = database.userNames.size() + 1;
+			user = new User();
 			user.apiUser = new OsuApiUser();
-			user.apiUser.setUserName(username);
 			user.apiUser.setUserId(userid);
-			user.apiUser.setPp(pp);
-			user.apiUser.setRank(rank);
-
+			database.userNames.put(username, userid);
 			database.users.put(userid, user);
+		}
+		
+		user = database.users.get(database.userNames.get(username));
+		
+		user.isDonator = isDonator;
+		user.apiUser.setUserName(username);
+		user.apiUser.setPp(pp);
+		user.apiUser.setRank(rank);
+		
+		if (write) {
 			writeDatabase();
 		}
 	}
@@ -275,11 +278,7 @@ public class TestBackend implements BotBackend {
 	@Override
 	public int getLastVisitedVersion(String nick) throws SQLException,
 			UserException {
-		try {
-			return database.users.get(resolveIRCName(nick)).lastVisistedVersion;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return database.users.get(database.userNames.get(nick)).lastVisistedVersion;
 	}
 
 	@Override
@@ -305,11 +304,7 @@ public class TestBackend implements BotBackend {
 	@Override
 	public void setLastVisitedVersion(String nick, int version)
 			throws SQLException {
-		try {
-			database.users.get(resolveIRCName(nick)).lastVisistedVersion = version;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		database.users.get(database.userNames.get(nick)).lastVisistedVersion = version;
 		writeDatabase();
 	}
 
@@ -333,12 +328,6 @@ public class TestBackend implements BotBackend {
 	@Override
 	public int getDonator(OsuApiUser user) throws SQLException, IOException {
 		return database.users.get(user.getUserId()).isDonator ? 1 : 0;
-	}
-
-	@Override
-	public Integer resolveIRCName(String ircName) throws SQLException,
-			IOException {
-		return database.userNames.get(ircName);
 	}
 
 	@Override
@@ -442,14 +431,12 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public OsuApiUser resolveManually(int userid) throws SQLException,
-			IOException {
-		if(userid <= 0) {
+	public OsuApiUser downloadUser(String userName) throws IOException,
+			SQLException {
+		Integer userid = database.userNames.get(userName);
+		if (userid == null) {
 			return null;
 		}
-		OsuApiUser osuApiUser = mock(OsuApiUser.class);
-		when(osuApiUser.getUserName()).thenReturn("user with id " + userid);
-		when(osuApiUser.getUserId()).thenReturn(userid);
-		return osuApiUser;
+		return database.users.get(userid).apiUser;
 	}
 }
