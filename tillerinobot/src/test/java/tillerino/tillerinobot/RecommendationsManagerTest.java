@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -16,12 +18,13 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	RecommendationsManager manager = new RecommendationsManager(backend);
 
-	OsuApiUser user = new OsuApiUser();
+	OsuApiUser user;
 
-	public RecommendationsManagerTest() throws SQLException, IOException {
-		backend.hintUser("user", true, 1, 1000);
+	@Before
+	public void createUser() throws SQLException, IOException {
+		backend.hintUser("donator", true, 1, 1000);
 
-		user.setUserId(1);
+		user = backend.downloadUser("donator");
 	}
 
 	@Test
