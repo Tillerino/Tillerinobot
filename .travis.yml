@@ -1,8 +1,14 @@
 language: java
 jdk:
   - oraclejdk8
+sudo: required
+dist: trusty
 before_install:
-  - cd tillerinobot
+  - git clone https://github.com/Tillerino/oppai.git
+  - cd oppai
+  - ./build.sh
+  - sudo cp oppai /bin
+  - cd ../tillerinobot
 
 # we're not installing anything
 install: true
