@@ -1,3 +1,8 @@
 # Tillerinobot
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Tillerino/Tillerinobot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+This project contains the IRC frontend and a growing part of the backend for ppaddict recommendations and similar services.
+The web frontend can be found in the [ppaddict](https://github.com/Tillerino/ppaddict) project.
+
+Please visit the [wiki](https://github.com/Tillerino/Tillerinobot/wiki) for documentation.
+
+Join the discussion on [discord](https://discord.gg/0ww19XGd9XsiJ4LI)!
