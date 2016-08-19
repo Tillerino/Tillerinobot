@@ -90,7 +90,7 @@ public class RecommendHandler implements CommandHandler {
 				userData.getHearts(), null, null, null))) {
 			userData.setLastSongInfo(new BeatmapWithMods(beatmap.getBeatmap()
 					.getBeatmapId(), beatmap.getMods()));
-			backend.saveGivenRecommendation(apiUser.getUserId(), beatmap
+			manager.saveGivenRecommendation(apiUser.getUserId(), beatmap
 					.getBeatmap().getBeatmapId(), recommendation.bareRecommendation
 					.getMods());
 

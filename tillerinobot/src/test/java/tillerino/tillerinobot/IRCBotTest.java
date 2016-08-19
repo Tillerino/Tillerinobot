@@ -108,9 +108,17 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	}
 	
 	IRCBot getTestBot(BotBackend backend) {
-		IRCBot ircBot = new IRCBot(backend, spy(new RecommendationsManager(
-				backend)), new BotInfo(), new UserDataManager(
-				backend), mock(Pinger.class), false, em, emf, resolver);
+		RecommendationsManager recMan;
+		if (backend == this.backend) {
+			recMan = this.recommendationsManager;
+		} else {
+			recMan = spy(new RecommendationsManager(backend,
+					recommendationsRepo, em));
+		}
+
+		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
+				new UserDataManager(backend), mock(Pinger.class), false, em,
+				emf, resolver);
 		return ircBot;
 	}
 	
@@ -119,12 +127,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		MockitoAnnotations.initMocks(this);
 		
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
+		
+		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em));
 	}
 	
 	@Spy
 	TestBackend backend = new TestBackend(false);
 	
 	IrcNameResolver resolver;
+	
+	RecommendationsManager recommendationsManager;
 	
 	@Test
 	public void testHugs() throws Exception {
@@ -161,21 +173,19 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		IRCBot bot = getTestBot(backend);
 
 		backend.hintUser("user", false, 0, 1000);
-
-		IRCBotUser botUser = mock(IRCBotUser.class);
-		when(botUser.getNick()).thenReturn("user");
+		IRCBotUser botUser = mockBotUser("user");
 
 		bot.processPrivateMessage(botUser, "!reset");
 
 		Integer id = resolver.resolveIRCName("user");
 
-		verify(backend).forgetRecommendations(id);
+		verify(recommendationsManager).forgetRecommendations(id);
 		verify(bot.manager).forgetRecommendations(id);
 	}
 
 	IRCBotUser mockBotUser(String name) {
 		IRCBotUser botUser = mock(IRCBotUser.class);
-		when(botUser.getNick()).thenReturn("user");
+		when(botUser.getNick()).thenReturn(name);
 		when(botUser.message(anyString())).thenAnswer(new Answer<Boolean>() {
 			@Override
 			public Boolean answer(InvocationOnMock invocation) throws Throwable {

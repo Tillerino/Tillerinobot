@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -21,10 +22,8 @@ import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
@@ -34,6 +33,10 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
+import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.data.GivenRecommendation;
+import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
@@ -41,7 +44,6 @@ import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
 import tillerino.tillerinobot.mbeans.RecommendationsManagerMXBean;
 import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
-import tillerino.tillerinobot.UserException.RareUserException;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -54,6 +56,7 @@ import com.google.common.cache.LoadingCache;
  * @author Tillerino
  */
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RecommendationsManager extends AbstractMBeanRegistration implements RecommendationsManagerMXBean {
 	/**
 	 * Recommendation as returned by the backend. Needs to be enriched before being displayed.
@@ -83,35 +86,6 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		 * @return this is not normed, so the sum of all probabilities can be greater than 1 and this must be accounted for!
 		 */
 		double getProbability();
-	}
-	
-	@Data
-	public static class GivenRecommendation {
-		public GivenRecommendation(@UserId int userid, @BeatmapId int beatmapid, long date, @BitwiseMods long mods) {
-			super();
-			this.userid = userid;
-			this.beatmapid = beatmapid;
-			this.date = date;
-			this.mods = mods;
-		}
-
-		protected GivenRecommendation() {
-
-		}
-
-		@UserId
-		@Getter(onMethod = @__(@UserId))
-		@Setter(onParam = @__(@UserId))
-		public int userid;
-		@BeatmapId
-		@Getter(onMethod = @__(@BeatmapId))
-		@Setter(onParam = @__(@BeatmapId))
-		public int beatmapid;
-		public long date;
-		@BitwiseMods
-		@Getter(onMethod = @__(@BitwiseMods))
-		@Setter(onParam = @__(@BitwiseMods))
-		public long mods;
 	}
 	
 	/**
@@ -211,14 +185,13 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		}
 	}
 	
-	BotBackend backend;
+	private final BotBackend backend;
+	
+	private final GivenRecommendationRepository recommendationsRepo;
+	
+	private final ThreadLocalAutoCommittingEntityManager em;
 
 	PredicateParser parser = new PredicateParser();
-
-	@Inject
-	public RecommendationsManager(BotBackend backend) {
-		this.backend = backend;
-	}
 
 	@Override
 	public ObjectName preRegister(MBeanServer server, ObjectName objectName)
@@ -232,16 +205,9 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	public Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
 			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).recordStats().build();
 
-	public LoadingCache<Integer, List<Integer>> givenRecomendations =  CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).recordStats().build(new CacheLoader<Integer, List<Integer>>() {
-		@Override
-		public List<Integer> load(@UserId Integer key) throws Exception {
-			List<Integer> list = new ArrayList<>();
-			for (GivenRecommendation recommendation : backend.loadGivenRecommendations(key)) {
-				list.add(recommendation.getBeatmapid());
-			}
-			return list;
-		}
-	});
+	public LoadingCache<Integer, List<GivenRecommendation>> givenRecomendations = CacheBuilder
+			.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).recordStats()
+			.build(CacheLoader.from(this::doLoadGivenRecommendations));
 	
 	public CacheMXBean givenRecomendationsMXBean = new CacheMXBeanImpl(givenRecomendations, getClass(), "givenRecommendations");
 	
@@ -305,9 +271,12 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			Settings settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
 
 			if (sampler == null || !sampler.settings.equals(settings)) {
-				Collection<BareRecommendation> recommendations = backend.loadRecommendations(userid,
-						givenRecomendations.getUnchecked(userid), settings.model, settings.nomod,
-						settings.requestedMods);
+				List<Integer> exclude = loadGivenRecommendations(userid)
+						.stream().map(GivenRecommendation::getBeatmapid)
+						.collect(Collectors.toList());
+				Collection<BareRecommendation> recommendations = backend
+						.loadRecommendations(userid, exclude, settings.model,
+								settings.nomod, settings.requestedMods);
 
 				// only keep the 1k most probable recommendations to save some
 				// memory
@@ -360,10 +329,16 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		 * save recommendation internally
 		 */
 
-		givenRecomendations.getUnchecked(userid).add(beatmapid);
+		loadGivenRecommendations(userid).add(toGivenRecommendation(sample, userid));
 		lastRecommendation.put(userid, recommendation);
 
 		return recommendation;
+	}
+
+	private GivenRecommendation toGivenRecommendation(
+			BareRecommendation sample, @UserId int userid) {
+		return new GivenRecommendation(userid, sample.getBeatmapId(),
+				System.currentTimeMillis(), sample.getMods());
 	}
 
 	public Settings parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message,
@@ -479,8 +454,56 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		return arrayList;
 	}
 
-	public void forgetRecommendations(@UserId int userid) throws SQLException {
-		givenRecomendations.getUnchecked(userid).clear();
-		backend.forgetRecommendations(userid);
+	/**
+	 * forgets all given recommendations of the past for a single user
+	 * 
+	 * @param user
+	 */
+	public void forgetRecommendations(@UserId int user) {
+		em.ensureTransaction(() -> recommendationsRepo.forgetAll(user));
+		givenRecomendations.getUnchecked(user).clear();
+	}
+	
+	public void saveGivenRecommendation(@UserId int userid,
+			@BeatmapId int beatmapid, @BitwiseMods long mods)
+			throws SQLException {
+		GivenRecommendation givenRecommendation = new GivenRecommendation(
+				userid, beatmapid, System.currentTimeMillis(), mods);
+		recommendationsRepo.save(givenRecommendation);
+	}
+	
+	/**
+	 * recommendations from the last four weeks
+	 * @param userid
+	 * @return ordered by date given from newest to oldest
+	 */
+	public List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) {
+		return givenRecomendations.getUnchecked(userid);
+	}
+
+	private List<GivenRecommendation> doLoadGivenRecommendations(@UserId int userid) {
+		// we have to make a copy here since this list will escape the current entity manager
+		return new ArrayList<>(recommendationsRepo
+				.findByUseridAndDateGreaterThanAndForgottenFalseOrderByDateDesc(
+						userid, System.currentTimeMillis() - 28l * 24 * 60 * 60
+								* 1000));
+	}
+	
+	/**
+	 * Hide a recommendation. It will no longer be displayed in ppaddict, but
+	 * still taken into account when generating new recommendations.
+	 */
+	public void hideRecommendation(@UserId int userId,
+			@BeatmapId int beatmapid, @BitwiseMods long mods)
+			throws SQLException {
+		em.ensureTransaction(() -> recommendationsRepo.hideRecommendations(userId, beatmapid, mods));
+	}
+
+	/**
+	 * non-hidden recommendations. These might be older than four weeks.
+	 * @returnordered by date given from newest to oldest
+	 */
+	public List<GivenRecommendation> loadVisibleRecommendations(@UserId int userId) {
+		return recommendationsRepo.findByUseridAndHiddenFalseOrderByDateDesc(userId);
 	}
 }

@@ -35,10 +35,9 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.output.OutputIRC;
 import org.pircbotx.output.OutputUser;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 
+import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
-import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 
 import com.google.inject.AbstractModule;
@@ -69,25 +68,14 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		install(new CreateInMemoryDatabaseModule());
+		
 		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore"))
 				.toInstance(false);
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
-		bind(ThreadLocalAutoCommittingEntityManager.class).in(Singleton.class);
-		bind(EntityManagerFactory.class).toInstance(AbstractDatabaseTest.newEntityManagerFactory());
-	}
-	
-	@Provides
-	@Singleton
-	public UserNameMappingRepository repo(EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em) {
-		em.setThreadLocalEntityManager(emf.createEntityManager());
-		try {
-			return new JpaRepositoryFactory(em).getRepository(UserNameMappingRepository.class);
-		} finally {
-			em.close();
-		}
 	}
 
 	@Provides

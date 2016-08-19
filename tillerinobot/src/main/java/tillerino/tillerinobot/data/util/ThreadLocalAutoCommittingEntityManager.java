@@ -282,13 +282,12 @@ public class ThreadLocalAutoCommittingEntityManager implements
 
 	@Override
 	public <T> T merge(T entity) {
-		return ensureTransaction(false,
-				() -> getTargetEntityManager().merge(entity));
+		return ensureTransaction(() -> getTargetEntityManager().merge(entity));
 	}
 
 	@Override
 	public void persist(Object entity) {
-		ensureTransaction(false, () -> getTargetEntityManager().persist(entity));
+		ensureTransaction(() -> getTargetEntityManager().persist(entity));
 	}
 
 	@Override
@@ -314,7 +313,7 @@ public class ThreadLocalAutoCommittingEntityManager implements
 
 	@Override
 	public void remove(Object entity) {
-		ensureTransaction(false, () -> {
+		ensureTransaction(() -> {
 			getTargetEntityManager().remove(entity);
 		});
 	}
@@ -338,7 +337,7 @@ public class ThreadLocalAutoCommittingEntityManager implements
 		return getTargetEntityManager().unwrap(cls);
 	}
 
-	public <T> T ensureTransaction(boolean rollbackOnException, Supplier<T> r) {
+	public <T> T ensureTransaction(Supplier<T> r) {
 		EntityTransaction transaction = getTargetEntityManager()
 				.getTransaction();
 		boolean createTransaction = !transaction.isActive();
@@ -349,7 +348,7 @@ public class ThreadLocalAutoCommittingEntityManager implements
 		try {
 			return r.get();
 		} catch (Exception e) {
-			if (createTransaction && rollbackOnException) {
+			if (createTransaction) {
 				rolledBack = true;
 				transaction.rollback();
 			}
@@ -361,8 +360,8 @@ public class ThreadLocalAutoCommittingEntityManager implements
 		}
 	}
 
-	public void ensureTransaction(boolean rollbackOnException, Runnable r) {
-		ensureTransaction(rollbackOnException, () -> {
+	public void ensureTransaction(Runnable r) {
+		ensureTransaction(() -> {
 			r.run();
 			return null;
 		});

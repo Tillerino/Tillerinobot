@@ -20,7 +20,6 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
@@ -48,8 +47,6 @@ public interface BotBackend {
 	@CheckForNull
 	public BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException, InterruptedException;
 
-	public void saveGivenRecommendation(@UserId int userid, @BeatmapId int beatmapid, @BitwiseMods long mods) throws SQLException;
-
 	/**
 	 * @param nick
 	 * @return the last version of the bot that was visited by this user. -1 if
@@ -59,14 +56,6 @@ public interface BotBackend {
 	 */
 	public int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
 	
-	/**
-	 * recommendations from the last two weeks
-	 * @param userid
-	 * @return ordered by date given from newest to oldest
-	 * @throws SQLException
-	 */
-	List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) throws SQLException;
-
 	public void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
 
 	/**
@@ -130,14 +119,6 @@ public interface BotBackend {
 	 * @throws SQLException
 	 */
 	public void saveOptions(@UserId int user, String options) throws SQLException;
-
-	/**
-	 * forgets all given recommendations of the past for a single user
-	 * 
-	 * @param user
-	 * @throws SQLException
-	 */
-	public void forgetRecommendations(@UserId int user) throws SQLException;
 
 	/**
 	 * Retreives beatmap. Implementation hint: this might be called a *lot* when

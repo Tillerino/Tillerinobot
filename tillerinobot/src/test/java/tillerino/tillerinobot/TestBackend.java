@@ -15,10 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import javax.inject.Inject;
@@ -26,14 +24,12 @@ import javax.inject.Named;
 
 import lombok.Getter;
 
-import org.apache.commons.lang3.tuple.MutablePair;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.CBeatmap;
@@ -114,7 +110,6 @@ public class TestBackend implements BotBackend {
 
 	static class User {
 		int lastVisistedVersion = 0;
-		LinkedList<MutablePair<GivenRecommendation, Boolean>> givenRecommendations = new LinkedList<>();
 		OsuApiUser apiUser;
 		boolean isDonator = false;
 		long lastActivity;
@@ -269,36 +264,9 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public void saveGivenRecommendation(int userid, int beatmapid, long mods) throws SQLException {
-		GivenRecommendation rec = new GivenRecommendation(userid, beatmapid, System.currentTimeMillis(), mods);
-		database.users.get(userid).givenRecommendations.push(new MutablePair<>(rec, true));
-		writeDatabase();
-	}
-
-	@Override
 	public int getLastVisitedVersion(String nick) throws SQLException,
 			UserException {
 		return database.users.get(database.userNames.get(nick)).lastVisistedVersion;
-	}
-
-	@Override
-	public List<GivenRecommendation> loadGivenRecommendations(int userid)
-			throws SQLException {
-		ArrayList<GivenRecommendation> ret = new ArrayList<>();
-		for (Entry<GivenRecommendation, Boolean> givenRecommendation : database.users.get(userid).givenRecommendations) {
-			ret.add(givenRecommendation.getKey());
-		}
-		return ret;
-	}
-
-	public List<GivenRecommendation> loadVisibleRecommendations(int userid) throws SQLException {
-		ArrayList<GivenRecommendation> ret = new ArrayList<>();
-		for (Entry<GivenRecommendation, Boolean> givenRecommendation : database.users.get(userid).givenRecommendations) {
-			if (givenRecommendation.getValue()) {
-				ret.add(givenRecommendation.getKey());
-			}
-		}
-		return ret;
 	}
 
 	@Override
@@ -405,19 +373,6 @@ public class TestBackend implements BotBackend {
 	public void saveOptions(int user, String options) throws SQLException {
 		database.users.get(user).options = options;
 		writeDatabase();
-	}
-
-	@Override
-	public void forgetRecommendations(int user) throws SQLException {
-		database.users.get(user).givenRecommendations.clear();
-	}
-
-	public void hideRecommendation(int userid, int beatmapid, long mods) {
-		for (MutablePair<GivenRecommendation, Boolean> rec : database.users.get(userid).givenRecommendations) {
-			if (rec.left.beatmapid == beatmapid && rec.left.mods == mods) {
-				rec.right = false;
-			}
-		}
 	}
 
 	@Override
