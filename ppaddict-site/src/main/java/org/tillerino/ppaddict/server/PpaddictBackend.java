@@ -1,20 +1,15 @@
 package org.tillerino.ppaddict.server;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.osuApiModel.types.BeatmapId;
-import org.tillerino.osuApiModel.types.BitwiseMods;
-import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.types.PpaddictId;
 
-import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
@@ -68,10 +63,4 @@ public interface PpaddictBackend {
    */
   @CheckForNull
   Map<BeatmapWithMods, BeatmapData> getBeatmaps();
-
-  public List<GivenRecommendation> loadVisibleRecommendations(@UserId int userId)
-      throws SQLException;
-
-  void hideRecommendation(@UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods)
-      throws SQLException;
 }

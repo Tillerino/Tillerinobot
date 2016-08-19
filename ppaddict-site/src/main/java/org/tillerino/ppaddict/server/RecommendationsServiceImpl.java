@@ -20,10 +20,10 @@ import org.tillerino.ppaddict.shared.PpaddictException;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.RecommendationsManager;
-import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
@@ -54,12 +54,8 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
 
     int osuId = userData.getLinkedOsuIdOrThrow();
 
-    List<GivenRecommendation> givenRecommendations;
-    try {
-      givenRecommendations = backend.loadVisibleRecommendations(osuId);
-    } catch (SQLException e) {
-      throw ExceptionsUtil.getLoggedWrappedException(log, e);
-    }
+    List<GivenRecommendation> givenRecommendations =
+        recommendationsManager.loadVisibleRecommendations(osuId);
 
     LinkedList<Beatmap> recommendations = new LinkedList<>();
 
@@ -101,7 +97,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
             continue;
           }
 
-          botBackend.saveGivenRecommendation(osuId,
+          recommendationsManager.saveGivenRecommendation(osuId,
               recommendation.bareRecommendation.getBeatmapId(),
               recommendation.bareRecommendation.getMods());
 
@@ -131,7 +127,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
           userDataService.getServerUserData(userDataService
               .getCredentialsOrThrow(getThreadLocalRequest()));
       int osuId = linkedData.getLinkedOsuIdOrThrow();
-      backend.hideRecommendation(osuId, beatmapid, longMods);
+      recommendationsManager.hideRecommendation(osuId, beatmapid, longMods);
       OsuApiUser apiUser = botBackend.getUser(osuId, 0);
       Recommendation recommendation = null;
       for (int i = 0; i < 10; i++) {
@@ -148,7 +144,8 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
         throw new PpaddictException(
             "Could not get a recommendation. Pls contact @Tillerino or /u/Tillerino");
       }
-      botBackend.saveGivenRecommendation(osuId, recommendation.bareRecommendation.getBeatmapId(),
+      recommendationsManager.saveGivenRecommendation(osuId,
+          recommendation.bareRecommendation.getBeatmapId(),
           recommendation.bareRecommendation.getMods());
       return beatmapTableService.makeBeatmap(linkedData, recommendation.beatmap);
     } catch (SQLException | UserException | IOException | InterruptedException e) {

@@ -1,6 +1,7 @@
 package org.tillerino.ppaddict;
 
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
+import org.tillerino.ppaddict.server.EntityManagerFilter;
 import org.tillerino.ppaddict.server.RecommendationsServiceImpl;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
 import org.tillerino.ppaddict.server.auth.AuthModule;
@@ -13,7 +14,7 @@ public class PpaddictModule extends ServletModule {
     serve("/ppaddict/beatmaps").with(BeatmapTableServiceImpl.class);
     serve("/ppaddict/user").with(UserDataServiceImpl.class);
     serve("/ppaddict/recommendations").with(RecommendationsServiceImpl.class);
-
+    filter("/ppaddict/*").through(EntityManagerFilter.class);
     install(new AuthModule());
   }
 }

@@ -17,7 +17,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -34,7 +33,6 @@ import org.tillerino.ppaddict.shared.types.PpaddictId;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IrcNameResolver;
-import tillerino.tillerinobot.RecommendationsManager.GivenRecommendation;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
@@ -203,15 +201,5 @@ public class TestBackend implements PpaddictBackend {
     }
 
     return ret;
-  }
-
-  @Override
-  public void hideRecommendation(int userId, int beatmapid, long mods) {
-    botBackend.hideRecommendation(userId, beatmapid, mods);
-  }
-
-  @Override
-  public List<GivenRecommendation> loadVisibleRecommendations(int userId) throws SQLException {
-    return botBackend.loadVisibleRecommendations(userId);
   }
 }
