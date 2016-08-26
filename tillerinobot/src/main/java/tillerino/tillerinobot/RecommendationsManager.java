@@ -187,6 +187,8 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	
 	private final BotBackend backend;
 	
+	private final UserDataManager dataManager;
+	
 	private final GivenRecommendationRepository recommendationsRepo;
 	
 	private final ThreadLocalAutoCommittingEntityManager em;
@@ -269,7 +271,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			 */
 
 			Settings settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
-
+			
 			if (sampler == null || !sampler.settings.equals(settings)) {
 				List<Integer> exclude = loadGivenRecommendations(userid)
 						.stream().map(GivenRecommendation::getBeatmapid)
@@ -353,7 +355,13 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			String param = remaining[i];
 			String lowerCase = param.toLowerCase();
 			if(lowerCase.length() == 0)
+			{
+				if(!dataManager.getData(apiUser.getUserId()).isRecommendModdedMaps())
+				{
+					settings.nomod = true;
+				}
 				continue;
+			}
 			if(getLevenshteinDistance(lowerCase, "nomod") <= 2) {
 				settings.nomod = true;
 				continue;

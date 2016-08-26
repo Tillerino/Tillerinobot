@@ -73,7 +73,13 @@ public class OptionsHandler implements CommandHandler {
 			} else {
 				ircUser.message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
 			}
-		} else {
+		} else if (getLevenshteinDistance(option, "recommendmods") <= 1) {
+			if (set) {
+				userData.setRecommendMods(parseBoolean(value, userData.getLanguage()));
+			} else {
+				ircUser.message("Recommend modded maps: " + (userData.isRecommendModdedMaps() ? "ON" : "OFF"));
+			}
+	    } else {
 			throw new UserException(userData.getLanguage().invalidChoice(option,
 					"Language" + (userData.getHearts() > 0 ? ", Welcome" : "")));
 		}

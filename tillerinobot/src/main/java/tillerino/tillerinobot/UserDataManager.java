@@ -205,6 +205,14 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			changed |= welcomeMessage != this.showWelcomeMessage;
 			this.showWelcomeMessage = welcomeMessage;
 		}
+		
+		@Getter
+		boolean recommendModdedMaps = true;
+		
+		public void setRecommendMods(boolean recommendMods) {
+	        changed |= recommendMods != this.recommendModdedMaps;
+	        this.recommendModdedMaps = recommendMods;
+		}
 	}
 	
 	final BotBackend backend;
