@@ -100,22 +100,6 @@ public class Greek implements Language {
 		return "Δοκίμασε αυτό το τραγούδι με " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Το ονομά σου με μπερδεύει. Είσαι απαγορευμένος; Εάν όχι, παρακαλώ [https://github.com/Tillerino/Tillerinobot/wiki/Contact επικοινώνησε με τον Tillerino]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Συγνώμη, υπήρχε αυτή η όμορφη σειρά από άσσους και μηδενικά και παρασύρθηκα. Τί ήθελες ξανα;";

@@ -99,22 +99,6 @@ public class Russian implements Language {
 		return "Попробуйте эту карту с " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Ваш ник меня настораживает. Вас забанили? Если нет, пожалуйста [https://github.com/Tillerino/Tillerinobot/wiki/Contact свяжитесь с Tillerino]. (назовите код "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Извините, я отвлекся на эту удивительную последовательность из нулей и единиц. Чем я могу быть полезен?";

@@ -117,6 +117,7 @@ public class Default implements Language {
 	 *            the irc nick which could not be resolved
 	 * @return
 	 */
+	// No need to translate this!!!
 	public String unresolvableName(String exceptionMarker, String name) {
 		return "Your name is confusing me. Are you banned? If not, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
 				+ exceptionMarker + ")";

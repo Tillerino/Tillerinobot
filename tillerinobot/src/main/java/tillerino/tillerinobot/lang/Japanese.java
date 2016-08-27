@@ -99,22 +99,6 @@ public class Japanese implements Language {
 		return Mods.toShortNamesContinuous(mods) + "と組み合わせてみてください。";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "あなたの名前を見るとなぜかおかしくなってしまいます。BANとかされてないですか？もし違うのなら、 [https://github.com/Tillerino/Tillerinobot/wiki/Contact Tillerinoに知らせて下さい]。 (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "すみません、ちょっと通りすがりの0と1の配列があまりにも魅力的だったので気をとられてしまいました。もう一回、要件を言ってください。";
