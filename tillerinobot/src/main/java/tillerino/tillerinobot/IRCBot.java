@@ -94,6 +94,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		 * @return true if the action was sent
 		 */
 		boolean action(String msg);
+
+		/**
+		 *
+		 * @return the bot instance
+         */
+		PircBotX getBot();
 	}
 
 	public static final String MDC_HANDLER = "handler";
@@ -378,6 +384,11 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			public String getNick() {
 				return user.getNick();
 			}
+
+			@Override
+			public PircBotX getBot() {
+				return event.getBot();
+			}
 		};
 	}
 	
@@ -641,7 +652,10 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		if(userId == null) {
 			String string = IRCBot.getRandomString(8);
 			log.error("bot user not resolvable " + string + " name: " + user.getNick());
-			
+
+			// send STAT-message to BanchoBot in attempt to resolve the name from BanchoBot response
+			sendMessageToBanchoBot(user.getBot(), "STAT " + user.getNick());
+
 			throw new UserException(new Default().unresolvableName(string, user.getNick()));
 		}
 		
@@ -652,6 +666,18 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 		
 		return apiUser;
+	}
+
+	private void sendMessageToBanchoBot(PircBotX bot, String msg) {
+		try {
+			pinger.ping((CloseableBot) bot);
+
+			bot.sendIRC().message("BanchoBot", msg);
+			log.debug("BanchoBot send: " + msg);
+			botInfo.setLastSentMessage(System.currentTimeMillis());
+		} catch (InterruptedException | IOException e) {
+			log.warn("BanchoBot not sent", e);
+		}
 	}
 
 	@Override
