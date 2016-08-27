@@ -112,7 +112,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		if (backend == this.backend) {
 			recMan = this.recommendationsManager;
 		} else {
-			recMan = spy(new RecommendationsManager(backend,
+			recMan = spy(new RecommendationsManager(
+					backend, new UserDataManager(backend),
 					recommendationsRepo, em));
 		}
 
@@ -128,7 +129,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 		
-		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em));
+		recommendationsManager = spy(new RecommendationsManager(backend, new UserDataManager(backend),
+				                                                recommendationsRepo, em));
 	}
 	
 	@Spy

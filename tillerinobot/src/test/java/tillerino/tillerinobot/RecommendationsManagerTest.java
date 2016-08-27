@@ -18,6 +18,8 @@ import tillerino.tillerinobot.lang.Default;
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	TestBackend backend = new TestBackend(false);
 
+	UserDataManager dataManager = new UserDataManager(backend);
+	
 	RecommendationsManager manager;
 
 	OsuApiUser user;
@@ -31,7 +33,8 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	
 	@Before
 	public void createRecommendationsManager() {
-		manager = new RecommendationsManager(backend, recommendationsRepo, em);
+		manager = new RecommendationsManager(backend, new UserDataManager(backend),
+				                             recommendationsRepo, em);
 	}
 
 	@Test
@@ -83,7 +86,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testHiding() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em);
+		RecommendationsManager recMan = new RecommendationsManager(null, new UserDataManager(backend), recommendationsRepo, em);
 
 		// save a recommendation and reload it
 		recMan.saveGivenRecommendation(1954, 2, 0);
