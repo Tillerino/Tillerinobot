@@ -127,4 +127,18 @@ public class IrcNameResolver {
 		repo.save(mapping);
 		return user;
 	}
+
+	/**
+	 * Set a UserNameMapping
+	 *
+	 * @param username The username of the user
+	 * @param userid The user-id of the user
+     */
+	public void setUserNameMapping(String username, int userid) {
+		UserNameMapping mapping = new UserNameMapping();
+		mapping.setResolved(System.currentTimeMillis());
+		mapping.setUserid(userid);
+		mapping.setUserName(username.replace(' ', '_'));
+		repo.save(mapping);
+	}
 }

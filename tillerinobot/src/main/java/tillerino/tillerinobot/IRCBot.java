@@ -18,6 +18,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -396,6 +397,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		MDC.put(MDC_STATE, "msg");
 		log.debug("received: " + originalMessage);
 
+		// check for BanchoBot
+		if(user.getNick().equalsIgnoreCase("BanchoBot")) {
+			processBanchoBotMessage(originalMessage);
+			return;
+		}
+
 		Language lang = new Default();
 
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
@@ -458,6 +465,21 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		} finally {
 			semaphore.release();
 		}
+	}
+
+	private static Pattern banchoBotStatResponsePattern = Pattern.compile("Stats for \\((.*\\))\\[https://osu.ppy.sh/u/(\\d+)\\].*");
+
+	private void processBanchoBotMessage(String message) {
+		Matcher matcher = banchoBotStatResponsePattern.matcher(message);
+		if(!matcher.matches()) {
+			// no stat-response message, ignore
+			return;
+		}
+
+		// match found, lets resolve that user-id
+		String username = matcher.group(1);
+		int userId = Integer.parseInt(matcher.group(2));
+		resolver.setUserNameMapping(username, userId);
 	}
 
 	private void checkVersionInfo(final IRCBotUser user) throws SQLException, UserException {
