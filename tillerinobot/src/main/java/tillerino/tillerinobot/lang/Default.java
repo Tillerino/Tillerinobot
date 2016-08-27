@@ -119,7 +119,8 @@ public class Default implements Language {
 	 */
 	// No need to translate this!!!
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
+		return "Your name is confusing me. Are you banned? I'll try to resolve this by myself, try again in a moment." +
+				"If that does not work please [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino] (reference "
 				+ exceptionMarker + ")";
 	}
 
