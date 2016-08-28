@@ -207,9 +207,9 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		}
 		
 		@Getter
-		boolean recommendModdedMaps = true;
+		RecommendationType[] recommendModdedMaps = new RecommendationType[]{RecommendationType.ANY};
 		
-		public void setRecommendMods(boolean recommendMods) {
+		public void setRecommendMods(RecommendationType[] recommendMods) {
 	        changed |= recommendMods != this.recommendModdedMaps;
 	        this.recommendModdedMaps = recommendMods;
 		}

@@ -104,7 +104,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	 * 
 	 * @author Tillerino
 	 */
-	public enum Model {
+	public static enum Model {
 		ALPHA,
 		BETA,
 		GAMMA
@@ -348,7 +348,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		String[] remaining = message.split(" ");
 		
 		Settings settings = new Settings();
-		
+		RecommendationType[] rt = dataManager.getData(apiUser.getUserId()).getRecommendModdedMaps();
 		settings.model = Model.GAMMA;
 
 		for (int i = 0; i < remaining.length; i++) {
@@ -356,9 +356,39 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			String lowerCase = param.toLowerCase();
 			if(lowerCase.length() == 0)
 			{
-				if(!dataManager.getData(apiUser.getUserId()).isRecommendModdedMaps())
-				{
-					settings.nomod = true;
+				for (int l = 0; l < rt.length; l++) {
+					if(rt.length == 0)
+					{
+						continue;
+					}
+					if(rt[l].equals(RecommendationType.NOMOD)) {
+						settings.nomod = true;
+						continue;
+					}
+					if(rt[l].equals(RecommendationType.RELAX)) {
+						settings.model = Model.ALPHA;
+						continue;
+					}
+					if(rt[l].equals(RecommendationType.BETA)) {
+						settings.model = Model.BETA;
+						continue;
+					}
+					if(rt[l].equals(RecommendationType.GAMMA)) {
+						settings.model = Model.GAMMA;
+						continue;
+					}
+					if(settings.model == Model.GAMMA && (rt[l].equals(RecommendationType.DT))) {
+						settings.requestedMods = Mods.add(settings.requestedMods, Mods.DoubleTime);
+						continue;
+					}
+					if(settings.model == Model.GAMMA &&  rt[l].equals(RecommendationType.HR)) {
+						settings.requestedMods = Mods.add(settings.requestedMods, Mods.HardRock);
+						continue;
+					}
+					if(settings.model == Model.GAMMA &&  rt[l].equals(RecommendationType.HD)) {
+						settings.requestedMods = Mods.add(settings.requestedMods, Mods.Hidden);
+						continue;
+					}
 				}
 				continue;
 			}
