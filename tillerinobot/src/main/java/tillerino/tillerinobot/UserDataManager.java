@@ -207,11 +207,11 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		}
 		
 		@Getter
-		RecommendationType[] recommendModdedMaps = new RecommendationType[]{RecommendationType.ANY};
+		RecommendationType[] recommendModdedMaps = new RecommendationType[]{RecommendationType.ANY}.clone();
 		
 		public void setRecommendMods(RecommendationType[] recommendMods) {
 	        changed |= recommendMods != this.recommendModdedMaps;
-	        this.recommendModdedMaps = recommendMods;
+	        this.recommendModdedMaps = recommendMods.clone();
 		}
 	}
 	
