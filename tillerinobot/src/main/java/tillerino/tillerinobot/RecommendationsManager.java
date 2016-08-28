@@ -348,7 +348,16 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		String[] remaining = message.split(" ");
 		
 		Settings settings = new Settings();
-		RecommendationType[] rt = dataManager.getData(apiUser.getUserId()).getRecommendModdedMaps();
+		RecommendationType[] rt;
+		if(dataManager!=null)
+		{
+		   rt = dataManager.getData(apiUser.getUserId()).getRecommendModdedMaps();
+		}
+		else
+		{
+	       rt = new RecommendationType[]{};
+		}
+
 		settings.model = Model.GAMMA;
 
 		for (int i = 0; i < remaining.length; i++) {
