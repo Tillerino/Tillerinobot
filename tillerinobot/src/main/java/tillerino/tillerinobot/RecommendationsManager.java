@@ -351,7 +351,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		RecommendationType[] rt;
 		if(dataManager!=null)
 		{
-		   rt = dataManager.getData(apiUser.getUserId()).getRecommendModdedMaps();
+		   rt = dataManager.getData(apiUser.getUserId()).getRecommendMods();
 		}
 		else
 		{

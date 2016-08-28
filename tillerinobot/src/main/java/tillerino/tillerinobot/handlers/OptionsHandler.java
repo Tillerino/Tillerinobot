@@ -81,7 +81,7 @@ public class OptionsHandler implements CommandHandler {
 			if (set) {
 				userData.setRecommendMods(parseType(value, userData.getLanguage()));
 			} else {
-				ircUser.message("Recommend modded maps: " + RecommendationType.parseStr(userData.getRecommendModdedMaps()));
+				ircUser.message("Recommend modded maps: " + RecommendationType.parseStr(userData.getRecommendMods()));
 			}
 	    } else {
 			throw new UserException(userData.getLanguage().invalidChoice(option,
