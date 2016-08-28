@@ -206,8 +206,10 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			this.showWelcomeMessage = welcomeMessage;
 		}
 		
-		@Getter(onMethod = @__({ @Nonnull }))
-		RecommendationType[] recommendModdedMaps = new RecommendationType[]{RecommendationType.ANY}.clone();
+		RecommendationType[] recommendDefault = new RecommendationType[]{RecommendationType.ANY};
+		
+		@Getter
+		RecommendationType[] recommendModdedMaps = recommendDefault;
 		
 		public void setRecommendMods(RecommendationType[] recommendMods) {
 	        changed |= recommendMods != this.recommendModdedMaps;
