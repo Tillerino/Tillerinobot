@@ -84,6 +84,7 @@ public class BeatmapMeta {
 
 		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(mods));
 		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(mods));
+		estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(mods));
 
 		String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
 
