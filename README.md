@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://discordapp.com/invite/0ww19XGd9XsiJ4LI">
-    <img alt="Logo" src="https://discordapp.com/api/guilds/170177781257207808/widget.png?style=banner1">
+    <img alt="Logo" src="https://discordapp.com/api/guilds/170177781257207808/widget.png?style=banner3">
   </a>
 </p>
 
