@@ -13,3 +13,15 @@ Join the discussion on [discord](https://discord.gg/0ww19XGd9XsiJ4LI)!
     <img alt="Logo" src="https://discordapp.com/api/guilds/170177781257207808/widget.png?style=banner2">
   </a>
 </p>
+
+## Technology
+
+Since a lot of people ask, the IRC frontend is built using [PirxBotX](https://github.com/TheLQ/pircbotx).
+
+For the [osu! API](https://github.com/ppy/osu-api/wiki), I rolled my own [Java library](https://github.com/Tillerino/osuApiConnector). It's available in [maven central](https://mvnrepository.com/artifact/com.github.tillerino/osu-api-connector). It also does some of the AR/OD calculations.
+
+Since it came out, [oppai](https://github.com/Francesco149/oppai) (or rather [a fork](https://github.com/Tillerino/oppai)) is being used to make beatmap difficulty calculation more stable.
+
+## Building/Running Tillerinobot
+
+Check out [the wiki](https://github.com/Tillerino/Tillerinobot/wiki/Working-on-Tillerinobot) to find out how to build and run Tillerinobot.
