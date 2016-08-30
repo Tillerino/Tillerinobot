@@ -210,7 +210,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		String recommendationDefault = "Gamma | Any.";
 		
 		public void setRecommendMods(String defaults) {
-	        changed |= defaults != this.recommendationDefault;
+	        changed |= !defaults.equalsIgnoreCase(this.recommendationDefault);
 	        this.recommendationDefault = defaults;
 		}
 	}
