@@ -617,7 +617,7 @@ public class Tsundere implements Language {
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		if (choices.contains("[nomod]")) {
+		if (choices.contains("[any|nomod]")) {
 			// recommendation parameter was off
 			setChanged(true);
 			/*

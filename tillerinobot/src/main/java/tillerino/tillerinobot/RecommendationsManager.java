@@ -358,11 +358,8 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 		        String param = remaining[i];
 		        String lowerCase = param.toLowerCase();
-
-		        if (lowerCase.length() == 0) {
+		        if (lowerCase.length() == 0) 
 		            continue;
-		        }
-
 
 		        if (lowerCase.equals("any")) {
 		            if (settings.requestedMods == 0 && !settings.nomod) {
@@ -464,8 +461,8 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		            }
 		        }
 
-		        throw new UserException(lang.invalidChoice(param,
-		            "[any|nomod] [relax|beta|gamma] [dt] [hr] [hd]" + message));
+				throw new UserException(lang.invalidChoice(param,
+						"[any|nomod] [relax|beta|gamma] [dt] [hr] [hd]"));
 		    }
 
 		    if((settings.requestedMods != 0 && settings.model != Model.GAMMA) || modelError)
