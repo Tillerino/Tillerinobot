@@ -141,7 +141,7 @@ public class Hebrew implements Language {
 	
 	@Override
 	public String illegalModelMix() {
-			return "What do you mean Relax/Beta with mods?";
+			return "?יחד עם מודים Relax/Betaמה אתה מתכוון ב"";
 	}
 	
 	@Override
