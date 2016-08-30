@@ -5,18 +5,17 @@ import static org.apache.commons.lang3.StringUtils.join;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationType;
+import tillerino.tillerinobot.RecommendationsManager;
+import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
 import tillerino.tillerinobot.UserException;
@@ -77,11 +76,11 @@ public class OptionsHandler implements CommandHandler {
 			} else {
 				ircUser.message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
 			}
-		} else if (getLevenshteinDistance(option, "recommendmods") <= 1) {
+		} else if (getLevenshteinDistance(option, "rdefaults") <= 1) {
 			if (set) {
-				userData.setRecommendMods(parseType(value, userData.getLanguage()));
+				userData.setRecommendMods(parseStr(apiUser, value, userData.getLanguage()));
 			} else {
-				ircUser.message("Recommend modded maps: " + RecommendationType.parseStr(userData.getRecommendMods()));
+				ircUser.message("Recommendation defaults: " + userData.getRecommendationDefault());
 			}
 	    } else {
 			throw new UserException(userData.getLanguage().invalidChoice(option,
@@ -102,95 +101,44 @@ public class OptionsHandler implements CommandHandler {
 		throw new UserException(lang.invalidChoice(original, "on|true|yes|1|off|false|no|0"));
 	}
 	
-	private static RecommendationType[] parseType(final @Nonnull String o, Language lang) throws UserException 
-	{
-	    List<RecommendationType> rtList = new ArrayList<RecommendationType>();
-		String[] remaining = o.split(" ");
-		 for(int i = 0; i < o.length() && i < remaining.length; i++)
-		 {
-			String param = remaining[i];
-			String lowerCase = param.toLowerCase();
-			if(lowerCase.length() == 0)
-			{
-				continue;
-			}
-			if(!rtList.contains(RecommendationType.ANY))
-			{   
-				
-			  if (!rtList.contains(RecommendationType.NOMOD) &&
-			     !(rtList.contains(RecommendationType.DT) ||
-				   rtList.contains(RecommendationType.HD) || 
-				   rtList.contains(RecommendationType.HR)))
-			  {
-				  
-				if (getLevenshteinDistance(lowerCase, "any") <= 2) {
-				    rtList.add(RecommendationType.ANY);
-				    continue;
-				
-				}
-				if(getLevenshteinDistance(lowerCase, "nomod") <= 2) {
-				   rtList.add(RecommendationType.NOMOD);
-				   continue;
-				}
-				
-			  }
-			  
-			  if (!(rtList.contains(RecommendationType.RELAX) ||
-				    rtList.contains(RecommendationType.BETA)  ||
-				    rtList.contains(RecommendationType.GAMMA)))
-			  {
-				  if(!(rtList.contains(RecommendationType.DT) ||
-					   rtList.contains(RecommendationType.HD) || 
-				       rtList.contains(RecommendationType.HR)))
-				  {
-						if (getLevenshteinDistance(lowerCase, "relax") <= 2) {
-							rtList.add(RecommendationType.RELAX);
-							continue;
-						}
-						if (getLevenshteinDistance(lowerCase, "beta") <= 1) {
-							rtList.add(RecommendationType.BETA);
-							continue;
-						}
-				  }
-					if (getLevenshteinDistance(lowerCase, "gamma") <= 2) {
-						rtList.add(RecommendationType.GAMMA);
-						continue;
-					}
-			  }
-			  
-			  
-				 if (!rtList.contains(RecommendationType.NOMOD) &&
-				    !(rtList.contains(RecommendationType.BETA)  ||
-				      rtList.contains(RecommendationType.RELAX)))
-				 {
-					 
-					  if (!rtList.contains(RecommendationType.DT) && ((lowerCase.equals("dt") || lowerCase.equals("nc")))) 
-					  {
-							rtList.add(RecommendationType.DT);
-							continue;
-					  }
-					  
-					  if (!rtList.contains(RecommendationType.HR) && lowerCase.equals("hr")) 
-					  {
-							rtList.add(RecommendationType.HR);
-							continue;
-					  }
-					  
-					  if (!rtList.contains(RecommendationType.HD) && lowerCase.equals("hd")) 
-					  {
-							rtList.add(RecommendationType.HD);
-							continue;
-					  }
-					  
-			    }
-		  }
-		}
-		if(rtList.size() < 1)
+	public static String parseStr(OsuApiUser apiUser, String value, Language lang) throws UserException, SQLException, IOException {
+
+		Settings set = RecommendationsManager.parseSamplerSettings(null, null, apiUser, value, lang);
+		String model = set.model.toString().substring(0, 1).toUpperCase() 
+			     + set.model.toString().toLowerCase().substring(1);
+		String[] mods = new String[]{};
+		
+		if(set.requestedMods != 0)
 		{
-		throw new UserException(lang.invalidChoice(o, "Nomod|Any & DT/NC/HR/HD & Relax|Gamma|Beta (You can choose more than 1)"));
+			mods = Mods.getMods(set.requestedMods).toString().replaceAll("[\\[\\]]", "").split(" ");
+		}
+		else if(set.nomod)
+		{
+			mods = new String[]{"Nomod"};
 		}
 		else
-			return rtList.toArray(new RecommendationType[rtList.size()]);
+		{
+			mods = new String[]{"Any"};
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(model + " | ");
+		int i = 1;
+		for (String mod : mods)
+		{
+		    sb.append(mod);
+		    if(i == mods.length)
+		    {
+		    	sb.append(".");
+		    }
+		    else
+		    {
+		        sb.append(" ");
+		    }
+		    i++;
+		}
+		
+		return sb.toString();
 	}
 	
 	public static @Nonnull <E extends Enum<E>> E find(@Nonnull E[] haystack, @Nonnull String needle) {

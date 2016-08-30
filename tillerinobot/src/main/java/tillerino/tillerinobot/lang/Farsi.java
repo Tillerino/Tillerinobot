@@ -146,6 +146,11 @@ public class Farsi implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Hawaaseto jam kon, nomod ba mods yani chi~?";
 	}

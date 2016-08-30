@@ -151,6 +151,11 @@ public class Turkish implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Nomod with mods derken ne demeye çalışıyorsun ?";
 	}

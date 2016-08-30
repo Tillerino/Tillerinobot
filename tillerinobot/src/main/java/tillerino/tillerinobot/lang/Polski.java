@@ -149,6 +149,11 @@ public class Polski implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Jak chcesz połączyć brak modów z modami?";
 	}

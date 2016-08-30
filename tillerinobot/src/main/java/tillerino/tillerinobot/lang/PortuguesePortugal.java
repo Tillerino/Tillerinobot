@@ -151,6 +151,11 @@ public class PortuguesePortugal implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "O que queres dizer com nomod com mods?";
 	}

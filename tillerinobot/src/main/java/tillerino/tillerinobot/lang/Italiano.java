@@ -150,6 +150,11 @@ public class Italiano implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Cosa intendi per nomod con le mod?";
 	}

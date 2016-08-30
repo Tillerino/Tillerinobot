@@ -151,6 +151,11 @@ public class Japanese implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "ノーModと一緒にModをつけるとか面白い人ですね。";
 	}

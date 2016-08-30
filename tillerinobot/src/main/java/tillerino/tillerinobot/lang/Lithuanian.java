@@ -151,6 +151,11 @@ public class Lithuanian implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Ką tu turi omeny, sakydamas nomod su modais?";
 	}

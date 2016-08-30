@@ -206,16 +206,12 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			this.showWelcomeMessage = welcomeMessage;
 		}
 		
-		RecommendationType[] recommendModdedMaps = new RecommendationType[] {RecommendationType.ANY}.clone();
+		@Getter
+		String recommendationDefault = "Gamma | Any.";
 		
-		public RecommendationType[] getRecommendMods()
-		{
-			return (RecommendationType[]) recommendModdedMaps.clone();
-		}
-		
-		public void setRecommendMods(RecommendationType[] recommendMods) {
-	        changed |= recommendMods != this.recommendModdedMaps;
-	        this.recommendModdedMaps = recommendMods.clone();
+		public void setRecommendMods(String defaults) {
+	        changed |= defaults != this.recommendationDefault;
+	        this.recommendationDefault = defaults;
 		}
 	}
 	

@@ -151,6 +151,11 @@ public class Svenska implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Vad menar du med nomod och mods?";
 	}

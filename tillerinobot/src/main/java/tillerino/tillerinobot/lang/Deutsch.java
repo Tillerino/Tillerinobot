@@ -148,6 +148,11 @@ public class Deutsch implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Ich bin nur ein einfacher Roboter, aber ich glaube nomod mit Mods geht nicht.";
 	}

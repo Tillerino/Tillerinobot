@@ -149,6 +149,11 @@ public class Nederlands implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Hoe bedoel je, nomod met mods?";
 	}
