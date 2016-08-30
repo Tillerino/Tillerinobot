@@ -78,7 +78,7 @@ public class OptionsHandler implements CommandHandler {
 			}
 		} else if (getLevenshteinDistance(option, "rdefaults") <= 1) {
 			if (set) {
-				userData.setRecommendMods(parseStr(apiUser, value, userData.getLanguage()));
+				userData.setRecommendationDefaults(parseStr(apiUser, value, userData.getLanguage()));
 			} else {
 				ircUser.message("Recommendation defaults: " + userData.getRecommendationDefault());
 			}

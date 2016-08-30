@@ -209,7 +209,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		@Getter
 		String recommendationDefault = "Gamma | Any.";
 		
-		public void setRecommendMods(String defaults) {
+		public void setRecommendationDefaults(String defaults) {
 	        changed |= !defaults.equalsIgnoreCase(this.recommendationDefault);
 	        this.recommendationDefault = defaults;
 		}
