@@ -100,22 +100,6 @@ public class Hungarian implements Language {
 		return "Próbáld ki ezt a mapot " + Mods.toShortNamesContinuous(mods) + " modokkal!";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Összezavar a neved. Bannolva vagy? Ha nem, írj [https://github.com/Tillerino/Tillerinobot/wiki/Contact Tillerino]-nak. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Bocsi, itt volt ez a gyönyörű kód nullásokból és egyesekből, és elterelte a figyelmemet. Mit akartál?";

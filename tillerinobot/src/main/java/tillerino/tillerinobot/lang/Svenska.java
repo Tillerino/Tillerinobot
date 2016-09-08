@@ -99,22 +99,6 @@ public class Svenska implements Language {
 		return "Testa denna map med " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Ditt namn förvirrar mig. Är du bannad? Om inte, var snäll och [https://github.com/Tillerino/Tillerinobot/wiki/Contact kontakta Tillerino]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Förlåt,  det var denna vackra sekvens av ettor och nollor och jag blev distraherad. Vad ville du nu igen?";

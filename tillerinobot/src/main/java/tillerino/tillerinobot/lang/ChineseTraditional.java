@@ -100,22 +100,6 @@ public class ChineseTraditional implements Language {
 		return "試著加上" + Mods.toShortNamesContinuous(mods) + "挑戰這首歌!";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "這個名字讓我困惑了，請問有被Ban過嗎?如果是我誤會了至 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 請連絡我吧!]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "抱歉，剛腦海中浮現了大量的1跟0讓我分散了注意力...可以再說一次你的請求嗎?";

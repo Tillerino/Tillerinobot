@@ -99,22 +99,6 @@ public class Lithuanian implements Language {
 		return "Pabandyk šį grajų su " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Tavo vardas mane trikdo. Gal tu esi užblokuotas? Jei ne, prašau [https://github.com/Tillerino/Tillerinobot/wiki/Contact susisiekti su Tillerino]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Atleisk, radau grąžų sakinį, sudaryta iš nulių ir vienetų ir aš išsiblaškiau. Pakartok dar kartą, ko norėjai?";

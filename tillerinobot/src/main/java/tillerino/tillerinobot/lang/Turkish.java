@@ -99,22 +99,6 @@ public class Turkish implements Language {
 		return "Bu mapı şu modlarla dene: " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "İsmin benim aklımı karıştırıyor.Banlandın mı ? Eğer değilse, Lütfen [https://github.com/Tillerino/Tillerinobot/wiki/Contact ulaş Tillerino]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Üzgünüm, şurada bir dizi çok güzel sıfırlar ve birler vardı ve aklım karıştı. Tekrar ne istediğini söyler misin ?";

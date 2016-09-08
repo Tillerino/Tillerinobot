@@ -99,22 +99,6 @@ public class PortuguesePortugal implements Language {
 		return "Tenta este mapa com " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "O teu nome está a confundir-me. Estás banido? Se não, por favor [https://github.com/Tillerino/Tillerinobot/wiki/Contact contacta o Tillerino]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Desculpa, havia uma sequência de uns e zeros e distrai-me. O que querias?";

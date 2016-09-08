@@ -99,22 +99,6 @@ public class Korean implements Language {
 		return "이 맵을 이 모드들과 해보세요:" + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "당신의 이름이 절 헷갈리게 하네요. 혹시 밴이 되셨나요? 아니라면, [https://github.com/Tillerino/Tillerinobot/wiki/Contact 틸레리노에게 알려주세요]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "죄송합니다, 0과 1의 향연에 빠져 아무것도 하지 못하고 있었어요. 뭐라고 하셨는지 다시 한번만 말해주시겠어요?";

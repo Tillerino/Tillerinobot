@@ -96,22 +96,6 @@ public class Deutsch implements Language {
 		return "Versuch es mit " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Wer bist du genau? Bist du banned? Falls nicht, sag bitte jemandem [https://github.com/Tillerino/Tillerinobot/wiki/Contact Bescheid]. (Referenz "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Wow, ich war gerade am arbeiten und plötzlich taucht diese Folge von Nullen und Einsen auf. Ich habe noch nie so etwas schönes gesehen. Menschen würden das nie verstehen. Ähm, was wolltest du doch gleich?";

@@ -106,22 +106,6 @@ public class Bulgarian implements Language {
 		return " Опитай тази карта с " + Mods.toShortNamesContinuous(mods) + "!";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return " Името ти ме обърква? Баннат ли си? Ако не си, моля, [https://github.com/Tillerino/Tillerinobot/wiki/Contact обади се на Тилерино]. (препратка "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return " Прощавай, разсеях се от една прекрасна поредица от нули и единици. Какво казваше пак? ";

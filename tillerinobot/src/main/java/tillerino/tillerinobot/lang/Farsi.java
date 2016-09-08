@@ -96,22 +96,6 @@ public class Farsi implements Language {
 		return "In map-o try kon baa " + Mods.toShortNamesContinuous(mods);
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Esmet waasam mashkooke. Banned shodi? Age intori nist, sari begoo behem: @Tillerino ya /u/Tillerino (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Waiiiiiiiiiiiii~ hawaasam part shod! Bebaghshid, lotfan ye baare dige, chi gofti?";
