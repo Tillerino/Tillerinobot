@@ -106,22 +106,6 @@ public class Romana implements Language {
 		return "Încearcă harta asta cu " + Mods.toShortNamesContinuous(mods) + "!";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Numele tău mă bulversează. Ești banat? Dacă nu, te rog să îl [https://github.com/Tillerino/Tillerinobot/wiki/Contact contactezi pe Tillerino]. (referință "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "Îmi pare rău, mă uitam la această minunată segvență de unu și zero și n-am mai fost atent. Ce ai vrut?";

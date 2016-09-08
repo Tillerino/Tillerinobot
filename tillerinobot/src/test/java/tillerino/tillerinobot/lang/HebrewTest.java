@@ -119,12 +119,6 @@ public class HebrewTest {
 	}
 
 	@Test
-	public void testUnresolvableName() throws Exception {
-		System.out.println("unresolvableName");
-		System.out.println(lang.unresolvableName("6v3gg63v", "herpaderpa"));
-	}
-
-	@Test
 	public void testExcuseForError() throws Exception {
 		System.out.println("excuseForError");
 		System.out.println(lang.excuseForError());

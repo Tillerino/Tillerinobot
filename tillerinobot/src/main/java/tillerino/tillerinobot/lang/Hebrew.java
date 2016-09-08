@@ -93,21 +93,6 @@ public class Hebrew implements Language {
 		return Mods.toShortNamesContinuous(mods) + "נסה את המפה הזו עם ";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "(" + exceptionMarker + ") :שגיאה ./u/Tillerino או @Tillerino שמך מבלבל אותי. אתה מושעה? אם לא, צור איתי קשר דרך";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "?אני מצטער, זה היה משפט יפה שמורכב מאחדות ואפסים, בולבלתי. מה רצית שוב";
