@@ -118,7 +118,8 @@ public class Default implements Language {
 	 * @return
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
+		return "Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
+				+ " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
 				+ exceptionMarker + ")";
 	}
 
