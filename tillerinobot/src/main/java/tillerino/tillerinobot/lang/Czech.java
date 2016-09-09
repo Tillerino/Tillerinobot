@@ -135,6 +135,11 @@ public class Czech implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Co myslíš tím bez modu s modama?";
 	}

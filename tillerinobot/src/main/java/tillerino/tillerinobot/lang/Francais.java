@@ -138,6 +138,11 @@ public class Francais implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Euh... NoMods avec des mods ? Y a pas un petit problème par ici ?";
 	}

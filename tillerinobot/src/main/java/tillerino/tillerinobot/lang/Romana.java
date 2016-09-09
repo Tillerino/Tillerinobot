@@ -142,6 +142,11 @@ public class Romana implements Language {
 	}
 
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Cum adicaă fără moduri cu moduri?";
 	}

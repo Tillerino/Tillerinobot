@@ -159,6 +159,11 @@ public class Default implements Language {
 	}
 
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "What do you mean nomod with mods?";
 	}

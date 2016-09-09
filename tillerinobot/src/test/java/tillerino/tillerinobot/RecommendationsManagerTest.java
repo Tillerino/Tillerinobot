@@ -18,6 +18,8 @@ import tillerino.tillerinobot.lang.Default;
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	TestBackend backend = new TestBackend(false);
 
+	UserDataManager dataManager = new UserDataManager(backend);
+	
 	RecommendationsManager manager;
 
 	OsuApiUser user;
@@ -31,25 +33,26 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	
 	@Before
 	public void createRecommendationsManager() {
-		manager = new RecommendationsManager(backend, recommendationsRepo, em);
+		manager = new RecommendationsManager(backend, new UserDataManager(backend),
+				                             recommendationsRepo, em);
 	}
 
 	@Test
 	public void testPredicateParser() throws Exception {
-		Settings samplerSettings = manager.parseSamplerSettings(user, "gamma AR=9", new Default());
+		Settings samplerSettings = RecommendationsManager.parseSamplerSettings(backend, dataManager, user, "gamma AR=9", new Default());
 
 		assertEquals(1, samplerSettings.predicates.size());
 
 		// Test "nc" alias for nightcore
 		// Gives double-time recommendations
-		samplerSettings = manager.parseSamplerSettings(user, "nc", new Default());
+		samplerSettings = RecommendationsManager.parseSamplerSettings(backend, dataManager, user, "nc", new Default());
 
 		assertTrue(Mods.DoubleTime.is(samplerSettings.requestedMods));
 	}
 
 	@Test(expected = UserException.class)
 	public void testContradiction() throws Exception {
-		manager.parseSamplerSettings(user, "ar=1 ar=2", new Default());
+		RecommendationsManager.parseSamplerSettings(backend, dataManager, user, "ar=1 ar=2", new Default());
 	}
 	
 	@Test
@@ -83,7 +86,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testHiding() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em);
+		RecommendationsManager recMan = new RecommendationsManager(null, new UserDataManager(backend), recommendationsRepo, em);
 
 		// save a recommendation and reload it
 		recMan.saveGivenRecommendation(1954, 2, 0);

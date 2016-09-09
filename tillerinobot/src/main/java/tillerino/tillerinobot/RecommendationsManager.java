@@ -22,9 +22,6 @@ import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -32,6 +29,13 @@ import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
@@ -44,11 +48,6 @@ import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
 import tillerino.tillerinobot.mbeans.RecommendationsManagerMXBean;
 import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 /**
  * Communicates with the backend and creates recommendations samplers as well as caching information.
@@ -104,7 +103,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	 * 
 	 * @author Tillerino
 	 */
-	public enum Model {
+	public static enum Model {
 		ALPHA,
 		BETA,
 		GAMMA
@@ -187,12 +186,14 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	
 	private final BotBackend backend;
 	
+	private final UserDataManager dataManager;
+	
 	private final GivenRecommendationRepository recommendationsRepo;
 	
 	private final ThreadLocalAutoCommittingEntityManager em;
 
-	PredicateParser parser = new PredicateParser();
-
+	static PredicateParser parser = new PredicateParser();
+	
 	@Override
 	public ObjectName preRegister(MBeanServer server, ObjectName objectName)
 			throws Exception {
@@ -268,8 +269,8 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			 * parse arguments
 			 */
 
-			Settings settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
-
+			Settings settings = parseSamplerSettings(backend, dataManager, apiUser, message == null ? "" : message, lang);
+			
 			if (sampler == null || !sampler.settings.equals(settings)) {
 				List<Integer> exclude = loadGivenRecommendations(userid)
 						.stream().map(GivenRecommendation::getBeatmapid)
@@ -341,77 +342,137 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				System.currentTimeMillis(), sample.getMods());
 	}
 
-	public Settings parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message,
-			Language lang) throws UserException, SQLException, IOException {
-		String[] remaining = message.split(" ");
-		
-		Settings settings = new Settings();
-		
-		settings.model = Model.GAMMA;
+	public static Settings parseSamplerSettings(@CheckForNull BotBackend backend, UserDataManager dataManager, OsuApiUser apiUser, @Nonnull String message,
+		    Language lang) throws UserException, SQLException, IOException {
 
-		for (int i = 0; i < remaining.length; i++) {
-			String param = remaining[i];
-			String lowerCase = param.toLowerCase();
-			if(lowerCase.length() == 0)
-				continue;
-			if(getLevenshteinDistance(lowerCase, "nomod") <= 2) {
-				settings.nomod = true;
-				continue;
-			}
-			if(getLevenshteinDistance(lowerCase, "relax") <= 2) {
-				settings.model = Model.ALPHA;
-				continue;
-			}
-			if(getLevenshteinDistance(lowerCase, "beta") <= 1) {
-				settings.model = Model.BETA;
-				continue;
-			}
-			if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
-				settings.model = Model.GAMMA;
-				continue;
-			}
-			if(settings.model == Model.GAMMA && (lowerCase.equals("dt") || lowerCase.equals("nc"))) {
-				settings.requestedMods = Mods.add(settings.requestedMods, Mods.DoubleTime);
-				continue;
-			}
-			if(settings.model == Model.GAMMA &&  lowerCase.equals("hr")) {
-				settings.requestedMods = Mods.add(settings.requestedMods, Mods.HardRock);
-				continue;
-			}
-			if(settings.model == Model.GAMMA &&  lowerCase.equals("hd")) {
-				settings.requestedMods = Mods.add(settings.requestedMods, Mods.Hidden);
-				continue;
-			}
-			if (backend.getDonator(apiUser) > 0) {
-				RecommendationPredicate predicate = parser.tryParse(param, lang);
-				if (predicate != null) {
-					for (RecommendationPredicate existingPredicate : settings.predicates) {
-						if (existingPredicate.contradicts(predicate)) {
-							throw new UserException(lang.invalidChoice(
-									existingPredicate.getOriginalArgument() + " with "
-											+ predicate.getOriginalArgument(),
-									"either " + existingPredicate.getOriginalArgument() + " or "
-											+ predicate.getOriginalArgument()));
-						}
-					}
-					settings.predicates.add(predicate);
-					continue;
-				}
-			}
-			throw new UserException(lang.invalidChoice(param,
-					"[nomod] [relax|beta|gamma] [dt] [hr] [hd]"));
+	    	if(message.length() == 0)
+	    		message = dataManager.getData(apiUser.getUserId()).getRecommendationDefault().replaceAll("[,.]", "").replace("| ", "");
+		    String[] remaining = message.split(" ");
+		    Settings settings = new Settings();
+		    settings.model = Model.GAMMA;
+		    boolean nomodError = false;
+		    boolean modelError = false;
+		    
+		    
+		    for (int i = 0; i < remaining.length; i++) {
+
+		        String param = remaining[i];
+		        String lowerCase = param.toLowerCase();
+		        if (lowerCase.length() == 0) 
+		            continue;
+
+		        if (lowerCase.equals("any")) {
+		            if (settings.requestedMods == 0 && !settings.nomod) {
+		                remaining = new String[] {};
+		                continue;
+		            } else if (!settings.nomod) {
+		                nomodError = true;
+		                break;
+		            }
+		            else
+		            {
+				        throw new UserException(lang.mixedNomodAndMods());
+		            }
+		        }
+
+		        if (getLevenshteinDistance(lowerCase, "nomod") <= 2) {
+		            if (settings.requestedMods == 0) {
+		                settings.nomod = true;
+		                continue;
+		            } else {
+		                nomodError = true;
+		                break;
+		            }
+		        }
+
+
+		        if (getLevenshteinDistance(lowerCase, "relax") <= 2) {
+		            if (settings.requestedMods == 0) {
+		                settings.model = Model.ALPHA;
+		                continue;
+		            } else {
+		            	modelError = true;
+		                break;
+		            }
+		        }
+
+		        if (getLevenshteinDistance(lowerCase, "beta") <= 1) {
+		            if (settings.requestedMods == 0) {
+		                settings.model = Model.BETA;
+		                continue;
+		            } else {
+		            	modelError = true;
+		                break;
+		            }
+		        }
+
+
+		        if (getLevenshteinDistance(lowerCase, "gamma") <= 2) {
+		            settings.model = Model.GAMMA;
+		            continue;
+		        }
+
+		        if (lowerCase.equals("dt") || lowerCase.equals("nc") ||
+		            lowerCase.equals("doubletime")) {
+		            if (!settings.nomod) {
+		                settings.requestedMods = Mods.add(settings.requestedMods, Mods.DoubleTime);
+		                continue;
+		            } else {
+		                nomodError = true;
+		                break;
+		            }
+		        }
+
+		        if (lowerCase.equals("hr") || lowerCase.equals("hardrock")) {
+		            if (!settings.nomod) {
+		                settings.requestedMods = Mods.add(settings.requestedMods, Mods.HardRock);
+		                continue;
+		            } else {
+		                nomodError = true;
+		                break;
+		            }
+		        }
+
+		        if (lowerCase.equals("hd") || lowerCase.equals("hidden")) {
+		            if (!settings.nomod) {
+		                settings.requestedMods = Mods.add(settings.requestedMods, Mods.Hidden);
+		                continue;
+		            } else {
+		                nomodError = true;
+		                break;
+		            }
+		        }
+
+
+		        if (backend != null) {
+		            if (backend.getDonator(apiUser) > 0) {
+		                RecommendationPredicate predicate = parser.tryParse(param, lang);
+		                if (predicate != null) {
+		                    for (RecommendationPredicate existingPredicate: settings.predicates) {
+		                        if (existingPredicate.contradicts(predicate)) {
+		                            throw new UserException(lang.invalidChoice(
+		                                existingPredicate.getOriginalArgument() + " with " + predicate.getOriginalArgument(),
+		                                "either " + existingPredicate.getOriginalArgument() + " or " + predicate.getOriginalArgument()));
+		                        }
+		                    }
+		                    settings.predicates.add(predicate);
+		                    continue;
+		                }
+		            }
+		        }
+
+				throw new UserException(lang.invalidChoice(param,
+						"[any|nomod] [relax|beta|gamma] [dt] [hr] [hd]"));
+		    }
+
+		    if((settings.requestedMods != 0 && settings.model != Model.GAMMA) || modelError)
+		        throw new UserException(lang.illegalModelMix());
+		    
+		    if (nomodError)
+		        throw new UserException(lang.mixedNomodAndMods());
+
+		    return settings;
 		}
-		
-		/*
-		 * verify the arguments
-		 */
-		
-		if(settings.nomod && settings.requestedMods != 0) {
-			throw new UserException(lang.mixedNomodAndMods());
-		}
-		
-		return settings;
-	}
 
 	/**
 	 * returns

@@ -205,6 +205,14 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			changed |= welcomeMessage != this.showWelcomeMessage;
 			this.showWelcomeMessage = welcomeMessage;
 		}
+		
+		@Getter
+		String recommendationDefault = "Gamma | Any.";
+		
+		public void setRecommendationDefaults(String defaults) {
+	        changed |= !defaults.equalsIgnoreCase(this.recommendationDefault);
+	        this.recommendationDefault = defaults;
+		}
 	}
 	
 	final BotBackend backend;

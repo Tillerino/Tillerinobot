@@ -135,6 +135,11 @@ public class Korean implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "논모드로 모드를 한다는게 무슨 소리죠?";
 	}

@@ -184,11 +184,18 @@ public interface Language {
 	 * @param minRank
 	 *            The minimum rank to be able to use this feature.
 	 * @param user
-	 *            ther user who is requesting the feature
+	 *            The user who is requesting the feature
 	 * @return
 	 */
 	String featureRankRestricted(String feature, int minRank, OsuApiUser user);
 
+	/**
+	 * The user requested a recommendation with models and illegal mods/other models
+	 * 
+	 * @return
+	 */
+	String illegalModelMix();
+	
 	/**
 	 * The user requested a recommendation and both gave a mod and the nomod
 	 * option.
@@ -196,7 +203,7 @@ public interface Language {
 	 * @return
 	 */
 	String mixedNomodAndMods();
-
+	
 	/**
 	 * The current recommendations sampler is empty. User can use other
 	 * recommendation options or command !reset to forget all given

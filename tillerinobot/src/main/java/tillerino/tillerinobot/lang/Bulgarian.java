@@ -142,6 +142,11 @@ public class Bulgarian implements Language {
 	}
 
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return " Какви ги говориш? 'Без модове с модове'?";
 	}
@@ -269,4 +274,5 @@ public class Bulgarian implements Language {
 	public String getPatience() {
 		return " Само секунда...";
 	}
+
 }

@@ -125,6 +125,11 @@ public class Hebrew implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "?יחד עם מודים Relax/Betaלמה אתה מתכוון ב";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "?יחד עם מודים nomodלמה אתה מתכוון ב";
 	}

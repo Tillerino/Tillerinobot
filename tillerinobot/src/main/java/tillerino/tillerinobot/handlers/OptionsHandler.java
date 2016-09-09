@@ -1,21 +1,24 @@
 package tillerino.tillerinobot.handlers;
 
+import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
+import static org.apache.commons.lang3.StringUtils.join;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
-
 import javax.annotation.Nonnull;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.RecommendationsManager;
+import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 
 public class OptionsHandler implements CommandHandler {
@@ -73,7 +76,13 @@ public class OptionsHandler implements CommandHandler {
 			} else {
 				ircUser.message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
 			}
-		} else {
+		} else if (getLevenshteinDistance(option, "rdefaults") <= 1) {
+			if (set) {
+				userData.setRecommendationDefaults(parseStr(apiUser, value, userData.getLanguage()));
+			} else {
+				ircUser.message("Recommendation defaults: " + userData.getRecommendationDefault());
+			}
+	    } else {
 			throw new UserException(userData.getLanguage().invalidChoice(option,
 					"Language" + (userData.getHearts() > 0 ? ", Welcome" : "")));
 		}
@@ -81,7 +90,7 @@ public class OptionsHandler implements CommandHandler {
 		return true;
 	}
 
-	public static boolean parseBoolean(final @Nonnull String original, Language lang) throws UserException {
+	private static boolean parseBoolean(final @Nonnull String original, Language lang) throws UserException {
 		String s = original.toLowerCase();
 		if(s.equals("on") || s.equals("true") || s.equals("yes") || s.equals("1")) {
 			return true;
@@ -90,6 +99,46 @@ public class OptionsHandler implements CommandHandler {
 			return false;
 		}
 		throw new UserException(lang.invalidChoice(original, "on|true|yes|1|off|false|no|0"));
+	}
+	
+	public static String parseStr(OsuApiUser apiUser, String value, Language lang) throws UserException, SQLException, IOException {
+
+		Settings set = RecommendationsManager.parseSamplerSettings(null, null, apiUser, value, lang);
+		String model = set.model.toString().substring(0, 1).toUpperCase() 
+			     + set.model.toString().toLowerCase().substring(1);
+		String[] mods = new String[]{};
+		
+		if(set.requestedMods != 0)
+		{
+			mods = Mods.getMods(set.requestedMods).toString().replaceAll("[\\[\\]]", "").split(" ");
+		}
+		else if(set.nomod)
+		{
+			mods = new String[]{"Nomod"};
+		}
+		else
+		{
+			mods = new String[]{"Any"};
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(model + " | ");
+		int i = 1;
+		for (String mod : mods)
+		{
+		    sb.append(mod);
+		    if(i == mods.length)
+		    {
+		    	sb.append(".");
+		    }
+		    else
+		    {
+		        sb.append(" ");
+		    }
+		    i++;
+		}
+		
+		return sb.toString();
 	}
 	
 	public static @Nonnull <E extends Enum<E>> E find(@Nonnull E[] haystack, @Nonnull String needle) {

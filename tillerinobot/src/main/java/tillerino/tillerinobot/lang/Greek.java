@@ -136,6 +136,11 @@ public class Greek implements Language {
 	}
 	
 	@Override
+	public String illegalModelMix() {
+			return "What do you mean Relax/Beta with mods?";
+	}
+	
+	@Override
 	public String mixedNomodAndMods() {
 		return "Τί εννοείς nomods με mods;";
 	}
