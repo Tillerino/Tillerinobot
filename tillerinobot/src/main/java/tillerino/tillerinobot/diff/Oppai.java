@@ -54,6 +54,10 @@ public class Oppai {
 		@SerializedName("aim_stars")
 		double aim;
 		double pp;
+		
+		public int getAllObjectsCount() {
+			return getCircleCount() + getSliderCount() + getSpinnerCount();
+		}
 	}
 
 	@SuppressFBWarnings("RV")

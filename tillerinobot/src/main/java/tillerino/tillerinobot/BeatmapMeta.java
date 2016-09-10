@@ -85,6 +85,14 @@ public class BeatmapMeta {
 		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(mods));
 		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(mods));
 		estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(mods));
+		
+		if (estimates.isOppaiOnly()) {
+			estimateMessage += " (";
+			if (!estimates.isRanked()) {
+				estimateMessage += "unranked; ";
+			}
+			estimateMessage += "all [https://github.com/Francesco149/oppai oppai])";
+		}
 
 		String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
 

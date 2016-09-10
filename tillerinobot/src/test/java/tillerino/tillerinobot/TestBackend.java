@@ -106,6 +106,16 @@ public class TestBackend implements BotBackend {
 		public CBeatmap getBeatmap() {
 			throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public boolean isOppaiOnly() {
+			return false;
+		}
+		
+		@Override
+		public boolean isRanked() {
+			return true;
+		}
 	}
 
 	static class User {

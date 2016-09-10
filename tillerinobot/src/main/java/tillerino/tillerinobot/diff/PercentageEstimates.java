@@ -34,4 +34,8 @@ public interface PercentageEstimates {
 	CBeatmap getBeatmap();
 	
 	int getAllObjectsCount();
+	
+	boolean isOppaiOnly();
+	
+	boolean isRanked();
 }
