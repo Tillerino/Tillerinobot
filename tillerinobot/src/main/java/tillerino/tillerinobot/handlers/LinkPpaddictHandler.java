@@ -11,10 +11,9 @@ import lombok.Value;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.CommandHandler;
+import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 
 @Value
@@ -25,17 +24,16 @@ public class LinkPpaddictHandler implements CommandHandler {
 	BotBackend backend;
 	
 	@Override
-	public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
+	public Response handle(String command, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException {
 		if(!TOKEN_PATTERN.matcher(command).matches()) {
-			return false;
+			return null;
 		}
 		String ppaddictName = backend.tryLinkToPpaddict(command, apiUser);
 		if(ppaddictName == null)
-			ircUser.message("nothing happened.");
+			throw new UserException("nothing happened.");
 		else
-			ircUser.message("linked to " + ppaddictName);
-		return true;
+			return new Success("linked to " + ppaddictName);
 	}
 
 }

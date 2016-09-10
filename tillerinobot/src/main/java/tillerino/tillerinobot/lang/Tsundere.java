@@ -7,7 +7,10 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.NoResponse;
+import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
@@ -24,7 +27,7 @@ public class Tsundere implements Language {
 	StringShuffler welcomeUserLongShuffler = new StringShuffler(rnd);
 	
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		String username = apiUser.getUserName();
 		String greeting = "";
 		//Greetings for <4 minutes, normal, and >4 days
@@ -51,7 +54,6 @@ public class Tsundere implements Language {
 				"Ugh! Do you have any idea how long " + inactiveTime + " milliseconds is !?"
 			);
 		}
-		user.message(greeting);
 		//Recent counter reset (4 hours)
 		if (inactiveTime > 4 * 60 * 60 * 1000) {
 			recentRecommendations = 0;
@@ -59,6 +61,8 @@ public class Tsundere implements Language {
 		}
 
 		setChanged(true);
+
+		return new Message(greeting);
 	}
 
 	StringShuffler unknownBeatmapShuffler = new StringShuffler(rnd);
@@ -165,7 +169,7 @@ public class Tsundere implements Language {
 	}
 	
 	@Override
-	public void hug(IRCBotUser user, OsuApiUser apiUser) {
+	public Response hug(OsuApiUser apiUser) {
 		setChanged(true);
 		//Responses move from tsun to dere with more hug attempts and recommendations
 		recentHugs++;
@@ -174,53 +178,41 @@ public class Tsundere implements Language {
 		String username = apiUser.getUserName();
 		switch (hugLevel) {
 			default:
-				user.action("completely ignores " + username + "'s request for a hug");
-				break;
+				return new Action("completely ignores " + username + "'s request for a hug");
 			case 0:
-				user.action("slaps " + username);
-				user.message("Sorry, that was just a reflex.");
-				break;
+				return new Action("slaps " + username)
+					.then(new Message("Sorry, that was just a reflex."));
 			case 1:
-				user.action("hugs " + username);
-				user.message("Wow, you suck at hugs. Someone needs to teach you.");
-				break;
+				return new Action("hugs " + username)
+					.then(new Message("Wow, you suck at hugs. Someone needs to teach you."));
 			case 2:
-				user.message("There's something on your back, you slob. Here, let me get that.");
-				user.action("hugs " + username);
-				break;
+				return new Message("There's something on your back, you slob. Here, let me get that.")
+					.then(new Action("hugs " + username));
 			case 3:
-				user.action("hugs " + username);
-				user.message("I w-wasn't trying to hug you! I just lost my balance for a second and fell onto you.");
-				break;
+				return new Action("hugs " + username)
+					.then(new Message("I w-wasn't trying to hug you! I just lost my balance for a second and fell onto you."));
 			case 4:
-				user.action("hugs " + username);
-				user.message("The hardest part of hugging you is letting go. I think you sweat too much.");
-				break;
+				return new Action("hugs " + username)
+					.then(new Message("The hardest part of hugging you is letting go. I think you sweat too much."));
 			case 5:
-				user.action("slaps " + username);
-				user.message("Whoops... well, you probably deserved it anyways.");
-				break;
+				return new Action("slaps " + username)
+					.then(new Message("Whoops... well, you probably deserved it anyways."));
 			case 6:
-				user.action("hugs " + username);
-				user.message("Don't misunderstand, it's not like I like you or anything...");
-				break;
+				return new Action("hugs " + username)
+					.then(new Message("Don't misunderstand, it's not like I like you or anything..."));
 			case 7:
-				user.message("Clinginess is considered a bad thing, you idiot.");
-				user.action("hugs " + username);
-				break;
+				return new Message("Clinginess is considered a bad thing, you idiot.")
+					.then(new Action("hugs " + username));
 			case 8:
-				user.message("S-stupid. It's l-like you enjoy hugging me or something.");
-				user.action("hugs " + username);
-				break;
+				return new Message("S-stupid. It's l-like you enjoy hugging me or something.")
+					.then(new Action("hugs " + username));
 			case 9:
-				user.action("hugs " + username);
-				user.message("Don't forget: you're here forever.");
-				break;
+				return new Action("hugs " + username)
+					.then(new Message("Don't forget: you're here forever."));
 			case 10:
-				user.action("slaps " + username + " hard");
-				user.message("Hehe. You know you like it.");
-				user.action("hugs " + username + " happily");
-				break;
+				return new Action("slaps " + username + " hard")
+					.then(new Message("Hehe. You know you like it."))
+					.then(new Action("hugs " + username + " happily"));
 		}
 	}
 
@@ -520,50 +512,53 @@ public class Tsundere implements Language {
 	StringShuffler optionalCommentOnNPEasyShuffler = new StringShuffler(rnd);
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta) {
+	public Response optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
 		if (Math.random() > 0.25) {
-			return;
+			return new NoResponse();
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20.0);
 		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
-			user.message("Are you serious!? If that map doesn't kill you, I will.");
+			return new Message("Are you serious!? If that map doesn't kill you, I will.");
 		} else if (estimates.getPPForAcc(1) / typicalPP < 0.333) {
-			user.message("Playing that won't impress me much... n-n-not that I'd want you to.");
+			return new Message("Playing that won't impress me much... n-n-not that I'd want you to.");
 		}
+		return new NoResponse();
 	}
 	
 	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta) {
+	public Response optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
 		//The following checks are probably redundant, but they don't hurt anyone either.
 		if (Math.random() > 0.25) {
-			return;
+			return new NoResponse();
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20);
 		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
-			user.message("You idiot! You're going to get hurt trying mods like that!");
+			return new Message("You idiot! You're going to get hurt trying mods like that!");
 		} else if (estimates.getPPForAcc(1) / typicalPP < 0.5) {
-			user.message("If you wanted to be treated like a baby, you could just ask... no, go ahead and play.");
+			return new Message("If you wanted to be treated like a baby, you could just ask... no, go ahead and play.");
 		}
+		return new NoResponse();
 	}
 	
 	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user, OsuApiUser apiUser, Recommendation meta) {
+	public Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation meta) {
 		setChanged(true);
 
 		recentRecommendations++;
 		if(recentRecommendations == 7) {
-			user.message("I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.");
+			return new Message("I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.");
 		} else if(recentRecommendations == 17) {
-			user.message("You know, it's a privilege to talk to me this much, not a right.");
+			return new Message("You know, it's a privilege to talk to me this much, not a right.");
 		} else if(recentRecommendations == 37) {
-			user.message("How would you even play this game if I wasn't telling you what to do?");
+			return new Message("How would you even play this game if I wasn't telling you what to do?");
 		} else if(recentRecommendations == 73) {
-			user.message("I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything.");
+			return new Message("I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything.");
 		} else if(recentRecommendations == 173) {
-			user.message("Just can't leave me alone, huh? I guess t-that's okay. But don't you dare tell anyone!");
+			return new Message("Just can't leave me alone, huh? I guess t-that's okay. But don't you dare tell anyone!");
 		}
+		return new NoResponse();
 	}
 	
 	transient boolean changed;
@@ -598,10 +593,10 @@ public class Tsundere implements Language {
 	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(rnd);
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
 		setChanged(true);
 
-		user.message(optionalCommentOnLanguageShuffler.get(
+		return new Message(optionalCommentOnLanguageShuffler.get(
 			"You seem like just the sort of idiot that wouldn't believe me if I said I wasn't tsundere.",
 			"What kind of idiot wants a tsundere robot!? That's seriously the dumbest idea I've ever heard.",
 			"Fine, but I'm only acting tsundere because I want to. It has nothing to do with you!"

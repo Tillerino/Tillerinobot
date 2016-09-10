@@ -8,21 +8,20 @@ import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 
-import lombok.extern.slf4j.Slf4j;
-
+import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class NPHandler implements CommandHandler {
 	static final Pattern npPattern = Pattern
@@ -41,21 +40,21 @@ public class NPHandler implements CommandHandler {
 	}
 
 	@Override
-	public boolean handle(String message, IRCBotUser user, OsuApiUser apiUser,
-			UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+	public Response handle(String message, OsuApiUser apiUser, UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+		MDC.put(IRCBot.MDC_HANDLER, "np");
+		
 		Language lang = userData.getLanguage();
 
 		BeatmapWithMods pair = parseNP(message, lang);
 
 		if (pair == null)
-			return false;
+			return null;
 
 		BeatmapMeta beatmap = backend.loadBeatmap(pair.getBeatmap(),
 				pair.getMods(), lang);
 
 		if (beatmap == null) {
-			user.message(lang.unknownBeatmap());
-			return true;
+			throw new UserException(lang.unknownBeatmap());
 		}
 
 		PercentageEstimates estimates = beatmap.getEstimates();
@@ -65,16 +64,11 @@ public class NPHandler implements CommandHandler {
 			addition = "(" + lang.noInformationForModsShort() + ")";
 		}
 
-		if (user.message(beatmap.formInfoMessage(false, addition,
-				userData.getHearts(), null, null, null))) {
-			userData.setLastSongInfo(new BeatmapWithMods(pair.getBeatmap(),
-					beatmap
-					.getMods()));
-
-			lang.optionalCommentOnNP(user, apiUser, beatmap);
-		}
-
-		return true;
+		return new Success(beatmap.formInfoMessage(false,
+				addition, userData.getHearts(), null, null, null)).thenRun(
+				() -> userData.setLastSongInfo(new BeatmapWithMods(pair
+						.getBeatmap(), beatmap.getMods()))).then(
+				lang.optionalCommentOnNP(apiUser, beatmap));
 	}
 
 	@CheckForNull

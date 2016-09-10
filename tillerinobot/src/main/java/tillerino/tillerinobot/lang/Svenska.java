@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://osu.ppy.sh/u/3258429 SnickarN https://github.com/SnickarN-
@@ -41,15 +41,15 @@ public class Svenska implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Välkommen tillbaka, " + apiUser.getUserName() + ".");
+			return new Message("Välkommen tillbaka, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...Är det du? Det var så längesen!");
-			user.message("Det känns bra att du är tillbaka. Kan jag intressera dig med en rekommendation?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...Är det du? Det var så längesen!"))
+				.then(new Message("Det känns bra att du är tillbaka. Kan jag intressera dig med en rekommendation?"));
 		} else {
 			String[] messages = {
 					"det ser ut som att du vill ha en rekommendation.",
@@ -64,7 +64,7 @@ public class Svenska implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Svenska implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Kom hit, du!");
-		user.action("kram " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Kom hit, du!")
+			.then(new Action("kram " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -150,24 +150,6 @@ public class Svenska implements Language {
 	public String notRanked() {
 		return "Ser ut som att den mappen inte är rankad.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -185,8 +167,8 @@ public class Svenska implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("[https://osu.ppy.sh/u/3258429 SnickarN] hjälpte mig att lära mig svenska!");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("[https://osu.ppy.sh/u/3258429 SnickarN] hjälpte mig att lära mig svenska!");
 	}
 
 	@Override

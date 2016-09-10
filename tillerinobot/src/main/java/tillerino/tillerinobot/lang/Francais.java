@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * French Language implementation. Thx to https://osu.ppy.sh/u/Howaitorufu & https://osu.ppy.sh/u/ThePooN for
@@ -43,15 +43,15 @@ public class Francais implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Re ! :)");
+			return new Message("Re ! :)");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...c'est vraiment toi ? Cela fait si longtemps ! :o");
-			user.message("Heureux de te revoir " + apiUser.getUserName() + ". Puis-je te recommander quelques maps ?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...c'est vraiment toi ? Cela fait si longtemps ! :o"))
+				.then(new Message("Heureux de te revoir " + apiUser.getUserName() + ". Puis-je te recommander quelques maps ?"));
 		} else {
 			String[] messages = {
 					"tu as l'air de vouloir quelques recommandations !",
@@ -65,7 +65,7 @@ public class Francais implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -113,9 +113,9 @@ public class Francais implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Hey toi, viens ici!");
-		user.action("câline " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Hey toi, viens ici!")
+			.then(new Action("câline " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -155,24 +155,6 @@ public class Francais implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-			// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-			// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-			// regular Tillerino doesn't comment on this
-	}
-	
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -188,8 +170,8 @@ public class Francais implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Howaitorufu, ThePooN et Pweenzor m'ont appris à parler Français ! :D");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Howaitorufu, ThePooN et Pweenzor m'ont appris à parler Français ! :D");
 	}
 
 	@Override

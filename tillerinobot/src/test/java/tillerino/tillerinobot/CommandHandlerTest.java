@@ -1,10 +1,13 @@
 package tillerino.tillerinobot;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
 
@@ -20,9 +23,9 @@ public class CommandHandlerTest {
 
 	CommandHandler handler = CommandHandler.handling(
 			"A ",
-			CommandHandler.alwaysHandling("B", (a, b, c, d) -> called_b = true)
+			CommandHandler.alwaysHandling("B", (a, c, d) -> { called_b = true; return new NoResponse(); })
 					.or(CommandHandler.alwaysHandling("C",
-							(a, b, c, d) -> called_c = true)));
+							(a, c, d) -> { called_c = true; return new NoResponse(); })));
 
 	@Test
 	public void testNestedChoices() throws Exception {
@@ -31,24 +34,24 @@ public class CommandHandlerTest {
 
 	@Test
 	public void testPass() throws Exception {
-		assertFalse(handler.handle("X", null, null, null));
+		assertNull(handler.handle("X", null, null));
 	}
 
 	@Test(expected = UserException.class)
 	public void testNoNestedChoice() throws Exception {
-		handler.handle("A X", null, null, userData);
+		handler.handle("A X", null, userData);
 	}
 
 	@Test
 	public void testB() throws Exception {
-		handler.handle("A B", null, null, userData);
+		handler.handle("A B", null, userData);
 		assertTrue(called_b);
 		assertFalse(called_c);
 	}
 
 	@Test
 	public void testC() throws Exception {
-		handler.handle("A C", null, null, userData);
+		handler.handle("A C", null, userData);
 		assertTrue(called_c);
 		assertFalse(called_b);
 	}

@@ -44,7 +44,7 @@ public class OptionsHandlerTest {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(mock(Language.class));
 		
-		handler.handle("set languge tsundre", null, null, userData);
+		handler.handle("set languge tsundre", null, userData);
 		
 		verify(userData).setLanguage(LanguageIdentifier.Tsundere);
 	}
@@ -56,6 +56,6 @@ public class OptionsHandlerTest {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(mock(Language.class));
 		
-		handler.handle("set language defflt", null, null, userData);
+		handler.handle("set language defflt", null, userData);
 	}
 }

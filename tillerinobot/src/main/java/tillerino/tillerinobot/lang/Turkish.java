@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://github.com/Lucri https://osu.ppy.sh/u/Lucri
@@ -41,15 +41,15 @@ public class Turkish implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Hoşgeldin!, " + apiUser.getUserName() + ".");
+			return new Message("Hoşgeldin!, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...Bu sen misin? Görmeyeli çok uzun zaman oldu!");
-			user.message("Seni tekrardan görmek güzel. Sana bir öneride bulunabilir miyim?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...Bu sen misin? Görmeyeli çok uzun zaman oldu!"))
+				.then(new Message("Seni tekrardan görmek güzel. Sana bir öneride bulunabilir miyim?"));
 		} else {
 			String[] messages = {
 					"Sanki bir tavsiye istiyormuş gibi görünüyorsun.",
@@ -64,7 +64,7 @@ public class Turkish implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Turkish implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Hey sen, buraya gel !");
-		user.action("sarılır " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Hey sen, buraya gel !")
+			.then(new Action("sarılır " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -150,24 +150,6 @@ public class Turkish implements Language {
 	public String notRanked() {
 		return "Görünüşe göre bu beatmap ranked değil.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -185,8 +167,8 @@ public class Turkish implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Lucri bana Türkçe'yi öðrenmeme yardým etti.");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Lucri bana Türkçe'yi öðrenmeme yardým etti.");
 	}
 
 	@Override

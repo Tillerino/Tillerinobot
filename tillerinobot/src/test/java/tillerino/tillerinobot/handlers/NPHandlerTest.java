@@ -22,7 +22,7 @@ public class NPHandlerTest {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(new Default());
 		try {
-			new NPHandler(null).handle("is editing [https://osu.ppy.sh/s/123 title]", null, null, userData);
+			new NPHandler(null).handle("is editing [https://osu.ppy.sh/s/123 title]", null, userData);
 			fail();
 		} catch(UserException e) {
 			assertEquals(new Default().isSetId(), e.getMessage());

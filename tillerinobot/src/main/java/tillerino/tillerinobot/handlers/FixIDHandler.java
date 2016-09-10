@@ -12,7 +12,6 @@ import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -23,11 +22,11 @@ public class FixIDHandler implements CommandHandler {
     private final IrcNameResolver resolver;
 
 	@Override
-	public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
+	public Response handle(String command, OsuApiUser apiUser, UserData userData)
 					throws UserException, IOException, SQLException {
 
         if (!command.toLowerCase().startsWith(COMMAND)) {
-            return false;
+            return null;
         }
 
         String idStr = command.substring(COMMAND.length()).trim();
@@ -35,12 +34,10 @@ public class FixIDHandler implements CommandHandler {
 
 		OsuApiUser user = resolver.resolveManually(id);
 		if(user == null) {
-			ircUser.message("That user-id does not exist :(");
+			throw new UserException("That user-id does not exist :(");
 		} else {
-            ircUser.message("User '" + user.getUserName() + "' is now resolvable to user-id " + user.getUserId());
+			return new Message("User '" + user.getUserName() + "' is now resolvable to user-id " + user.getUserId());
 		}
-
-		return true;
 	}
 
 	@SuppressFBWarnings("TQ")

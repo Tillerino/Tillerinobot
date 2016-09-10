@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://osu.ppy.sh/u/Polarni https://github.com/Polarni
@@ -41,15 +41,15 @@ public class Czech implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Vítej zpět, " + apiUser.getUserName() + ".");
+			return new Message("Vítej zpět, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...jsi to ty? Už je to nějaká doba!");
-			user.message("To je dobře, že jsi zpátky. Mohu vás zaujmout doporučením?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...jsi to ty? Už je to nějaká doba!"))
+				.then(new Message("To je dobře, že jsi zpátky. Mohu vás zaujmout doporučením?"));
 		} else {
 			String[] messages = {
 					"vypadáš jako že chceš doporučení.",
@@ -64,7 +64,7 @@ public class Czech implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Czech implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Pojď sem, ty!");
-		user.action("objetí " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Pojď sem, ty!")
+			.then(new Action("objetí " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -150,24 +150,6 @@ public class Czech implements Language {
 	public String notRanked() {
 		return "Vypadá to že beatmapa není hodnocená.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -185,8 +167,8 @@ public class Czech implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Polarni mi pomohl naučit se česky.");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Polarni mi pomohl naučit se česky.");
 	}
 
 	@Override

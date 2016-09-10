@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://github.com/jerossen https://osu.ppy.sh/u/jeross
@@ -41,15 +41,15 @@ public class Dansk implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Velkommen tilbage, " + apiUser.getUserName() + ".");
+			return new Message("Velkommen tilbage, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...er det dig? Det er så længe siden!");
-			user.message("Det er godt at have dig tilbage. Kan jeg interessere dig til en anbefaling?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...er det dig? Det er så længe siden!"))
+				.then(new Message("Det er godt at have dig tilbage. Kan jeg interessere dig til en anbefaling?"));
 		} else {
 			String[] messages = {
 					"du ser ud til at ville have en anbefaling.",
@@ -64,7 +64,7 @@ public class Dansk implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Dansk implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Kom her!");
-		user.action("krammer " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Kom her!")
+			.then(new Action("krammer " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -152,24 +152,6 @@ public class Dansk implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -185,8 +167,8 @@ public class Dansk implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("jeross har hjulpet mig med at lære dansk.");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("jeross har hjulpet mig med at lære dansk.");
 	}
 
 	@Override

@@ -10,7 +10,6 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 
 public class ResetHandler implements CommandHandler {
@@ -23,13 +22,13 @@ public class ResetHandler implements CommandHandler {
 	}
 
 	@Override
-	public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
+	public Response handle(String command, OsuApiUser apiUser, UserData userData)
 					throws UserException, IOException, SQLException {
 		if (!command.equalsIgnoreCase("reset"))
-			return false;
+			return null;
 
 		backend.forgetRecommendations(apiUser.getUserId());
 
-		return true;
+		return new NoResponse();
 	}
 }

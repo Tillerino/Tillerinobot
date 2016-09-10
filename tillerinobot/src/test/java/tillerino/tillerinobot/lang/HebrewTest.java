@@ -1,19 +1,14 @@
 package tillerino.tillerinobot.lang;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 
 public class HebrewTest {
 	Hebrew lang = new Hebrew();
@@ -41,9 +36,6 @@ public class HebrewTest {
 		System.out.println("noInformationForModsShort");
 		System.out.println(lang.noInformationForModsShort());
 	}
-
-	@Mock
-	IRCBotUser user;
 	
 	@Mock
 	OsuApiUser apiUser;
@@ -51,35 +43,19 @@ public class HebrewTest {
 	public HebrewTest() {
 		MockitoAnnotations.initMocks(this);
 		
-		when(user.getNick()).thenReturn("username");
-		when(user.message(anyString())).then(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				System.out.println("Tillerino sends: " + invocation.getArguments()[0]);
-				return null;
-			}
-		});
-		when(user.action(anyString())).then(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				System.out.println("Tillerino action: " + invocation.getArguments()[0]);
-				return null;
-			}
-		});
-		
 		when(apiUser.getUserName()).thenReturn("username");
 	}
 	
 	@Test
 	public void testWelcomeUser() throws Exception {
 		System.out.println("welcomeUser 10 seconds");
-		lang.welcomeUser(user, apiUser, 10 * 1000);
+		System.out.println(lang.welcomeUser(apiUser, 10 * 1000));
 		System.out.println("welcomeUser 5 hours");
-		lang.welcomeUser(user, apiUser, 5 * 3600 * 1000);
+		System.out.println(lang.welcomeUser(apiUser, 5 * 3600 * 1000));
 		System.out.println("welcomeUser 2 days");
-		lang.welcomeUser(user, apiUser, 2l * 24 * 3600 * 1000);
+		System.out.println(lang.welcomeUser(apiUser, 2l * 24 * 3600 * 1000));
 		System.out.println("welcomeUser 10 days");
-		lang.welcomeUser(user, apiUser, 10l * 24 * 3600 * 1000);
+		System.out.println(lang.welcomeUser(apiUser, 10l * 24 * 3600 * 1000));
 	}
 
 	@Test
@@ -133,7 +109,7 @@ public class HebrewTest {
 	@Test
 	public void testHug() throws Exception {
 		System.out.println("hug");
-		lang.hug(user, apiUser);
+		System.out.println(lang.hug(apiUser));
 	}
 
 	@Test
@@ -175,19 +151,19 @@ public class HebrewTest {
 	@Test
 	public void testOptionalCommentOnNP() throws Exception {
 		System.out.println("optionalCommentOnNP");
-		lang.optionalCommentOnNP(user, apiUser, null);
+		System.out.println(lang.optionalCommentOnNP(apiUser, null));
 	}
 
 	@Test
 	public void testOptionalCommentOnWith() throws Exception {
 		System.out.println("optionalCommentOnWith");
-		lang.optionalCommentOnWith(user, apiUser, null);
+		System.out.println(lang.optionalCommentOnWith(apiUser, null));
 	}
 
 	@Test
 	public void testOptionalCommentOnRecommendation() throws Exception {
 		System.out.println("optionalCommentOnRecommendation");
-		lang.optionalCommentOnRecommendation(user, apiUser, null);
+		System.out.println(lang.optionalCommentOnRecommendation(apiUser, null));
 	}
 
 	@Test
@@ -199,7 +175,7 @@ public class HebrewTest {
 	@Test
 	public void testOptionalCommentOnLanguage() throws Exception {
 		System.out.println("optionalCommentOnLanguage");
-		lang.optionalCommentOnLanguage(user, apiUser);
+		System.out.println(lang.optionalCommentOnLanguage(apiUser));
 	}
 
 	@Test

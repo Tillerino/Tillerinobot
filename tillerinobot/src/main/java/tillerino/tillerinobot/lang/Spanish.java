@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author Sibchil https://osu.ppy.sh/u/3988045 https://github.com/sibchil
@@ -43,15 +43,15 @@ public class Spanish implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Bienvenid@, " + apiUser.getUserName() + ".");
+			return new Message("Bienvenid@, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...¿eres tú? ¡Ha pasado tanto tiempo!");
-			user.message("Es genial tenerte de vuelta. ¿Puedo ofrecerte una recomendación?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...¿eres tú? ¡Ha pasado tanto tiempo!"))
+				.then(new Message("Es genial tenerte de vuelta. ¿Puedo ofrecerte una recomendación?"));
 		} else {
 			String[] messages = {
 					"me parece que necesitas una recomendación.",
@@ -66,7 +66,7 @@ public class Spanish implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -112,9 +112,9 @@ public class Spanish implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("¡Ven aquí!");
-		user.action("Abraza a " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("¡Ven aquí!")
+			.then(new Action("Abraza a " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -152,24 +152,6 @@ public class Spanish implements Language {
 	public String notRanked() {
 		return "Parece que este mapa no está rankeado.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -187,8 +169,8 @@ public class Spanish implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Sasakura, Underforest y [https://osu.ppy.sh/u/2743036 Zarkinox] me ayudaron a aprender español :3");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Sasakura, Underforest y [https://osu.ppy.sh/u/2743036 Zarkinox] me ayudaron a aprender español :3");
 	}
 
 	@Override

@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * TRANSLATION NOTE:
@@ -48,15 +48,15 @@ public class Romana implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Bun venit înapoi, " + apiUser.getUserName() + ".");
+			return new Message("Bun venit înapoi, " + apiUser.getUserName() + ".");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...ești chiar tu? A trecut atât de mult timp!");
-			user.message("Imi pare bine ca ai revenit. Pot să îți dau o recomandare?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...ești chiar tu? A trecut atât de mult timp!"))
+				.then(new Message("Imi pare bine ca ai revenit. Pot să îți dau o recomandare?"));
 		} else {
 			String[] messages = {
 					"arăți ca și cum ai vrea o recomandare.",
@@ -71,7 +71,7 @@ public class Romana implements Language {
 
 			String message = messages[random.nextInt(messages.length)];
 
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -117,9 +117,9 @@ public class Romana implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Vino aici, tu!");
-		user.action("îl îmbrățișează pe " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Vino aici, tu!")
+			.then(new Action("îl îmbrățișează pe " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -159,24 +159,6 @@ public class Romana implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -192,7 +174,7 @@ public class Romana implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
 		/*
 		 * TRANSLATION NOTE: This line is sent to the user right after they have
 		 * chosen this Language implementation. The English version refers to
@@ -218,7 +200,7 @@ public class Romana implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		user.message("[https://osu.ppy.sh/u/6579055 Dddsasul] mă ajută să învăț Româna!");
+		return new Message("[https://osu.ppy.sh/u/6579055 Dddsasul] mă ajută să învăț Româna!");
 	}
 
 	@Override

@@ -32,17 +32,17 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		
 		IRCBotUser user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("user");
-		when(user.message(anyString())).thenReturn(true);
+		when(user.message(anyString(), anyBoolean())).thenReturn(true);
 		
 		bot.processPrivateMessage(user, "!recommend");
-		verify(user).message(IRCBot.versionMessage);
+		verify(user).message(IRCBot.versionMessage, false);
 		verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.currentVersion));
 		
 		user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("user");
 		
 		bot.processPrivateMessage(user, "!recommend");
-		verify(user, never()).message(IRCBot.versionMessage);
+		verify(user, never()).message(IRCBot.versionMessage, false);
 	}
 	
 	@Test
@@ -58,19 +58,19 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		InOrder inOrder = inOrder(user);
 
 		bot.processPrivateMessage(user, "!recommend");
-		inOrder.verify(user).message(contains("http://osu.ppy.sh"));
+		inOrder.verify(user).message(contains("http://osu.ppy.sh"), anyBoolean());
 		
 		bot.processPrivateMessage(user, "!r");
-		inOrder.verify(user).message(contains("http://osu.ppy.sh"));
+		inOrder.verify(user).message(contains("http://osu.ppy.sh"), anyBoolean());
 		
 		bot.processPrivateMessage(user, "!recccomend");
-		inOrder.verify(user).message(contains("!help"));
+		inOrder.verify(user).message(contains("!help"), anyBoolean());
 		
 		bot.processPrivateMessage(user, "!halp");
-		inOrder.verify(user).message(contains("twitter"));
+		inOrder.verify(user).message(contains("twitter"), anyBoolean());
 		
 		bot.processPrivateMessage(user, "!feq");
-		inOrder.verify(user).message(contains("FAQ"));
+		inOrder.verify(user).message(contains("FAQ"), anyBoolean());
 	}
 
 	@Test
@@ -92,19 +92,19 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 1000);
 		bot.welcomeIfDonator(user);
-		verify(user).message(startsWith("beep boop"));
+		verify(user).message(startsWith("beep boop"), anyBoolean());
 
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 10 * 60 * 1000);
 		bot.welcomeIfDonator(user);
-		verify(user).message("Welcome back, TheDonator.");
+		verify(user).message("Welcome back, TheDonator.", false);
 		
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000);
 		bot.welcomeIfDonator(user);
-		verify(user).message(startsWith("TheDonator, "));
+		verify(user).message(startsWith("TheDonator, "), anyBoolean());
 		
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000);
 		bot.welcomeIfDonator(user);
-		verify(user).message(contains("so long"));
+		verify(user).message(contains("so long"), anyBoolean());
 	}
 	
 	IRCBot getTestBot(BotBackend backend) {
@@ -149,7 +149,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	
 		bot.processPrivateMessage(botUser, "I need a hug :(");
 		
-		verify(botUser, times(1)).message("Come here, you!");
+		verify(botUser, times(1)).message("Come here, you!", false);
 		verify(botUser).action("hugs donator");
 	}
 	
@@ -165,7 +165,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		bot.processPrivateMessage(botUser, "!r");
 		bot.processPrivateMessage(botUser, "!complain");
 		
-		verify(botUser, times(1)).message(contains("complaint"));
+		verify(botUser, times(1)).message(contains("complaint"), anyBoolean());
 	}
 
 	@Test
@@ -186,7 +186,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	IRCBotUser mockBotUser(String name) {
 		IRCBotUser botUser = mock(IRCBotUser.class);
 		when(botUser.getNick()).thenReturn(name);
-		when(botUser.message(anyString())).thenAnswer(new Answer<Boolean>() {
+		when(botUser.message(anyString(), anyBoolean())).thenAnswer(new Answer<Boolean>() {
 			@Override
 			public Boolean answer(InvocationOnMock invocation) throws Throwable {
 				System.out.println(invocation.getArguments()[0]);
@@ -221,20 +221,20 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		IRCBotUser botUser = mockBotUser("user");
 
 		bot.processPrivateMessage(botUser, "!r");
-		verify(botUser, times(1)).message(contains("/b/1"));
+		verify(botUser, times(1)).message(contains("/b/1"), anyBoolean());
 
 		bot.processPrivateMessage(botUser, "!r");
-		verify(botUser, times(1)).message(contains("!reset"));
-		verify(botUser, times(1)).message(contains("/b/1"));
+		verify(botUser, times(1)).message(contains("!reset"), anyBoolean());
+		verify(botUser, times(1)).message(contains("/b/1"), anyBoolean());
 
 		bot.processPrivateMessage(botUser, "!r");
-		verify(botUser, times(2)).message(contains("!reset"));
-		verify(botUser, times(1)).message(contains("/b/1"));
+		verify(botUser, times(2)).message(contains("!reset"), anyBoolean());
+		verify(botUser, times(1)).message(contains("/b/1"), anyBoolean());
 
 		bot.processPrivateMessage(botUser, "!reset");
 
 		bot.processPrivateMessage(botUser, "!r");
-		verify(botUser, times(2)).message(contains("/b/1"));
+		verify(botUser, times(2)).message(contains("/b/1"), anyBoolean());
 	}
 
 	@Test

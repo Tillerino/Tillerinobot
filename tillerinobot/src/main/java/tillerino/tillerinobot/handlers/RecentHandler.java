@@ -12,7 +12,6 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
@@ -22,14 +21,14 @@ public class RecentHandler implements CommandHandler {
 	BotBackend backend;
 
 	@Override
-	public boolean handle(String command, IRCBotUser ircUser, OsuApiUser apiUser, UserData userData)
+	public Response handle(String command, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException, InterruptedException {
 		if (!command.toLowerCase().equals("now")) {
-			return false;
+			return null;
 		}
 		
 		if(userData.getHearts() <= 0) {
-			return false;
+			return null;
 		}
 		
 		final Language language = userData.getLanguage();
@@ -50,11 +49,10 @@ public class RecentHandler implements CommandHandler {
 			throw new UserException(language.noInformationForMods());
 		}
 
-		if(ircUser.message(estimates.formInfoMessage(false, null, userData.getHearts(), score.getAccuracy(), null, null))) {
-			userData.setLastSongInfo(estimates.getBeatmapWithMods());
-		}
-		return true;
-
+		return new Success(estimates.formInfoMessage(false, null,
+				userData.getHearts(), score.getAccuracy(), null, null))
+				.thenRun(() -> userData.setLastSongInfo(estimates
+						.getBeatmapWithMods()));
 	}
 
 }

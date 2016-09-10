@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author Souen- https://osu.ppy.sh/u/2234772 https://github.com/Soukyuen
@@ -41,15 +41,15 @@ public class Japanese implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("ﾋﾟﾋﾟｯ");
+			return new Message("ﾋﾟﾋﾟｯ");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("また会いましたね、" + apiUser.getUserName() + "さん。");
+			return new Message("また会いましたね、" + apiUser.getUserName() + "さん。");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "さん・・・");
-			user.message(apiUser.getUserName() + "さんですか？お久しぶりです。");
-			user.message("少し、おすすめの譜面でも見て行ってくれますか？");
+			return new Message(apiUser.getUserName() + "さん・・・")
+				.then(new Message(apiUser.getUserName() + "さんですか？お久しぶりです。"))
+				.then(new Message("少し、おすすめの譜面でも見て行ってくれますか？"));
 		} else {
 			String[] messages = {
 					"おすすめ譜面が欲しい様ですね。",
@@ -64,7 +64,7 @@ public class Japanese implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Japanese implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("ちょっと私に近づいてください。");
-		user.action("hugs " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("ちょっと私に近づいてください。")
+			.then(new Action("hugs " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -152,24 +152,6 @@ public class Japanese implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-	
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -185,8 +167,8 @@ public class Japanese implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("私はSouen-さんに日本語を教えてもらいました。よろしくお願いします。");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("私はSouen-さんに日本語を教えてもらいました。よろしくお願いします。");
 	}
 
 	@Override

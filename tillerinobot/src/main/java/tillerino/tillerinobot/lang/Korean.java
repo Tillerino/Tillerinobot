@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://github.com/jamkevin https://osu.ppy.sh/u/jamkevin
@@ -41,15 +41,15 @@ public class Korean implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("띵동");
+			return new Message("띵동");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("다시 오신 것을 환영합니다, " + apiUser.getUserName() + ".");
+			return new Message("다시 오신 것을 환영합니다, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...당신인가요? 오랜만이네요!");
-			user.message("당신을 다시 만나게 되어 기뻐요. 몇 가지 곡을 추천해드릴까요?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...당신인가요? 오랜만이네요!"))
+				.then(new Message("당신을 다시 만나게 되어 기뻐요. 몇 가지 곡을 추천해드릴까요?"));
 		} else {
 			String[] messages = {
 					"곡을 추천받고 싶어하는 것 같네요.",
@@ -64,7 +64,7 @@ public class Korean implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Korean implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("이리 오세요!");
-		user.action("(포옹) " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("이리 오세요!")
+			.then(new Action("(포옹) " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -152,24 +152,6 @@ public class Korean implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-	
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -185,8 +167,8 @@ public class Korean implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("언어가 한국어로 전환되었습니다. 번역: jamkevin:)");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin:)");
 	}
 
 	@Override

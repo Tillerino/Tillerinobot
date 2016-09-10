@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author [HDHR] andre.pedrocv@gmail.com https://osu.ppy.sh/u/3547567 https://github.com/ThatGuy986
@@ -41,15 +41,15 @@ public class PortuguesePortugal implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Olá, " + apiUser.getUserName() + ".");
+			return new Message("Olá, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...és mesmo tu? Há quanto tempo!");
-			user.message("Que bom ter-te de volta! Interessado em alguma recomendação?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...és mesmo tu? Há quanto tempo!"))
+				.then(new Message("Que bom ter-te de volta! Interessado em alguma recomendação?"));
 		} else {
 			String[] messages = {
 					"parece que queres uma recomendação.",
@@ -64,7 +64,7 @@ public class PortuguesePortugal implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class PortuguesePortugal implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("anda cá!");
-		user.action("abraça " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("anda cá!")
+			.then(new Action("abraça " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -150,24 +150,6 @@ public class PortuguesePortugal implements Language {
 	public String notRanked() {
 		return "Parece que este mapa não está ranqueado.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -185,8 +167,8 @@ public class PortuguesePortugal implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("O [HDHR] ensinou-me a falar Português (de Portugal)!");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("O [HDHR] ensinou-me a falar Português (de Portugal)!");
 	}
 
 	@Override

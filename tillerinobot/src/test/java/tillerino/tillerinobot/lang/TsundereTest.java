@@ -31,7 +31,7 @@ public class TsundereTest {
 		// make a bullshit call to the handler four times
 		for (int i = 0; i < 4; i++) {
 			try {
-				handler.handle("r bullshit", null, mock(OsuApiUser.class), userData);
+				handler.handle("r bullshit", mock(OsuApiUser.class), userData);
 				// we should not get this far because we're expecting an exception
 				fail("there should be an exception");
 			} catch (UserException e) {

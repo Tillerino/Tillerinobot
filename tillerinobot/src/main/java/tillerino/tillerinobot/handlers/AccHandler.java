@@ -12,7 +12,6 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
@@ -31,11 +30,11 @@ public class AccHandler implements CommandHandler {
 	static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 
 	@Override
-	public boolean handle(String message, IRCBotUser user,
-			OsuApiUser apiUser, UserData userData) throws UserException,
+	public Response handle(String message, OsuApiUser apiUser,
+			UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
 		if (!message.toLowerCase().startsWith("acc")) {
-			return false;
+			return null;
 		}
 		
 		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
@@ -54,7 +53,7 @@ public class AccHandler implements CommandHandler {
 			if (beatmap == null) {
 				throw new RareUserException(lang.excuseForError());
 			}
-			user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
+			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
 		} else {
 			if(message.endsWith("%")) {
 				message = message.substring(0, message.length() - 1);
@@ -64,9 +63,8 @@ public class AccHandler implements CommandHandler {
 			if (beatmap == null) {
 				throw new RareUserException(lang.excuseForError());
 			}
-			user.message(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, null, null));
+			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, null, null));
 		}
-		return true;
 	}
 
 	public static double parseAcc(String accString, Language lang) throws UserException {

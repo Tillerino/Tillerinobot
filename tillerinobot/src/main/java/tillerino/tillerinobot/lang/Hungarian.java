@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://github.com/ApeConfirmed https://osu.ppy.sh/u/BakaHarcos
@@ -42,15 +42,15 @@ public class Hungarian implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
-			user.message("bíp búp");
+			return new Message("bíp búp");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Üdv. újra, " + apiUser.getUserName() + ".");
+			return new Message("Üdv. újra, " + apiUser.getUserName() + ".");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...te vagy az? Olyan rég láttalak!");
-			user.message("Jó hogy visszajöttél. Küldhetek egy ajánlást?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...te vagy az? Olyan rég láttalak!"))
+				.then(new Message("Jó hogy visszajöttél. Küldhetek egy ajánlást?"));
 		} else {
 			String[] messages = {
 					"úgy látszik ajánlásra éhezel.",
@@ -65,7 +65,7 @@ public class Hungarian implements Language {
 
 			String message = messages[random.nextInt(messages.length)];
 
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -111,9 +111,9 @@ public class Hungarian implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Gyere ide!");
-		user.action("megöleli " + apiUser.getUserName() + "t");
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Gyere ide!")
+			.then(new Action("megöleli " + apiUser.getUserName() + "t"));
 	}
 
 	@Override
@@ -153,24 +153,6 @@ public class Hungarian implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -186,7 +168,7 @@ public class Hungarian implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
 		/*
 		 * TRANSLATION NOTE: This line is sent to the user right after they have
 		 * chosen this Language implementation. The English version refers to
@@ -212,7 +194,7 @@ public class Hungarian implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		user.message("[http://osu.ppy.sh/u/BakaHarcos BakaHarcos]([http://github.com/ApeConfirmed ApeConfirmed]) megtanított magyarul beszélni :)");
+		return new Message("[http://osu.ppy.sh/u/BakaHarcos BakaHarcos]([http://github.com/ApeConfirmed ApeConfirmed]) megtanított magyarul beszélni :)");
 	}
 
 	@Override

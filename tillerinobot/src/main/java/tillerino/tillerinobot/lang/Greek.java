@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author Till https://github.com/nikosbks https://osu.ppy.sh/u/3619345
@@ -42,15 +42,15 @@ public class Greek implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Καλώς ήρθες πίσω," + apiUser.getUserName() + ".");
+			return new Message("Καλώς ήρθες πίσω," + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...είσαι εσύ αυτός; Πάει πολύς καιρός!");
-			user.message("Είναι ωραίο να σε έχουμε πίσω. Μπορώ να σε ενδιαφέρω με μια πρόταση;");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...είσαι εσύ αυτός; Πάει πολύς καιρός!"))
+				.then(new Message("Είναι ωραίο να σε έχουμε πίσω. Μπορώ να σε ενδιαφέρω με μια πρόταση;"));
 		} else {
 			String[] messages = {
 				        "Φαίνεσαι σαν να θες μια πρόταση.",
@@ -65,7 +65,7 @@ public class Greek implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -111,9 +111,9 @@ public class Greek implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Έλα εδώ εσυ!");
-		user.action("Αγκαλιάζει " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Έλα εδώ εσυ!")
+			.then(new Action("Αγκαλιάζει " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -153,24 +153,6 @@ public class Greek implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-	
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -186,8 +168,8 @@ public class Greek implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Ο N for Niko με βοήθησε να μάθω Ελληνικά");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Ο N for Niko με βοήθησε να μάθω Ελληνικά");
 	}
 
 	@Override

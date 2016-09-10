@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 public class Farsi implements Language {
 
@@ -38,15 +38,15 @@ public class Farsi implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("bip boop");
+			return new Message("bip boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Khosh aamadi, " + apiUser.getUserName() + ".");
+			return new Message("Khosh aamadi, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...in toi? Kheiliwakhte hamdigaro nadidim!");
-			user.message("Didamet hal kardam. Mikhai recommendation-i behet bedam?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...in toi? Kheiliwakhte hamdigaro nadidim!"))
+				.then(new Message("Didamet hal kardam. Mikhai recommendation-i behet bedam?"));
 		} else {
 			String[] messages = {
 					"to hatman ye recommendation-i mikhai, haan?",
@@ -61,7 +61,7 @@ public class Farsi implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -107,9 +107,9 @@ public class Farsi implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Bia injaa binam!");
-		user.action("ra " + apiUser.getUserName() + " baghal mikone");
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Bia injaa binam!")
+			.then(new Action("ra " + apiUser.getUserName() + " baghal mikone"));
 	}
 
 	@Override
@@ -145,24 +145,6 @@ public class Farsi implements Language {
 	public String notRanked() {
 		return "In beatmap ranked ke nist!";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -180,8 +162,8 @@ public class Farsi implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("ikhebepicmuis Farsi-harfzadano yaadamdaad!"); 
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("ikhebepicmuis Farsi-harfzadano yaadamdaad!"); 
 	}
 
 	@Override

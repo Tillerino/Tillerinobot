@@ -1,5 +1,8 @@
 package tillerino.tillerinobot.handlers;
 
+import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
+import static org.apache.commons.lang3.StringUtils.join;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -7,21 +10,18 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 
 public class OptionsHandler implements CommandHandler {
 	@Override
-	public boolean handle(String command, IRCBotUser ircUser,
-			OsuApiUser apiUser, UserData userData) throws UserException,
+	public Response handle(String command, OsuApiUser apiUser,
+			UserData userData) throws UserException,
 			IOException, SQLException {
 		boolean set = false;
 		
@@ -32,7 +32,7 @@ public class OptionsHandler implements CommandHandler {
 				|| command.toLowerCase().startsWith("view")) {
 			command = command.substring("show".length()).trim();
 		} else {
-			return false;
+			return null;
 		}
 		
 		if (set && !command.contains(" ")) {
@@ -62,23 +62,22 @@ public class OptionsHandler implements CommandHandler {
 
 				userData.setLanguage(ident);
 
-				userData.getLanguage().optionalCommentOnLanguage(ircUser,
-						apiUser);
+				return userData.getLanguage().optionalCommentOnLanguage(apiUser);
 			} else {
-				ircUser.message("Language: " + userData.getLanguageIdentifier().toString());
+				return new Message("Language: " + userData.getLanguageIdentifier().toString());
 			}
 		} else if (getLevenshteinDistance(option, "welcome") <= 1 && userData.getHearts() > 0) {
 			if (set) {
 				userData.setShowWelcomeMessage(parseBoolean(value, userData.getLanguage()));
 			} else {
-				ircUser.message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
+				return new Message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
 			}
 		} else {
 			throw new UserException(userData.getLanguage().invalidChoice(option,
 					"Language" + (userData.getHearts() > 0 ? ", Welcome" : "")));
 		}
 
-		return true;
+		return new NoResponse();
 	}
 
 	public static boolean parseBoolean(final @Nonnull String original, Language lang) throws UserException {

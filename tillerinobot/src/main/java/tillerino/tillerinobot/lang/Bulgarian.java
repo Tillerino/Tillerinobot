@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * TRANSLATION NOTE:
@@ -48,15 +48,15 @@ public class Bulgarian implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
-			user.message(" бип-боп");
+			return new Message(" бип-боп");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message(" Хей, " + apiUser.getUserName() + ".");
+			return new Message(" Хей, " + apiUser.getUserName() + ".");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("... ти ли си? Здрасти!");
-			user.message(" Радвам се да те видя пак. Една препоръка ще те заинтересува ли?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("... ти ли си? Здрасти!"))
+				.then(new Message(" Радвам се да те видя пак. Една препоръка ще те заинтересува ли?"));
 		} else {
 			String[] messages = {
 					" Изглеждаш ми сякаш искаш препоръка.",
@@ -71,7 +71,7 @@ public class Bulgarian implements Language {
 
 			String message = messages[random.nextInt(messages.length)];
 
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -117,9 +117,9 @@ public class Bulgarian implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message(" Ела тук!");
-		user.action(" Прегръдка за " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message(" Ела тук!")
+			.then(new Action(" Прегръдка за " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -159,24 +159,6 @@ public class Bulgarian implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -192,7 +174,7 @@ public class Bulgarian implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
 		/*
 		 * TRANSLATION NOTE: This line is sent to the user right after they have
 		 * chosen this Language implementation. The English version refers to
@@ -218,7 +200,7 @@ public class Bulgarian implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		user.message("Преводът достига до Вас с подкрепата на [https://osu.ppy.sh/u/6330087 rint0] ^.^");
+		return new Message("Преводът достига до Вас с подкрепата на [https://osu.ppy.sh/u/6330087 rint0] ^.^");
 	}
 
 	@Override

@@ -209,6 +209,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 						ActionEvent<PircBotX> event = mock(ActionEvent.class);
 						when(event.getUser()).thenReturn(user);
 						when(event.getBot()).thenReturn(pircBot);
+						when(event.getTimestamp()).thenReturn(System.currentTimeMillis());
 						when(event.getMessage()).thenReturn("is listening to [http://osu.ppy.sh/b/" + line.substring(4) + " title]");
 						dispatch(event);
 					} else if(line.startsWith("/nps ")) {
@@ -216,6 +217,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 						ActionEvent<PircBotX> event = mock(ActionEvent.class);
 						when(event.getUser()).thenReturn(user);
 						when(event.getBot()).thenReturn(pircBot);
+						when(event.getTimestamp()).thenReturn(System.currentTimeMillis());
 						when(event.getMessage()).thenReturn("is listening to [https://osu.ppy.sh/b/" + line.substring(5) + " title]");
 						dispatch(event);
 					} else if(line.startsWith("/q")) {
@@ -228,6 +230,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 						when(event.getUser()).thenReturn(user);
 						when(event.getBot()).thenReturn(pircBot);
 						when(event.getMessage()).thenReturn(line);
+						when(event.getTimestamp()).thenReturn(System.currentTimeMillis());
 						dispatch(event);
 					}
 				}

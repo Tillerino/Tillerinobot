@@ -1,13 +1,14 @@
 package tillerino.tillerinobot.lang;
 
-import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
-
 import java.util.List;
 import java.util.Random;
+
+import org.tillerino.osuApiModel.Mods;
+import org.tillerino.osuApiModel.OsuApiUser;
+
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * Dutch language implementation by https://osu.ppy.sh/u/PudiPudi and https://github.com/notadecent and https://osu.ppy.sh/u/2756335
@@ -41,15 +42,15 @@ public class Nederlands implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Welkom terug, " + apiUser.getUserName() + ".");
+			return new Message("Welkom terug, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...ben jij dat? Dat is lang geleden!");
-			user.message("Het is goed om je weer te zien. Kan ik je wellicht een recommandatie geven?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...ben jij dat? Dat is lang geleden!"))
+				.then(new Message("Het is goed om je weer te zien. Kan ik je wellicht een recommandatie geven?"));
 		} else {
 			String[] messages = {
 					"jij ziet er uit alsof je een recommandatie wilt.",
@@ -64,7 +65,7 @@ public class Nederlands implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +111,9 @@ public class Nederlands implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Kom eens hier jij!");
-		user.action("knuffelt " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Kom eens hier jij!")
+			.then(new Action("knuffelt " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -148,24 +149,6 @@ public class Nederlands implements Language {
 	public String notRanked() {
 		return "Lijkt erop dat die beatmap niet ranked is.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -183,8 +166,8 @@ public class Nederlands implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("PudiPudi heeft me geleerd Nederlands te spreken.");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("PudiPudi heeft me geleerd Nederlands te spreken.");
 	}
 
 	@Override

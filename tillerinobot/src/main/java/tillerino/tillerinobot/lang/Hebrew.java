@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://github.com/shavitush https://reddit.com/u/shavitush
@@ -36,15 +36,15 @@ public class Hebrew implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("ביפ בופ");
+			return new Message("ביפ בופ");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("." + apiUser.getUserName() + " ברוך הבא");
+			return new Message("." + apiUser.getUserName() + " ברוך הבא");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...זה אתה? עבר כל כך הרבה זמן");
-			user.message("?נפלא לראות אותך. תתעניין בהצעה");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...זה אתה? עבר כל כך הרבה זמן"))
+				.then(new Message("?נפלא לראות אותך. תתעניין בהצעה"));
 		} else {
 			String[] messages = {
 					"..אתה נראה כאילו אתה רוצה הצעה",
@@ -59,7 +59,7 @@ public class Hebrew implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(message + " ," + apiUser.getUserName());
+			return new Message(message + " ," + apiUser.getUserName());
 		}
 	}
 
@@ -104,9 +104,9 @@ public class Hebrew implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("!בוא הנה, אתה");
-		user.action(apiUser.getUserName() + " מחבק את");
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("!בוא הנה, אתה")
+			.then(new Action(apiUser.getUserName() + " מחבק את"));
 	}
 
 	@Override
@@ -143,24 +143,6 @@ public class Hebrew implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-	
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -176,8 +158,8 @@ public class Hebrew implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message(".עזר לי ללמוד עברית shavitush");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message(".עזר לי ללמוד עברית shavitush");
 	}
 
 	@Override

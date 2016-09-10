@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author Tomoka Rin leoyao321@gmail.com https://osu.ppy.sh/u/125308
@@ -42,15 +42,15 @@ public class ChineseTraditional implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
-			user.message("哈囉!");
+			return new Message("哈囉!");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("歡迎回來!， " + apiUser.getUserName() + "。");
+			return new Message("歡迎回來!， " + apiUser.getUserName() + "。");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message(":D 好久不見了呢!");
-			user.message("很高興看到你回來，需要讓我推薦你幾首歌重溫感覺嗎?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message(":D 好久不見了呢!"))
+				.then(new Message("很高興看到你回來，需要讓我推薦你幾首歌重溫感覺嗎?"));
 		} else {
 			String[] messages = {
 					"看起來你想要我推薦你譜面呢!",
@@ -65,7 +65,7 @@ public class ChineseTraditional implements Language {
 
 			String message = messages[random.nextInt(messages.length)];
 
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -111,9 +111,9 @@ public class ChineseTraditional implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("可以來到我這邊一下嗎?");
-		user.action("抱" + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("可以來到我這邊一下嗎?")
+			.then(new Action("抱" + apiUser.getUserName()));
 	}
 
 	@Override
@@ -153,24 +153,6 @@ public class ChineseTraditional implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -186,8 +168,8 @@ public class ChineseTraditional implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("是Tomoka Rin教我中文的，請多多指教。");
+	public Message optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("是Tomoka Rin教我中文的，請多多指教。");
 	}
 
 	@Override

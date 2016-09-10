@@ -1,13 +1,10 @@
 package tillerino.tillerinobot;
 
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -22,13 +19,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.CoreHooks;
@@ -48,12 +45,20 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
+import tillerino.tillerinobot.CommandHandler.ResponseList;
+import tillerino.tillerinobot.CommandHandler.Success;
+import tillerino.tillerinobot.CommandHandler.Task;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.handlers.AccHandler;
+import tillerino.tillerinobot.handlers.ComplaintHandler;
 import tillerino.tillerinobot.handlers.DebugHandler;
+import tillerino.tillerinobot.handlers.FixIDHandler;
+import tillerino.tillerinobot.handlers.HelpHandler;
 import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
 import tillerino.tillerinobot.handlers.NPHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
@@ -61,7 +66,6 @@ import tillerino.tillerinobot.handlers.RecentHandler;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.handlers.WithHandler;
-import tillerino.tillerinobot.handlers.FixIDHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
@@ -76,7 +80,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks implements TidyObject {
-	public interface IRCBotUser {
+
+	interface IRCBotUser {
 		/**
 		 * @return the user's IRC nick, not their actual user name.
 		 */
@@ -84,9 +89,10 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		/**
 		 * 
 		 * @param msg
+		 * @param success see {@link Success}
 		 * @return true if the message was sent
 		 */
-		boolean message(String msg);
+		boolean message(String msg, boolean success);
 		
 		/**
 		 * 
@@ -98,6 +104,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 	public static final String MDC_HANDLER = "handler";
 	public static final String MDC_STATE = "state";
+	public static final String MDC_SUCCESS = "success";
+	public static final String MDC_DURATION = "duration";
 	
 	final BotBackend backend;
 	final private boolean silent;
@@ -132,6 +140,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		commandHandlers.add(new RecommendHandler(backend, manager));
 		commandHandlers.add(new RecentHandler(backend));
 		commandHandlers.add(new DebugHandler(backend, resolver));
+		commandHandlers.add(new HelpHandler());
+		commandHandlers.add(new ComplaintHandler(manager));
 	}
 
 	@Override
@@ -227,17 +237,18 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			t.setStackTrace(stackTrace);
 			log.warn(purpose + " - request has been processing for " + processing, t);
 			if(!semaphore.isSentWarning()) {
-				user.message(lang.getPatience());
+				user.message(lang.getPatience(), false);
 			}
 		} else {
 			log.debug(purpose);
 		}
 		if(semaphore.getAttemptsSinceLastAcquired() >= 3 && !semaphore.isSentWarning()) {
-			user.message("[http://i.imgur.com/Ykfua8r.png ...]");
+			user.message("[http://i.imgur.com/Ykfua8r.png ...]", false);
 		}
 	}
 
 	void processPrivateAction(IRCBotUser user, String message) {
+		MDC.put(MDC_STATE, "action");
 		log.debug("action: " + message);
 		
 		Language lang = new Default();
@@ -255,7 +266,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			
 			checkVersionInfo(user);
 
-			new NPHandler(backend).handle(message, user, apiUser, userData);
+			sendResponse(new NPHandler(backend).handle(message, apiUser, userData), user);
 		} catch (RuntimeException | Error | UserException | IOException | SQLException | InterruptedException e) {
 			handleException(user, e, lang);
 		} finally {
@@ -265,6 +276,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 	private void handleException(IRCBotUser user, Throwable e, Language lang) {
 		try {
+			MDC.remove(MDC_SUCCESS);
 			if(e instanceof ExecutionException) {
 				e = e.getCause();
 			}
@@ -275,18 +287,18 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				if(e instanceof QuietException) {
 					return;
 				}
-				user.message(e.getMessage());
+				user.message(e.getMessage(), false);
 			} else {
 				if (e instanceof SocketTimeoutException) {
-					user.message(lang.apiTimeoutException());
+					user.message(lang.apiTimeoutException(), false);
 					log.debug("osu api timeout");
 				} else {
 					String string = logException(e, log);
 	
 					if (e instanceof IOException) {
-						user.message(lang.externalException(string));
+						user.message(lang.externalException(string), false);
 					} else {
-						user.message(lang.internalException(string));
+						user.message(lang.internalException(string), false);
 					}
 				}
 			}
@@ -328,7 +340,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		return new IRCBotUser() {
 			
 			@Override
-			public boolean message(String msg) {
+			public boolean message(String msg, boolean success) {
 				try {
 					senderSemaphore.acquire();
 				} catch (InterruptedException e) {
@@ -338,7 +350,11 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().message(msg);
-					MDC.put("duration", System.currentTimeMillis() - event.getTimestamp() + "");
+					MDC.put(MDC_STATE, "sent");
+					if (success) {
+						MDC.put(MDC_DURATION, System.currentTimeMillis() - event.getTimestamp() + "");
+						MDC.put(MDC_SUCCESS, "true");
+					}
 					log.debug("sent: " + msg);
 					botInfo.setLastSentMessage(System.currentTimeMillis());
 					return true;
@@ -346,6 +362,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					log.error("not sent: " + e.getMessage());
 					return false;
 				} finally {
+					MDC.remove(MDC_DURATION);
+					MDC.remove(MDC_SUCCESS);
 					senderSemaphore.release();
 				}
 			}
@@ -361,7 +379,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().action(msg);
-					MDC.put("duration", System.currentTimeMillis() - event.getTimestamp() + "");
+					MDC.put(MDC_STATE, "sent");
 					log.debug("sent action: " + msg);
 					return true;
 				} catch (IOException | InterruptedException e) {
@@ -381,6 +399,38 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		};
 	}
 	
+	void sendResponse(@Nullable Response response, IRCBotUser user) {
+		if (response instanceof ResponseList) {
+			for (Response r : ((ResponseList) response).responses) {
+				sendResponse(r, user);
+			}
+		}
+		if (response instanceof Message) {
+			user.message(((Message) response).getContent(), false);
+		} 
+		if (response instanceof Success) {
+			user.message(((Success) response).getContent(), true);
+		} 
+		if (response instanceof Action) {
+			user.action(((Action) response).getContent());
+		} 
+		if (response instanceof Task) {
+			((Task) response).run();
+		}
+	}
+	
+	boolean tryHandleAndRespond(CommandHandler handler, String originalMessage,
+			OsuApiUser apiUser, UserData userData, IRCBotUser user)
+			throws UserException, IOException, SQLException,
+			InterruptedException {
+		Response response = handler.handle(originalMessage, apiUser, userData);
+		if (response == null) {
+			return false;
+		}
+		sendResponse(response, user);
+		return true;
+	}
+	
 	void processPrivateMessage(final IRCBotUser user, String originalMessage) {
 		MDC.put(MDC_STATE, "msg");
 		log.debug("received: " + originalMessage);
@@ -394,7 +444,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 
 		try {
-			if (new FixIDHandler(resolver).handle(originalMessage, user, null, null)) {
+			if (tryHandleAndRespond(new FixIDHandler(resolver), originalMessage, null, null, user)) {
 				return;
 			}
 			OsuApiUser apiUser = getUserOrThrow(user);
@@ -405,12 +455,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			
 			if(hugPattern.matcher(originalMessage).find()) {
 				if (apiUser != null && userData.getHearts() > 0) {
-					lang.hug(user, apiUser);
+					sendResponse(lang.hug(apiUser), user);
 					return;
 				}
 			}
 			
-			if(new LinkPpaddictHandler(backend).handle(originalMessage, user, apiUser, userData)) {
+			if(tryHandleAndRespond(new LinkPpaddictHandler(backend), originalMessage, apiUser, userData, user)) {
 				return;
 			}
 			if (!originalMessage.startsWith("!")) {
@@ -420,27 +470,16 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 			checkVersionInfo(user);
 			
-			if(getLevenshteinDistance(originalMessage.toLowerCase(), "help") <= 1) {
-				user.message(lang.help());
-			} else if(getLevenshteinDistance(originalMessage.toLowerCase(), "faq") <= 1) {
-				user.message(lang.faq());
-			} else if(getLevenshteinDistance(originalMessage.toLowerCase().substring(0, Math.min("complain".length(), originalMessage.length())), "complain") <= 2) {
-				Recommendation lastRecommendation = manager
-						.getLastRecommendation(apiUser.getUserId());
-				if(lastRecommendation != null && lastRecommendation.beatmap != null) {
-					log.debug("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getBeatmapId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.getCauses())));
-					user.message(lang.complaint());
+			Response response = null;
+			for (CommandHandler handler : commandHandlers) {
+				if ((response = handler.handle(originalMessage, apiUser, userData)) != null) {
+					sendResponse(response, user);
+					break;
 				}
-			} else {
-				boolean handled = false;
-				for (CommandHandler handler : commandHandlers) {
-					if (handled = handler.handle(originalMessage, user,	apiUser, userData)) {
-						break;
-					}
-				}
-				if (!handled) {
-					throw new UserException(lang.unknownCommand(originalMessage));
-				}
+				MDC.remove(MDC_HANDLER);
+			}
+			if (response == null) {
+				throw new UserException(lang.unknownCommand(originalMessage));
 			}
 		} catch (RuntimeException | Error | UserException | IOException | SQLException | InterruptedException e) {
 			handleException(user, e, lang);
@@ -452,7 +491,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	private void checkVersionInfo(final IRCBotUser user) throws SQLException, UserException {
 		int userVersion = backend.getLastVisitedVersion(user.getNick());
 		if(userVersion < currentVersion) {
-			if(versionMessage == null || user.message(versionMessage)) {
+			if(versionMessage == null || user.message(versionMessage, false)) {
 				backend.setLastVisitedVersion(user.getNick(), currentVersion);
 			}
 		}
@@ -554,8 +593,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 				long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
 				
-				data.getLanguage()
-						.welcomeUser(user, apiUser, inactiveTime);
+				Response welcome = data.getLanguage().welcomeUser(apiUser,
+						inactiveTime);
+				sendResponse(welcome, user);
 				
 				checkVersionInfo(user);
 			}

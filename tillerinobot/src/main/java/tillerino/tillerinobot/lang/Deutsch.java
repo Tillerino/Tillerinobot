@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 public class Deutsch implements Language {
 
@@ -38,15 +38,15 @@ public class Deutsch implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Willkommen zurück, " + apiUser.getUserName() + ".");
+			return new Message("Willkommen zurück, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...bist du das? Ich erkenne dich kaum wieder!");
-			user.message("Schön, dass du wieder da bist. Wie wäre es mit einer Empfehlung?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...bist du das? Ich erkenne dich kaum wieder!"))
+				.then(new Message("Schön, dass du wieder da bist. Wie wäre es mit einer Empfehlung?"));
 		} else {
 			String[] messages = {
 					"du siehst so aus als bräuchtest du eine heiße Tasse Empfehlungen.",
@@ -61,7 +61,7 @@ public class Deutsch implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -107,9 +107,9 @@ public class Deutsch implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Lass dich drücken!");
-		user.action("umarmt " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Lass dich drücken!")
+			.then(new Action("umarmt " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -147,24 +147,6 @@ public class Deutsch implements Language {
 	public String notRanked() {
 		return "Die map ist, so weit ich weiß, nicht ranked.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -182,8 +164,8 @@ public class Deutsch implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Nichts leichter als das!");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Nichts leichter als das!");
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package tillerino.tillerinobot.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 
@@ -18,9 +17,6 @@ public class DebugHandlerTest {
 	
 	@Mock
 	IrcNameResolver resolver;
-	
-	@Mock
-	IRCBotUser ircBotUser;
 	
 	DebugHandler handler;
 	
@@ -36,8 +32,8 @@ public class DebugHandlerTest {
 	
 	@Test
 	public void testIfHandles() throws Exception {
-		assertTrue(handler.handle("debug resolve bla", ircBotUser, null, userData));
-		assertTrue(handler.handle("debug getUserByIdFresh 1", ircBotUser, null, userData));
-		assertTrue(handler.handle("debug getUserByIdCached 1", ircBotUser, null, userData));
+		assertNotNull(handler.handle("debug resolve bla", null, userData));
+		assertNotNull(handler.handle("debug getUserByIdFresh 1", null, userData));
+		assertNotNull(handler.handle("debug getUserByIdCached 1", null, userData));
 	}
 }

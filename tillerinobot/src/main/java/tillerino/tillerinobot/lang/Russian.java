@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://github.com/firedigger https://osu.ppy.sh/u/firedigger
@@ -41,15 +41,15 @@ public class Russian implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("бип боп");
+			return new Message("бип боп");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Рад снова вас видеть, " + apiUser.getUserName() + ".");
+			return new Message("Рад снова вас видеть, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...это действительно вы? Столько времени прошло!");
-			user.message("Здорово, что вы вернулись. Могу ли я заинтересовать вас рекомендацией?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...это действительно вы? Столько времени прошло!"))
+				.then(new Message("Здорово, что вы вернулись. Могу ли я заинтересовать вас рекомендацией?"));
 		} else {
 			String[] messages = {
 					"Полагаю, вы хотите рекомендацию",
@@ -64,7 +64,7 @@ public class Russian implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Russian implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Подойдите, ну же!");
-		user.action("обнимает " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Подойдите, ну же!")
+			.then(new Action("обнимает " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -150,24 +150,6 @@ public class Russian implements Language {
 	public String notRanked() {
 		return "Похоже, что эта карта еще не ранкнута.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -185,8 +167,8 @@ public class Russian implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Вы изъявили желание общаться на русском (Перевод сделан [https://osu.ppy.sh/u/firedigger firedigger])");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Вы изъявили желание общаться на русском (Перевод сделан [https://osu.ppy.sh/u/firedigger firedigger])");
 	}
 
 	@Override

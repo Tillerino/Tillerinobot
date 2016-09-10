@@ -2,16 +2,106 @@ package tillerino.tillerinobot;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.Value;
 
 import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 
 public interface CommandHandler {
+	/**
+	 * Response sent to the user as the result of a command
+	 */
+	interface Response {
+		/**
+		 * Adds another response to the current one.
+		 */
+		default Response then(Response nextResponse) {
+			ResponseList list = new ResponseList();
+			if (this instanceof NoResponse) {
+				return nextResponse;
+			}
+			if (nextResponse instanceof NoResponse) {
+				return this;
+			}
+			if (this instanceof ResponseList) {
+				list.responses.addAll(((ResponseList) this).responses);
+			} else {
+				list.responses.add(this);
+			}
+			if (nextResponse instanceof ResponseList) {
+				list.responses.addAll(((ResponseList) nextResponse).responses);
+			} else {
+				list.responses.add(nextResponse);
+			}
+			return list;
+		}
+		
+		/**
+		 * Executes a task after this response
+		 */
+		default Response thenRun(Task task) {
+			return then(task);
+		}
+	}
+	
+	/**
+	 * A regular IRC message. This should not be used as the direct response to
+	 * a command, but for other auxiliary messages, see {@link Success}.
+	 */
+	@Value
+	public static class Message implements Response {
+		String content;
+	}
+	
+	/**
+	 * A regular IRC message, which will be logged as a successfully executed command.
+	 * This is the message that the command duration will be logged for.
+	 */
+	@Value
+	public static class Success implements Response {
+		String content;
+	}
+	
+	/**
+	 * An "action" type IRC message
+	 */
+	@Value
+	public static class Action implements Response {
+		String content;
+	}
+	
+	/**
+	 * Returned by the handler to clarify that the command was handled, but no
+	 * response is sent.
+	 */
+	@EqualsAndHashCode
+	public static final class NoResponse implements Response {
+		@Override
+		public String toString() {
+			return "[No Response]";
+		}
+	}
+	
+	@EqualsAndHashCode
+	@ToString
+	public static final class ResponseList implements Response {
+		List<Response> responses = new ArrayList<>();
+	}
+	
+	interface Task extends Response {
+		void run();
+	}
+	
 	/**
 	 * A special command handler, which will handle any input. It will at most
 	 * throw a {@link UserException} if the input is somehow invalid.
@@ -22,17 +112,17 @@ public interface CommandHandler {
 		 * @param command
 		 *            the command <i>excluding</i> the leading exclamation mark
 		 *            if there was one.
-		 * @param ircUser
-		 *            the requesting user's irc object.
 		 * @param apiUser
 		 *            the requesting user's api object.
 		 * @param userData
 		 *            the requesting user's data.
+		 * @return null if the command was not handled
 		 * @throws UserException
 		 *             if the input is invalid
 		 */
-		public void handle(String command, IRCBotUser ircUser,
-				OsuApiUser apiUser, UserData userData) throws UserException,
+		@Nonnull
+		public Response handle(String command, OsuApiUser apiUser,
+				UserData userData) throws UserException,
 				IOException, SQLException, InterruptedException;
 	}
 
@@ -41,32 +131,32 @@ public interface CommandHandler {
 	 * @param command
 	 *            the command <i>excluding</i> the leading exclamation mark if
 	 *            there was one.
-	 * @param ircUser
-	 *            the requesting user's irc object.
 	 * @param apiUser
 	 *            the requesting user's api object.
 	 * @param userData
 	 *            the requesting user's data.
-	 * @return true if the input matched this handler.
+	 * @return null if the command was not handled
 	 * @throws UserException
 	 *             if the input is invalid
 	 */
-	public boolean handle(String command, IRCBotUser ircUser,
-			OsuApiUser apiUser, UserData userData) throws UserException,
+	@CheckForNull
+	public Response handle(String command, OsuApiUser apiUser,
+			UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException;
 
 	public default CommandHandler or(CommandHandler next) {
 		CommandHandler me = this;
 		return new CommandHandler() {
 			@Override
-			public boolean handle(String command, IRCBotUser ircUser,
-					OsuApiUser apiUser, UserData userData)
+			public Response handle(String command, OsuApiUser apiUser,
+					UserData userData)
 					throws UserException, IOException, SQLException,
 					InterruptedException {
-				if (me.handle(command, ircUser, apiUser, userData)) {
-					return true;
+				Response response = me.handle(command, apiUser, userData);
+				if (response != null) {
+					return response;
 				}
-				return next.handle(command, ircUser, apiUser, userData);
+				return next.handle(command, apiUser, userData);
 			}
 
 			@Override
@@ -98,19 +188,20 @@ public interface CommandHandler {
 			CommandHandler underlying) {
 		return new CommandHandler() {
 			@Override
-			public boolean handle(String command, IRCBotUser ircUser,
-					OsuApiUser apiUser, UserData userData)
+			public Response handle(String command, OsuApiUser apiUser,
+					UserData userData)
 					throws UserException, IOException, SQLException,
 					InterruptedException {
 				if (!StringUtils.startsWithIgnoreCase(command, start)) {
-					return false;
+					return null;
 				}
-				if (!underlying.handle(command.substring(start.length()),
-						ircUser, apiUser, userData)) {
-					throw new UserException(userData.getLanguage()
-							.invalidChoice(command, getChoices()));
+				Response response = underlying.handle(command.substring(start.length()),
+						apiUser, userData);
+				if (response != null) {
+					return response;
 				}
-				return true;
+				throw new UserException(userData.getLanguage()
+						.invalidChoice(command, getChoices()));
 			}
 
 			@Override
@@ -140,16 +231,15 @@ public interface CommandHandler {
 			AnyCommandHandler underlying) {
 		return new CommandHandler() {
 			@Override
-			public boolean handle(String command, IRCBotUser ircUser,
-					OsuApiUser apiUser, UserData userData)
+			public Response handle(String command, OsuApiUser apiUser,
+					UserData userData)
 					throws UserException, IOException, SQLException,
 					InterruptedException {
 				if (!StringUtils.startsWithIgnoreCase(command, start)) {
-					return false;
+					return null;
 				}
-				underlying.handle(command.substring(start.length()), ircUser,
-						apiUser, userData);
-				return true;
+				return underlying.handle(command.substring(start.length()), apiUser,
+						userData);
 			}
 
 			@Override

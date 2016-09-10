@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * Polish language implementation by https://osu.ppy.sh/u/pawwit
@@ -41,15 +41,15 @@ public class Polski implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Witaj ponownie, " + apiUser.getUserName() + ".");
+			return new Message("Witaj ponownie, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...czy to Ty? Minęło sporo czasu!");
-			user.message("Dobrze znowu Cie widzieć. Chcesz usłyszeć kilka rekomendacji?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...czy to Ty? Minęło sporo czasu!"))
+				.then(new Message("Dobrze znowu Cie widzieć. Chcesz usłyszeć kilka rekomendacji?"));
 		} else {
 			String[] messages = {
 					"wygląda na to że chcesz jakieś rekomendacje.",
@@ -64,7 +64,7 @@ public class Polski implements Language {
 			
 			String message = messages[random.nextInt(messages.length)];
 			
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class Polski implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Chodź tu!");
-		user.action("przytula " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Chodź tu!")
+			.then(new Action("przytula " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -148,27 +148,6 @@ public class Polski implements Language {
 	public String notRanked() {
 		return "Wygląda na to, że ta mapa nie jest rankingowa.";
 	}
-
-	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-		// return "Ok, zapamiętam tą mapę!";
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-		// return "Ok, zapamiętam te mody";
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-		// I have no idea what Tillerino can say with recommendation
-	}
 	
 	@Override
 	public boolean isChanged() {
@@ -186,8 +165,8 @@ public class Polski implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Pawwit nauczył mnie jak mówić po polsku, jeśli uważasz, że gdzieś się pomylił napisz do niego na osu!");
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("Pawwit nauczył mnie jak mówić po polsku, jeśli uważasz, że gdzieś się pomylił napisz do niego na osu!");
 	}
 
 	@Override

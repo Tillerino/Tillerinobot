@@ -6,9 +6,9 @@ import java.util.Random;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.Message;
+import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * TRANSLATION NOTE:
@@ -48,15 +48,15 @@ public class Default implements Language {
 	}
 
 	@Override
-	public void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime) {
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
-			user.message("beep boop");
+			return new Message("beep boop");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
-			user.message("Welcome back, " + apiUser.getUserName() + ".");
+			return new Message("Welcome back, " + apiUser.getUserName() + ".");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
-			user.message(apiUser.getUserName() + "...");
-			user.message("...is that you? It's been so long!");
-			user.message("It's good to have you back. Can I interest you in a recommendation?");
+			return new Message(apiUser.getUserName() + "...")
+				.then(new Message("...is that you? It's been so long!"))
+				.then(new Message("It's good to have you back. Can I interest you in a recommendation?"));
 		} else {
 			String[] messages = {
 					"you look like you want a recommendation.",
@@ -71,7 +71,7 @@ public class Default implements Language {
 
 			String message = messages[random.nextInt(messages.length)];
 
-			user.message(apiUser.getUserName() + ", " + message);
+			return new Message(apiUser.getUserName() + ", " + message);
 		}
 	}
 
@@ -134,9 +134,9 @@ public class Default implements Language {
 	}
 
 	@Override
-	public void hug(final IRCBotUser user, OsuApiUser apiUser) {
-		user.message("Come here, you!");
-		user.action("hugs " + apiUser.getUserName());
+	public Response hug(OsuApiUser apiUser) {
+		return new Message("Come here, you!")
+			.then(new Action("hugs " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -176,24 +176,6 @@ public class Default implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnNP(IRCBotUser user,
-			OsuApiUser apiUser, BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser,
-			BeatmapMeta meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
-	public void optionalCommentOnRecommendation(IRCBotUser user,
-			OsuApiUser apiUser, Recommendation meta) {
-		// regular Tillerino doesn't comment on this
-	}
-
-	@Override
 	public boolean isChanged() {
 		return false;
 	}
@@ -209,7 +191,7 @@ public class Default implements Language {
 	}
 
 	@Override
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser) {
+	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
 		/*
 		 * TRANSLATION NOTE: This line is sent to the user right after they have
 		 * chosen this Language implementation. The English version refers to
@@ -235,7 +217,7 @@ public class Default implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		user.message("So you like me just the way I am :)");
+		return new Message("So you like me just the way I am :)");
 	}
 
 	@Override

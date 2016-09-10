@@ -2,11 +2,14 @@ package tillerino.tillerinobot.lang;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IRCBot.IRCBotUser;
+import tillerino.tillerinobot.CommandHandler.NoResponse;
+import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 /**
@@ -80,14 +83,12 @@ public interface Language {
 	 * Welcome a donator who has been offline. This can include multiple
 	 * messages and even actions.
 	 * 
-	 * @param user
-	 *            communication interface
 	 * @param apiUser
 	 *            for more information about the user
 	 * @param inactiveTime
 	 *            time since the user was last seen in #osu in milliseconds
 	 */
-	void welcomeUser(IRCBotUser user, OsuApiUser apiUser, long inactiveTime);
+	Response welcomeUser(OsuApiUser apiUser, long inactiveTime);
 
 	/**
 	 * The entire command that the user typed is not known.
@@ -154,13 +155,11 @@ public interface Language {
 	/**
 	 * Donator mentioned hug or hugs. Response can include multiple messages or
 	 * even actions.
-	 * 
-	 * @param user
-	 *            communication interface.
 	 * @param apiUser
 	 *            user object for more info
 	 */
-	void hug(IRCBotUser user, OsuApiUser apiUser);
+	@Nonnull
+	Response hug(OsuApiUser apiUser);
 
 	/**
 	 * Response to !help command.
@@ -215,27 +214,30 @@ public interface Language {
 
 	/**
 	 * Comment after beatmap info was sent in response to /np
-	 * @param user 
 	 * @param apiUser 
 	 * @param meta 
 	 */
-	void optionalCommentOnNP(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta);
+	default Response optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
+		return new NoResponse();
+	}
 
 	/**
 	 * Comment after beatmap info was sent in response to !with
-	 * @param user 
 	 * @param apiUser 
 	 * @param meta 
 	 */
-	void optionalCommentOnWith(IRCBotUser user, OsuApiUser apiUser, BeatmapMeta meta);
+	default Response optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
+		return new NoResponse();
+	}
 	
 	/**
 	 * Comment after beatmap info was sent in response to !recommend
-	 * @param user 
 	 * @param apiUser 
 	 * @param recommendation 
 	 */
-	void optionalCommentOnRecommendation(IRCBotUser user, OsuApiUser apiUser, Recommendation recommendation);
+	default Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
+		return new NoResponse();
+	}
 	
 	/**
 	 * @return true if the object has been changed since the last time that
@@ -261,10 +263,11 @@ public interface Language {
 
 	/**
 	 * The user has chosen this language. Say something to acknowledge that!
-	 * @param user 
 	 * @param apiUser 
 	 */
-	public void optionalCommentOnLanguage(IRCBotUser user, OsuApiUser apiUser);
+	default Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new NoResponse();
+	}
 
 	/**
 	 * The user has made an invalid choice.
