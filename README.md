@@ -20,7 +20,7 @@ Since a lot of people ask, the IRC frontend is built using [PirxBotX](https://gi
 
 For the [osu! API](https://github.com/ppy/osu-api/wiki), I rolled my own [Java library](https://github.com/Tillerino/osuApiConnector). It's available in [maven central](https://mvnrepository.com/artifact/com.github.tillerino/osu-api-connector). It also does some of the AR/OD calculations.
 
-Since it came out, [oppai](https://github.com/Francesco149/oppai) (or rather [a fork](https://github.com/Tillerino/oppai)) is being used to make beatmap difficulty calculation more stable.
+Since it came out, [oppai](https://github.com/Francesco149/oppai) (or rather [a fork](https://github.com/Tillerino/oppai)) is being used to make beatmap difficulty calculation more stable and to calculate difficulties for unranked beatmaps.
 
 ## Building/Running Tillerinobot
 

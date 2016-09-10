@@ -491,11 +491,9 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		pinger.handleUnknownEvent(event);
 	}
 	
-	static final int currentVersion = 10;
-	static final String versionMessage = "Quick update: I now speak [https://github.com/Tillerino/Tillerinobot/blob/master/tillerinobot/src/main/java/tillerino/tillerinobot/UserDataManager.java#L62 a bunch of new languages] thanks to the contributions of your fellow players."
-			+ " If you'd like to contribute a translation as well, please [https://github.com/Tillerino/Tillerinobot/wiki/Contact get in touch]!"
-			+ " Oh and you can get hidden mods for gamma recommendations by adding \" hd\" to whatever you're requesting."
-			+ " If you haven't already done so, make sure to check out [http://ppaddict.tillerino.org/ ppaddict].";
+	static final int currentVersion = 11;
+	static final String versionMessage = "Good news, everyone! Thanks to a great project called [https://github.com/Francesco149/oppai oppai], I can now figure out pp values for unranked maps."
+			+ " Oh and if you haven't already done so, make sure to check out [http://ppaddict.tillerino.org/ ppaddict].";
 	
 	long lastListTime = System.currentTimeMillis();
 	
