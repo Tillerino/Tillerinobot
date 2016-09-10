@@ -7,11 +7,13 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
+import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
@@ -36,6 +38,8 @@ public class AccHandler implements CommandHandler {
 		if (!message.toLowerCase().startsWith("acc")) {
 			return null;
 		}
+		
+		MDC.put(IRCBot.MDC_HANDLER, "acc");
 		
 		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 		Language lang = userData.getLanguage();

@@ -5,12 +5,14 @@ import java.sql.SQLException;
 
 import javax.inject.Inject;
 
+import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
+import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -33,7 +35,9 @@ public class WithHandler implements CommandHandler {
 		if (!message.toLowerCase().startsWith("with")) {
 			return null;
 		}
-			
+
+		MDC.put(IRCBot.MDC_HANDLER, "with");
+		
 		Language lang = userData.getLanguage();
 		
 		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
