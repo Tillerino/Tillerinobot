@@ -239,16 +239,16 @@ public class Romana implements Language {
 	
 	@Override
 	public String noRecentPlays() {
-		return new "Nu te-am mai văzut jucăndu-te in ultimul timp.";
+		return "Nu te-am mai văzut jucăndu-te in ultimul timp.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new "Aceasta se referă la un set de hărti, nu o singură hartă";
+		return "Aceasta se referă la un set de hărti, nu o singură hartă";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new "Doar o secundă...";
+		return "Doar o secundă...";
 	}
 }
