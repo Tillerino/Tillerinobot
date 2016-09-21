@@ -318,7 +318,11 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     beatmap.version = apiBeatmap.getVersion();
 
     if (estimates.getMods() != 0) {
-      beatmap.mods = Mods.toShortNamesContinuous(Mods.getMods(estimates.getMods()));
+      if (estimates.getMods() == -1) {
+        beatmap.mods = "?";
+      } else {
+        beatmap.mods = Mods.toShortNamesContinuous(Mods.getMods(estimates.getMods()));
+      }
     }
     return beatmap;
   }

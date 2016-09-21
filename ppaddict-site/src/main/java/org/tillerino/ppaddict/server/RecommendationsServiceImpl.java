@@ -118,7 +118,8 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
   @Override
   public Beatmap hideRecommendation(int beatmapid, String mods) throws PpaddictException {
     try {
-      Long longMods = mods != null ? Mods.fromShortNamesContinuous(mods) : (Long) 0l;
+      Long longMods =
+          mods != null ? (mods.equals("?") ? -1 : Mods.fromShortNamesContinuous(mods)) : (Long) 0l;
       if (longMods == null) {
         throw ExceptionsUtil.getLoggedWrappedException(log, new NullPointerException(
             "mods not parsable: " + mods));
