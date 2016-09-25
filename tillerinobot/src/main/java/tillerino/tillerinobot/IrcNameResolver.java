@@ -123,8 +123,10 @@ public class IrcNameResolver {
 		UserNameMapping mapping = new UserNameMapping();
 		mapping.setResolved(System.currentTimeMillis());
 		mapping.setUserid(userid);
-		mapping.setUserName(user.getUserName().replace(' ', '_'));
+		String ircName = user.getUserName().replace(' ', '_');
+		mapping.setUserName(ircName);
 		repo.save(mapping);
+		resolvedIRCNames.invalidate(ircName);
 		return user;
 	}
 }
