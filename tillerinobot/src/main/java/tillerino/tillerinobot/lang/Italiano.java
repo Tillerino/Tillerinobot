@@ -101,12 +101,6 @@ public class Italiano implements Language {
 		return "Prova questa mappa con " + Mods.toShortNamesContinuous(mods) + "!";
 	}
  
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Il tuo nome mi sta confondendo. Sei bannato? Se non lo sei, per favore controlla [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error questa pagina] su come risolvere questo problema!"
-				+ " se ciò non doesse funzionare, per favore [https://github.com/Tillerino/Tillerinobot/wiki/Contact contatta Tillerino]. ( codice di riferimento "
-				+ exceptionMarker + ")";
-        }
-	
 	@Override
 	public String excuseForError() {
 		return "Scusa, c'era una bellissima sequenza di uno e zero e mi sono distratto. Puoi ripetermi che cosa volevi?";
