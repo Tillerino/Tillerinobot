@@ -9,13 +9,13 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
-
 /**
  * Italian Language implementation. Thanks go to
  * https://osu.ppy.sh/u/marcostudios and https://osu.ppy.sh/u/Howl for this.
  */
 public class Italiano implements Language {
- 
+        static final Random rnd = new Random();
+		
 	@Override
 	public String unknownBeatmap() {
 		return "Mi spiace, Non conosco quella mappa. Potrebbe essere nuovissima, molto difficile, non rankata oppure potrebbe non essere per la modalità standard di osu.";
@@ -24,7 +24,8 @@ public class Italiano implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Ugh... Sembra che Tillerino umano abbia incasinato il programma."
-				+ "Se non lo nota subito, puoi informarlo? @Tillerino o /u/Tillerino (in inglese)? (codice di riferimento "
+			        + " Tillerino umano dice che non c'è nulla di cui preoccuparsi e che dovremmo riprovare."
+				+ " Se non lo nota subito, puoi informarlo? @Tillerino o /u/Tillerino (in inglese)? (codice di riferimento "
 				+ marker + ")";
 	}
  
@@ -32,7 +33,7 @@ public class Italiano implements Language {
 	public String externalException(String marker) {
 		return "Che succede? Sto ricevendo solo risposte senza senso dai server di osu. Puoi dirmi cosa significa? 0011101001010000"
 				+ " - il Tillerino umano dice che non c'è nulla di cui preoccuparsi, e che dovremmo riprovare."
-				+ " Se sei super preoccupato per qualche motivo, puoi dirlo a @Tillerino o /u/Tillerino (in inglese). (codice di riferimento "
+				+ " Se sei super preoccupato per qualche motivo, puoi [https://github.com/Tillerino/Tillerinobot/wiki/Contact contattalo]. (codice di riferimento "
 				+ marker + ")";
 	}
  
@@ -71,8 +72,8 @@ public class Italiano implements Language {
  
 	@Override
 	public String unknownCommand(String command) {
-		return "\"" + command
-				+ "\" è un comando sconosciuto. scrivi !help se hai bisogno di aiuto!";
+		return "Comando sconosciuto \"" + command
+				+ "\". Scrivi !help se hai bisogno di aiuto!";
 	}
  
 	@Override
@@ -97,14 +98,14 @@ public class Italiano implements Language {
  
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Prova questa mappa con " + Mods.toShortNamesContinuous(mods);
+		return "Prova questa mappa con " + Mods.toShortNamesContinuous(mods) + "!";
 	}
  
 	@Override
 	public String excuseForError() {
 		return "Scusa, c'era una bellissima sequenza di uno e zero e mi sono distratto. Puoi ripetermi che cosa volevi?";
 	}
- 
+	 
 	@Override
 	public String complaint() {
 		return "La tua segnalazione è stato inviata. Tillerino lo guarderà appena riesce.";
@@ -119,13 +120,15 @@ public class Italiano implements Language {
 	@Override
 	public String help() {
 		return "Ciao! Sono il robot che ha ucciso Tillerino e ha preso possesso del suo account. Scherzo, ma uso lo stesso il suo account."
-				+ " Controlla https://twitter.com/Tillerinobot per informazioni sullo stato e aggiornamenti!"
-				+ " Guarda https://github.com/Tillerino/Tillerinobot/wiki per i comandi!";
+				+ " [https://twitter.com/Tillerinobot stato e aggiornamenti]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki comandi]"
+			        + " - [http://ppaddict.tillerino.org/ ppaddict]"
+			        + " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contatti]";
 	}
  
 	@Override
 	public String faq() {
-		return "Vedi https://github.com/Tillerino/Tillerinobot/wiki/FAQ per le FAQ!";
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Domande Comuni]";
 	}
 	
 	@Override
@@ -170,7 +173,7 @@ public class Italiano implements Language {
  
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("marcostudios e Howl mi hanno insegnato l'italiano <3");
+		return new Message("[https://osu.ppy.sh/u/1273955 - Marco -] e [https://osu.ppy.sh/u/2751672 Howl] mi hanno insegnato l'italiano <3");
 	}
  
 	@Override
@@ -184,23 +187,41 @@ public class Italiano implements Language {
 		return "La sintassi per impostare un parametro è !set opzione valore. Usa !help se ti servono più indicazioni.";
 	}
 	
+	StringShuffler doSomething = new StringShuffler(rnd);
+	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
-	}
+		final String message = "I server di osu! sono super lenti per ora, quindi non c'è nulla che posso fare al momento. ";
+		return message + doSomething.get(
+				"Dimmi... Quand'è stata l'ultima volta che hai parlato a tua nonna?",
+				"Che ne dici di pulire la tua stanza e poi chiedermelo di nuovo?",
+				"Scommetto che vuoi fare una passeggiata ora. Sai... fuori?",
+				"So che hai altre cose da fare. Che ne dic di farle ora?",
+				"Sembra che hai bisogno di fare un pisolino comunque.",
+				"Ma guarda questa pagina super interessante su [https://en.wikipedia.org/wiki/Special:Random wikipedia]!",
+				"Controlliamo che qualcuno di bravo sta [http://www.twitch.tv/directory/game/Osu! streammando] proprio ora!",
+				"Guarda, ecco un'altro [http://dagobah.net/flash/Cursor_Invisible.swf gioco] a cui non sai giocare!",
+				"Questo dovrebbe darti molto tempo per studiare [https://github.com/Tillerino/Tillerinobot/wiki il mio manuale].",
+				"Non ti preoccupare, questi [https://www.reddit.com/r/osugame meme] dovrebbero farti passare del tempo.",
+				"Mentre sei annoiato, prova [http://gabrielecirulli.github.io/2048/ 2048]!",
+				"Domanda divertente: Se il tuo disco rigido crasha in questo momento, quandi dati personali perderesti per sempre?",
+				"Quindi... hai mai provato la [https://www.google.it/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
+				"Puoi andare a fare altro oppure possiamo guardarci negli occhi. Silenziosamente."
+				);
+}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Non ti ho visto giocare recentemente.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Questo indica un set di mappe, non una singola.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
-	}
+		return "Solo un secondo...";
+        }
 }
