@@ -9,15 +9,13 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
-
-static final Random rnd = new Random();
-
 /**
  * Italian Language implementation. Thanks go to
  * https://osu.ppy.sh/u/marcostudios and https://osu.ppy.sh/u/Howl for this.
  */
-public class Italiano implements Language {
- 
+public class Default implements Language {
+        static final Random rnd = new Random();
+		
 	@Override
 	public String unknownBeatmap() {
 		return "Mi spiace, Non conosco quella mappa. Potrebbe essere nuovissima, molto difficile, non rankata oppure potrebbe non essere per la modalità standard di osu.";
