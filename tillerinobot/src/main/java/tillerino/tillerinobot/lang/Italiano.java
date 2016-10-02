@@ -25,7 +25,7 @@ public class Italiano implements Language {
 	public String internalException(String marker) {
 		return "Ugh... Sembra che Tillerino umano abbia incasinato il programma."
 			        + " Tillerino umano dice che non c'è nulla di cui preoccuparsi e che dovremmo riprovare."
-				+ "Se non lo nota subito, puoi informarlo? @Tillerino o /u/Tillerino (in inglese)? (codice di riferimento "
+				+ " Se non lo nota subito, puoi informarlo? @Tillerino o /u/Tillerino (in inglese)? (codice di riferimento "
 				+ marker + ")";
 	}
  
