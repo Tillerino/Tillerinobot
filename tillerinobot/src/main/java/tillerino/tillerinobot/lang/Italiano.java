@@ -24,7 +24,7 @@ public class Italiano implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Ugh... Sembra che Tillerino umano abbia incasinato il programma."
-			        + " Tillerino umano dice che non c'è nulla di cui preoccuparsi e che dovremmo riprovare.
+			        + " Tillerino umano dice che non c'è nulla di cui preoccuparsi e che dovremmo riprovare."
 				+ "Se non lo nota subito, puoi informarlo? @Tillerino o /u/Tillerino (in inglese)? (codice di riferimento "
 				+ marker + ")";
 	}
@@ -129,7 +129,7 @@ public class Italiano implements Language {
 				+ " [https://twitter.com/Tillerinobot stato e aggiornamenti]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki comandi]"
 			        + " - [http://ppaddict.tillerino.org/ ppaddict]"
-			        + " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contatti];
+			        + " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contatti]";
 	}
  
 	@Override
@@ -229,4 +229,5 @@ public class Italiano implements Language {
 	@Override
 	public String getPatience() {
 		return "Solo un secondo...";
+        }
 }
