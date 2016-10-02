@@ -13,7 +13,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * Italian Language implementation. Thanks go to
  * https://osu.ppy.sh/u/marcostudios and https://osu.ppy.sh/u/Howl for this.
  */
-public class Default implements Language {
+public class Italiano implements Language {
         static final Random rnd = new Random();
 		
 	@Override
@@ -179,7 +179,7 @@ public class Default implements Language {
  
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("[https://osu.ppy.sh/u/-_Marco_- - Marco -] e [https://osu.ppy.sh/u/Howl Howl] mi hanno insegnato l'italiano <3");
+		return new Message("[https://osu.ppy.sh/u/1273955 - Marco -] e [https://osu.ppy.sh/u/2751672 Howl] mi hanno insegnato l'italiano <3");
 	}
  
 	@Override
