@@ -14,8 +14,10 @@ import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
-public class TsundereBase implements Language
-{
+public abstract class TsundereBase implements Language {
+
+	//random object
+	static final Random rnd = new Random();
 
 	public String unknownRecommendationParameter() {
 		String[] fakes = {

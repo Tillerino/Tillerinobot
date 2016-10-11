@@ -14,7 +14,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
-public class TsundereGerman extends TsundereBase implements Language {
+public class TsundereGerman extends TsundereBase {
 	
 	//Random object, used in StringShuffler
 	static final Random rnd = new Random();
