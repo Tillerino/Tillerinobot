@@ -61,7 +61,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		public enum LanguageIdentifier {
 			Default(Default.class),
 			English(Default.class),
-			Tsundere(Tsundere.class),
+			Tsundere(TsundereEnglish.class),
 			TsundereGerman(TsundereGerman.class),
 			Italiano(Italiano.class),
 			Français(Francais.class),
