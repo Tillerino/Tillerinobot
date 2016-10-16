@@ -36,7 +36,11 @@ public class ExcludeMod implements RecommendationPredicate {
 				return null;
 			}
 			try {
-				return new ExcludeMod(Mods.fromShortName(argument.substring(1).toUpperCase()));
+				Mods mod = Mods.fromShortName(argument.substring(1).toUpperCase());
+				if (mod == null) {
+					return null;
+				}
+				return new ExcludeMod(mod);
 			} catch (IllegalArgumentException e) {
 				return null;
 			}
