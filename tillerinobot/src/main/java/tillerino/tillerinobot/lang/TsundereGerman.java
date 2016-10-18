@@ -341,9 +341,9 @@ public class TsundereGerman extends TsundereBase {
 		setChanged(true);
 
 		return new Message(optionalCommentOnLanguageShuffler.get(
-			"MrMorkat hat mir dabei geholfen Deutsch zu lernen. Aber welche Art von Idiot will einen Tsundere Roboter auf Deutsch!? Das ist ernsthaft die dümmste Idee die ich je gehört habe!",
-			"MrMorkat hat mir dabei geholfen Deutsch zu lernen. Das wollte ich dir immer schon in einer anderen Sprache sagen: Ich lieb... Ich hab nichts gesagt!",
-			"MrMorkat hat mir dabei geholfen Deutsch zu lernen. Aber ich hab das nur gemacht weil ich es wollte. Das hat nichts mit dir zu tun!"
+			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber welche Art von Idiot will einen Tsundere Roboter auf Deutsch!? Das ist ernsthaft die dümmste Idee die ich je gehört habe!",
+			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Das wollte ich dir immer schon in einer anderen Sprache sagen: Ich lieb... Ich hab nichts gesagt!",
+			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber ich hab das nur gemacht weil ich es wollte. Das hat nichts mit dir zu tun!"
 		));
 	}
 
@@ -367,7 +367,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String setFormat() {
-		return "Drei Worte: !set option_name value_to_set. Versuch !help falls dir drei-Wort-Sätze zu kompliziert sind.";
+		return "Drei Worte: !set option_name value_to_set. Versuch !help falls dir drei-Wort-Sätze zu kompliziert sind."; //dunno if i should translate the example command
 	}
 	
 	@Override
