@@ -42,7 +42,7 @@ public class StringShufflerTest {
 	
 	@Test
 	public void testInTsundere() {
-		Tsundere tsundere = new Tsundere();
+		TsundereEnglish tsundere = new TsundereEnglish();
 		
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		

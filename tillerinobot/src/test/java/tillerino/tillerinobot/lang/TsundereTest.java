@@ -17,7 +17,7 @@ public class TsundereTest {
 	@Test
 	public void testInvalidChoice() throws Exception {
 		// spy on a fresh tsundere object
-		Tsundere tsundere = spy(new Tsundere());
+		TsundereEnglish tsundere = spy(new TsundereEnglish());
 
 		// mock backend and create RecommendationsManager and RecommendHandler based on mocked backend
 		BotBackend backend = mock(BotBackend.class);
