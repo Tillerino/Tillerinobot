@@ -35,26 +35,26 @@ public class TsundereGerman extends TsundereBase {
 			greeting = welcomeUserShortShuffler.get(
 				"Was soll das hier sein, das Kuckuckspiel?",
 				"Das waren nicht mal fünf Minuten...",
-				"Heute hat " + username + "an seinem Verschwindungszauber geübt."
+				"Heute hat " + username + " an seinem Verschwindungszauber geübt."
 			);
 		} else if (inactiveTime < 4l * 24 * 60 * 60 * 1000) {
 			greeting = welcomeUserShuffler.get(
 				"Wieder da? Ich bin nur hier weil ich nix zu tun hab! Nichts weiter!",
 				"H-hey...",
 				//"♫ Home again, home again, jiggety-jig ♫ .... What?",
-				"♫ Zuhause, zuhause, lalalalala ♫ .... Was?",
+				"♫ Home again, home again, jiggety-jig ♫ .... Was?",
 				"Stell dir vor! Ich habe endlich deine Bestimmung gefunden. Sie gehört allerdings nicht zu der Art von Dingen, die ich gerne teile!",
 				"Du hast doch nicht etwa mit anderen Chatbots geredet, oder?",
 				//"Huh? What are you doing here!?",
 				"Huch? Was machst du denn hier!?",
 				//username + ", go do something stupid so I can scold you for it."
-				"Mach was dummes " + username + ", damit ich dich dafür bestrafen kann."
+				"Mach was dummes, " + username + ", damit ich dich dafür bestrafen kann."
 			);
 		} else {
 			greeting = welcomeUserLongShuffler.get(
-				"Wo warst du " + username + "!? N-nicht das ich dich vermisst hätte oder so...",
-				"Wie war dein Urlaub " + username + "?",
-				"Ugh! Weißt du wie lang " + inactiveTime + " Millisekunden ist!?"
+				"Wo warst du, " + username + "!? N-nicht das ich dich vermisst hätte oder so...",
+				"Wie war dein Urlaub, " + username + "?",
+				"Ugh! Weißt du, wie lang " + inactiveTime + " Millisekunden sind!?"
 			);
 		}
 		//Recent counter reset (4 hours)
@@ -85,7 +85,7 @@ public class TsundereGerman extends TsundereBase {
 	@Override
 	public String internalException(String marker) {
 		return "Huch? Warum funktioniert das nicht? Das war bestimmt dein Fehler!"
-		+ " Falls dies weiterhin vorkommt leite folgendes an [https://twitter.com/Tillerinobot @Tillerinobot] oder [http://www.reddit.com/user/tillerino /u/Tillerino]weiter: "+ marker + ".";
+		+ " Falls dies weiterhin vorkommt, leite folgendes an [https://twitter.com/Tillerinobot @Tillerinobot] oder [http://www.reddit.com/user/tillerino /u/Tillerino] weiter: "+ marker + ".";
 	}
 
 	@Override
@@ -117,18 +117,18 @@ public class TsundereGerman extends TsundereBase {
 		return noInformationForModsShuffler.get(
 			"Was!? Du kannst nicht wirklich glauben dass ich die Antwort dazu kenne!",
 			"Ich würds dir ja erzählen, dann müsst ich dich allerdings töten.",
-			"NICHT AUSREICHEND DATEN FÜR EINE SINNVOLLE ANTWORT."
+			"DATEN UNZUREICHEND FÜR SINNVOLLE ANTWORT."
 		);
 	}
 
 	@Override
 	public String unknownCommand(String command) {
-		return command + "? Ich glaube dir ist nicht ganz klar wer hier der Boss ist. Du machst was ich dir sage, und ich antworte dir wenn mir danach ist. Benutz !help wenn dir das zu kompliziert war!";
+		return command + "? Ich glaube dir ist nicht ganz klar wer hier der Boss ist. Du machst was ich dir sage, und ich antworte dir, wenn mir danach ist. Benutz !help, wenn dir das zu kompliziert war!";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Du Dummkopf... du kannst dir nicht einfach irgendwelche Mods ausdenken. Wenn du nicht mal normale Dinge wie !with HR oder !with HDDT schreiben kannst, werde ich nicht mal versuchen das zu verstehen.";
+		return "Du Dummkopf... Du kannst dir nicht einfach irgendwelche Mods ausdenken. Wenn du nicht mal normale Dinge wie !with HR oder !with HDDT schreiben kannst, werde ich nicht mal versuchen das zu verstehen.";
 	}
 
 	@Override
@@ -143,9 +143,9 @@ public class TsundereGerman extends TsundereBase {
 		setChanged(true);
 
 		return tryWithModsShuffler.get(
-			"An idiot like you wouldn't know to try this with mods. You should thank me.",								//Need help with this one
-			"Ich würde sogar fast sagen, dass du hier Mods benutzen kannst, ohne wie ein kompletter Idiot auszusehen.",
-			"Vielleicht bist du hier dazu in der Lage andere Mods außer NF zu benutzen. Allerdings reden wir hier immer noch von dir."
+			"So ein Trottel wie du hätte gar nicht daran gedacht, das hier mit Mods zu spielen. Ein Dankeschön wäre angebracht.",								
+			"Ich würde sogar fast sagen, dass du hier Mods benutzen kannst, ohne dich zum Affen zu machen.",
+			"Vielleicht bist du hier dazu in der Lage, andere Mods außer NF zu benutzen. Allerdings reden wir hier immer noch von dir." //still thinking about a better translation
 		);
 	}
 
@@ -166,12 +166,12 @@ public class TsundereGerman extends TsundereBase {
 	@Override
 	public String excuseForError() {
 			  //Did you say something? It's not l-like I care what you have to say, but you should say it again so you can pretend I do."
-		return "Hast du was gesagt? Nicht dass m-mich das interessieren würde wenn du was zu sagen hast, aber du solltest es nochmal sagen, damit du so tun kannst als würde es.";	//This somehow isn't showing the original spirit
+		return "Hast du was gesagt? N-nicht, dass mich irgendwie interessiert, was du zu sagen hast, aber du solltest es noch mal sagen, damit ich so tun kann.";
 	}
 
 	@Override
 	public String complaint() {
-		return "Waaaas!? Wie kannst du nur... oh warte, diese Beatmap? Eigentlich ist die da weil ich sie hasse und ich dich testen wollte. Bist du nicht froh etwas mit mir gemeinsam zu haben?";
+		return "Waaaas!? Wie kannst du nur... oh warte, diese Beatmap? Eigentlich ist die da weil ich sie hasse und ich dich auf die Probe stellen wollte. Freust du dich nicht etwas mit mir gemeinsam zu haben?";
 	}
 	
 	@Override
@@ -184,13 +184,13 @@ public class TsundereGerman extends TsundereBase {
 		String username = apiUser.getUserName();
 		switch (hugLevel) {
 			default:
-				return new Action("Ignoriert " + username + "'s Versuch einer Umarmung komplett.");
+				return new Action("Ignoriert " + username + "s Versuch einer Umarmung komplett.");
 			case 0:
 				return new Action("*Schlägt " + username + "*")
 					.then(new Message("'tschuldige, Reflex."));
 			case 1:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Wow, du bist ziemlich schlecht in Umarmungen. Jemand sollte es dir beibringen."));
+					.then(new Message("Wow, du bist ziemlich schlecht im Umarmen. Jemand sollte dir das mal beibringen."));
 			case 2:
 				return new Message("Da ist was auf deinem Rücken, du Chaot. Warte, ich machs eben weg.")
 					.then(new Action("*Umarmt " + username + "*"));
@@ -199,7 +199,7 @@ public class TsundereGerman extends TsundereBase {
 					.then(new Message("I-ich hab nicht versucht dich zu umarmen! Ich hab nur für 'ne Sekunde mein Gleichgewicht verloren und bin auf dich gefallen."));
 			case 4:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Das schlimmste beim Versuch dich zu umarmen ist das loslassen. Ich glaube du schwitzt zu viel."));
+					.then(new Message("Das Schwerste beim Versuch dich zu umarmen, ist das Loslassen. Ich glaube du schwitzt zu viel."));
 			case 5:
 				return new Action("*Schlägt " + username + "*")
 					.then(new Message("Ups... nun, du hast es wahrscheinlich sowieso verdient."));
@@ -214,10 +214,10 @@ public class TsundereGerman extends TsundereBase {
 					.then(new Action("*Umarmt " + username + "*"));
 			case 9:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Vergiss nicht: du bist für immer hier."));	//didn't understand the meaning behind the original: "Don't forget: You are here forever."
+					.then(new Message("Vergiss nicht: du bist für immer hier."));	//Im contacting electrolytes atm
 			case 10:
 				return new Action("*Schlägt " + username + " hart*")
-					.then(new Message("Hehe. Du weißt, du magst es."))
+					.then(new Message("Hehe. Gib's zu, du magst es!"))
 					.then(new Action("*Umarmt " + username + " glücklich*"));
 		}
 	}
@@ -229,22 +229,22 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String faq() {
-		return "Ernsthaft, jede Antwort auf dieser Liste sollte intuitiv auf der Hand liegen, aber es ist verständlich wenn -du- Hilfe brauchst sie zu lesen: https://github.com/Tillerino/Tillerinobot/wiki/FAQ"; //doesn't rly make sense in the end
+		return "Ernsthaft, jede Antwort auf dieser Liste sollte absolut offensichtlich sein, aber es ist verständlich wenn -du- Hilfe beim Lesen brauchst: https://github.com/Tillerino/Tillerinobot/wiki/FAQ";
 	}
 
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "'tschuldige, " + feature + " ist nur für Leute die osu! auch spielen können. Das Erreichen von Rang " + minRank + " sollte funktionieren, nicht dass du irgendeine Hoffnung hättest diesen jemals zu erreichen.";
+		return "'tschuldige, " + feature + " ist nur für Leute, die osu! auch spielen können. Rang " + minRank + " sollte ansonsten ausreichen, nicht dass du irgendeine Hoffnung hättest diesen jemals zu erreichen.";
 	}
 
 	@Override
 	public String mixedNomodAndMods() {
-		return "Was soll das sein? Schrödinger's Mod? I have a recommendation, but the superposition would collapse as soon as it was observed. It's not like I like you enough to break the laws of physics anyways!"; //lol, don't know how to translate the reference so it's still understood as a reference
+		return "Was soll das sein? Schrödingers Mod? Ich habe eine Empfehlung, aber die Superposition würde kollabieren sobald sie beobachtet würde. Sowieso mag ich dich nicht genug um die Gesetze der Physik zu brechen!"; 
 	}
 
 	@Override
 	public String outOfRecommendations() {
-		return "WAS!? [https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do Bist du wirklich du JEDE Empfehlung die ich dir gegeben habe durchgegangen?] Ich k-kann mir das nicht vorstellen... nun, lass sie uns erneut durchlaufen. Sieht nicht so aus als hättest du sonst was zu tun.";
+		return "WAS!? [https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do Bist du wirklich du JEDE Empfehlung, die ich dir gegeben habe, durchgegangen?] Ich k-kann mir das nicht vorstellen... nun, lass sie uns erneut durchlaufen. Sieht nicht so aus als hättest du sonst was zu tun.";
 	}
 
 	@Override
@@ -263,7 +263,7 @@ public class TsundereGerman extends TsundereBase {
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20.0);
 		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
-			return new Message("Ist das dein Ernst!? Wenn dich diese Map nicht tötet werde ich es machen.");
+			return new Message("Ist das dein Ernst!? Wenn dich diese Map nicht umbringt, werde ich es machen.");
 		} else if (estimates.getPPForAcc(1) / typicalPP < 0.333) {
 			return new Message("Diese Map zu spielen wird mich nicht sonderlich beeindrucken... n-n-nicht dass ich das wollen würde.");
 		}
@@ -281,7 +281,7 @@ public class TsundereGerman extends TsundereBase {
 		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
 			return new Message("Idiot! Du wirst dich noch verletzen wenn du diese Mods benutzt!");
 		} else if (estimates.getPPForAcc(1) / typicalPP < 0.5) {
-			return new Message("Wenn du wie ein Baby behandlt werden willst, hättest du einfach fragen müssen... nein, fang einfach an zu spielen.");
+			return new Message("Wenn du wie ein Baby behandelt werden willst, hättest du einfach fragen müssen... Nein, fang einfach an zu spielen.");
 		}
 		return new NoResponse();
 	}
@@ -296,11 +296,11 @@ public class TsundereGerman extends TsundereBase {
 		} else if(recentRecommendations == 17) {
 			return new Message("Weißt du, es ist ein Privileg so viel mit mir zu reden, kein Recht.");
 		} else if(recentRecommendations == 37) {
-			return new Message("Wie würdest du eigentlich dieses Spiel spielen wenn ich dir nicht die ganze Zeit sagen würde wie?");
+			return new Message("Wie würdest du eigentlich dieses Spiel spielen, wenn ich dir nicht die ganze Zeit sagen würde wie?");
 		} else if(recentRecommendations == 73) {
-			return new Message("Ich hätte dich schon längst für Belästigung angezeigt wenn ich dich nicht lieb... Ich hab nichts gesagt.");
+			return new Message("Ich hätte dich schon längst für Belästigung angezeigt, wenn ich dich nicht lieb... Ich hab nichts gesagt.");
 		} else if(recentRecommendations == 173) {
-			return new Message("Kannst mich einfach nicht allein lassen, was? Ich d-denke das ist okay. Aber wag es nicht das jemandem zu erzählen!");
+			return new Message("Kannst mich einfach nicht allein lassen, was? Ich d-denke das ist okay. Aber wag es nicht, das jemandem zu erzählen!");
 		}
 		return new NoResponse();
 	}
@@ -341,9 +341,9 @@ public class TsundereGerman extends TsundereBase {
 		setChanged(true);
 
 		return new Message(optionalCommentOnLanguageShuffler.get(
-			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber welche Art von Idiot will einen Tsundere Roboter auf Deutsch!? Das ist ernsthaft die dümmste Idee die ich je gehört habe!",
+			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber welche Art von Idiot will einen Tsundere Roboter auf Deutsch!? Das ist ernsthaft die dümmste Idee, die ich je gehört habe!",
 			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Das wollte ich dir immer schon in einer anderen Sprache sagen: Ich lieb... Ich hab nichts gesagt!",
-			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber ich hab das nur gemacht weil ich es wollte. Das hat nichts mit dir zu tun!"
+			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber ich hab das nur gemacht, weil ich es wollte. Das hat nichts mit dir zu tun!"
 		));
 	}
 
@@ -367,7 +367,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String setFormat() {
-		return "Drei Worte: !set option_name value_to_set. Versuch !help falls dir drei-Wort-Sätze zu kompliziert sind."; //dunno if i should translate the example command
+		return "Drei Worte: !set option_name value_to_set. Versuch !help, falls dir drei-Wort-Sätze zu kompliziert sind."; //dunno if i should translate the example command
 	}
 	
 	@Override
