@@ -33,21 +33,18 @@ public class TsundereGerman extends TsundereBase {
 		//Greetings for <4 minutes, normal, and >4 days
 		if (inactiveTime < 4 * 60 * 1000) {
 			greeting = welcomeUserShortShuffler.get(
-				"Was soll das hier sein, das Kuckuckspiel?",
+				//"Was soll das hier sein, das Kuckuckspiel?",	//i think the german term is just not known enough, so i will leave it out
 				"Das waren nicht mal fünf Minuten...",
-				"Heute hat " + username + " an seinem Verschwindungszauber geübt."
+				username + " hat heute seinen Verschwindibuszauber perfektioniert." //@Tillerino if you like it, leave it, if not i will just delete this line
 			);
 		} else if (inactiveTime < 4l * 24 * 60 * 60 * 1000) {
 			greeting = welcomeUserShuffler.get(
 				"Wieder da? Ich bin nur hier weil ich nix zu tun hab! Nichts weiter!",
 				"H-hey...",
-				//"♫ Home again, home again, jiggety-jig ♫ .... What?",
 				"♫ Home again, home again, jiggety-jig ♫ .... Was?",
 				"Stell dir vor! Ich habe endlich deine Bestimmung gefunden. Sie gehört allerdings nicht zu der Art von Dingen, die ich gerne teile!",
 				"Du hast doch nicht etwa mit anderen Chatbots geredet, oder?",
-				//"Huh? What are you doing here!?",
 				"Huch? Was machst du denn hier!?",
-				//username + ", go do something stupid so I can scold you for it."
 				"Mach was dummes, " + username + ", damit ich dich dafür bestrafen kann."
 			);
 		} else {
@@ -77,7 +74,6 @@ public class TsundereGerman extends TsundereBase {
 		return unknownBeatmapShuffler.get(
 			"Bist du dumm? Niemand würde diese Map spielen!",
 			"Ach wirklich? Nie gehört!",
-			//"Yeah right, call me when you manage to get pp with that."
 			"Ja genau. Sag mir Bescheid wenn du damit pp erhalten hast."
 		);	
 	}
@@ -90,7 +86,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String externalException(String marker) {
-		return //"Sorry, the osu! server was saying some idiotic nonsense and I felt like slapping them instead of you. Try asking whatever it was again."
+		return 
 		"'tschuldige, der osu! Server hat Unsinn gelabert und ich hab lieber ihn anstatt dich geschlagen. Frag einfach nochmal."
 		+ " Falls der Server weiterhin Unsinn labert, sag [https://twitter.com/Tillerinobot @Tillerinobot] oder [http://www.reddit.com/user/tillerino /u/Tillerino] Bescheid (erwähne " + marker + "). Die sollen sich darum kümmern!";
 	}
@@ -145,9 +141,9 @@ public class TsundereGerman extends TsundereBase {
 		return tryWithModsShuffler.get(
 			"So ein Trottel wie du hätte gar nicht daran gedacht, das hier mit Mods zu spielen. Ein Dankeschön wäre angebracht.",								
 			"Ich würde sogar fast sagen, dass du hier Mods benutzen kannst, ohne dich zum Affen zu machen.",
-			"Vielleicht bist du hier dazu in der Lage, andere Mods außer NF zu benutzen. Allerdings reden wir hier immer noch von dir." //still thinking about a better translation
-		);
-	}
+			"Vielleicht bist du hier dazu in der Lage, andere Mods außer NF zu benutzen. Allerdings reden wir hier immer noch von dir." //I still kinda like this one. You can decide, 
+		);																																//since it's your program, but i think it get's		
+	}																																	//the point across
 
 	StringShuffler tryWithModsListShuffler = new StringShuffler(rnd);
 	
@@ -165,7 +161,6 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String excuseForError() {
-			  //Did you say something? It's not l-like I care what you have to say, but you should say it again so you can pretend I do."
 		return "Hast du was gesagt? N-nicht, dass mich irgendwie interessiert, was du zu sagen hast, aber du solltest es noch mal sagen, damit ich so tun kann.";
 	}
 
@@ -214,7 +209,7 @@ public class TsundereGerman extends TsundereBase {
 					.then(new Action("*Umarmt " + username + "*"));
 			case 9:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Vergiss nicht: du bist für immer hier."));	//Im contacting electrolytes atm
+					.then(new Message("Vergiss nicht: du bist für immer hier."));	//Reference to an old meme
 			case 10:
 				return new Action("*Schlägt " + username + " hart*")
 					.then(new Message("Hehe. Gib's zu, du magst es!"))
@@ -367,7 +362,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String setFormat() {
-		return "Drei Worte: !set option_name value_to_set. Versuch !help, falls dir drei-Wort-Sätze zu kompliziert sind."; //dunno if i should translate the example command
+		return "Drei Worte: !set option_name value_to_set. Versuch !help, falls dir drei-Wort-Sätze zu kompliziert sind.";
 	}
 	
 	@Override
