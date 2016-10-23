@@ -367,21 +367,21 @@ public class TsundereGerman extends TsundereBase {
 	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		return new Deutsch().apiTimeoutException();
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return new Deutsch().noRecentPlays();
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return new Deutsch().isSetId();
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return new Deutsch().getPatience();
 	}
 }
