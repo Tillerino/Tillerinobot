@@ -11,60 +11,54 @@ import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
- * TRANSLATION NOTE:
- * 
- * Please put some contact data into the following tag. If any additional
- * messages are required, I'll use the English version in all translations and
- * notify the authors.
- * 
- * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
+ * @author Tomoka Rin leoyao321@gmail.com https://osu.ppy.sh/u/125308
  */
-public class Default implements Language {
+public class ChineseTraditional implements Language {
 	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
-		return "I'm sorry, I don't know that map. It might be very new, very hard, unranked or not standard osu mode.";
+		return "抱歉，查詢不到這個譜面的資料唷。這個譜面可能是尚未Rank、過新、太難或非標準模式用的譜面。";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Ugh... Looks like human Tillerino screwed up my wiring."
-				+ " If he doesn't notice soon, could you [https://github.com/Tillerino/Tillerinobot/wiki/Contact inform him]? (reference "
+		return "Tillerino搞砸了...。"
+				+ " 稍等片刻，如果沒有復原的話請至 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 告訴我!]。 (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "What's going on? I'm only getting nonsense from the osu server. Can you tell me what this is supposed to mean? 0011101001010000"
-				+ " Human Tillerino says that this is nothing to worry about, and that we should try again."
-				+ " If you're super worried for some reason, you can [https://github.com/Tillerino/Tillerinobot/wiki/Contact tell him] about it. (reference "
+		return "發生了無法預期的錯誤。"
+				+ "Tillerino：不用擔心，讓我們再試一次吧!"
+				+ " 如果還是很擔心的話請至 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 告訴我!]。 (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "no data for requested mods";
+		return "目前找不到該Mod的資料。";
 	}
 
 	@Override
 	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
-			return new Message("beep boop");
+			return new Message("哈囉!");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
-			return new Message("Welcome back, " + apiUser.getUserName() + ".");
+			return new Message("歡迎回來!， " + apiUser.getUserName() + "。");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			return new Message(apiUser.getUserName() + "...")
-				.then(new Message("...is that you? It's been so long!"))
-				.then(new Message("It's good to have you back. Can I interest you in a recommendation?"));
+				.then(new Message("好久不見了呢!"))
+				.then(new Message("很高興看到你回來，需要我推薦你幾首歌重溫感覺嗎?"));
 		} else {
 			String[] messages = {
-					"you look like you want a recommendation.",
-					"how nice to see you! :)",
-					"my favourite human. (Don't tell the other humans!)",
-					"what a pleasant surprise! ^.^",
-					"I was hoping you'd show up. All the other humans are lame, but don't tell them I said that! :3",
-					"what do you feel like doing today?",
+					"看起來你很想要我推薦你譜面呢!",
+					"很高興能再次看見你上線!",
+					"你可是我最關注的人! (噓!別跟別人說!)",
+					"這是多麼感動的驚喜!",
+					"很高興能夠見到你，千萬別跟別人說呀!",
+					"今天準備做什麼呢?",
 			};
 
 			Random random = new Random();
@@ -77,102 +71,85 @@ public class Default implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "Unknown command \"" + command
-				+ "\". Type !help if you need help!";
+		return "不明的指令 \"" + command
+				+ "\". 請輸入 !help 獲取更多資訊。";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return "Sorry, I can't provide information for those mods at this time.";
+		return " 抱歉，目前無法提供該Mod的資訊。";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Those mods don't look right. Mods can be any combination of DT HR HD HT EZ NC FL SO NF. Combine them without any spaces or special chars. Example: !with HDHR, !with DTEZ";
+		return "看起來你輸入的Mod有錯唷，以下是各Mod的簡寫 (DT HR HD HT EZ NC FL SO NF)。可以選擇輸入其中一種，或是組合其中幾個模式; 例如: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "I don't remember giving you any song info...";
+		return "我不記得有給過你任何歌曲資訊呢...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Try this map with some mods!";
+		return "試著加入Mod挑戰這首歌吧!";
 	}
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Try this map with " + Mods.toShortNamesContinuous(mods) + "!";
-	}
-
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
-				+ " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
-				+ exceptionMarker + ")";
+		return "試著加上" + Mods.toShortNamesContinuous(mods) + "挑戰這首歌!";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?";
+		return "抱歉，腦海中浮現了大量的1跟0讓我分散了注意力...可以再說一次你的請求嗎?";
 	}
 
 	@Override
 	public String complaint() {
-		return "Your complaint has been filed. Tillerino will look into it when he can.";
+		return "回報已經送出了! Tillerino有空就會看的!";
 	}
 
 	@Override
 	public Response hug(OsuApiUser apiUser) {
-		return new Message("Come here, you!")
-			.then(new Action("hugs " + apiUser.getUserName()));
+		return new Message("可以來我這邊一下嗎?")
+			.then(new Action("抱" + apiUser.getUserName()));
 	}
 
 	@Override
 	public String help() {
-		return "Hi! I'm the robot who killed Tillerino and took over his account. Just kidding, but I do use the account a lot."
-				+ " [https://twitter.com/Tillerinobot status and updates]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki commands]"
-				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact]";
+		return "嗨!Tillerino已經死亡了...開玩笑的。這個帳號已經被我改造成機器人使用囉。"
+				+ " [https://twitter.com/Tillerinobot 更新情報看這邊。]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki 各式指令。]"
+				+ " - [http://ppaddict.tillerino.org/ 歌曲詳細資訊]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact 聯絡我。]";
 	}
 
 	@Override
 	public String faq() {
-		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Frequently asked questions]";
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ 問與答。]";
 	}
 
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Sorry, at this point " + feature + " is only available for players who have surpassed rank " + minRank + ".";
+		return "抱歉在這個時間 " + feature + " 只開放給 " + minRank + "以上的人使用。";
 	}
 
 	@Override
 	public String mixedNomodAndMods() {
-		return "What do you mean nomod with mods?";
+		return "就是Nomod";
 	}
 
 	@Override
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
-				+ " I've recommended everything that I can think of]."
-				+ " Try other recommendation options or use !reset. If you're not sure, check !help.";
+				+ " 我會推薦所有想得到適合你的譜面]。"
+				+ " 試試看其他推薦譜面的方法或是用 !reset 來重置推薦的譜面難度。如果你不確定功能該如何使用，可以輸入 !help來幫助你。";
 	}
 
 	@Override
 	public String notRanked() {
-		return "Looks like that beatmap is not ranked.";
+		return "這譜面還沒Rank呢。";
 	}
 
 	@Override
@@ -187,85 +164,51 @@ public class Default implements Language {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		return "Invalid accuracy: \"" + acc + "\"";
+		return "無效的Acc數值。: \"" + acc + "\"";
 	}
 
 	@Override
-	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		/*
-		 * TRANSLATION NOTE: This line is sent to the user right after they have
-		 * chosen this Language implementation. The English version refers to
-		 * itself as the default version ("just the way I am"), so translating
-		 * the English message doesn't make any sense.
-		 * 
-		 * Instead, we've been using the line
-		 * "*Translator* helped me learn *Language*." in translations. Replace
-		 * *Translator* with your osu name and *Language* with the name of the
-		 * language that you are translating to, and translate the line into the
-		 * new language. This serves two purposes: It shows that the language
-		 * was changed and gives credit to the translator.
-		 * 
-		 * You don't need to use the line above, and you don't have have to give
-		 * yourself credit, but you should show that the language has changed.
-		 * For example, in the German translation, I just used the line
-		 * "Nichts leichter als das!", which translates literally to
-		 * "Nothing easier than that!", which refers to German being my first
-		 * language.
-		 * 
-		 * Tillerino
-		 * 
-		 * P.S. you can put a link to your profile into the line like this:
-		 * [https://osu.ppy.sh/u/2070907 Tillerino]
-		 */
-		return new Message("So you like me just the way I am :)");
+	public Message optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return new Message("是Tomoka Rin教我中文的，請多多指教。");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		return "I'm sorry, but \"" + invalid
-				+ "\" does not compute. Try these: " + choices + "!";
+		return "很抱歉，但 \"" + invalid
+				+ "\" 是不正確的。 試試看這個: " + choices + "!";
 	}
 
 	@Override
 	public String setFormat() {
-		return "The syntax to set a parameter is !set option value. Try !help if you need more pointers.";
+		return " 要設定變數的話 請輸入 !set option value(數值) 來做更動。"
+				+ "更多資訊請輸入 !help 來幫助你。";
 	}
 	
 	StringShuffler doSomething = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
-		final String message = "The osu! servers are super slow right now, so there's nothing I can do for you at this moment. ";
+		final String message = "Osu!伺服器目前連線緩慢，所以我跟你一樣什麼事都不能做...你可以試著...";
 		return message + doSomething.get(
-				"Say... When was the last time you talked to your grandmother?",
-				"How about you clean your room and then ask again?",
-				"I bet you'd love to take a walk right now. You know... outside?",
-				"I just know that you have a bunch of other things to do. How about just doing them now?",
-				"You look like you need a nap anyway.",
-				"But check out this super interesting page on [https://en.wikipedia.org/wiki/Special:Random wikipedia]!",
-				"Let's check if anybody good is [http://www.twitch.tv/directory/game/Osu! streaming] right now!",
-				"Look, here is another [http://dagobah.net/flash/Cursor_Invisible.swf game] that you probably suck at!",
-				"This should give you plenty of time to study [https://github.com/Tillerino/Tillerinobot/wiki my manual].",
-				"Don't worry, these [https://www.reddit.com/r/osugame dank memes] should pass the time.",
-				"While you're bored, give [http://gabrielecirulli.github.io/2048/ 2048] a try!",
-				"Fun question: If your harddrive crashed right now, how much of your personal data would be lost forever?",
-				"So... Have you ever tried the [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
-				"You can go do something else or we can just stare into each others eyes. Silently."
+				"泡杯咖啡看看最近有什麼新聞打發時間。",
+				"去小睡一下再回來!",
+				"來看看現在有誰在實況吧! [http://www.twitch.tv/directory/game/Osu! streaming]",
+				"別擔心 ! [https://www.reddit.com/r/osugame dank memes] 這或許能幫助你打發時間!"
 				);
 	}
 
 	@Override
 	public String noRecentPlays() {
-		return "I haven't seen you play lately.";
+		return "有一段時間沒有看到你玩了呢";
 	}
 	
 	@Override
 	public String isSetId() {
-		return "This references a set of beatmaps, not a single beatmap.";
+		return "這似乎是好幾個譜面的資料組成，而不是單一譜面。";
 	}
 	
 	@Override
 	public String getPatience() {
-		return "Just a second...";
+		return "請稍後...";
 	}
 }
