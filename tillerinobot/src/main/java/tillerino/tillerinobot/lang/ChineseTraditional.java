@@ -18,13 +18,13 @@ public class ChineseTraditional implements Language {
 
 	@Override
 	public String unknownBeatmap() {
-		return "抱歉，查詢不到這個譜面的資料唷。這譜面可能是尚未Rank、過新、太難、非標準模式用的譜面。";
+		return "抱歉，查詢不到這個譜面的資料唷。這個譜面可能是尚未Rank、過新、太難或非標準模式用的譜面。";
 	}
 
 	@Override
 	public String internalException(String marker) {
 		return "Tillerino搞砸了...。"
-				+ " 稍等片刻，如果沒有復原的話至 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 請告訴我吧!]。 (reference "
+				+ " 請稍等片刻，如果沒有復原的話請至 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 告訴我!]。 (reference "
 				+ marker + ")";
 	}
 
@@ -32,13 +32,13 @@ public class ChineseTraditional implements Language {
 	public String externalException(String marker) {
 		return "發生了無法預期的錯誤。"
 				+ "Tillerino：不用擔心，讓我們再試一次吧!"
-				+ " 如果還是很擔心的話至 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 請告訴我吧!]。 (reference "
+				+ " 如果還是有問題的話請至 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 告訴我!]。 (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "目前找不到該Mod的資料D:。";
+		return "目前找不到該Mod的資料。";
 	}
 
 	@Override
@@ -49,12 +49,12 @@ public class ChineseTraditional implements Language {
 			return new Message("歡迎回來!， " + apiUser.getUserName() + "。");
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			return new Message(apiUser.getUserName() + "...")
-				.then(new Message(":D 好久不見了呢!"))
-				.then(new Message("很高興看到你回來，需要讓我推薦你幾首歌重溫感覺嗎?"));
+				.then(new Message("好久不見了呢!"))
+				.then(new Message("很高興看到你回來，需要我推薦你幾首歌重溫感覺嗎?"));
 		} else {
 			String[] messages = {
-					"看起來你想要我推薦你譜面呢!",
-					"很高興再次看見你上線!",
+					"看起來你很想要我推薦你譜面呢!",
+					"很高興能再次看見你上線!",
 					"你可是我最關注的人! (噓!別跟別人說!)",
 					"這是多麼感動的驚喜!",
 					"很高興能夠見到你，千萬別跟別人說呀!",
@@ -72,17 +72,17 @@ public class ChineseTraditional implements Language {
 	@Override
 	public String unknownCommand(String command) {
 		return "不明的指令 \"" + command
-				+ "\". 輸入 !help 獲取更多資訊。";
+				+ "\". 請輸入 !help 獲取更多資訊。";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return " 抱歉D:，目前無法提供該Mod的資訊。";
+		return " 抱歉，目前無法提供該Mod的資訊。";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "看起來輸入的Mod字有錯唷，以下是各Mod的簡稱 DT HR HD HT EZ NC FL SO NF。可以選擇輸入單一模式，或是組合其中幾個模式詞句; 例如: !with HDHR, !with DTEZ";
+		return "看起來你輸入的Mod有錯唷，以下是各Mod的簡寫(DT、HR、HD、HT、EZ、NC、FL、SO、NF)。可以選擇輸入其中一種，或是組合其中幾個模式; 例如: !with HDHR, !with DTEZ";
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class ChineseTraditional implements Language {
 
 	@Override
 	public String tryWithMods() {
-		return "試著加入Mod挑戰這首歌!";
+		return "試著加入Mod挑戰這首歌吧!";
 	}
 
 	@Override
@@ -102,23 +102,23 @@ public class ChineseTraditional implements Language {
 
 	@Override
 	public String excuseForError() {
-		return "抱歉，剛腦海中浮現了大量的1跟0讓我分散了注意力...可以再說一次你的請求嗎?";
+		return "抱歉，腦海中浮現了大量的1跟0讓我分散了注意力...可以再說一次你的請求嗎?";
 	}
 
 	@Override
 	public String complaint() {
-		return "回報已經送出了! Tillerino有空就會看的!(大概:D ";
+		return "回報已經送出了! Tillerino有空就會看的!";
 	}
 
 	@Override
 	public Response hug(OsuApiUser apiUser) {
-		return new Message("可以來到我這邊一下嗎?")
+		return new Message("可以來我這邊一下嗎?")
 			.then(new Action("抱" + apiUser.getUserName()));
 	}
 
 	@Override
 	public String help() {
-		return "嗨!Tillerino已經死亡了...開玩笑的:D 這個帳號已經被我改造成機器人使用囉。"
+		return "嗨!Tillerino已經死亡了...開玩笑的。這個帳號已經被我改造成機器人使用囉。"
 				+ " [https://twitter.com/Tillerinobot 更新情報看這邊。]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki 各式指令。]"
 				+ " - [http://ppaddict.tillerino.org/ 歌曲詳細資訊]"
@@ -132,24 +132,24 @@ public class ChineseTraditional implements Language {
 
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "抱歉在這個時間 " + feature + " 只開放給至 " + minRank + "以上的人使用。";
+		return "抱歉在這個時間 " + feature + " 只開放給 " + minRank + "以上的人使用。";
 	}
 
 	@Override
 	public String mixedNomodAndMods() {
-		return "None類型";
+		return "就是Nomod";
 	}
 
 	@Override
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
-				+ " 我會推薦所有想得到合適你的譜面]。"
+				+ " 我會推薦所有想得到適合你的譜面]。"
 				+ " 試試看其他推薦譜面的方法或是用 !reset 來重置推薦的譜面難度。如果你不確定功能該如何使用，可以輸入 !help來幫助你。";
 	}
 
 	@Override
 	public String notRanked() {
-		return "這譜面還沒Rank呢D:。";
+		return "這譜面還沒Rank呢。";
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class ChineseTraditional implements Language {
 		final String message = "Osu!伺服器目前連線緩慢，所以我跟你一樣什麼事都不能做...你可以試著...";
 		return message + doSomething.get(
 				"泡杯咖啡看看最近有什麼新聞打發時間。",
-				"你看起來需要小睡一下呢!",
+				"去小睡一下再回來!",
 				"來看看現在有誰在實況吧! [http://www.twitch.tv/directory/game/Osu! streaming]",
 				"別擔心 ! [https://www.reddit.com/r/osugame dank memes] 這或許能幫助你打發時間!"
 				);
@@ -199,7 +199,7 @@ public class ChineseTraditional implements Language {
 
 	@Override
 	public String noRecentPlays() {
-		return "一段時間沒有看到你玩了呢:D";
+		return "有一段時間沒有看到你玩了呢";
 	}
 	
 	@Override
@@ -209,6 +209,6 @@ public class ChineseTraditional implements Language {
 	
 	@Override
 	public String getPatience() {
-		return "稍後...";
+		return "請稍後...";
 	}
 }
