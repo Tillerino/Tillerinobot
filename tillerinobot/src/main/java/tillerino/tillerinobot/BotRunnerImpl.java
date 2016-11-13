@@ -157,7 +157,9 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 			@Named("tillerinobot.irc.port") int port,
 			@Named("tillerinobot.irc.nickname") String nickname,
 			@Named("tillerinobot.irc.password") String password,
-			@Named("tillerinobot.irc.autojoin") String autojoinChannel) {
+			@Named("tillerinobot.irc.autojoin") String autojoinChannel,
+			@Named("tillerinobot.git.commit.id.abbrev") String commit,
+			@Named("tillerinobot.git.commit.message.short") String commitMessage) {
 		super();
 		this.tillerinoBot = tillerinoBot;
 		this.server = server.split(",");
@@ -165,6 +167,8 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 		this.nickname = nickname;
 		this.password = password;
 		this.autojoinChannel = autojoinChannel;
+		this.commit = commit;
+		this.commitMessage = commitMessage;
 	}
 
 	private final Provider<IRCBot> tillerinoBot;
@@ -174,6 +178,8 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 	private final String nickname;
 	private final String password;
 	private final String autojoinChannel;
+	private final String commit;
+	private final String commitMessage;
 
 	@Override
 	@CheckForNull
@@ -188,6 +194,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 	
 	@Override
 	public void run() {
+		log.info("Starting Tillerinobot {}: {}", commit, commitMessage);
 		for (int i = 0; ; i++) {
 			if(!reconnect) {
 				break;

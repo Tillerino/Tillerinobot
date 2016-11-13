@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.core.UriBuilder;
@@ -46,6 +47,8 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * The purpose of this class and its main function is to completely mock backend
  * and IRC connection to quickly check out the functionality of Tillerinobot.
@@ -53,6 +56,7 @@ import com.google.inject.name.Names;
  * @author Tillerino
  * 
  */
+@Slf4j
 public class LocalConsoleTillerinobot extends AbstractModule {
 	static class PircBotX extends CloseableBot {
 		public PircBotX(
@@ -69,6 +73,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	@Override
 	protected void configure() {
 		install(new CreateInMemoryDatabaseModule());
+		install(new TillerinobotConfigurationModule());
 		
 		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore"))
 				.toInstance(false);
@@ -82,7 +87,9 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	@Singleton
 	public BotRunner getRunner(final IRCBot bot, final BotBackend backend,
 			final IrcNameResolver resolver, EntityManagerFactory emf,
-			ThreadLocalAutoCommittingEntityManager em) throws Exception {
+			ThreadLocalAutoCommittingEntityManager em,
+			@Named("tillerinobot.git.commit.id.abbrev") String commit,
+			@Named("tillerinobot.git.commit.message.short") String commitMessage) throws Exception {
 		final PircBotX pircBot = mock(PircBotX.class);
 		when(pircBot.isConnected()).thenReturn(true);
 		when(pircBot.getSocket()).thenReturn(mock(Socket.class));
@@ -140,6 +147,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		doAnswer(new Answer<Void>() {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
+				log.info("Starting Tillerinobot {}: {}", commit, commitMessage);
 				@SuppressWarnings("unchecked")
 				ConnectEvent<PircBotX> event = mock(ConnectEvent.class);
 				when(event.getBot()).thenReturn(pircBot);
