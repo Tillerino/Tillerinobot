@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot</artifactId>
-	<version>0.10.1</version>
+	<version>0.11.0</version>
 	<build>
 		<plugins>
 			<plugin>

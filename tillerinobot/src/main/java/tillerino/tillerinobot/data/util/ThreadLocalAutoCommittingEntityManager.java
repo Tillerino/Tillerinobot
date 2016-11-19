@@ -321,6 +321,10 @@ public class ThreadLocalAutoCommittingEntityManager implements
 	public void setThreadLocalEntityManager(EntityManager em) {
 		entityManager.set(em);
 	}
+	
+	public boolean isThreadLocalEntityManagerPresent() {
+		return entityManager.get() != null;
+	}
 
 	@Override
 	public void setFlushMode(FlushModeType flushMode) {

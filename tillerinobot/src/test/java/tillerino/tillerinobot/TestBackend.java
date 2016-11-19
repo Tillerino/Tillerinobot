@@ -123,7 +123,6 @@ public class TestBackend implements BotBackend {
 		OsuApiUser apiUser;
 		boolean isDonator = false;
 		long lastActivity;
-		String options;
 	}
 
 	static class Database {
@@ -372,17 +371,6 @@ public class TestBackend implements BotBackend {
 	@Override
 	public boolean verifyGeneralKey(String key) throws SQLException {
 		return "testkey".equals(key);
-	}
-	
-	@Override
-	public String getOptions(int user) throws SQLException {
-		return database.users.get(user).options;
-	}
-	
-	@Override
-	public void saveOptions(int user, String options) throws SQLException {
-		database.users.get(user).options = options;
-		writeDatabase();
 	}
 
 	@Override

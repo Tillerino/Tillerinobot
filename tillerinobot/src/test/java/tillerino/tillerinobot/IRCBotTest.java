@@ -1,6 +1,21 @@
 package tillerino.tillerinobot;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyCollectionOf;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.startsWith;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -8,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -23,6 +39,8 @@ import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 public class IRCBotTest extends AbstractDatabaseTest {
+	UserDataManager userDataManager;
+	
 	@Test
 	public void testVersionMessage() throws IOException, SQLException, UserException {
 		IRCBot bot = getTestBot(backend);
@@ -117,7 +135,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		}
 
 		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
-				new UserDataManager(backend), mock(Pinger.class), false, em,
+				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
 				emf, resolver);
 		return ircBot;
 	}
@@ -129,6 +147,13 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 		
 		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em));
+	}
+	
+	@After
+	public void tidyUserDataManager() {
+		if (userDataManager != null) {
+			userDataManager.tidyUp(false);
+		}
 	}
 	
 	@Spy

@@ -99,28 +99,6 @@ public interface BotBackend {
 	public boolean verifyGeneralKey(String key) throws SQLException;
 	
 	/**
-	 * retreives options for this user as saved through the
-	 * {@link #saveOptions(int, String)} method.
-	 * 
-	 * @param user
-	 * @return may be null or empty string.
-	 * @throws SQLException
-	 */
-	@CheckForNull
-	public String getOptions(@UserId int user) throws SQLException;
-	
-	/**
-	 * saves options for this user. options should be saved in a human-readable
-	 * format. care must be taken to keep the format backwards-compatible at all
-	 * times.
-	 * 
-	 * @param user
-	 * @param options
-	 * @throws SQLException
-	 */
-	public void saveOptions(@UserId int user, String options) throws SQLException;
-
-	/**
 	 * Retreives beatmap. Implementation hint: this might be called a *lot* when
 	 * checking recommendation predicates and should probably be cached.
 	 * 
