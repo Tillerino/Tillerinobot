@@ -249,14 +249,7 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	 */
 	public Recommendation getRecommendation(@Nonnull OsuApiUser apiUser, @CheckForNull String message, Language lang)
 			throws UserException, SQLException, IOException, InterruptedException {
-		/*
-		 * log activity making sure that we can resolve the user's IRC name
-		 */
-		
 		int userid = apiUser.getUserId();
-		
-		backend.registerActivity(userid);
-		
 		/*
 		 * load sampler
 		 */

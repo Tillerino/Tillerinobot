@@ -24,8 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.CoreHooks;
@@ -34,15 +32,21 @@ import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
-import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
+import org.pircbotx.hooks.types.GenericUserEvent;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.CommandHandler.Action;
@@ -69,13 +73,6 @@ import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
@@ -156,7 +153,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			return;
 		
 		if (event.getChannel() == null || event.getUser().getNick().equals("Tillerino")) {
-			MDC.put("user", event.getUser().getNick());
 			processPrivateAction(fromIRC(event.getUser(), event), event.getMessage());
 		}
 	}
@@ -328,7 +324,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		if(silent)
 			return;
 		
-		MDC.put("user", event.getUser().getNick());
 		processPrivateMessage(fromIRC(event.getUser(), event), event.getMessage());
 	}
 	
@@ -518,6 +513,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				event.getBot().sendRaw().rawLine("NAMES #osu");
 			}
 
+			if (event instanceof GenericUserEvent<?>) {
+				String nick = ((GenericUserEvent) event).getUser().getNick();
+				MDC.put("user", nick);
+				scheduleRegisterActivity(nick);
+			}
+
 			super.onEvent(event);
 		} finally {
 			em.close();
@@ -547,17 +548,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	
 	@Override
 	public void onJoin(JoinEvent event) throws Exception {
-		final String nick = event.getUser().getNick();
-
 		if (silent) {
 			return;
 		}
 
-		MDC.put("user", nick);
 		IRCBotUser user = fromIRC(event.getUser(), event);
 		welcomeIfDonator(user);
-
-		scheduleRegisterActivity(nick);
 	}
 	
 	void welcomeIfDonator(IRCBotUser user) {
@@ -622,16 +618,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		} catch (RejectedExecutionException e) {
 			// bot is shutting down
 		}
-	}
-	
-	@Override
-	public void onPart(PartEvent event) throws Exception {
-		scheduleRegisterActivity(event.getUser().getNick());
-	}
-
-	@Override
-	public void onQuit(QuitEvent event) throws Exception {
-		scheduleRegisterActivity(event.getUser().getNick());
 	}
 	
 	@Override
