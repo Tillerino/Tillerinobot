@@ -228,7 +228,7 @@ public class Default implements Language {
 
 	@Override
 	public String setFormat() {
-		return "The syntax to set a parameter is !set option value. Try !help if you need more pointers.";
+		return "Syntaksen for å sette parameter er !set option value. Prøv !help hvis du trenger mer veiledning.";
 	}
 	
 	StringShuffler doSomething = new StringShuffler(rnd);
@@ -241,12 +241,12 @@ public class Default implements Language {
 				"Hva med at du rydder rommet ditt så spør du meg igjen?",
 				"Jeg vedder på at du ville elsket å gått en tur akkuratt nå. Du vet... ut?",
 				"Jeg bare vet at du har utrolig mye andre ting å gjøre. Hva med at du gjør dem nå?",
-				"Det ser du som du trenger litt søv uansett.",
+				"Det ser du som du trenger litt søvn uansett.",
 				"Men skjekk ut denne super interresange siden på [https://en.wikipedia.org/wiki/Special:Random wikipedia]!",
-				"La oss se om det er noen gode spiller som [http://www.twitch.tv/directory/game/Osu! streamer] akkurat nå!",
-				"Se, her er et annet [http://dagobah.net/flash/Cursor_Invisible.swf spill] som du mest sansynlig kommer til å dårlig i!",
-				"Dette bør gi det mye tid til å studere [https://github.com/Tillerino/Tillerinobot/wiki manualen min].",
-				"Ikke beskymr deg! Disse [https://www.reddit.com/r/osugame danke memsene] bør få tiden til å fly.",
+				"La oss se om det er noen gode spillere som [http://www.twitch.tv/directory/game/Osu! streamer] akkurat nå!",
+				"Se, her er et annet [http://dagobah.net/flash/Cursor_Invisible.swf spill] som du mest sansynlig kommer til å være dårlig i!",
+				"Dette bør gi deg mye tid til å studere [https://github.com/Tillerino/Tillerinobot/wiki manualen min].",
+				"Ikke beskymre deg! Disse [https://www.reddit.com/r/osugame danke memsene] bør få tiden til å fly.",
 				"Mens du kjeder deg, gi [http://gabrielecirulli.github.io/2048/ 2048] et forsøk!",
 				"Morsomt spørsmål: Hvis harddisken din krasjet akkurat nå, hvor mye av din personlige data vil bli tapt for altid?",
 				"Så... Har du noen gang prøvd [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
