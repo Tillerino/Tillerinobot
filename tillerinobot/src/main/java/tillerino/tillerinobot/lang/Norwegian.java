@@ -251,4 +251,4 @@ public class Default implements Language {
 	public String getPatience() {
 		return "Et øyeblikk.";
 	}
-}
+} //end of file
