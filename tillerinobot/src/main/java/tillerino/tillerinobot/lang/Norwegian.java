@@ -19,7 +19,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Akuma Kudasai aka _BibleThump diabloxx50@gmail.com https://git.blosu.net/Diabloxx osu account is restricted
  */
-public class Default implements Language {
+public class Norwegian implements Language {
 	static final Random rnd = new Random();
 
 	@Override
@@ -251,4 +251,4 @@ public class Default implements Language {
 	public String getPatience() {
 		return "Et øyeblikk.";
 	}
-} //end of file
+}
