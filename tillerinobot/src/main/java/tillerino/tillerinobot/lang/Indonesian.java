@@ -17,7 +17,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * messages are required, I'll use the English version in all translations and
  * notify the authors.
  * 
- * @author "[ RumberkrenZ ]" rrr.ee.uu.bb.ee.nnn@gmail.com https://github.com/Rumberkren https://osu.ppy.sh/u/3925053
+ * @author "Rumberkren" rrr.ee.uu.bb.ee.nnn@gmail.com https://github.com/Rumberkren https://osu.ppy.sh/u/3925053
  */
 public class Default implements Language {
 	static final Random rnd = new Random();
@@ -30,15 +30,15 @@ public class Default implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Umm... Sepertinya Tillerino asli mengacaukan pengaturan saya."
-				+ "Jika dia tidak segera mengetahuinya, bisakah kau [https://github.com/Tillerino/Tillerinobot/wiki/Contact memberitahunya]? (reference "
+				+ " Jika dia tidak segera mengetahuinya, bisakah kau [https://github.com/Tillerino/Tillerinobot/wiki/Contact memberitahunya]? (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "A[a yang terjadi? Saya hanya mendapatkan omong kosong dari server osu. Bisakah kau memberitahu saya apa yang terjadi? 0011101001010000"
-				+ "Tillerino asli mengatakan bahwa ini tidak perlu dikhawatirkan, dan kita harus mencoba lagi."
-				+ "Jika kau mencemaskan ini, kau bisa [https://github.com/Tillerino/Tillerinobot/wiki/Contact memberitahunya] tentang ini. (reference "
+		return "Apa yang terjadi? Saya hanya mendapatkan omong kosong dari server osu. Bisakah kau memberitahu saya apa yang terjadi? 0011101001010000"
+				+ " Tillerino asli mengatakan bahwa ini tidak perlu dikhawatirkan, dan kita harus mencoba lagi."
+				+ " Jika kau mencemaskan ini, kau bisa [https://github.com/Tillerino/Tillerinobot/wiki/Contact memberitahunya] tentang ini. (reference "
 				+ marker + ")";
 	}
 
@@ -59,12 +59,12 @@ public class Default implements Language {
 				.then(new Message("Senang bisa menemuimu kembali. Bisakah saya menarik minat anda dalam sebuah rekomendasi?"));
 		} else {
 			String[] messages = {
-					"Kau terlihat seperti kau ingin sebuah rekomendasi.",
-					"Sangat senang bisa menemuimu! :)",
-					"Manusia favoritku. (Jangan beritahu manusia lain!)",
-					"Kejutan yang ramah! ^.^",
-					"Saya berharap kau akan datang. Semua manusia lain bodoh, tapi jangan beritahu yang lain bahwa saya berkata seperti itu! :3",
-					"Apa yang anda rasa ingin anda lakukan hari ini?",
+					"kau terlihat seperti kau ingin sebuah rekomendasi.",
+					"sangat senang bisa menemuimu! :)",
+					"manusia favoritku. (Jangan beritahu manusia lain!)",
+					"kejutan yang ramah! ^.^",
+					"saya berharap kau akan datang. Semua manusia lain bodoh, tapi jangan beritahu yang lain bahwa saya berkata seperti itu! :3",
+					"apa yang anda rasa ingin anda lakukan hari ini?",
 			};
 
 			Random random = new Random();
@@ -77,7 +77,7 @@ public class Default implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "Unknown command \"" + command
+		return "Perintah tidak diketahui \"" + command
 				+ "\". Ketik !help jika kau butuh bantuan!";
 	}
 
@@ -119,7 +119,7 @@ public class Default implements Language {
 	 */
 	public String unresolvableName(String exceptionMarker, String name) {
 		return "Namamu membuat saya bingung. Apakah anda di banned? Jika tidak, tolong cek [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error laman ini] tentang cara memperbaiki ini!"
-				+ "Jika itu tidak bekerja, tolong [https://github.com/Tillerino/Tillerinobot/wiki/Contact hubungi Tillerino]. (reference "
+				+ " Jika itu tidak bekerja, tolong [https://github.com/Tillerino/Tillerinobot/wiki/Contact hubungi Tillerino]. (reference "
 				+ exceptionMarker + ")";
 	}
 
@@ -217,7 +217,7 @@ public class Default implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		return new Message("Jadi kau suka denganku apa adanya :)");
+		return new Message("Halo! [https://osu.ppy.sh/u/3925053 Rumberkren] membantuku mempelajari Bahasa Indonesia");
 	}
 
 	@Override
