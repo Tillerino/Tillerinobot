@@ -19,7 +19,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author "Rumberkren" rrr.ee.uu.bb.ee.nnn@gmail.com https://github.com/Rumberkren https://osu.ppy.sh/u/3925053
  */
-public class Default implements Language {
+public class Indonesian implements Language {
 	static final Random rnd = new Random();
 
 	@Override
@@ -104,23 +104,6 @@ public class Default implements Language {
 	@Override
 	public String tryWithMods(List<Mods> mods) {
 		return "coba map ini dengan " + Mods.toShortNamesContinuous(mods) + "!";
-	}
-
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Namamu membuat saya bingung. Apakah anda di banned? Jika tidak, tolong cek [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error laman ini] tentang cara memperbaiki ini!"
-				+ " Jika itu tidak bekerja, tolong [https://github.com/Tillerino/Tillerinobot/wiki/Contact hubungi Tillerino]. (reference "
-				+ exceptionMarker + ")";
 	}
 
 	@Override
