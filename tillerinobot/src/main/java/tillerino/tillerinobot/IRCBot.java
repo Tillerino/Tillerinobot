@@ -285,7 +285,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				}
 				user.message(e.getMessage(), false);
 			} else {
-				if (e instanceof SocketTimeoutException) {
+				if ((e instanceof SocketTimeoutException)
+						|| ((e instanceof IOException) && e.getMessage().startsWith("Premature EOF"))) {
 					user.message(lang.apiTimeoutException(), false);
 					log.debug("osu api timeout");
 				} else {
