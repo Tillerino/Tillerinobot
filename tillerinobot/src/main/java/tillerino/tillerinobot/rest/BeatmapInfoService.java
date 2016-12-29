@@ -84,6 +84,8 @@ public class BeatmapInfoService {
 		int beatmapid;
 		long mods;
 		Map<Double, Double> ppForAcc = new TreeMap<>();
+		boolean oppaiOnly;
+		Double starDiff;
 	}
 	
 	@GET
@@ -104,6 +106,8 @@ public class BeatmapInfoService {
 			BeatmapInfo info = new BeatmapInfo();
 			info.beatmapid = beatmapid;
 			info.mods = estimates.getMods();
+			info.oppaiOnly = estimates.isOppaiOnly();
+			info.starDiff = estimates.getStarDiff();
 
 			for (double acc : new double[] { 1, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75 }) {
 				info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
