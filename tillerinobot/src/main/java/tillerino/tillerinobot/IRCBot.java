@@ -514,9 +514,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			}
 
 			if (event instanceof GenericUserEvent<?>) {
-				String nick = ((GenericUserEvent) event).getUser().getNick();
-				MDC.put("user", nick);
-				scheduleRegisterActivity(nick);
+				User user = ((GenericUserEvent) event).getUser();
+				if (user != null) {
+					String nick = user.getNick();
+					MDC.put("user", nick);
+					scheduleRegisterActivity(nick);
+				}
 			}
 
 			super.onEvent(event);
