@@ -569,9 +569,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			Integer userid;
 			try {
 				userid = resolver.resolveIRCName(user.getNick());
-			} catch (SocketTimeoutException e1) {
-				log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
-				return;
+			} catch (IOException e) {
+				if (isTimeout(e)) {
+					log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
+					return;
+				}
+				throw e;
 			}
 			
 			if(userid == null)
@@ -580,9 +583,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			OsuApiUser apiUser;
 			try {
 				apiUser = backend.getUser(userid, 0);
-			} catch (SocketTimeoutException e) {
-				log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
-				return;
+			} catch (IOException e) {
+				if (isTimeout(e)) {
+					log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
+					return;
+				}
+				throw e;
 			}
 			
 			if(apiUser == null)
@@ -603,6 +609,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				
 				checkVersionInfo(user);
 			}
+		} catch (InterruptedException e) {
+			// no problem
 		} catch (Exception e) {
 			log.error("error welcoming potential donator", e);
 		}
@@ -667,7 +675,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	}
 
 	@Nonnull
-	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException {
+	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException, InterruptedException {
 		Integer userId = resolver.resolveIRCName(user.getNick());
 		
 		if(userId == null) {

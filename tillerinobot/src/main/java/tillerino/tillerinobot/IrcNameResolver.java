@@ -2,6 +2,7 @@ package tillerino.tillerinobot;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.Semaphore;
 
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
@@ -12,6 +13,8 @@ import org.tillerino.osuApiModel.types.UserId;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
@@ -30,25 +33,34 @@ public class IrcNameResolver {
 	private final Cache<String, Integer> resolvedIRCNames = CacheBuilder
 			.newBuilder().maximumSize(100000).build();
 
+	private final LoadingCache<String, Semaphore> semaphores = CacheBuilder.newBuilder().maximumSize(10000)
+			.build(CacheLoader.from(() -> new Semaphore(1)));
+
 	/*
 	 * cached
 	 */
 	@SuppressFBWarnings(value = "TQ", justification = "producer")
 	@CheckForNull
 	public @UserId Integer resolveIRCName(String ircName) throws SQLException,
-			IOException {
-		Integer resolved = resolvedIRCNames.getIfPresent(ircName);
+			IOException, InterruptedException {
+		Semaphore semaphore = semaphores.getUnchecked(ircName);
+		semaphore.acquire();
+		try {
+			Integer resolved = resolvedIRCNames.getIfPresent(ircName);
 
-		if (resolved != null) {
+			if (resolved != null) {
+				return resolved;
+			}
+
+			resolved = getIDByUserName(ircName);
+			if (resolved == null) {
+				return null;
+			}
+			resolvedIRCNames.put(ircName, resolved);
 			return resolved;
+		} finally {
+			semaphore.release();
 		}
-
-		resolved = getIDByUserName(ircName);
-		if (resolved == null) {
-			return null;
-		}
-		resolvedIRCNames.put(ircName, resolved);
-		return resolved;
 	}
 
 	@CheckForNull
