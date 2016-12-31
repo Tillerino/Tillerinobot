@@ -31,6 +31,9 @@ import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.types.PpaddictId;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
@@ -38,9 +41,6 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * Backend test implementation. Not thread safe or anything. Serializes database to ppaddict-db.json
@@ -141,7 +141,7 @@ public class TestBackend implements PpaddictBackend {
         em.setThreadLocalEntityManager(emf.createEntityManager());
         try {
           link(ppaddictId, osuName);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException | IOException | InterruptedException e) {
           e.printStackTrace();
         } finally {
           em.close();
@@ -153,8 +153,8 @@ public class TestBackend implements PpaddictBackend {
   }
 
 
-  public void link(@PpaddictId String loginId, @OsuName String osuName) throws SQLException,
-      IOException {
+  public void link(@PpaddictId String loginId, @OsuName String osuName)
+      throws SQLException, IOException, InterruptedException {
     System.out.println("linking " + loginId + " to " + osuName);
 
     botBackend.hintUser(osuName, false, 100, 1000);
