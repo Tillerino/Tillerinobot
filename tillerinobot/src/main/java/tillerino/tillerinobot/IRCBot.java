@@ -285,8 +285,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				}
 				user.message(e.getMessage(), false);
 			} else {
-				if ((e instanceof SocketTimeoutException)
-						|| ((e instanceof IOException) && e.getMessage().startsWith("Premature EOF"))) {
+				if (isTimeout(e)) {
 					user.message(lang.apiTimeoutException(), false);
 					log.debug("osu api timeout");
 				} else {
@@ -302,6 +301,11 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
 		}
+	}
+
+	public static boolean isTimeout(Throwable e) {
+		return (e instanceof SocketTimeoutException)
+				|| ((e instanceof IOException) && e.getMessage().startsWith("Premature EOF"));
 	}
 
 	public static String logException(Throwable e, Logger logger) {
