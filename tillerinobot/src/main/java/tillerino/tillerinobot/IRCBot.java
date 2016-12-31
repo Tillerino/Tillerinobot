@@ -58,20 +58,10 @@ import tillerino.tillerinobot.CommandHandler.Task;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.handlers.AccHandler;
-import tillerino.tillerinobot.handlers.ComplaintHandler;
-import tillerino.tillerinobot.handlers.DebugHandler;
-import tillerino.tillerinobot.handlers.FixIDHandler;
-import tillerino.tillerinobot.handlers.HelpHandler;
-import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
-import tillerino.tillerinobot.handlers.NPHandler;
-import tillerino.tillerinobot.handlers.OptionsHandler;
-import tillerino.tillerinobot.handlers.RecentHandler;
-import tillerino.tillerinobot.handlers.RecommendHandler;
-import tillerino.tillerinobot.handlers.ResetHandler;
-import tillerino.tillerinobot.handlers.WithHandler;
+import tillerino.tillerinobot.handlers.*;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.osutrack.Downloader;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
@@ -139,6 +129,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		commandHandlers.add(new DebugHandler(backend, resolver));
 		commandHandlers.add(new HelpHandler());
 		commandHandlers.add(new ComplaintHandler(manager));
+		commandHandlers.add(new OsuTrackHandler(new Downloader()));
 	}
 
 	@Override
