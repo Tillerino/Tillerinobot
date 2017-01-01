@@ -372,6 +372,16 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				settings.requestedMods = Mods.add(settings.requestedMods, Mods.Hidden);
 				continue;
 			}
+			if (settings.model == Model.GAMMA) {
+				Long mods = Mods.fromShortNamesContinuous(lowerCase);
+				if (mods != null) {
+					mods = Mods.fixNC(mods);
+					if (mods == (mods & Mods.getMask(Mods.DoubleTime, Mods.HardRock, Mods.Hidden))) {
+						settings.requestedMods |= mods;
+						continue;
+					}
+				}
+			}
 			if (backend.getDonator(apiUser) > 0) {
 				RecommendationPredicate predicate = parser.tryParse(param, lang);
 				if (predicate != null) {
