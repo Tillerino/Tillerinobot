@@ -377,7 +377,9 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 				if (mods != null) {
 					mods = Mods.fixNC(mods);
 					if (mods == (mods & Mods.getMask(Mods.DoubleTime, Mods.HardRock, Mods.Hidden))) {
-						settings.requestedMods |= mods;
+						for (Mods mod : Mods.getMods(mods)) {
+							settings.requestedMods = Mods.add(settings.requestedMods, mod);
+						}
 						continue;
 					}
 				}
