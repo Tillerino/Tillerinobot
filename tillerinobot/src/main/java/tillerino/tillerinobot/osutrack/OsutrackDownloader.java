@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.net.URL;
 
-public class Downloader {
+public class OsutrackDownloader {
     //  __________________________________________________________________________________________
     // /\                                                                                         \
     // \_|    If you're reading this and thinking, hey, I wanna use that osutrack API as well:    |
@@ -15,9 +15,9 @@ public class Downloader {
     //    \_/_______________________________________________________________________________________/
     private static final String OSUTRACK_ENDPOINT = "https://ameobea.me/osutrack/api/get_changes.php?user=%s&mode=0";
 
-    private final Gson gson;
+    final Gson gson;
 
-    public Downloader() {
+    public OsutrackDownloader() {
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(Highscore.class, new HighscoreAdapter())
                 .create();

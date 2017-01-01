@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.tillerino.osuApiModel.types.GameMode;
 
+import java.util.List;
+
 @Data
 public class UpdateResult {
     private String username;
@@ -57,5 +59,5 @@ public class UpdateResult {
     private boolean exists;
 
     @SerializedName("newhs")
-    private Highscore[] newHighscores;
+    private List<Highscore> newHighscores;
 }

@@ -36,6 +36,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 public class IRCBotTest extends AbstractDatabaseTest {
@@ -136,7 +137,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
 				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
-				emf, resolver);
+				emf, resolver, new TestOsutrackDownloader());
 		return ircBot;
 	}
 	

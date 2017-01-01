@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.deserializer.CustomGson;
 
 import java.io.IOException;
@@ -34,14 +35,6 @@ public class HighscoreAdapter extends TypeAdapter<Highscore> {
         }
 
         JsonObject o = (JsonObject)new JsonParser().parse(in);
-        Highscore score = gson.fromJson(o, Highscore.class);
-        score.setMode(0);
-        if(o.has("pp")) {
-            JsonElement ppMaybe = o.get("pp");
-            if(!ppMaybe.isJsonNull()) {
-                score.setPp(ppMaybe.getAsDouble());
-            }
-        }
-        return score;
+        return OsuApiScore.fromJsonObject(o, Highscore.class, 0);
     }
 }
