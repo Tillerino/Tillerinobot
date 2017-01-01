@@ -21,7 +21,7 @@ public class TsundereTest {
 
 		// mock backend and create RecommendationsManager and RecommendHandler based on mocked backend
 		BotBackend backend = mock(BotBackend.class);
-		RecommendHandler handler = new RecommendHandler(backend,
+		RecommendHandler handler = new RecommendHandler(
 				new RecommendationsManager(backend, null, null));
 
 		// mock a user data object and make it return the tsundere object that we're spying on

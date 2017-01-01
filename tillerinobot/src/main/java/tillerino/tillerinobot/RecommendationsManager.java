@@ -93,10 +93,11 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 	 * 
 	 * @author Tillerino
 	 */
+	@RequiredArgsConstructor
 	public static class Recommendation {
-		public BeatmapMeta beatmap;
+		public final BeatmapMeta beatmap;
 		
-		public BareRecommendation bareRecommendation;
+		public final BareRecommendation bareRecommendation;
 	}
 	
 	/**
@@ -294,10 +295,6 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 		int beatmapid = sample.getBeatmapId();
 
-		Recommendation recommendation = new Recommendation();
-
-		recommendation.bareRecommendation = sample;
-
 		BeatmapMeta loadBeatmap;
 		try {
 			if (sample.getMods() < 0) {
@@ -314,14 +311,14 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 		if (loadBeatmap == null) {
 			throw new RareUserException(lang.excuseForError());
 		}
-		recommendation.beatmap = loadBeatmap;
-
 		loadBeatmap.setPersonalPP(sample.getPersonalPP());
 
 		/*
 		 * save recommendation internally
 		 */
 
+		Recommendation recommendation = new Recommendation(loadBeatmap, sample);
+		
 		loadGivenRecommendations(userid).add(toGivenRecommendation(sample, userid));
 		lastRecommendation.put(userid, recommendation);
 

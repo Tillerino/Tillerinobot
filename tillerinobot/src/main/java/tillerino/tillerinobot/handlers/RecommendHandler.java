@@ -7,14 +7,13 @@ import java.sql.SQLException;
 
 import javax.inject.Inject;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.RecommendationsManager;
@@ -26,16 +25,9 @@ import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
 
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RecommendHandler implements CommandHandler {
-	BotBackend backend;
-	RecommendationsManager manager;
-
-	@Inject
-	public RecommendHandler(BotBackend backend, RecommendationsManager manager) {
-		super();
-		this.backend = backend;
-		this.manager = manager;
-	}
+	final RecommendationsManager manager;
 
 	@Override
 	public Response handle(final String originalCommand, OsuApiUser apiUser,
@@ -47,7 +39,7 @@ public class RecommendHandler implements CommandHandler {
 
 		String lowerCase = originalCommand.toLowerCase();
 
-		final String command;
+		String command;
 		searchRecommend: {
 			if (lowerCase.equals("r")) {
 				command = "";
@@ -69,6 +61,10 @@ public class RecommendHandler implements CommandHandler {
 				}
 			}
 			return null;
+		}
+
+		if (command.isEmpty() && userData.getDefaultRecommendationOptions() != null) {
+			command = userData.getDefaultRecommendationOptions();
 		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,

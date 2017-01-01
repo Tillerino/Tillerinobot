@@ -188,6 +188,15 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			this.lastSongInfo = lastSongInfo;
 		}
 
+		@Getter(onMethod = @__({ @CheckForNull }))
+		String defaultRecommendationOptions = null;
+
+		public void setDefaultRecommendationOptions(String defaultRecommendationOptions) {
+			changed |= !Objects.equals(this.defaultRecommendationOptions, defaultRecommendationOptions);
+
+			this.defaultRecommendationOptions = defaultRecommendationOptions;
+		}
+
 		/*
 		 * we only use this field for serialization purposes. it should not be
 		 * accessed from outside of UserDataManager. This field should be kept
