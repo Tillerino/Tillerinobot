@@ -29,8 +29,6 @@ public class Downloader {
         // lets shamefully reuse osuApiConnector downloader :D:D
         String json = org.tillerino.osuApiModel.Downloader.downloadDirect(endpoint);
 
-        System.err.println(json);
-
         return gson.fromJson(json, UpdateResult.class);
     }
 }
