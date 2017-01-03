@@ -1,8 +1,9 @@
 package tillerino.tillerinobot.handlers;
 
-import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.CommandHandler;
+import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
@@ -14,44 +15,21 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
-
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class OsuTrackHandler implements CommandHandler {
+public class OsuTrackHandler extends CommandHandler.WithCommand {
     private final OsutrackDownloader osutrackDownloader;
 
+    @Inject
+    public OsuTrackHandler(OsutrackDownloader osutrackDownloader) {
+        super("update");
+        this.osutrackDownloader = osutrackDownloader;
+    }
 
     @Override
-    public Response handle(String originalCommand, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
-        String lowerCase = originalCommand.toLowerCase();
+    public Response handleCommand(String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+        MDC.put(IRCBot.MDC_HANDLER, "u");
 
-        // welp that copy from RecommendHandler :P
-        final String username;
-        searchRecommend:
-        {
-            if (lowerCase.equals("u")) {
-                username = apiUser.getUserName();
-                break searchRecommend;
-            }
-            if (getLevenshteinDistance(lowerCase, "update") <= 2) {
-                username = apiUser.getUserName();
-                break searchRecommend;
-            }
-            if (lowerCase.startsWith("u ")) {
-                username = originalCommand.substring(2);
-                break searchRecommend;
-            }
-            if (lowerCase.contains(" ")) {
-                int pos = lowerCase.indexOf(' ');
-                if (getLevenshteinDistance(lowerCase.substring(0, pos), "update") <= 2) {
-                    username = originalCommand.substring(pos + 1);
-                    break searchRecommend;
-                }
-            }
-            return null;
-        }
-
-        UpdateResult update = osutrackDownloader.getUpdate(username.trim());
+        String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();
+        UpdateResult update = osutrackDownloader.getUpdate(username);
 
         if (!update.isExists()) {
             return new Success(String.format("The user %s can't be found.  Try replaced spaces with underscores and try again.", update.getUsername()));
