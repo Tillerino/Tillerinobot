@@ -2,7 +2,6 @@ package tillerino.tillerinobot.osutrack;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.deserializer.CustomGson;
@@ -11,6 +10,7 @@ import java.io.IOException;
 
 public class HighscoreAdapter extends TypeAdapter<Highscore> {
     private final Gson gson = CustomGson.wrap(false, Highscore.class);
+    private final JsonParser jsonParser = new JsonParser();
 
     @Override
     public void write(JsonWriter out, Highscore highscore) throws IOException {
@@ -23,18 +23,16 @@ public class HighscoreAdapter extends TypeAdapter<Highscore> {
 
     @Override
     public Highscore read(JsonReader in) throws IOException {
-        JsonToken peek = in.peek();
-        switch (peek) {
-            case NULL:
-                in.nextNull();
-                return null;
-            case BEGIN_OBJECT:
-                break;
-            default:
-                throw new IllegalStateException("Expected NULL or BEGIN_OBJECT but was " + peek);
+        JsonElement e = jsonParser.parse(in);
+
+        if(e.isJsonNull()) {
+            return null;
         }
 
-        JsonObject o = (JsonObject)new JsonParser().parse(in);
-        return OsuApiScore.fromJsonObject(o, Highscore.class, 0);
+        if(e.isJsonObject()) {
+            return OsuApiScore.fromJsonObject((JsonObject) e, Highscore.class, 0);
+        }
+
+        throw new IllegalStateException("Json element was not 'null' or 'object'");
     }
 }
