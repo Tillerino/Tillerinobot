@@ -251,12 +251,12 @@ public interface CommandHandler {
 		};
 	}
 
-	public static abstract class WithCommand implements CommandHandler {
+	public static abstract class WithShorthand implements CommandHandler {
 		private final String command;
 		private final String alias;
 		private final String aliasWithSpace;
 
-		public WithCommand(String command) {
+		public WithShorthand(String command) {
 			this.command = command;
 			this.alias = String.valueOf(command.charAt(0));
 			this.aliasWithSpace = new String(new char[]{command.charAt(0), ' '});
@@ -290,10 +290,10 @@ public interface CommandHandler {
 				return null;
 			}
 
-			return handleCommand(remaining, apiUser, userData);
+			return handleArgument(remaining, apiUser, userData);
 		}
 
-		public abstract Response handleCommand(String remaining, OsuApiUser apiUser, UserData userData) throws UserException,
+		public abstract Response handleArgument(String remaining, OsuApiUser apiUser, UserData userData) throws UserException,
 				IOException, SQLException, InterruptedException;
 	}
 }

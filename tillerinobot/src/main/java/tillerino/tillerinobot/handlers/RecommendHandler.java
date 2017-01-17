@@ -24,7 +24,7 @@ import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
 
 @Slf4j
-public class RecommendHandler extends CommandHandler.WithCommand {
+public class RecommendHandler extends CommandHandler.WithShorthand {
 	BotBackend backend;
 	RecommendationsManager manager;
 
@@ -36,8 +36,8 @@ public class RecommendHandler extends CommandHandler.WithCommand {
 	}
 
 	@Override
-	public Response handleCommand(final String remaining, OsuApiUser apiUser,
-			UserData userData) throws UserException,
+	public Response handleArgument(final String remaining, OsuApiUser apiUser,
+								   UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
 		MDC.put(IRCBot.MDC_HANDLER, "r");
 

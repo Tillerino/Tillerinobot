@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class OsuTrackHandler extends CommandHandler.WithCommand {
+public class OsuTrackHandler extends CommandHandler.WithShorthand {
     private final OsutrackDownloader osutrackDownloader;
 
     @Inject
@@ -25,7 +25,7 @@ public class OsuTrackHandler extends CommandHandler.WithCommand {
     }
 
     @Override
-    public Response handleCommand(String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+    public Response handleArgument(String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
         MDC.put(IRCBot.MDC_HANDLER, "u");
 
         String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();
