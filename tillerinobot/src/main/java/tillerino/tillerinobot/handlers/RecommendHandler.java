@@ -33,7 +33,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 	}
 
 	@Override
-	public Response handleArgument(final String remaining, OsuApiUser apiUser,
+	public Response handleArgument(String remaining, OsuApiUser apiUser,
 								   UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
 		MDC.put(IRCBot.MDC_HANDLER, "r");
