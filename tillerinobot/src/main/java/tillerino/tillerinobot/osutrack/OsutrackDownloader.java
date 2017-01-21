@@ -29,7 +29,7 @@ public class OsutrackDownloader {
         URL endpoint = new URL(String.format(OSUTRACK_ENDPOINT, username.replace(' ', '_')));
 
         // lets shamefully reuse osuApiConnector downloader :D:D
-        String json = org.tillerino.osuApiModel.Downloader.downloadDirect(endpoint);
+        String json = org.tillerino.osuApiModel.Downloader.downloadDirect(endpoint, 30000);
 
         return parseJson(json);
     }
