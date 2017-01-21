@@ -88,7 +88,7 @@ public class TsundereGerman extends TsundereBase {
 	public String externalException(String marker) {
 		return 
 		"'tschuldige, der osu! Server hat Unsinn gelabert und ich hab lieber ihn anstatt dich geschlagen. Frag einfach nochmal."
-		+ " Falls der Server weiterhin Unsinn labert, sag [https://twitter.com/Tillerinobot @Tillerinobot] oder [http://www.reddit.com/user/tillerino /u/Tillerino] Bescheid (erwähne " + marker + "). Die sollen sich darum kümmern!";
+		+ " Falls der Server weiterhin Unsinn labert, sag [https://twitter.com/Tillerinobot @Tillerinobot] oder [http://www.reddit.com/user/tillerino /u/Tillerino] Bescheid (erwähne " + marker + "). Der soll sich darum kümmern!";
 	}
 
 	StringShuffler noInformationForModsShortShuffler = new StringShuffler(rnd);
@@ -337,7 +337,7 @@ public class TsundereGerman extends TsundereBase {
 
 		return new Message(optionalCommentOnLanguageShuffler.get(
 			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber welche Art von Idiot will einen Tsundere Roboter auf Deutsch!? Das ist ernsthaft die dümmste Idee, die ich je gehört habe!",
-			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Das wollte ich dir immer schon in einer anderen Sprache sagen: Ich lieb... Ich hab nichts gesagt!",
+			//"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Das wollte ich dir immer schon in einer anderen Sprache sagen: Ich lieb... Ich hab nichts gesagt!", I kinda not like this
 			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber ich hab das nur gemacht, weil ich es wollte. Das hat nichts mit dir zu tun!"
 		));
 	}
