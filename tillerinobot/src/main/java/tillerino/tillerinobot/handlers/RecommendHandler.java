@@ -1,20 +1,17 @@
 package tillerino.tillerinobot.handlers;
 
-import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.inject.Inject;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.RecommendationsManager;
@@ -26,53 +23,29 @@ import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
 
 @Slf4j
-public class RecommendHandler implements CommandHandler {
-	BotBackend backend;
+public class RecommendHandler extends CommandHandler.WithShorthand {
 	RecommendationsManager manager;
 
 	@Inject
-	public RecommendHandler(BotBackend backend, RecommendationsManager manager) {
-		super();
-		this.backend = backend;
+	public RecommendHandler(RecommendationsManager manager) {
+		super("recommend");
 		this.manager = manager;
 	}
 
 	@Override
-	public Response handle(final String originalCommand, OsuApiUser apiUser,
-			UserData userData) throws UserException,
+	public Response handleArgument(String remaining, OsuApiUser apiUser,
+								   UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
 		MDC.put(IRCBot.MDC_HANDLER, "r");
 
 		Language lang = userData.getLanguage();
 
-		String lowerCase = originalCommand.toLowerCase();
-
-		final String command;
-		searchRecommend: {
-			if (lowerCase.equals("r")) {
-				command = "";
-				break searchRecommend;
-			}
-			if (getLevenshteinDistance(lowerCase, "recommend") <= 2) {
-				command = "";
-				break searchRecommend;
-			}
-			if (lowerCase.startsWith("r ")) {
-				command = originalCommand.substring(2);
-				break searchRecommend;
-			}
-			if (lowerCase.contains(" ")) {
-				int pos = lowerCase.indexOf(' ');
-				if (getLevenshteinDistance(lowerCase.substring(0, pos), "recommend") <= 2) {
-					command = originalCommand.substring(pos + 1);
-					break searchRecommend;
-				}
-			}
-			return null;
+		if (remaining.isEmpty() && userData.getDefaultRecommendationOptions() != null) {
+			remaining = userData.getDefaultRecommendationOptions();
 		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,
-				command, lang);
+				remaining, lang);
 		BeatmapMeta beatmap = recommendation.beatmap;
 
 		if (beatmap == null) {

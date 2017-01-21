@@ -1,0 +1,33 @@
+package tillerino.tillerinobot.handlers;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.junit.Test;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
+
+import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.RecommendationsManager;
+import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
+import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.diff.PercentageEstimates;
+import tillerino.tillerinobot.lang.Default;
+
+public class RecommendHandlerTest {
+	@Test
+	public void testDefaultSettings() throws Exception {
+		RecommendationsManager manager = mock(RecommendationsManager.class);
+		when(manager.getRecommendation(any(), any(), any())).thenReturn(
+				new Recommendation(new BeatmapMeta(new OsuApiBeatmap(), null, mock(PercentageEstimates.class)), mock(BareRecommendation.class)));
+		UserData userData = mock(UserData.class);
+		when(userData.getLanguage()).thenReturn(new Default());
+
+		when(userData.getDefaultRecommendationOptions()).thenReturn("dt");
+		new RecommendHandler(manager).handle("r", null, userData);
+		verify(manager).getRecommendation(any(), eq("dt"), any());
+	}
+}

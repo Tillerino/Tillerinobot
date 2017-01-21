@@ -12,12 +12,17 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.persistence.EntityManagerFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
+import tillerino.tillerinobot.data.BotUserData;
+import tillerino.tillerinobot.data.repos.BotUserDataRepository;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.*;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.CacheMXBean;
@@ -86,6 +91,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Romana(Romana.class),
 			繁體中文(ChineseTraditional.class),
 			български(Bulgarian.class),
+			Norsk(Norwegian.class),
+			Indonesian(Indonesian.class),
 			; // please end identifier entries with a comma and leave this semicolon here
 			
 			Class<? extends Language> cls;
@@ -121,12 +128,12 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			this.changed = changed;
 			
 			if(!changed) {
-				language.setChanged(changed);
+				getLanguage().setChanged(changed);
 			}
 		}
 		
 		public boolean isChanged() {
-			return changed || language.isChanged();
+			return changed || getLanguage().isChanged();
 		}
 		
 		@Getter
@@ -152,6 +159,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			}
 		}
 		
+		@CheckForNull
 		transient Language language;
 		
 		public Language getLanguage() {
@@ -178,6 +186,15 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			changed |= !Objects.equals(this.lastSongInfo, lastSongInfo);
 
 			this.lastSongInfo = lastSongInfo;
+		}
+
+		@Getter(onMethod = @__({ @CheckForNull }))
+		String defaultRecommendationOptions = null;
+
+		public void setDefaultRecommendationOptions(String defaultRecommendationOptions) {
+			changed |= !Objects.equals(this.defaultRecommendationOptions, defaultRecommendationOptions);
+
+			this.defaultRecommendationOptions = defaultRecommendationOptions;
 		}
 
 		/*
@@ -210,12 +227,22 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 	
 	final BotBackend backend;
 	
+	final EntityManagerFactory emf;
+	
+	final ThreadLocalAutoCommittingEntityManager em;
+	
+	final BotUserDataRepository repository;
+	
 	final ShutdownHook hook = new ShutdownHook(this);
 	
 	@Inject
-	public UserDataManager(BotBackend backend) {
+	public UserDataManager(BotBackend backend, EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em,
+			BotUserDataRepository repository) {
 		super();
 		this.backend = backend;
+		this.emf = emf;
+		this.em = em;
+		this.repository = repository;
 
 		hook.add();
 	}
@@ -271,13 +298,13 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			.create();
 	
 	private UserData load(@UserId int key) throws SQLException {
-		String rawOptions = backend.getOptions(key);
+		BotUserData data = repository.findByUserId(key);
 		
 		UserData options;
-		if(rawOptions == null || rawOptions.isEmpty()) {
+		if(data == null || StringUtils.isEmpty(data.getUserdata())) {
 			options = new UserData();
 		} else {
-			options = gson.fromJson(rawOptions, UserData.class);
+			options = gson.fromJson(data.getUserdata(), UserData.class);
 		}
 
 		options.backend = backend;
@@ -295,13 +322,16 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		String serialized = gson.toJson(options);
 		postSerialization(options);
 		
-		backend.saveOptions(userid, serialized);
+		BotUserData data = new BotUserData();
+		data.setUserId(userid);
+		data.setUserdata(serialized);
+		repository.save(data);
 		options.setChanged(false);
 	}
 
 	private void preSerialization(UserData options) {
 		options.serializedLanguage = (JsonObject) gson
-				.toJsonTree(options.language);
+				.toJsonTree(options.getLanguage());
 	}
 	
 	private void postSerialization(UserData options) {
@@ -312,7 +342,18 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 	public void tidyUp(boolean fromShutdownHook) {
 		log.info("tidyUp({})", fromShutdownHook);
 		
-		cache.invalidateAll();
+		boolean createEm = false;
+		if (!em.isThreadLocalEntityManagerPresent() || !em.isOpen()) {
+			createEm = true;
+			em.setThreadLocalEntityManager(emf.createEntityManager());
+		}
+		try {
+			cache.invalidateAll();
+		} finally {
+			if (createEm) {
+				em.close();
+			}
+		}
 		
 		hook.remove(fromShutdownHook);
 	}

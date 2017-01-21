@@ -46,7 +46,7 @@ public interface TidyObject {
 				 * to true if this method gets called again during the shutdown
 				 */
 				removed = true;
-			} else if (!added && !removed) {
+			} else if (added && !removed) {
 				Runtime.getRuntime().removeShutdownHook(this);
 				removed = true;
 			}

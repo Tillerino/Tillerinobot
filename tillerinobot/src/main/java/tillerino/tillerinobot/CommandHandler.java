@@ -17,6 +17,8 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.UserDataManager.UserData;
 
+import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
+
 public interface CommandHandler {
 	/**
 	 * Response sent to the user as the result of a command
@@ -179,7 +181,7 @@ public interface CommandHandler {
 	 * @param start
 	 *            only messages starting with this string are considered. case
 	 *            ignored.
-	 * @param handler
+	 * @param underlying
 	 *            the handler to be called if the message starts with the given
 	 *            string. the remaining string will be passed to this handler.
 	 * @return the modified handler.
@@ -222,7 +224,7 @@ public interface CommandHandler {
 	 * @param start
 	 *            only messages starting with this string are considered. case
 	 *            ignored.
-	 * @param handler
+	 * @param underlying
 	 *            the handler to be called if the message starts with the given
 	 *            string. the remaining string will be passed to this handler.
 	 * @return the modified handler.
@@ -247,5 +249,51 @@ public interface CommandHandler {
 				return start;
 			}
 		};
+	}
+
+	public static abstract class WithShorthand implements CommandHandler {
+		private final String command;
+		private final String alias;
+		private final String aliasWithSpace;
+
+		public WithShorthand(String command) {
+			this.command = command;
+			this.alias = String.valueOf(command.charAt(0));
+			this.aliasWithSpace = new String(new char[]{command.charAt(0), ' '});
+		}
+
+		@Override
+		public final Response handle(String originalCommand, OsuApiUser apiUser, UserData userData) throws UserException,
+				IOException, SQLException, InterruptedException {
+			String lowerCase = originalCommand.toLowerCase();
+			final String remaining;
+			searchCommand: {
+				if (lowerCase.equals(alias)) {
+					remaining = "";
+					break searchCommand;
+				}
+				if (getLevenshteinDistance(lowerCase, command) <= 2) {
+					remaining = "";
+					break searchCommand;
+				}
+				if (lowerCase.startsWith(aliasWithSpace)) {
+					remaining = originalCommand.substring(2);
+					break searchCommand;
+				}
+				if (lowerCase.contains(" ")) {
+					int pos = lowerCase.indexOf(' ');
+					if (getLevenshteinDistance(lowerCase.substring(0, pos), command) <= 2) {
+						remaining = originalCommand.substring(pos + 1);
+						break searchCommand;
+					}
+				}
+				return null;
+			}
+
+			return handleArgument(remaining, apiUser, userData);
+		}
+
+		public abstract Response handleArgument(String remaining, OsuApiUser apiUser, UserData userData) throws UserException,
+				IOException, SQLException, InterruptedException;
 	}
 }

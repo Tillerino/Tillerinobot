@@ -24,8 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.CoreHooks;
@@ -34,15 +32,21 @@ import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
-import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
+import org.pircbotx.hooks.types.GenericUserEvent;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.CommandHandler.Action;
@@ -62,20 +66,15 @@ import tillerino.tillerinobot.handlers.HelpHandler;
 import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
 import tillerino.tillerinobot.handlers.NPHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
+import tillerino.tillerinobot.handlers.OsuTrackHandler;
 import tillerino.tillerinobot.handlers.RecentHandler;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
@@ -122,7 +121,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			BotInfo botInfo, UserDataManager userDataManager,
 			Pinger pinger, @Named("tillerinobot.ignore") boolean silent,
 			ThreadLocalAutoCommittingEntityManager em,
-			EntityManagerFactory emf, IrcNameResolver resolver) {
+			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader) {
 		this.backend = backend;
 		this.manager = manager;
 		this.botInfo = botInfo;
@@ -134,14 +133,15 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		this.resolver = resolver;
 		
 		commandHandlers.add(new ResetHandler(manager));
-		commandHandlers.add(new OptionsHandler());
+		commandHandlers.add(new OptionsHandler(manager));
 		commandHandlers.add(new AccHandler(backend));
 		commandHandlers.add(new WithHandler(backend));
-		commandHandlers.add(new RecommendHandler(backend, manager));
+		commandHandlers.add(new RecommendHandler(manager));
 		commandHandlers.add(new RecentHandler(backend));
 		commandHandlers.add(new DebugHandler(backend, resolver));
 		commandHandlers.add(new HelpHandler());
 		commandHandlers.add(new ComplaintHandler(manager));
+		commandHandlers.add(new OsuTrackHandler(osutrackDownloader));
 	}
 
 	@Override
@@ -156,7 +156,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			return;
 		
 		if (event.getChannel() == null || event.getUser().getNick().equals("Tillerino")) {
-			MDC.put("user", event.getUser().getNick());
 			processPrivateAction(fromIRC(event.getUser(), event), event.getMessage());
 		}
 	}
@@ -289,7 +288,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				}
 				user.message(e.getMessage(), false);
 			} else {
-				if (e instanceof SocketTimeoutException) {
+				if (isTimeout(e)) {
 					user.message(lang.apiTimeoutException(), false);
 					log.debug("osu api timeout");
 				} else {
@@ -305,6 +304,11 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
 		}
+	}
+
+	public static boolean isTimeout(Throwable e) {
+		return (e instanceof SocketTimeoutException)
+				|| ((e instanceof IOException) && e.getMessage().startsWith("Premature EOF"));
 	}
 
 	public static String logException(Throwable e, Logger logger) {
@@ -328,7 +332,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		if(silent)
 			return;
 		
-		MDC.put("user", event.getUser().getNick());
 		processPrivateMessage(fromIRC(event.getUser(), event), event.getMessage());
 	}
 	
@@ -518,6 +521,15 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				event.getBot().sendRaw().rawLine("NAMES #osu");
 			}
 
+			if (event instanceof GenericUserEvent<?>) {
+				User user = ((GenericUserEvent) event).getUser();
+				if (user != null) {
+					String nick = user.getNick();
+					MDC.put("user", nick);
+					scheduleRegisterActivity(nick);
+				}
+			}
+
 			super.onEvent(event);
 		} finally {
 			em.close();
@@ -547,17 +559,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	
 	@Override
 	public void onJoin(JoinEvent event) throws Exception {
-		final String nick = event.getUser().getNick();
-
 		if (silent) {
 			return;
 		}
 
-		MDC.put("user", nick);
 		IRCBotUser user = fromIRC(event.getUser(), event);
 		welcomeIfDonator(user);
-
-		scheduleRegisterActivity(nick);
 	}
 	
 	void welcomeIfDonator(IRCBotUser user) {
@@ -565,9 +572,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			Integer userid;
 			try {
 				userid = resolver.resolveIRCName(user.getNick());
-			} catch (SocketTimeoutException e1) {
-				log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
-				return;
+			} catch (IOException e) {
+				if (isTimeout(e)) {
+					log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
+					return;
+				}
+				throw e;
 			}
 			
 			if(userid == null)
@@ -576,9 +586,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			OsuApiUser apiUser;
 			try {
 				apiUser = backend.getUser(userid, 0);
-			} catch (SocketTimeoutException e) {
-				log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
-				return;
+			} catch (IOException e) {
+				if (isTimeout(e)) {
+					log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
+					return;
+				}
+				throw e;
 			}
 			
 			if(apiUser == null)
@@ -599,6 +612,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				
 				checkVersionInfo(user);
 			}
+		} catch (InterruptedException e) {
+			// no problem
 		} catch (Exception e) {
 			log.error("error welcoming potential donator", e);
 		}
@@ -622,16 +637,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		} catch (RejectedExecutionException e) {
 			// bot is shutting down
 		}
-	}
-	
-	@Override
-	public void onPart(PartEvent event) throws Exception {
-		scheduleRegisterActivity(event.getUser().getNick());
-	}
-
-	@Override
-	public void onQuit(QuitEvent event) throws Exception {
-		scheduleRegisterActivity(event.getUser().getNick());
 	}
 	
 	@Override
@@ -665,15 +670,17 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			}
 			
 			backend.registerActivity(userid);
-		} catch (SocketTimeoutException e) {
-			log.debug("osu api timeout while logging activity of user {}", fNick);
 		} catch (Exception e) {
-			log.error("error logging activity", e);
+			if (isTimeout(e)) {
+				log.debug("osu api timeout while logging activity of user {}", fNick);
+			} else {
+				log.error("error logging activity", e);
+			}
 		}
 	}
 
 	@Nonnull
-	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException {
+	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException, InterruptedException {
 		Integer userId = resolver.resolveIRCName(user.getNick());
 		
 		if(userId == null) {

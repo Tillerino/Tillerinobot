@@ -1,6 +1,21 @@
 package tillerino.tillerinobot;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyCollectionOf;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.startsWith;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -8,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -20,9 +36,12 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 public class IRCBotTest extends AbstractDatabaseTest {
+	UserDataManager userDataManager;
+	
 	@Test
 	public void testVersionMessage() throws IOException, SQLException, UserException {
 		IRCBot bot = getTestBot(backend);
@@ -117,8 +136,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		}
 
 		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
-				new UserDataManager(backend), mock(Pinger.class), false, em,
-				emf, resolver);
+				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
+				emf, resolver, new TestOsutrackDownloader());
 		return ircBot;
 	}
 	
@@ -129,6 +148,13 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 		
 		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em));
+	}
+	
+	@After
+	public void tidyUserDataManager() {
+		if (userDataManager != null) {
+			userDataManager.tidyUp(false);
+		}
 	}
 	
 	@Spy
@@ -261,5 +287,30 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		verify(backend).loadRecommendations(anyInt(),
 				anyCollectionOf(Integer.class),
 				eq(Model.GAMMA), anyBoolean(), anyLong());
+	}
+
+	@Test
+	public void testOsutrack1() throws SQLException, IOException,
+			UserException {
+		IRCBot bot = getTestBot(backend);
+		backend.hintUser("oliebol", false, 125000, 1000);
+
+		IRCBotUser botUser = mockBotUser("oliebol");
+
+		bot.processPrivateMessage(botUser, "!u");
+		verify(botUser, times(1)).message(eq("Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/oliebol osu!track]."), anyBoolean());
+	}
+
+	@Test
+	public void testOsutrack2() throws SQLException, IOException,
+			UserException {
+		IRCBot bot = getTestBot(backend);
+		backend.hintUser("fartownik", false, 125000, 1000);
+
+		IRCBotUser botUser = mockBotUser("fartownik");
+
+		bot.processPrivateMessage(botUser, "!u");
+		verify(botUser, times(1)).message(eq("Rank: +3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track]."), anyBoolean());
+		verify(botUser, times(1)).message(eq("2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.058000pp; [https://osu.ppy.sh/b/693195 #89]: 331.885000pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."), anyBoolean());
 	}
 }
