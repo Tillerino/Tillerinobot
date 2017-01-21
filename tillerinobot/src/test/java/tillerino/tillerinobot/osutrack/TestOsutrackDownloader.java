@@ -12,6 +12,6 @@ public class TestOsutrackDownloader extends OsutrackDownloader {
         InputStream inputStream = TestOsutrackDownloader.class.getResourceAsStream("/osutrack/" + username.replace(' ', '_') + ".json");
         String json = new BufferedReader(new InputStreamReader(inputStream)).lines()
                 .parallel().collect(Collectors.joining("\n"));
-        return gson.fromJson(json, UpdateResult.class);
+        return parseJson(json);
     }
 }

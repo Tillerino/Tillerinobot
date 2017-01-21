@@ -1,7 +1,7 @@
 package tillerino.tillerinobot.osutrack;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.tillerino.osuApiModel.deserializer.CustomGson;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,12 +15,14 @@ public class OsutrackDownloader {
     //    \_/_______________________________________________________________________________________/
     private static final String OSUTRACK_ENDPOINT = "https://ameobea.me/osutrack/api/get_changes.php?user=%s&mode=0";
 
-    final Gson gson;
+    private final Gson gson = CustomGson.wrap(false, Highscore.class);
 
-    public OsutrackDownloader() {
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(Highscore.class, new HighscoreAdapter())
-                .create();
+    protected UpdateResult parseJson(String json) {
+        UpdateResult updateResult = gson.fromJson(json, UpdateResult.class);
+        for (Highscore highscore : updateResult.getNewHighscores()) {
+            highscore.setMode(0);
+        }
+        return updateResult;
     }
 
     public UpdateResult getUpdate(String username) throws IOException {
@@ -29,6 +31,6 @@ public class OsutrackDownloader {
         // lets shamefully reuse osuApiConnector downloader :D:D
         String json = org.tillerino.osuApiModel.Downloader.downloadDirect(endpoint);
 
-        return gson.fromJson(json, UpdateResult.class);
+        return parseJson(json);
     }
 }
