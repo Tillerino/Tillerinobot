@@ -9,16 +9,22 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.CommandHandler;
+import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class OptionsHandler implements CommandHandler {
+	final RecommendationsManager manager;
+
 	@Override
 	public Response handle(String command, OsuApiUser apiUser,
 			UserData userData) throws UserException,
@@ -34,14 +40,17 @@ public class OptionsHandler implements CommandHandler {
 		} else {
 			return null;
 		}
-		
-		if (set && !command.contains(" ")) {
-			throw new UserException(userData.getLanguage().setFormat());
-		}
 
-		String option = set ? command.substring(0, command.indexOf(' '))
-				.toLowerCase() : command.toLowerCase();
-		String value = set ? command.substring(option.length() + 1) : null;
+		String option = command.toLowerCase();
+		String value = null;
+		if (set) {
+			if (command.contains(" ")) {
+				option = command.substring(0, command.indexOf(' ')).toLowerCase();
+				value = command.substring(option.length() + 1);
+			} else {
+				value = "";
+			}
+		}
 
 		if (option.equals("lang") || getLevenshteinDistance(option, "language") <= 1) {
 			if (set) {
@@ -72,9 +81,22 @@ public class OptionsHandler implements CommandHandler {
 			} else {
 				return new Message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
 			}
+		} else if (getLevenshteinDistance(option, "default") <= 1) {
+			if (set) {
+				if (value.isEmpty()) {
+					userData.setDefaultRecommendationOptions(null);
+				} else {
+					manager.parseSamplerSettings(apiUser, value, userData.getLanguage());
+					userData.setDefaultRecommendationOptions(value);
+				}
+			} else {
+				return new Message(
+						"Default recommendation settings: " + (userData.getDefaultRecommendationOptions() != null
+								? userData.getDefaultRecommendationOptions() : "-"));
+			}
 		} else {
 			throw new UserException(userData.getLanguage().invalidChoice(option,
-					"Language" + (userData.getHearts() > 0 ? ", Welcome" : "")));
+					"Language, Default" + (userData.getHearts() > 0 ? ", Welcome" : "")));
 		}
 
 		return new NoResponse();

@@ -133,10 +133,10 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		this.resolver = resolver;
 		
 		commandHandlers.add(new ResetHandler(manager));
-		commandHandlers.add(new OptionsHandler());
+		commandHandlers.add(new OptionsHandler(manager));
 		commandHandlers.add(new AccHandler(backend));
 		commandHandlers.add(new WithHandler(backend));
-		commandHandlers.add(new RecommendHandler(backend, manager));
+		commandHandlers.add(new RecommendHandler(manager));
 		commandHandlers.add(new RecentHandler(backend));
 		commandHandlers.add(new DebugHandler(backend, resolver));
 		commandHandlers.add(new HelpHandler());
@@ -670,10 +670,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			}
 			
 			backend.registerActivity(userid);
-		} catch (SocketTimeoutException e) {
-			log.debug("osu api timeout while logging activity of user {}", fNick);
 		} catch (Exception e) {
-			log.error("error logging activity", e);
+			if (isTimeout(e)) {
+				log.debug("osu api timeout while logging activity of user {}", fNick);
+			} else {
+				log.error("error logging activity", e);
+			}
 		}
 	}
 

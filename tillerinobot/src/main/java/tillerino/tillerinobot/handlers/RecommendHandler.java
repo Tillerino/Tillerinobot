@@ -5,14 +5,13 @@ import java.sql.SQLException;
 
 import javax.inject.Inject;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.RecommendationsManager;
@@ -25,13 +24,11 @@ import tillerino.tillerinobot.lang.Language;
 
 @Slf4j
 public class RecommendHandler extends CommandHandler.WithShorthand {
-	BotBackend backend;
 	RecommendationsManager manager;
 
 	@Inject
-	public RecommendHandler(BotBackend backend, RecommendationsManager manager) {
+	public RecommendHandler(RecommendationsManager manager) {
 		super("recommend");
-		this.backend = backend;
 		this.manager = manager;
 	}
 
@@ -42,6 +39,10 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 		MDC.put(IRCBot.MDC_HANDLER, "r");
 
 		Language lang = userData.getLanguage();
+
+		if (command.isEmpty() && userData.getDefaultRecommendationOptions() != null) {
+			command = userData.getDefaultRecommendationOptions();
+		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,
 				remaining, lang);

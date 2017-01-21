@@ -47,6 +47,17 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 		assertTrue(Mods.DoubleTime.is(samplerSettings.requestedMods));
 	}
 
+	@Test
+	public void testContinuousMods() throws Exception {
+		Settings samplerSettings = manager.parseSamplerSettings(user, "hdhr", new Default());
+
+		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock), samplerSettings.requestedMods);
+
+		samplerSettings = manager.parseSamplerSettings(user, "hdhr dt", new Default());
+
+		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime), samplerSettings.requestedMods);
+	}
+
 	@Test(expected = UserException.class)
 	public void testContradiction() throws Exception {
 		manager.parseSamplerSettings(user, "ar=1 ar=2", new Default());

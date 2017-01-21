@@ -28,10 +28,10 @@ public class BeatmapMeta {
 
 	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) {
 		
-		String beatmapName = getBeatmap().getArtist() + " - " + getBeatmap().getTitle()
-				+ " [" + getBeatmap().getVersion() + "]";
+		String beatmapName = String.format("%s - %s [%s]", getBeatmap().getArtist(), getBeatmap().getTitle(),
+				getBeatmap().getVersion());
 		if(formLink) {
-			beatmapName = "[http://osu.ppy.sh/b/" + getBeatmap().getBeatmapId() + " " + beatmapName + "]";
+			beatmapName = String.format("[http://osu.ppy.sh/b/%d %s]", getBeatmap().getBeatmapId(), beatmapName);
 		}
 		
 		PercentageEstimates percentageEstimates = getEstimates();
@@ -47,10 +47,12 @@ public class BeatmapMeta {
 		}
 
 		String estimateMessage = "";
-		if(getPersonalPP() != null) {
-			estimateMessage += "future you: " + getPersonalPP() + "pp | ";
+		Integer future = getPersonalPP();
+		if (future != null && future >= getPpForAcc(.9)
+				&& future < getPpForAcc(1) * 1.05) {
+			future = (int) Math.floor(Math.min(future, getPpForAcc(1)));
+			estimateMessage += "future you: " + future + "pp | ";
 		}
-		
 
 		if (acc != null) {
 			estimateMessage += format.format(acc * 100) + "%";
@@ -58,13 +60,13 @@ public class BeatmapMeta {
 				estimateMessage += " " + combo + "x " + misses + "miss: ";
 				estimateMessage += ": " + noDecimalsFormat.format(percentageEstimates.getPP(acc, combo, misses)) + "pp";
 			} else {
-				estimateMessage += ": " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(acc)) + "pp";
+				estimateMessage += ": " + noDecimalsFormat.format(getPpForAcc(acc)) + "pp";
 			}
 		} else {
-			estimateMessage += "95%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.95)) + "pp";
-			estimateMessage += " | 98%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.98)) + "pp";
-			estimateMessage += " | 99%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(.99)) + "pp";
-			estimateMessage += " | 100%: " + noDecimalsFormat.format(percentageEstimates.getPPForAcc(1)) + "pp";
+			estimateMessage += "95%: " + noDecimalsFormat.format(getPpForAcc(.95)) + "pp";
+			estimateMessage += " | 98%: " + noDecimalsFormat.format(getPpForAcc(.98)) + "pp";
+			estimateMessage += " | 99%: " + noDecimalsFormat.format(getPpForAcc(.99)) + "pp";
+			estimateMessage += " | 100%: " + noDecimalsFormat.format(getPpForAcc(1)) + "pp";
 		}
 		if (percentageEstimates.isShaky()) {
 			estimateMessage += " (rough estimates)";
@@ -114,5 +116,9 @@ public class BeatmapMeta {
 	
 	public BeatmapWithMods getBeatmapWithMods() {
 		return new BeatmapWithMods(beatmap.getBeatmapId(), estimates.getMods());
+	}
+
+	double getPpForAcc(double acc) {
+		return getEstimates().getPPForAcc(acc);
 	}
 }
