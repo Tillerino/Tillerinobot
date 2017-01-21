@@ -40,8 +40,8 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 
 		Language lang = userData.getLanguage();
 
-		if (command.isEmpty() && userData.getDefaultRecommendationOptions() != null) {
-			command = userData.getDefaultRecommendationOptions();
+		if (remaining.isEmpty() && userData.getDefaultRecommendationOptions() != null) {
+			remaining = userData.getDefaultRecommendationOptions();
 		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,
