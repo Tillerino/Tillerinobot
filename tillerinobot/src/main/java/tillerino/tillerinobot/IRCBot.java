@@ -66,12 +66,14 @@ import tillerino.tillerinobot.handlers.HelpHandler;
 import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
 import tillerino.tillerinobot.handlers.NPHandler;
 import tillerino.tillerinobot.handlers.OptionsHandler;
+import tillerino.tillerinobot.handlers.OsuTrackHandler;
 import tillerino.tillerinobot.handlers.RecentHandler;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.handlers.ResetHandler;
 import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
@@ -119,7 +121,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			BotInfo botInfo, UserDataManager userDataManager,
 			Pinger pinger, @Named("tillerinobot.ignore") boolean silent,
 			ThreadLocalAutoCommittingEntityManager em,
-			EntityManagerFactory emf, IrcNameResolver resolver) {
+			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader) {
 		this.backend = backend;
 		this.manager = manager;
 		this.botInfo = botInfo;
@@ -139,6 +141,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		commandHandlers.add(new DebugHandler(backend, resolver));
 		commandHandlers.add(new HelpHandler());
 		commandHandlers.add(new ComplaintHandler(manager));
+		commandHandlers.add(new OsuTrackHandler(osutrackDownloader));
 	}
 
 	@Override

@@ -36,6 +36,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
+import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 public class IRCBotTest extends AbstractDatabaseTest {
@@ -136,7 +137,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
 				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
-				emf, resolver);
+				emf, resolver, new TestOsutrackDownloader());
 		return ircBot;
 	}
 	
@@ -286,5 +287,30 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		verify(backend).loadRecommendations(anyInt(),
 				anyCollectionOf(Integer.class),
 				eq(Model.GAMMA), anyBoolean(), anyLong());
+	}
+
+	@Test
+	public void testOsutrack1() throws SQLException, IOException,
+			UserException {
+		IRCBot bot = getTestBot(backend);
+		backend.hintUser("oliebol", false, 125000, 1000);
+
+		IRCBotUser botUser = mockBotUser("oliebol");
+
+		bot.processPrivateMessage(botUser, "!u");
+		verify(botUser, times(1)).message(eq("Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/oliebol osu!track]."), anyBoolean());
+	}
+
+	@Test
+	public void testOsutrack2() throws SQLException, IOException,
+			UserException {
+		IRCBot bot = getTestBot(backend);
+		backend.hintUser("fartownik", false, 125000, 1000);
+
+		IRCBotUser botUser = mockBotUser("fartownik");
+
+		bot.processPrivateMessage(botUser, "!u");
+		verify(botUser, times(1)).message(eq("Rank: +3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track]."), anyBoolean());
+		verify(botUser, times(1)).message(eq("2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.058000pp; [https://osu.ppy.sh/b/693195 #89]: 331.885000pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."), anyBoolean());
 	}
 }
