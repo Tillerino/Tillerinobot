@@ -541,11 +541,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	public void onUnknown(UnknownEvent event) throws Exception {
 		pinger.handleUnknownEvent(event);
 	}
-	
-	static final int currentVersion = 11;
-	static final String versionMessage = "Good news, everyone! Thanks to a great project called [https://github.com/Francesco149/oppai oppai], I can now figure out pp values for unranked maps."
-			+ " Oh and if you haven't already done so, make sure to check out [http://ppaddict.tillerino.org/ ppaddict].";
-	
+
+	static final int currentVersion = 12;
+	static final String versionMessage = "Quick update: You might have heard of a sweet tool called [https://ameobea.me/osutrack/ osu!track] made by [https://osu.ppy.sh/u/Ameo Ameo]."
+			+ " Starting now, I can query it for you. Give it a go! Just type !u."
+			+ " For more info check out the [https://github.com/Tillerino/Tillerinobot/wiki/osu!track wiki].";
+
 	long lastListTime = System.currentTimeMillis();
 	
 	ExecutorService exec = Executors.newFixedThreadPool(4, new ThreadFactory() {
