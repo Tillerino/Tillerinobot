@@ -226,12 +226,12 @@ public class Indonesian implements Language {
 				"Aku baru tahu bahwa engkau memiliki banyak hal untuk dikerjakan. Bagaimana dengan mengerjakannya sekarang?",
 				"Kau terlihat seperti kau membutuhkan tidur sebentar.",
 				"Cek laman yang sangat menarik di [https://en.wikipedia.org/wiki/Special:Random wikipedia]!",
-				"Mari kita cek jika seseorang yang hebat [http://www.twitch.tv/directory/game/Osu! sedang streaming] sekarang!",
+				"Mari kita cek jika seseorang yang hebat [http://www.twitch.tv/directory/game/Osu! sedang siaran langsung] sekarang!",
 				"Ini adalah [http://dagobah.net/flash/Cursor_Invisible.swf game] lain yang mungkin anda payah juga!",
-				"Ini seharusnya memberimu waktu waktu yang banyak untuk membaca [https://github.com/Tillerino/Tillerinobot/wiki instruksi saya].",
+				"Ini seharusnya memberimu waktu waktu yang banyak untuk belajar [https://github.com/Tillerino/Tillerinobot/wiki petunjuk saya].",
 				"Jangan khawatir, [https://www.reddit.com/r/osugame dank memes] ini seharusnya bisa melewatkan waktu.",
 				"Selagi anda bosan, cobalah [http://gabrielecirulli.github.io/2048/ 2048]!",
-				"Pertanyaan: Jika harddrive anda rusak sekarang juga, seberapa banyak data personal yang akan hilang selamanya?",
+				"Pertanyaan: Jika harddrive anda rusak sekarang juga, seberapa banyak data personal anda yang akan hilang selamanya?",
 				"Jadi... Sudahkah kamu mencoba [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge Tantangan Sally Up Push Up]?",
 				"Anda bisa lakukan hal lain atau kita bisa menatap mata satu sama lain. Dengan diam."
 				);
