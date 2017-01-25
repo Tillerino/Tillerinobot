@@ -11,9 +11,16 @@ import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
- * @author https://osu.ppy.sh/u/Polarni https://github.com/Polarni
+ * TRANSLATION NOTE:
+ * 
+ * Please put some contact data into the following tag. If any additional
+ * messages are required, I'll use the English version in all translations and
+ * notify the authors.
+ * 
+ * @author Polarni tom.rivnac@gmail.com https://github.com/Polarni https://osu.ppy.sh/u/Polarni
  */
 public class Czech implements Language {
+  static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
@@ -22,22 +29,22 @@ public class Czech implements Language {
 
 	@Override
 	public String internalException(String marker) {
-		return "Uff... Vypadá to že lidský Tillerino zvoral mé instalace."
-				+ " Pokud si toho brzy nevšimne, mohl bys [https://github.com/Tillerino/Tillerinobot/wiki/Contact ho upozornit]? (reference "
+		return "Uff... Vypadá to že lidský Tillerino zvoral mojí instalaci."
+				+ " Pokud si toho brzy nevšimne, mohl(a) by jsi [https://github.com/Tillerino/Tillerinobot/wiki/Contact ho upozornit]? (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "Co se děje? Dostávám jen nesmyly z osu! serveru. Můžeš mi říct, co to znamená? 0011101001010000"
-				+ " Lidský Tillerino říká že se nejedná o nic o co by jsme se museli starat a měli bychom se pokusit znovu."
-				+ " Pokud se extra obáváš z nějakého důvodu, můžeš [https://github.com/Tillerino/Tillerinobot/wiki/Contact mu říct] o tom. (reference "
+		return "Co se děje? Dostávám nesmyly z osu! serveru. Můžeš mi říct, co to znamená? 0011101001010000"
+				+ " Lidský Tillerino říká že se nejedná o nic o co by jsme se museli starat a měli bychom to zkusit znovu."
+				+ " Pokud se z nějakého důvodu obáváš, můžeš [https://github.com/Tillerino/Tillerinobot/wiki/Contact mu to říct]. (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "žádné data pro požadovaný mody";
+		return "žádné data pro požadované mody";
 	}
 
 	@Override
@@ -49,7 +56,7 @@ public class Czech implements Language {
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			return new Message(apiUser.getUserName() + "...")
 				.then(new Message("...jsi to ty? Už je to nějaká doba!"))
-				.then(new Message("To je dobře, že jsi zpátky. Mohu vás zaujmout doporučením?"));
+				.then(new Message("To je dobře, že jsi zpátky. Mohu tě zaujmout doporučením?"));
 		} else {
 			String[] messages = {
 					"vypadáš jako že chceš doporučení.",
@@ -76,17 +83,17 @@ public class Czech implements Language {
 
 	@Override
 	public String noInformationForMods() {
-		return "Omlouvám se, Nemohu poskytnout informace pro tyto mody v tuto chvíli.";
+		return "Omlouvám se, ale v tuto chvíli nemohu poskytnout informace pro tyto mody.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Tyto mody nevypadaji dobre. Mody můžou být různé kombinace DT HR HD HT EZ NC FL SO NF. Zkombinuj je bez mezer a speciálních znaků. Například: !with HDHR, !with DTEZ";
+		return "Tyto mody nevypadají dobře. Mody můžou být různé kombinace DT HR HD HT EZ NC FL SO NF. Zkombinuj je bez mezer a speciálních znaků. Například: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "Nepamatuji si že můžete dostat info o jakýkoliv písničce...";
+		return "Nepamatuji si že můžeš dostat informace o jakékoliv písničce...";
 	}
 
 	@Override
@@ -98,6 +105,23 @@ public class Czech implements Language {
 	public String tryWithMods(List<Mods> mods) {
 		return "Zkus tuto mapu s " + Mods.toShortNamesContinuous(mods);
 	}
+  
+	/**
+	 * The user's IRC nick name could not be resolved to an osu user id. The
+	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
+	 * 
+	 * @param exceptionMarker
+	 *            a marker to reference the created log entry. six or eight
+	 *            characters.
+	 * @param name
+	 *            the irc nick which could not be resolved
+	 * @return
+	 */  
+  public String unresolvableName(String exceptionMarker, String name) {
+		return "Tvé jméno mě mate. Ty jsi zabanován(a)? Pokud ne, prosím ověr si na [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error této stránce] jak to vyřešit!"
+				+ " pokud to nefunguje, prosím [https://github.com/Tillerino/Tillerinobot/wiki/Contact kontaktuj Tillerino]. (reference "
+				+ exceptionMarker + ")";
+  }
 
 	@Override
 	public String excuseForError() {
@@ -117,7 +141,7 @@ public class Czech implements Language {
 
 	@Override
 	public String help() {
-		return "Ahoj! Já jsem robot který zabil Tillerino a převzal jeho účet. Dělám si srandu, ale já používám tento účet hodně."
+		return "Ahoj! Já jsem robot který zabil Tillerino a převzal jeho účet. Dělám si srandu, ale hodně používám jeho účet."
 				+ " [https://twitter.com/Tillerinobot status a aktualizace]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki příkazy]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
@@ -142,8 +166,8 @@ public class Czech implements Language {
 	@Override
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
-				+ " Doporučil jsem vše, co jsem vymyslel]."
-				+ " Zkus ostatní možnosti doporučení nebo použij !reset. Pokud si nejsi jistý koukni na !help.";
+				+ " Doporučil jsem vše, co mě napadlo]."
+				+ " Zkus ostatní možnosti doporučení nebo použij !reset. Pokud si nejsi jistý(á) koukni na !help.";
 	}
 
 	@Override
@@ -168,7 +192,32 @@ public class Czech implements Language {
 
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("Polarni mi pomohl naučit se česky.");
+    /*
+		 * TRANSLATION NOTE: This line is sent to the user right after they have
+		 * chosen this Language implementation. The English version refers to
+		 * itself as the default version ("just the way I am"), so translating
+		 * the English message doesn't make any sense.
+		 * 
+		 * Instead, we've been using the line
+		 * "*Translator* helped me learn *Language*." in translations. Replace
+		 * *Translator* with your osu name and *Language* with the name of the
+		 * language that you are translating to, and translate the line into the
+		 * new language. This serves two purposes: It shows that the language
+		 * was changed and gives credit to the translator.
+		 * 
+		 * You don't need to use the line above, and you don't have have to give
+		 * yourself credit, but you should show that the language has changed.
+		 * For example, in the German translation, I just used the line
+		 * "Nichts leichter als das!", which translates literally to
+		 * "Nothing easier than that!", which refers to German being my first
+		 * language.
+		 * 
+		 * Tillerino
+		 * 
+		 * P.S. you can put a link to your profile into the line like this:
+		 * [https://osu.ppy.sh/u/2070907 Tillerino]
+		 */
+		return new Message("[https://osu.ppy.sh/u/Polarni Polarni] mi pomohl naučit se česky.");
 	}
 
 	@Override
@@ -179,26 +228,44 @@ public class Czech implements Language {
 
 	@Override
 	public String setFormat() {
-		return "Syntaxe pro nastavení parametru je !set option (nastavení) value (hodnota). Zkus !help pokud potřebujete další ukazatele.";
+		return "Syntaxe pro nastavení parametru je !set option (nastavení) value (hodnota). Zkus !help pokud potřebuješ další ukazatele.";
 	}
 	
+  StringShuffler doSomething = new StringShuffler(rnd);
+  
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		final String message = "V tuto chvíli jsou osu! servery super pomalé, takže pro tuto chvíli nemůžu nic pro tebe udělat. ";
+		return message + doSomething.get(
+				"Řekni... Kdy jsi naposledy mluvil(a) se svojí babičkou?",
+				"Co říkáš na úklid tvého pokoje a pak se zkusit zeptat znova?",
+				"Vsadím se že by jsi se moc rád(a) běžel(a) projít. Ty víš... venku?",
+				"Já jen vím že máš spoust jiných věcí na dělání. Co třeba jít je udělat?",
+				"Stejně vypadáš jako kdyby jsi si potřeboval(a) zdřímnout.",
+				"Ale podívej se na tuhle zajímavou stránku na [https://en.wikipedia.org/wiki/Special:Random wikipedii]!",
+				"Pojďme zjistit jestli je někdo dobrý ve [http://www.twitch.tv/directory/game/Osu! streamování]!",
+				"Podívej, tady je jiná [http://dagobah.net/flash/Cursor_Invisible.swf hra] ve který jsi pravděpodobně špatný(á)!",
+				"Tohle by ti mělo dát dostatek času na prostudování [https://github.com/Tillerino/Tillerinobot/wiki mého návodu].",
+				"Neboj se, tady jsou [https://www.reddit.com/r/osugame dank meme] které by měly zabít nějaký tvůj čas.",
+				"Zatím co se nudíš, vyzkoušej [http://gabrielecirulli.github.io/2048/ 2048]!",
+				"Zábavná otázka: Pokud se teď tvůj pevný disk rozbije, kolik tvých osobních údajů může být navždy ztraceno?",
+				"Takže... Už jsi někdy zkoušel(a) [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge Bring Sally Up - klikovací výzvu]?",
+				"Můžeš jít dělat něco jinýho nebo můžem jít civět ostatním do očí. Tiše."
+				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Neviděl jsem tě v poslední době hrát.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Tohle odkazuje na balíček beatmap a ne na určitou beatmapu.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Moment...";
 	}
 }
