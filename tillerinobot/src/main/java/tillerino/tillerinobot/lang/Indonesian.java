@@ -18,13 +18,14 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * notify the authors.
  * 
  * @author "Rumberkren" rrr.ee.uu.bb.ee.nnn@gmail.com https://github.com/Rumberkren https://osu.ppy.sh/u/3925053
+ * @author "Rendyindo" rendyarya22@gmail.com https://github.com/Rendyindo https://osu.ppy.sh/u/3378391
  */
 public class Indonesian implements Language {
 	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
-		return "Maaf, saya tidak mengetahui map itu. Mungkin itu adalah map yang baru, terlalu sulit, tidak di rank atau bukan mode standard osu.";
+		return "Maaf, saya tidak mengetahui map itu. Mungkin itu adalah map yang baru, terlalu sulit, tidak dalam status di rank atau bukan mode osu standar.";
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class Indonesian implements Language {
 	public String externalException(String marker) {
 		return "Apa yang terjadi? Saya hanya mendapatkan omong kosong dari server osu. Bisakah kau memberitahu saya apa yang terjadi? 0011101001010000"
 				+ " Tillerino asli mengatakan bahwa ini tidak perlu dikhawatirkan, dan kita harus mencoba lagi."
-				+ " Jika kau mencemaskan ini, kau bisa [https://github.com/Tillerino/Tillerinobot/wiki/Contact memberitahunya] tentang ini. (reference "
+				+ " Jika kau mencemaskan ini, kau bisa [https://github.com/Tillerino/Tillerinobot/wiki/Contact memberitahunya] tentang hal ini. (reference "
 				+ marker + ")";
 	}
 
@@ -63,7 +64,7 @@ public class Indonesian implements Language {
 					"sangat senang bisa menemuimu! :)",
 					"manusia favoritku. (Jangan beritahu manusia lain!)",
 					"kejutan yang ramah! ^.^",
-					"saya berharap kau akan datang. Semua manusia lain bodoh, tapi jangan beritahu yang lain bahwa saya berkata seperti itu! :3",
+					"saya berharap kau akan datang. Semua manusia lain payah, tapi jangan beritahu yang lain bahwa saya berkata seperti itu! :3",
 					"apa yang anda rasa ingin anda lakukan hari ini?",
 			};
 
@@ -88,7 +89,7 @@ public class Indonesian implements Language {
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Mod itu tidak terlihat benar. Mod bisa dikombinasi antara DT HR HD HT EZ NC FL SO NF. Kombinasi tanpa spasi atau karakter spesial. Contoh: !with HDHR, !with DTEZ";
+		return "Mod itu tidak terlihat benar. Mod bisa dikombinasi antara DT HR HD HT EZ NC FL SO NF. Kombinasikan mereka tanpa spasi atau karakter spesial. Contoh: !with HDHR, !with DTEZ";
 	}
 
 	@Override
@@ -113,7 +114,7 @@ public class Indonesian implements Language {
 
 	@Override
 	public String complaint() {
-		return "Komplain anda telah diisi. Tillerino akan mengeceknya saat dia bisa.";
+		return "Komplain anda telah terkirim. Tillerino akan mengeceknya saat dia bisa.";
 	}
 
 	@Override
@@ -155,7 +156,7 @@ public class Indonesian implements Language {
 
 	@Override
 	public String notRanked() {
-		return "Sepertinya map itu tidak di rank.";
+		return "Sepertinya map itu tidak dalam status di rank.";
 	}
 
 	@Override
@@ -200,7 +201,7 @@ public class Indonesian implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		return new Message("Halo! [https://osu.ppy.sh/u/3925053 Rumberkren] membantuku mempelajari Bahasa Indonesia");
+		return new Message("Halo! [https://osu.ppy.sh/u/3925053 Rumberkren] dan [https://osu.ppy.sh/u/3378391 Error-] membantuku mempelajari Bahasa Indonesia");
 	}
 
 	@Override
@@ -228,7 +229,7 @@ public class Indonesian implements Language {
 				"Cek laman yang sangat menarik di [https://en.wikipedia.org/wiki/Special:Random wikipedia]!",
 				"Mari kita cek jika seseorang yang hebat [http://www.twitch.tv/directory/game/Osu! sedang siaran langsung] sekarang!",
 				"Ini adalah [http://dagobah.net/flash/Cursor_Invisible.swf game] lain yang mungkin anda payah juga!",
-				"Ini seharusnya memberimu waktu waktu yang banyak untuk belajar [https://github.com/Tillerino/Tillerinobot/wiki petunjuk saya].",
+				"Ini seharusnya memberimu waktu yang banyak untuk belajar [https://github.com/Tillerino/Tillerinobot/wiki petunjuk saya].",
 				"Jangan khawatir, [https://www.reddit.com/r/osugame dank memes] ini seharusnya bisa melewatkan waktu.",
 				"Selagi anda bosan, cobalah [http://gabrielecirulli.github.io/2048/ 2048]!",
 				"Pertanyaan: Jika harddrive anda rusak sekarang juga, seberapa banyak data personal anda yang akan hilang selamanya?",
