@@ -13,7 +13,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * @author Deardrops lness@qq.com https://github.com/Deardrops https://osu.ppy.sh/u/1735252
  */
-public class Default implements Language {
+public class ChineseSimple implements Language {
 	static final Random rnd = new Random();
 
 	@Override
@@ -23,7 +23,7 @@ public class Default implements Language {
 
 	@Override
 	public String internalException(String marker) {
-		return "唔，看样子Tillerino把我给玩坏了。"
+		return "唔，看样子Tillerino把我给玩坏了。 ╮(￣▽￣)╭"
 				+ " 如果短时间内没有修复，你可以在 [https://github.com/Tillerino/Tillerinobot/wiki/Contact 这里] 反馈！（错误信息： "
 				+ marker + "）";
 	}
@@ -53,12 +53,12 @@ public class Default implements Language {
 				.then(new Message("很高兴再次见到你。需要我为你推荐歌曲么?"));
 		} else {
 			String[] messages = {
-					"你看起来需要我给你推荐图呢！",
-					"很高兴再次见到你！",
-					"你是我最喜欢的人(*/ω＼*)",
-					"这真是个意外的惊喜呢~",
-					"我每天都在期待你的出现。",
-					"今天想做些什么呢?",
+					"你看起来需要我给你推荐图呢！ (๑•̀ㅂ•́)و✧",
+					"很高兴再次见到你！ <(*￣▽￣*)/",
+					"你是我最喜欢的人！ (*/ω＼*)",
+					"这真是个意外的惊喜呢~ (>▽<)",
+					"我每天都在期待你的出现 (*/ω＼*)",
+					"今天想做些什么呢？ o(￣▽￣)ｄ",
 			};
 
 			Random random = new Random();
@@ -87,7 +87,7 @@ public class Default implements Language {
 
 	@Override
 	public String noLastSongInfo() {
-		return "我不记得有给过你歌曲呢...";
+		return "我不记得有给过你歌曲呢...Σ(っ °Д °;)っ";
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class Default implements Language {
 	@Override
 	public Response hug(OsuApiUser apiUser) {
 		return new Message("可以过来一下么？")
-			.then(new Action("抱起 " + apiUser.getUserName()));
+			.then(new Action("抱 " + apiUser.getUserName()));
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class Default implements Language {
 
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "抱歉，现在 " + feature + " 只能被 " + minRank + "以上的人使用。";
+		return "抱歉，现在 " + feature + " 只能被Rank在 " + minRank + " 以上的人使用。";
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class Default implements Language {
 
 	@Override
 	public String notRanked() {
-		return "Looks like that beatmap is not ranked.";
+		return "看起来这张图是Unranded图。";
 	}
 
 	@Override
@@ -249,7 +249,7 @@ public class Default implements Language {
 
 	@Override
 	public String noRecentPlays() {
-		return "有一段时间没看到你玩了呢。";
+		return "有一段时间没见面了呢。";
 	}
 	
 	@Override
