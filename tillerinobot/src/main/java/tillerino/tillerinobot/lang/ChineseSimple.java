@@ -100,23 +100,6 @@ public class ChineseSimple implements Language {
 		return "加上" + Mods.toShortNamesContinuous(mods) + "试试？";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
-				+ " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "很抱歉，刚刚我没注意听...可以再说一次你想做的事情么？";

@@ -687,8 +687,11 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		if(userId == null) {
 			String string = IRCBot.getRandomString(8);
 			log.error("bot user not resolvable " + string + " name: " + user.getNick());
-			
-			throw new UserException(new Default().unresolvableName(string, user.getNick()));
+
+			// message not in language-files, since we cant possible know language atm
+			throw new UserException("Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
+						+ " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
+						+ string + ")");
 		}
 		
 		OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000);

@@ -106,23 +106,6 @@ public class Default implements Language {
 		return "Try this map with " + Mods.toShortNamesContinuous(mods) + "!";
 	}
 
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */
-	public String unresolvableName(String exceptionMarker, String name) {
-		return "Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
-				+ " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
-				+ exceptionMarker + ")";
-	}
-
 	@Override
 	public String excuseForError() {
 		return "I'm sorry, there was this beautiful sequence of ones and zeros and I got distracted. What did you want again?";

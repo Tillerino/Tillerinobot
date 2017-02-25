@@ -106,23 +106,6 @@ public class Czech implements Language {
 		return "Zkus tuto mapu s " + Mods.toShortNamesContinuous(mods);
 	}
   
-	/**
-	 * The user's IRC nick name could not be resolved to an osu user id. The
-	 * message should suggest to contact @Tillerinobot or /u/Tillerino.
-	 * 
-	 * @param exceptionMarker
-	 *            a marker to reference the created log entry. six or eight
-	 *            characters.
-	 * @param name
-	 *            the irc nick which could not be resolved
-	 * @return
-	 */  
-  public String unresolvableName(String exceptionMarker, String name) {
-		return "Tvé jméno mě mate. Ty jsi zabanován(a)? Pokud ne, prosím ověr si na [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error této stránce] jak to vyřešit!"
-				+ " pokud to nefunguje, prosím [https://github.com/Tillerino/Tillerinobot/wiki/Contact kontaktuj Tillerino]. (reference "
-				+ exceptionMarker + ")";
-  }
-
 	@Override
 	public String excuseForError() {
 		return "Omlouvám se, byla tam krásná posloupnost jedniček a nul a nechal jsem se rozptýlit. Ješte jednou prosím.";
