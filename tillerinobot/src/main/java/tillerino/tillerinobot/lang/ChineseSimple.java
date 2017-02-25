@@ -236,12 +236,12 @@ public class ChineseSimple implements Language {
 				"我想你现在应该去外面走走，去外面见见朋友。",
 				"我知道你现在有一堆其他事情要做。现在处理它们如何？",
 				"你看起来需要休息一会儿。",
-				"看看 [https://en.wikipedia.org/wiki/Special:Random wikipedia] 上一些有趣的页面？",
-				"让我们看看有没有谁正在 [http://www.twitch.tv/directory/game/Osu! 直播osu] ！",
+				"对了，你最近有看 [https://tieba.baidu.com/p/4817187865 藕酥轶闻录] 么？曲奇又FC了张难图。",
+				"让我们看看有没有谁正在 [http://live.bilibili.com/search/index/?keyword=osu 直播osu] ！",
 				"瞧，这里有一个同样适合你的 [http://dagobah.net/flash/Cursor_Invisible.swf 游戏] 。",
 				"现在有充足的时间去学习如何使用 [https://github.com/Tillerino/Tillerinobot/wiki Tillerinobot]。",
 				"别担心，看看 [https://www.reddit.com/r/osugame reddit] 打发时间吧。",
-				"无聊的时候，来试试 [http://gabrielecirulli.github.io/2048/ 2048] 吧！",
+				"无聊的时候，来玩会儿 [http://gabrielecirulli.github.io/2048/ 2048] 吧！",
 				"提问：如果现在你的电脑硬件损坏，你会因此丢失多少个人资料？",
 				"你可以做点别的事情，或者我们保持安静，就这么相互看着对方。"
 				);
