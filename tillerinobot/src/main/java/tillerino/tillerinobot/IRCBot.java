@@ -74,6 +74,7 @@ import tillerino.tillerinobot.handlers.WithHandler;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
+import tillerino.tillerinobot.osutrack.UpdateResult;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
@@ -115,6 +116,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	final ThreadLocalAutoCommittingEntityManager em;
 	final EntityManagerFactory emf;
 	final IrcNameResolver resolver;
+	final OsutrackDownloader osutrackDownloader;
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
@@ -131,6 +133,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		this.em = em;
 		this.emf = emf;
 		this.resolver = resolver;
+		this.osutrackDownloader = osutrackDownloader;
 		
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(manager));
@@ -610,6 +613,12 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				Response welcome = data.getLanguage().welcomeUser(apiUser,
 						inactiveTime);
 				sendResponse(welcome, user);
+
+				if (data.isDoOsuTrackUpdateOnWelcome()) {
+					UpdateResult update = osutrackDownloader.getUpdate(user.getNick());
+					Response updateResponse = OsuTrackHandler.UpdateResultToResponse(update);
+					sendResponse(updateResponse, user);
+				}
 				
 				checkVersionInfo(user);
 			}
