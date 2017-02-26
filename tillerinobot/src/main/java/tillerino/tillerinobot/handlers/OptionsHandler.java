@@ -37,6 +37,8 @@ public class OptionsHandler implements CommandHandler {
 		} else if (command.toLowerCase().startsWith("show")
 				|| command.toLowerCase().startsWith("view")) {
 			command = command.substring("show".length()).trim();
+		} else if (command.toLowerCase().startsWith("get")) {
+			command = command.substring("get".length()).trim();
 		} else {
 			return null;
 		}
