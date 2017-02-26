@@ -226,11 +226,11 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		}
 
 		@Getter
-		boolean doOsuTrackUpdateOnWelcome = false;
+		boolean osuTrackWelcomeEnabled = false;
 
-		public void setDoOsuTrackUpdateOnWelcome(boolean doOsuTrackUpdateOnWelcome) {
-			changed |= doOsuTrackUpdateOnWelcome != this.doOsuTrackUpdateOnWelcome;
-			this.doOsuTrackUpdateOnWelcome = doOsuTrackUpdateOnWelcome;
+		public void setOsuTrackWelcomeEnabled(boolean doOsuTrackUpdateOnWelcome) {
+			changed |= doOsuTrackUpdateOnWelcome != this.osuTrackWelcomeEnabled;
+			this.osuTrackWelcomeEnabled = doOsuTrackUpdateOnWelcome;
 		}
 	}
 	

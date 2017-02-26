@@ -614,7 +614,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 						inactiveTime);
 				sendResponse(welcome, user);
 
-				if (data.isDoOsuTrackUpdateOnWelcome()) {
+				if (data.isOsuTrackWelcomeEnabled()) {
 					UpdateResult update = osutrackDownloader.getUpdate(user.getNick());
 					Response updateResponse = OsuTrackHandler.updateResultToResponse(update);
 					sendResponse(updateResponse, user);

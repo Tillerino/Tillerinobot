@@ -83,11 +83,11 @@ public class OptionsHandler implements CommandHandler {
 			} else {
 				return new Message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
 			}
-		} else if (getLevenshteinDistance(option, "osutrack") <= 1 && userData.getHearts() > 0) {
+		} else if (getLevenshteinDistance(option, "osutrack-welcome") <= 1 && userData.getHearts() > 0) {
 			if (set) {
-				userData.setDoOsuTrackUpdateOnWelcome(parseBoolean(value, userData.getLanguage()));
+				userData.setOsuTrackWelcomeEnabled(parseBoolean(value, userData.getLanguage()));
 			} else {
-				return new Message("osu!track on welcome: " + (userData.isDoOsuTrackUpdateOnWelcome() ? "ON" : "OFF"));
+				return new Message("osu!track on welcome: " + (userData.isOsuTrackWelcomeEnabled() ? "ON" : "OFF"));
 			}
 		} else if (getLevenshteinDistance(option, "default") <= 1) {
 			if (set) {
