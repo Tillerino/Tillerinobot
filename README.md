@@ -16,7 +16,7 @@ Join the discussion on [discord](https://discord.gg/0ww19XGd9XsiJ4LI)!
 
 ## Technology
 
-Since a lot of people ask, the IRC frontend is built using [PirxBotX](https://github.com/TheLQ/pircbotx).
+Since a lot of people ask, the IRC frontend is built using [PircBotX](https://github.com/TheLQ/pircbotx).
 
 For the [osu! API](https://github.com/ppy/osu-api/wiki), I rolled my own [Java library](https://github.com/Tillerino/osuApiConnector). It's available in [maven central](https://mvnrepository.com/artifact/com.github.tillerino/osu-api-connector). It also does some of the AR/OD calculations.
 
