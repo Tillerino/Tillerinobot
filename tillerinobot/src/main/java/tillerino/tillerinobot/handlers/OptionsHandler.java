@@ -37,6 +37,8 @@ public class OptionsHandler implements CommandHandler {
 		} else if (command.toLowerCase().startsWith("show")
 				|| command.toLowerCase().startsWith("view")) {
 			command = command.substring("show".length()).trim();
+		} else if (command.toLowerCase().startsWith("get")) {
+			command = command.substring("get".length()).trim();
 		} else {
 			return null;
 		}
@@ -80,6 +82,12 @@ public class OptionsHandler implements CommandHandler {
 				userData.setShowWelcomeMessage(parseBoolean(value, userData.getLanguage()));
 			} else {
 				return new Message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
+			}
+		} else if (getLevenshteinDistance(option, "osutrack-welcome") <= 1 && userData.getHearts() > 0) {
+			if (set) {
+				userData.setOsuTrackWelcomeEnabled(parseBoolean(value, userData.getLanguage()));
+			} else {
+				return new Message("osu!track on welcome: " + (userData.isOsuTrackWelcomeEnabled() ? "ON" : "OFF"));
 			}
 		} else if (getLevenshteinDistance(option, "default") <= 1) {
 			if (set) {

@@ -31,6 +31,10 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
         String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();
         UpdateResult update = osutrackDownloader.getUpdate(username);
 
+        return updateResultToResponse(update);
+    }
+
+    public static Response updateResultToResponse(UpdateResult update) {
         if (!update.isExists()) {
             return new Success(String.format("The user %s can't be found.  Try replaced spaces with underscores and try again.", update.getUsername()));
         }

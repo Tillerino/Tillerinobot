@@ -224,6 +224,14 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			changed |= welcomeMessage != this.showWelcomeMessage;
 			this.showWelcomeMessage = welcomeMessage;
 		}
+
+		@Getter
+		boolean osuTrackWelcomeEnabled = false;
+
+		public void setOsuTrackWelcomeEnabled(boolean doOsuTrackUpdateOnWelcome) {
+			changed |= doOsuTrackUpdateOnWelcome != this.osuTrackWelcomeEnabled;
+			this.osuTrackWelcomeEnabled = doOsuTrackUpdateOnWelcome;
+		}
 	}
 	
 	final BotBackend backend;
