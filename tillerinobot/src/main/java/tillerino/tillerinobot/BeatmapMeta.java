@@ -57,7 +57,7 @@ public class BeatmapMeta {
 		if (acc != null) {
 			estimateMessage += format.format(acc * 100) + "%";
 			if(combo != null && misses != null) {
-				estimateMessage += " " + combo + "x " + misses + "miss: ";
+				estimateMessage += " " + combo + "x " + misses + "miss";
 				estimateMessage += ": " + noDecimalsFormat.format(percentageEstimates.getPP(acc, combo, misses)) + "pp";
 			} else {
 				estimateMessage += ": " + noDecimalsFormat.format(getPpForAcc(acc)) + "pp";
