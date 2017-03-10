@@ -524,16 +524,24 @@ public class IRCBot extends CoreHooks implements TidyObject {
 				event.getBot().sendRaw().rawLine("NAMES #osu");
 			}
 
+			User user = null;
 			if (event instanceof GenericUserEvent<?>) {
-				User user = ((GenericUserEvent) event).getUser();
+				user = ((GenericUserEvent) event).getUser();
 				if (user != null) {
-					String nick = user.getNick();
-					MDC.put("user", nick);
-					scheduleRegisterActivity(nick);
+					MDC.put("user", user.getNick());
 				}
 			}
 
 			super.onEvent(event);
+
+			/*
+			 * We delay registering the activity until after the event has been handled to
+			 * avoid a race condition and to make sure that the event handler can find
+			 * out the actual last active time.
+			 */
+			if (user != null) {
+				scheduleRegisterActivity(user.getNick());
+			}
 		} finally {
 			em.close();
 			MDC.clear();
