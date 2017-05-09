@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -9,6 +8,7 @@ import javax.annotation.Nonnull;
 import org.tillerino.ppaddict.shared.types.PpaddictId;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * An instance of this class is always available, even if the user is not logged in. It is used to
@@ -16,9 +16,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
  * 
  * @author Tillerino
  */
-public class ClientUserData implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+public class ClientUserData implements IsSerializable {
   /**
    * null if not logged in. will change from openid to osu! name
    */

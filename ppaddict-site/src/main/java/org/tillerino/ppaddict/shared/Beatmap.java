@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 import javax.annotation.CheckForNull;
 
-public class Beatmap implements Serializable {
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-  private static final long serialVersionUID = 1L;
+public class Beatmap implements IsSerializable {
   public String title;
   public String artist;
   public String version;

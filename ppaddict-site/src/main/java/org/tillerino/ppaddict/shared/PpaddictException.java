@@ -2,6 +2,8 @@ package org.tillerino.ppaddict.shared;
 
 import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 
 /**
  * An exception that is supposed to be handled by the visitor. It's message should be displayed on
@@ -9,7 +11,7 @@ import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
  * 
  * @author Tillerino
  */
-public class PpaddictException extends Exception {
+public class PpaddictException extends Exception implements IsSerializable {
   private static final long serialVersionUID = 1L;
 
   public PpaddictException(String message) {

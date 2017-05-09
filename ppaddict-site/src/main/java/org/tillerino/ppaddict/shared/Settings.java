@@ -1,16 +1,14 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.tillerino.ppaddict.shared.PpaddictException.OutOfBoundsException;
 
-public class Settings implements Serializable {
-  public static final Settings DEFAULT_SETTINGS = new Settings();
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-  private static final long serialVersionUID = 1L;
+public class Settings implements IsSerializable {
+  public static final Settings DEFAULT_SETTINGS = new Settings();
 
   public Settings() {}
 
@@ -82,9 +80,8 @@ public class Settings implements Serializable {
     temp = Double.doubleToLongBits(lowAccuracy);
     result = prime * result + (int) (temp ^ (temp >>> 32));
     result = prime * result + (openDirectOnMapSelect ? 1231 : 1237);
-    result =
-        prime * result
-            + ((recommendationsParameters == null) ? 0 : recommendationsParameters.hashCode());
+    result = prime * result
+        + ((recommendationsParameters == null) ? 0 : recommendationsParameters.hashCode());
     return result;
   }
 

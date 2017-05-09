@@ -1,13 +1,12 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BeatmapBundle implements Serializable {
-  private static final long serialVersionUID = 1L;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-  public List<Beatmap> beatmaps = new ArrayList<Beatmap>();
+public class BeatmapBundle implements IsSerializable {
+  public List<Beatmap> beatmaps = new ArrayList<>();
   public int available;
   public boolean loggedIn;
 

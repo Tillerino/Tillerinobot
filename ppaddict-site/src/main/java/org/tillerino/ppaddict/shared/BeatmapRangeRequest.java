@@ -1,11 +1,11 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class BeatmapRangeRequest implements Serializable {
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+public class BeatmapRangeRequest implements IsSerializable {
   public BeatmapRangeRequest() {
 
   }
@@ -32,8 +32,6 @@ public class BeatmapRangeRequest implements Serializable {
   public enum Sort {
     EXPECTED, PERFECT, BPM, LENGTH, STAR_DIFF
   }
-
-  private static final long serialVersionUID = 1L;
 
   public int start = 0;
   public int length = 100;

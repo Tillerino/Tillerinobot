@@ -1,10 +1,8 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class MinMax implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+public class MinMax implements IsSerializable {
   public MinMax() {
 
   }
@@ -38,23 +36,30 @@ public class MinMax implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     MinMax other = (MinMax) obj;
     if (max == null) {
-      if (other.max != null)
+      if (other.max != null) {
         return false;
-    } else if (!max.equals(other.max))
+      }
+    } else if (!max.equals(other.max)) {
       return false;
+    }
     if (min == null) {
-      if (other.min != null)
+      if (other.min != null) {
         return false;
-    } else if (!min.equals(other.min))
+      }
+    } else if (!min.equals(other.min)) {
       return false;
+    }
     return true;
   }
 

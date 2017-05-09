@@ -1,14 +1,12 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
-
 import javax.annotation.Nonnull;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class InitialData implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+public class InitialData implements IsSerializable {
   @Nonnull
   public ClientUserData userData;
   @Nonnull

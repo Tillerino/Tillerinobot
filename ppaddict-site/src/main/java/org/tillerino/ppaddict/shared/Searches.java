@@ -1,16 +1,14 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BeatmapSetId;
 
-public class Searches implements Serializable {
-  private static final long serialVersionUID = 1L;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
+public class Searches implements IsSerializable {
   public Searches() {}
 
   public Searches(Searches searches) {
