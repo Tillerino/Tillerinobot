@@ -203,16 +203,16 @@ public class Portuguese implements Language {
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Eu não tenho visto você jogar ultimamente";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Isto faz referência a um conjunto de mapas, não à apenas um.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Só um segundo";
 	}
 }
