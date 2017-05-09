@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 
 public class OsuTrackHandler extends CommandHandler.WithShorthand {
     private final OsutrackDownloader osutrackDownloader;
@@ -43,7 +44,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             return new Success(String.format("%s is now tracked.  Gain some PP and !update again!", update.getUsername()));
         }
 
-        String mainMessage = String.format("Rank: %+d (%+1.2f pp) in %d plays. | View detailed data on [https://ameobea.me/osutrack/user/%s osu!track].",
+        String mainMessage = String.format(Locale.US, "Rank: %+d (%+1.2f pp) in %d plays. | View detailed data on [https://ameobea.me/osutrack/user/%s osu!track].",
                 update.getPpRank()*-1,
                 update.getPpRaw(),
                 update.getPlayCount(),

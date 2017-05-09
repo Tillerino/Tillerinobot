@@ -1,6 +1,8 @@
 package tillerino.tillerinobot;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,9 +24,9 @@ public class BeatmapMeta {
 	
 	PercentageEstimates estimates;
 
-	static DecimalFormat format = new DecimalFormat("#.##");
+	static DecimalFormat format = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US));
 
-	static DecimalFormat noDecimalsFormat = new DecimalFormat("#");
+	static DecimalFormat noDecimalsFormat = new DecimalFormat("#", new DecimalFormatSymbols(Locale.US));
 
 	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) {
 		
