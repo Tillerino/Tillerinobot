@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 
 import org.tillerino.ppaddict.shared.types.PpaddictId;
 
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -38,7 +37,7 @@ public class ClientUserData implements IsSerializable {
    * null if logged in.
    */
   @CheckForNull
-  public List<SafeHtml> loginElements;
+  public List<String> loginElements;
 
   /**
    * null if not logged in.

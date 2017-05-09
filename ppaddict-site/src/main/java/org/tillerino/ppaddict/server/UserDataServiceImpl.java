@@ -34,15 +34,13 @@ import org.tillerino.ppaddict.shared.PpaddictException;
 import org.tillerino.ppaddict.shared.PpaddictException.NotLoggedIn;
 import org.tillerino.ppaddict.shared.Settings;
 
-import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.RecommendationsManager;
-import tillerino.tillerinobot.lang.Default;
-
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.RecommendationsManager;
+import tillerino.tillerinobot.lang.Default;
 
 @Singleton
 public class UserDataServiceImpl extends RemoteServiceServlet implements UserDataService {
@@ -95,9 +93,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
     ClientUserData userData = userDataWithPersistentUserData.userData;
 
     if (request == null) {
-      request =
-          userDataWithPersistentUserData.persistentUserData != null ? userDataWithPersistentUserData.persistentUserData
-              .getLastRequest() : null;
+      request = userDataWithPersistentUserData.persistentUserData != null
+          ? userDataWithPersistentUserData.persistentUserData.getLastRequest() : null;
     }
     if (request == null) {
       request = new BeatmapRangeRequest();
@@ -107,9 +104,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       request.length = AbstractBeatmapTable.PAGE_SIZE;
     }
 
-    BeatmapBundle beatmapBundle =
-        beatmapTableService.executeGetRange(request, credentials,
-            userDataWithPersistentUserData.persistentUserData);
+    BeatmapBundle beatmapBundle = beatmapTableService.executeGetRange(request, credentials,
+        userDataWithPersistentUserData.persistentUserData);
 
     return new InitialData(userData, beatmapBundle, request);
   }
@@ -176,13 +172,13 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
       return new UserData(data, persistent);
     } else {
-      data.loginElements = new ArrayList<SafeHtml>();
+      data.loginElements = new ArrayList<>();
       for (String providerName : authServices.keySet()) {
         String loginUrl = leaveService.getURL(providerName, referer);
 
-        data.loginElements.add(new SafeHtmlBuilder()
-            .appendHtmlConstant("<a href=\"" + loginUrl + "\">").appendEscaped(providerName)
-            .appendHtmlConstant("</a>").toSafeHtml());
+        data.loginElements
+            .add(new SafeHtmlBuilder().appendHtmlConstant("<a href=\"" + loginUrl + "\">")
+                .appendEscaped(providerName).appendHtmlConstant("</a>").toSafeHtml().asString());
 
       }
       return new UserData(data);
@@ -272,9 +268,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       userData.setBeatmapComments(new TreeSet<String>());
     }
 
-    comment =
-        comment.substring(0, Math.min(ClientUserData.BEATMAP_COMMENT_LENGTH, comment.length()))
-            .trim();
+    comment = comment
+        .substring(0, Math.min(ClientUserData.BEATMAP_COMMENT_LENGTH, comment.length())).trim();
 
     userData.putBeatMapComment(beatmapid, modsAsLong, comment);
 

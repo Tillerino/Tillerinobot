@@ -19,7 +19,6 @@ import org.tillerino.ppaddict.shared.ClientUserData;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -81,15 +80,15 @@ public class UserBox extends Composite implements HasHelpElements {
       return;
     }
     if (!isLoggedIn()) {
-      List<SafeHtml> loginElements = myData.loginElements;
+      List<String> loginElements = myData.loginElements;
       if (loginElements == null) {
         throw new RuntimeException("nickname null, but loginElements null as well");
       }
       final PopupPanel p = new HelpElements.PopupPanelWithHelpElements(help) {
         @Override
         public void showHelp(HelpElements elements) {
-          elements.positionAndShow(HelpElements.E.LOGIN_DIALOG, this.getElement(),
-              Side.BELOW_RIGHT, null);
+          elements.positionAndShow(HelpElements.E.LOGIN_DIALOG, this.getElement(), Side.BELOW_RIGHT,
+              null);
         }
       };
 
@@ -97,7 +96,7 @@ public class UserBox extends Composite implements HasHelpElements {
       p.add(flow);
       flow.add(new Label("Please choose an identity provider:"));
       flow.add(new Label(""));
-      for (SafeHtml provider : loginElements) {
+      for (String provider : loginElements) {
         HTMLPanel panel = new HTMLPanel(provider);
         flow.add(panel);
       }
@@ -112,7 +111,7 @@ public class UserBox extends Composite implements HasHelpElements {
     void handle(@Nonnull ClientUserData data);
   }
 
-  private List<UserDataHandler> loadHandlers = new LinkedList<UserDataHandler>();
+  private List<UserDataHandler> loadHandlers = new LinkedList<>();
 
   public void addLoadHandler(UserDataHandler handler) {
     loadHandlers.add(handler);

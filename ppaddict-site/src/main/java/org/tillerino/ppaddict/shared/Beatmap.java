@@ -1,7 +1,5 @@
 package org.tillerino.ppaddict.shared;
 
-import java.io.Serializable;
-
 import javax.annotation.CheckForNull;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -66,8 +64,7 @@ public class Beatmap implements IsSerializable {
     return b;
   }
 
-  public static class Personalization implements Serializable {
-    private static final long serialVersionUID = 1L;
+  public static class Personalization implements IsSerializable {
     public String comment;
     public String commentDate;
 
