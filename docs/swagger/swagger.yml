@@ -1,0 +1,268 @@
+swagger: '2.0'
+info:
+  description: >-
+    This is the API of ppaddict, the engine behind Tillerinobot, the osu! bot
+    known simply as Tillerino. Keys are currently handed out individually.
+    Please contact the developer for a key.
+  version: '0.1'
+  title: ppaddict API
+  contact:
+    name: Contact
+    url: 'https://github.com/Tillerino/Tillerinobot/wiki/Contact'
+host: api.tillerino.org
+basePath: /
+tags:
+  - name: public
+    description: public API
+schemes:
+  - https
+paths:
+  /beatmapinfo:
+    get:
+      tags:
+        - public
+      summary: Beatmap pp values
+      description: Shows pp values for a specified beatmaps and mods
+      operationId: beatmapinfo
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: beatmapid
+          description: 'Beatmap ID, e.g. 129891 for FOUR DIMENSIONS'
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: mods
+          description: 'game modifiers, see https://github.com/ppy/osu-api/wiki#mods'
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: wait
+          description: >-
+            maximum time to wait for computation of the result. Usually, the
+            response should be near instant, but it can take quite some time to
+            compute.
+          default: 1000
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/BeatmapDiffStats'
+        '202':
+          description: If the response could not be completed in the specified wait time.
+        '404':
+          description: If the beatmap was not found
+        '502':
+          description: If there were problems with the upstream osu! API.
+      security:
+        - api_key: []
+  /botinfo:
+    get:
+      tags:
+        - public
+      summary: Get info about the running bot
+      description: ''
+      operationId: botinfo
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/BotInfo'
+  /userbyid:
+    get:
+      tags:
+        - public
+      summary: Get a user by id
+      description: ''
+      operationId: getUserById
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: query
+          required: false
+          type: integer
+          format: int32
+      security:
+        - api_key: []
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/OsuApiUser'
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: k
+    in: query
+    description: 'An API key. Currently, you need to ask for it.'
+definitions:
+  BeatmapDiffStats:
+    type: object
+    properties:
+      beatmapid:
+        type: integer
+        format: int32
+      mods:
+        type: integer
+        format: int64
+        description: 'game modifiers, see https://github.com/ppy/osu-api/wiki#mods'
+      ppForAcc:
+        type: array
+        description: a list of accuracies and the awarded pp
+        items:
+          properties:
+            key:
+              description: accuracy
+              type: number
+            value:
+              description: pp
+              type: number
+      oppaiOnly:
+        type: boolean
+        default: false
+        description: indicates if these stats were calculated purely by oppai.
+      starDiff:
+        type: number
+        format: double
+    example:
+      beatmapid: 129891
+      mods: 0
+      oppaiOnly: false
+      ppForAcc:
+        entry:
+          - key: 0.75
+            value: 401.4848320624792
+          - key: 0.8
+            value: 412.988769201429
+          - key: 0.85
+            value: 424.8328439654947
+          - key: 0.9
+            value: 438.6601782059438
+          - key: 0.93
+            value: 450.8044543145452
+          - key: 0.95
+            value: 463.29048845485187
+          - key: 0.96
+            value: 471.9322720649097
+          - key: 0.97
+            value: 482.9623167470799
+          - key: 0.975
+            value: 489.686543769206
+          - key: 0.98
+            value: 497.22473496204844
+          - key: 0.985
+            value: 505.9834429421204
+          - key: 0.99
+            value: 515.8404040018527
+          - key: 0.995
+            value: 527.3288667111191
+          - key: 1
+            value: 540.2889215169421
+      starDiff: 7.068512916564941
+  BotInfo:
+    type: object
+    properties:
+      runningSince:
+        type: integer
+        format: int64
+        description: Time when the bot last connected (in milliseconds since the epoch).
+      lastPingDeath:
+        type: integer
+        format: int64
+        description: >-
+          Time when the bot last disconnected due to high ping (in milliseconds
+          since the epoch).
+      lastInteraction:
+        type: integer
+        format: int64
+        description: >-
+          Time when the last IRC event was received (in milliseconds since the
+          epoch).
+      lastSentMessage:
+        type: integer
+        format: int64
+        description: Time when the last message was sent (in milliseconds since the epoch).
+      connected:
+        type: boolean
+        default: false
+        description: If the bot is connected according to the PircBotX library.
+    example:
+      connected: true
+      lastInteraction: 1495296361422
+      lastPingDeath: 0
+      lastSentMessage: 1495296360538
+      runningSince: 1495009112579
+  OsuApiUser:
+    type: object
+    properties:
+      userId:
+        type: integer
+        format: int32
+      userName:
+        type: string
+      count300:
+        type: integer
+        format: int32
+      count100:
+        type: integer
+        format: int32
+      count50:
+        type: integer
+        format: int32
+      playCount:
+        type: integer
+        format: int32
+      rankedScore:
+        type: integer
+        format: int64
+      totalScore:
+        type: integer
+        format: int64
+      rank:
+        type: integer
+        format: int32
+      level:
+        type: number
+        format: double
+      pp:
+        type: number
+        format: double
+      accuracy:
+        type: number
+        format: double
+      countSS:
+        type: integer
+        format: int32
+      countS:
+        type: integer
+        format: int32
+      countA:
+        type: integer
+        format: int32
+      country:
+        type: string
+      mode:
+        type: integer
+        format: int32
+    example:
+      accuracy: 99.16427612304688
+      count100: 544085
+      count300: 6716020
+      count50: 55862
+      countA: 532
+      countS: 407
+      countSS: 19
+      country: DE
+      level: 100.121
+      mode: 0
+      playCount: 29434
+      pp: 4486.05
+      rank: 14077
+      rankedScore: 5937501449
+      totalScore: 39033181040
+      userId: 2070907
+      userName: Tillerino
