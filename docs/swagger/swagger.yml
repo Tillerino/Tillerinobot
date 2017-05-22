@@ -51,18 +51,20 @@ paths:
           schema:
             $ref: '#/definitions/BeatmapDiffStats'
         '202':
-          description: If the response could not be completed in the specified wait time.
+          description: Response could not be completed in the specified wait time.
+        '401':
+          $ref: '#/responses/unauthorized'
         '404':
-          description: If the beatmap was not found
+          description: Beatmap not found.
         '502':
-          description: If there were problems with the upstream osu! API.
+          $ref: '#/responses/upstream'
       security:
         - api_key: []
   /botinfo:
     get:
       tags:
         - public
-      summary: Get info about the running bot
+      summary: Information about the running bot
       description: ''
       operationId: botinfo
       produces:
@@ -93,12 +95,25 @@ paths:
         '200':
           schema:
             $ref: '#/definitions/OsuApiUser'
+        '401':
+          $ref: '#/responses/unauthorized'
+        '404':
+          description: User not found.
+        '502':
+          $ref: '#/responses/upstream'
 securityDefinitions:
   api_key:
     type: apiKey
     name: k
     in: query
     description: 'An API key. Currently, you need to ask for it.'
+responses:
+  unauthorized:
+    description: No or API key presented or key not authorized for this operation.
+  upstream:
+    description: >-
+      An upstream API failed to respond normally. It is okay to retry this
+      operation right away, but it will likely fail again.
 definitions:
   BeatmapDiffStats:
     type: object
