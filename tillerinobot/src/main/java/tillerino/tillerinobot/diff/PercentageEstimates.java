@@ -22,7 +22,14 @@ public interface PercentageEstimates {
 
 		return score.getPP(getBeatmap());
 	}
-	
+
+	public default double getPPForHitPoints(int x100, int x50, int combo, int misses) {
+		int x300 = getAllObjectsCount() - x50 - x100;
+		CStandardScore score = new CStandardScore(combo, x300, x100, x50, misses, getMods());
+
+		return score.getPP(getBeatmap());
+	}
+
 	@BitwiseMods
 	long getMods();
 	

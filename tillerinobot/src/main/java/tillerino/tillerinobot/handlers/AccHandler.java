@@ -28,8 +28,9 @@ public class AccHandler implements CommandHandler {
 		super();
 		this.backend = backend;
 	}
-	
+
 	static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
+	static Pattern superExtended = Pattern.compile("(\\d+)x100\\s+(?:(\\d+)x50\\s+)?(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public Response handle(String message, OsuApiUser apiUser,
@@ -52,12 +53,26 @@ public class AccHandler implements CommandHandler {
 			double acc = parseAcc(extendedMatcher.group(1), lang);
 			int combo = parseInt(extendedMatcher.group(2), lang);
 			int misses = parseInt(extendedMatcher.group(3), lang);
-			
+
 			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
 			if (beatmap == null) {
 				throw new RareUserException(lang.excuseForError());
 			}
 			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
+		} else if((extendedMatcher = superExtended.matcher(message)).matches()) {
+			// we're now in superExtended matching, aka drop % and add x100 and x50
+			int x100 = parseInt(extendedMatcher.group(1), lang);
+			String group2 = extendedMatcher.group(2);
+			int x50 = group2 == null ? 0 : parseInt(group2, lang);
+			int combo = parseInt(extendedMatcher.group(3), lang);
+			int misses = parseInt(extendedMatcher.group(4), lang);
+
+			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
+			if (beatmap == null) {
+				throw new RareUserException(lang.excuseForError());
+			}
+
+			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), x100, x50, combo, misses));
 		} else {
 			if(message.endsWith("%")) {
 				message = message.substring(0, message.length() - 1);

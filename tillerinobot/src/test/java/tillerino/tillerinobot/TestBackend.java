@@ -96,7 +96,12 @@ public class TestBackend implements BotBackend {
 		public double getPP(double acc, int combo, int misses) {
 			return getPPForAcc(acc);
 		}
-		
+
+		@Override
+		public double getPPForHitPoints(int x100, int x50, int combo, int misses) {
+			return 0; // I DUNNO WHAT TO DO HERE :S
+		}
+
 		@Override
 		public int getAllObjectsCount() {
 			throw new UnsupportedOperationException();
