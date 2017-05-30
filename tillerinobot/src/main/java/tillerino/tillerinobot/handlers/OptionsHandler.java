@@ -106,6 +106,21 @@ public class OptionsHandler implements CommandHandler {
 			throw new UserException(userData.getLanguage().invalidChoice(option,
 					"Language, Default" + (userData.getHearts() > 0 ? ", Welcome" : "")));
 		}
+		
+		if (option.equals("recommendmods")){
+if (set){
+			if (value == null){
+				ircUser.message("Please specify an option: mods/nomods");
+			}else{
+				if (value.equals("nomods"))
+				userData.setNoModOption(true);
+				else if (value.equals("mods"))
+				userData.setNoModOption(false);
+				else
+				icrUser.message("Invalid value!");
+			}
+			
+		}}
 
 		return new NoResponse();
 	}
