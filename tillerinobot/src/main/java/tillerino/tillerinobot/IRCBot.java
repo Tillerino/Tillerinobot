@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
@@ -79,7 +77,7 @@ import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
-public class IRCBot extends CoreHooks implements TidyObject {
+public class IRCBot extends CoreHooks {
 
 	interface IRCBotUser {
 		/**
@@ -123,7 +121,8 @@ public class IRCBot extends CoreHooks implements TidyObject {
 			BotInfo botInfo, UserDataManager userDataManager,
 			Pinger pinger, @Named("tillerinobot.ignore") boolean silent,
 			ThreadLocalAutoCommittingEntityManager em,
-			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader) {
+			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
+			@Named("tillerinobot.maintenance") ExecutorService exec) {
 		this.backend = backend;
 		this.manager = manager;
 		this.botInfo = botInfo;
@@ -134,6 +133,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		this.emf = emf;
 		this.resolver = resolver;
 		this.osutrackDownloader = osutrackDownloader;
+		this.exec = exec;
 		
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(manager));
@@ -506,7 +506,6 @@ public class IRCBot extends CoreHooks implements TidyObject {
 	@Override
 	public void onDisconnect(DisconnectEvent event) throws Exception {
 		log.info("received DisconnectEvent");
-		tidyUp(false);
 	}
 	
 	AtomicLong lastSerial = new AtomicLong(System.currentTimeMillis());
@@ -560,14 +559,7 @@ public class IRCBot extends CoreHooks implements TidyObject {
 
 	long lastListTime = System.currentTimeMillis();
 	
-	ExecutorService exec = Executors.newFixedThreadPool(4, new ThreadFactory() {
-		@Override
-		public Thread newThread(Runnable r) {
-			Thread t = new Thread(r);
-			t.setDaemon(true);
-			return t;
-		}
-	});
+	private final ExecutorService exec;
 	
 	@Override
 	public void onJoin(JoinEvent event) throws Exception {
@@ -718,13 +710,5 @@ public class IRCBot extends CoreHooks implements TidyObject {
 		}
 		
 		return apiUser;
-	}
-
-	@Override
-	public void tidyUp(boolean fromShutdownHook) {
-		log.info("tidyUp({})", fromShutdownHook);
-		if(!exec.isShutdown()) {
-			exec.shutdownNow();
-		}
 	}
 }
