@@ -3,16 +3,18 @@ package tillerino.tillerinobot;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
-import tillerino.tillerinobot.TestBackend.FakePercentageEstimates;
+import tillerino.tillerinobot.diff.CBeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
+import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 
 public class BestmapMetaTest {
 	@Test
 	public void testFuturePpSwitch() throws Exception {
-		PercentageEstimates estimates = new FakePercentageEstimates(64, 100);
 		OsuApiBeatmap beatmap = new OsuApiBeatmap();
+		CBeatmapImpl cBeatmap = new CBeatmapImpl(beatmap, 1.45, 1, 200, 250, false, false, true);
 		beatmap.setArtist("Artist");
 		beatmap.setTitle("Title");
 		beatmap.setVersion("Version");
@@ -21,14 +23,16 @@ public class BestmapMetaTest {
 		beatmap.setOverallDifficulty(7);
 		beatmap.setBpm(420);
 		beatmap.setBeatmapId(69);
+		beatmap.setStarDifficulty(cBeatmap.getStarDiff());
+		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, Mods.getMask(Mods.DoubleTime));
 		BeatmapMeta meta = new BeatmapMeta(beatmap, 101, estimates);
 		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 100pp | 95%: 77pp | 98%: 90pp | 99%: 95pp | 100%: 100pp | 1:14 ★ 3.64 ♫ 630 AR10.33 OD9.08",
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 100pp | 95%: 32pp | 98%: 61pp | 99%: 78pp | 100%: 100pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
 				meta.formInfoMessage(true, null, -1, null, null, null));
 
 		meta = new BeatmapMeta(beatmap, 110, estimates);
 		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 77pp | 98%: 90pp | 99%: 95pp | 100%: 100pp | 1:14 ★ 3.64 ♫ 630 AR10.33 OD9.08",
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 32pp | 98%: 61pp | 99%: 78pp | 100%: 100pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
 				meta.formInfoMessage(true, null, -1, null, null, null));
 	}
 }
