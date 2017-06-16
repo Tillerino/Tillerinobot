@@ -1,5 +1,7 @@
 package tillerino.tillerinobot;
 
+import static java.lang.String.format;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -28,8 +30,14 @@ public class BeatmapMeta {
 
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#", new DecimalFormatSymbols(Locale.US));
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) {
-		
+	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) throws UserException {
+		if (beatmap.getMaxCombo() <= 0) {
+			// This is kind of an awkward place to warn about this, but we don't want to be throwing UserExceptions from the backend.
+			throw new UserException(
+					format("Encountered a [https://osu.ppy.sh/b/%s broken beatmap], see [https://github.com/ppy/osu-api/issues/130 this issue]",
+							beatmap.getBeatmapId()));
+		}
+
 		String beatmapName = String.format("%s - %s [%s]", getBeatmap().getArtist(), getBeatmap().getTitle(),
 				getBeatmap().getVersion());
 		if(formLink) {
