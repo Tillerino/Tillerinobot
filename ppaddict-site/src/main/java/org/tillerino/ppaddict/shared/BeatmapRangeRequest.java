@@ -29,7 +29,7 @@ public class BeatmapRangeRequest implements IsSerializable {
     start = o.start;
   }
 
-  public enum Sort {
+  public enum Sort implements IsSerializable {
     EXPECTED, PERFECT, BPM, LENGTH, STAR_DIFF
   }
 
