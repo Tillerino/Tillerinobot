@@ -174,6 +174,7 @@ public class TestBackend implements BotBackend {
 						+ (int) (rand.nextDouble() + .5));
 				beatmap.setCircleSize(diff + 1);
 				beatmap.setBpm(50 * Math.pow(2, diff * .4 + rand.nextDouble()));
+				beatmap.setMaxCombo(100);
 			}
 		}
 		return beatmap;

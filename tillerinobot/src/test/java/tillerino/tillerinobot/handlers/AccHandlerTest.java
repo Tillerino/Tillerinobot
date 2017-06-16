@@ -42,8 +42,10 @@ public class AccHandlerTest {
 	@Test
 	public void testSimple() throws Exception {
 		BotBackend backend = mock(BotBackend.class);
+		OsuApiBeatmap beatmap = new OsuApiBeatmap();
+		beatmap.setMaxCombo(100);
 		when(backend.loadBeatmap(anyInt(), anyLong(), any(Language.class)))
-				.thenReturn(new BeatmapMeta(new OsuApiBeatmap(), null, mock(PercentageEstimates.class)));
+				.thenReturn(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)));
 		AccHandler accHandler = new AccHandler(backend);
 		
 		UserData userData = mock(UserData.class);

@@ -24,6 +24,7 @@ public class BestmapMetaTest {
 		beatmap.setBpm(420);
 		beatmap.setBeatmapId(69);
 		beatmap.setStarDifficulty(cBeatmap.getStarDiff());
+		beatmap.setMaxCombo(100);
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, Mods.getMask(Mods.DoubleTime));
 		BeatmapMeta meta = new BeatmapMeta(beatmap, 101, estimates);
 		assertEquals(
