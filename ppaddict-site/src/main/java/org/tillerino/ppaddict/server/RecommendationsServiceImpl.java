@@ -93,7 +93,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
 
           final BeatmapMeta meta = recommendation.beatmap;
 
-          if (meta == null || !(meta.getEstimates() instanceof PercentageEstimates)) {
+          if (meta.getBeatmap().getMaxCombo() <= 0) {
             continue;
           }
 
@@ -120,10 +120,6 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
     try {
       Long longMods =
           mods != null ? (mods.equals("?") ? -1 : Mods.fromShortNamesContinuous(mods)) : (Long) 0l;
-      if (longMods == null) {
-        throw ExceptionsUtil.getLoggedWrappedException(log, new NullPointerException(
-            "mods not parsable: " + mods));
-      }
       PersistentUserData linkedData =
           userDataService.getServerUserData(userDataService
               .getCredentialsOrThrow(getThreadLocalRequest()));
