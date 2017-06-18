@@ -110,7 +110,7 @@ public class BeatmapInfoService {
 			info.starDiff = estimates.getStarDiff();
 
 			for (double acc : new double[] { 1, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75 }) {
-				info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
+				info.ppForAcc.put(acc, estimates.getPP(acc));
 			}
 			
 			return info;

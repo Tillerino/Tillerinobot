@@ -123,7 +123,7 @@ public class BeatmapMeta {
 	}
 
 	double getPpForAcc(double acc) {
-		return getEstimates().getPPForAcc(acc);
+		return getEstimates().getPP(acc);
 	}
 
 	public interface PpMessageBuilder {
@@ -147,10 +147,10 @@ public class BeatmapMeta {
     public static class DefaultPpMessageBuilder implements PpMessageBuilder {
         @Override
         public String buildMessage(PercentageEstimates estimates) {
-            return "95%: " + noDecimalsFormat.format(estimates.getPPForAcc(.95)) + "pp" +
-                    " | 98%: " + noDecimalsFormat.format(estimates.getPPForAcc(.98)) + "pp" +
-                    " | 99%: " + noDecimalsFormat.format(estimates.getPPForAcc(.99)) + "pp" +
-                    " | 100%: " + noDecimalsFormat.format(estimates.getPPForAcc(1)) + "pp";
+            return "95%: " + noDecimalsFormat.format(estimates.getPP(.95)) + "pp" +
+                    " | 98%: " + noDecimalsFormat.format(estimates.getPP(.98)) + "pp" +
+                    " | 99%: " + noDecimalsFormat.format(estimates.getPP(.99)) + "pp" +
+                    " | 100%: " + noDecimalsFormat.format(estimates.getPP(1)) + "pp";
         }
     }
 
@@ -164,7 +164,7 @@ public class BeatmapMeta {
         @Override
         public String buildMessage(PercentageEstimates estimates) {
             return format.format(acc * 100) + "%: " +
-                    noDecimalsFormat.format(estimates.getPPForAcc(acc)) + "pp";
+                    noDecimalsFormat.format(estimates.getPP(acc)) + "pp";
         }
     }
 
@@ -202,7 +202,7 @@ public class BeatmapMeta {
         @Override
         public String buildMessage(PercentageEstimates estimates) {
             return x100 + "x100 " + x50 + "x50 " + combo + "x " + misses + "miss: " +
-                    noDecimalsFormat.format(estimates.getPPForHitPoints(x100, x50, combo, misses)) + "pp";
+                    noDecimalsFormat.format(estimates.getPP(x100, x50, combo, misses)) + "pp";
         }
     }
 }

@@ -256,9 +256,9 @@ public class TsundereEnglish extends TsundereBase {
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20.0);
-		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
+		if (estimates.getPP(.95) / typicalPP > 2.0) {
 			return new Message("Are you serious!? If that map doesn't kill you, I will.");
-		} else if (estimates.getPPForAcc(1) / typicalPP < 0.333) {
+		} else if (estimates.getPP(1) / typicalPP < 0.333) {
 			return new Message("Playing that won't impress me much... n-n-not that I'd want you to.");
 		}
 		return new NoResponse();
@@ -272,9 +272,9 @@ public class TsundereEnglish extends TsundereBase {
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20);
-		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
+		if (estimates.getPP(.95) / typicalPP > 2.0) {
 			return new Message("You idiot! You're going to get hurt trying mods like that!");
-		} else if (estimates.getPPForAcc(1) / typicalPP < 0.5) {
+		} else if (estimates.getPP(1) / typicalPP < 0.5) {
 			return new Message("If you wanted to be treated like a baby, you could just ask... no, go ahead and play.");
 		}
 		return new NoResponse();
