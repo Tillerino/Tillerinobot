@@ -22,22 +22,22 @@ import java.util.Random;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.Getter;
-
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import lombok.Getter;
 import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.diff.CBeatmap;
+import tillerino.tillerinobot.diff.CBeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
+import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 import tillerino.tillerinobot.lang.Language;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * <p>
@@ -63,66 +63,6 @@ import com.google.gson.GsonBuilder;
  * @author Tillerino
  */
 public class TestBackend implements BotBackend {
-	public static class FakePercentageEstimates implements PercentageEstimates {
-		private final long mods;
-		private final double fPp;
-
-		public FakePercentageEstimates(long mods, double fPp) {
-			this.mods = mods;
-			this.fPp = fPp;
-		}
-
-		@Override
-		public boolean isShaky() {
-			return false;
-		}
-
-		@Override
-		public double getPPForAcc(double acc) {
-			return fPp * Math.pow((double) acc, 5);
-		}
-
-		@Override
-		public long getMods() {
-			return mods;
-		}
-
-		@Override
-		public Double getStarDiff() {
-			return Math.log(fPp / 8) / Math.log(2);
-		}
-
-		@Override
-		public double getPP(double acc, int combo, int misses) {
-			return getPPForAcc(acc);
-		}
-
-		@Override
-		public double getPPForHitPoints(int x100, int x50, int combo, int misses) {
-			return 0; // I DUNNO WHAT TO DO HERE :S
-		}
-
-		@Override
-		public int getAllObjectsCount() {
-			throw new UnsupportedOperationException();
-		}
-		
-		@Override
-		public CBeatmap getBeatmap() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean isOppaiOnly() {
-			return false;
-		}
-		
-		@Override
-		public boolean isRanked() {
-			return true;
-		}
-	}
-
 	static class User {
 		int lastVisistedVersion = 0;
 		OsuApiUser apiUser;
@@ -137,7 +77,7 @@ public class TestBackend implements BotBackend {
 
 		Map<Integer, OsuApiBeatmap> beatmaps = new HashMap<>();
 
-		Map<BeatmapWithMods, FakePercentageEstimates> estimates = new HashMap<>();
+		Map<BeatmapWithMods, PercentageEstimates> estimates = new HashMap<>();
 	}
 
 	Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls()
@@ -193,24 +133,12 @@ public class TestBackend implements BotBackend {
 
 		BeatmapWithMods entry = new BeatmapWithMods(beatmapid, mods);
 
-		FakePercentageEstimates estimates = database.estimates.get(entry);
+		PercentageEstimates estimates = database.estimates.get(entry);
 
 		if (estimates == null) {
-			double pp = Math.pow(2, beatmap.getStarDifficulty()) * 8;
-
-			if (Mods.DoubleTime.is(mods)) {
-				pp *= 2.5;
-			}
-			if (Mods.HardRock.is(mods)) {
-				pp *= 1.3;
-			}
-			if (Mods.Hidden.is(mods)) {
-				pp *= 1.1;
-			}
-
-			final double fPp = pp;
-
-			estimates = new FakePercentageEstimates(mods, fPp);
+			CBeatmapImpl cBeatmap = new CBeatmapImpl(beatmap, beatmap.getStarDifficulty() / 2,
+					beatmap.getStarDifficulty() / 2, 200, 250, false, false, true);
+			estimates = new PercentageEstimatesImpl(cBeatmap, mods);
 		}
 
 		return new BeatmapMeta(beatmap, null, estimates);
@@ -246,6 +174,7 @@ public class TestBackend implements BotBackend {
 						+ (int) (rand.nextDouble() + .5));
 				beatmap.setCircleSize(diff + 1);
 				beatmap.setBpm(50 * Math.pow(2, diff * .4 + rand.nextDouble()));
+				beatmap.setMaxCombo(100);
 			}
 		}
 		return beatmap;

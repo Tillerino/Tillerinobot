@@ -21,8 +21,10 @@ public class RecommendHandlerTest {
 	@Test
 	public void testDefaultSettings() throws Exception {
 		RecommendationsManager manager = mock(RecommendationsManager.class);
+		OsuApiBeatmap beatmap = new OsuApiBeatmap();
+		beatmap.setMaxCombo(100);
 		when(manager.getRecommendation(any(), any(), any())).thenReturn(
-				new Recommendation(new BeatmapMeta(new OsuApiBeatmap(), null, mock(PercentageEstimates.class)), mock(BareRecommendation.class)));
+				new Recommendation(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)), mock(BareRecommendation.class)));
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(new Default());
 

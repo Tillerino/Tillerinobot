@@ -221,10 +221,10 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 					if(reconnect) {
 						log.info("Connecting");
 						(bot = new CloseableBot(configurationBuilder.buildConfiguration())).startBot();
+						log.info("Bot stopped");
 					}
 				} finally {
 					bot = null;
-					listener.tidyUp(false);
 					listener = null;
 				}
 			} catch (Exception e) {
@@ -232,6 +232,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 			} finally {
 				try {
 					if(reconnect) {
+						log.debug("Sleeping before reconnect");
 						Thread.sleep(reconnectTimeout);
 					}
 				} catch (InterruptedException e1) {
@@ -255,9 +256,6 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 				} catch (IOException e) {
 					log.error("error closing socket", e);
 				}
-			}
-			if(listener != null) {
-				listener.tidyUp(fromShutdownHook);
 			}
 		}
 	}

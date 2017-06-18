@@ -1,19 +1,19 @@
 package tillerino.tillerinobot;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
 import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BitwiseMods;
-
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.PercentageEstimates;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
+import static java.lang.String.format;
 
 @Data
 @AllArgsConstructor
@@ -28,40 +28,47 @@ public class BeatmapMeta {
 
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#", new DecimalFormatSymbols(Locale.US));
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) {
-	    return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(acc, combo, misses));
+	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) throws UserException {
+		return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(acc, combo, misses));
 	}
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, int x100, int x50, int combo, int misses) {
-        return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(x100, x50, combo, misses));
+	public String formInfoMessage(boolean formLink, String addition, int hearts, int x100, int x50, int combo, int misses) throws UserException {
+		return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(x100, x50, combo, misses));
 	}
 
-    private String formInfoMessage(boolean formLink, String addition, int hearts, PpMessageBuilder ppMessageBuilder) {
-        String beatmapName = String.format("%s - %s [%s]", getBeatmap().getArtist(), getBeatmap().getTitle(),
-                getBeatmap().getVersion());
-        if(formLink) {
-            beatmapName = String.format("[http://osu.ppy.sh/b/%d %s]", getBeatmap().getBeatmapId(), beatmapName);
-        }
+	public String formInfoMessage(boolean formLink, String addition, int hearts, PpMessageBuilder ppMessageBuilder) throws UserException {
+		if (beatmap.getMaxCombo() <= 0) {
+			// This is kind of an awkward place to warn about this, but we don't want to be throwing UserExceptions from the backend.
+			throw new UserException(
+					format("Encountered a [https://osu.ppy.sh/b/%s broken beatmap], see [https://github.com/ppy/osu-api/issues/130 this issue]",
+							beatmap.getBeatmapId()));
+		}
 
-        PercentageEstimates percentageEstimates = getEstimates();
-        long mods = percentageEstimates.getMods();
-        if (percentageEstimates.getMods() != 0) {
-            StringBuilder modsString = new StringBuilder();
-            for (Mods mod : Mods.getMods(percentageEstimates.getMods())) {
-                if (mod.isEffective()) {
-                    modsString.append(mod.getShortName());
-                }
-            }
-            beatmapName += " " + modsString;
-        }
+		String beatmapName = String.format("%s - %s [%s]", getBeatmap().getArtist(), getBeatmap().getTitle(),
+				getBeatmap().getVersion());
+		if(formLink) {
+			beatmapName = String.format("[http://osu.ppy.sh/b/%d %s]", getBeatmap().getBeatmapId(), beatmapName);
+		}
+		
+		PercentageEstimates percentageEstimates = getEstimates();
+		long mods = percentageEstimates.getMods();
+		if (percentageEstimates.getMods() != 0) {
+			StringBuilder modsString = new StringBuilder();
+			for (Mods mod : Mods.getMods(percentageEstimates.getMods())) {
+				if (mod.isEffective()) {
+					modsString.append(mod.getShortName());
+				}
+			}
+			beatmapName += " " + modsString;
+		}
 
-        String estimateMessage = "";
-        Integer future = getPersonalPP();
-        if (future != null && future >= getPpForAcc(.9)
-                && future < getPpForAcc(1) * 1.05) {
-            future = (int) Math.floor(Math.min(future, getPpForAcc(1)));
-            estimateMessage += "future you: " + future + "pp | ";
-        }
+		String estimateMessage = "";
+		Integer future = getPersonalPP();
+		if (future != null && future >= getPpForAcc(.9)
+				&& future < getPpForAcc(1) * 1.05) {
+			future = (int) Math.floor(Math.min(future, getPpForAcc(1)));
+			estimateMessage += "future you: " + future + "pp | ";
+		}
 
         estimateMessage += ppMessageBuilder.buildMessage(percentageEstimates);
 
@@ -71,34 +78,34 @@ public class BeatmapMeta {
 
         estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(mods));
 
-        Double starDiff = null;
-        if (mods == 0) {
-            starDiff = beatmap.getStarDifficulty();
-        } else {
-            starDiff = estimates.getStarDiff();
-        }
-        if (starDiff != null) {
-            estimateMessage += " ★ " + format.format(starDiff);
-        }
+		Double starDiff = null;
+		if (mods == 0) {
+			starDiff = beatmap.getStarDifficulty();
+		} else {
+			starDiff = estimates.getStarDiff();
+		}
+		if (starDiff != null) {
+			estimateMessage += " ★ " + format.format(starDiff);
+		}
 
-        estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(mods));
-        estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(mods));
-        estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(mods));
+		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(mods));
+		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(mods));
+		estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(mods));
+		
+		if (estimates.isOppaiOnly()) {
+			estimateMessage += " (";
+			if (!estimates.isRanked()) {
+				estimateMessage += "unranked; ";
+			}
+			estimateMessage += "all [https://github.com/Francesco149/oppai oppai])";
+		}
 
-        if (estimates.isOppaiOnly()) {
-            estimateMessage += " (";
-            if (!estimates.isRanked()) {
-                estimateMessage += "unranked; ";
-            }
-            estimateMessage += "all [https://github.com/Francesco149/oppai oppai])";
-        }
+		String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
 
-        String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
+		return beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : "") + heartString;
+	}
 
-        return beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : "") + heartString;
-    }
-
-    public static String secondsToMinuteColonSecond(int length) {
+	public static String secondsToMinuteColonSecond(int length) {
 		return length / 60 + ":" + StringUtils.leftPad(String.valueOf(length % 60), 2, '0');
 	}
 	

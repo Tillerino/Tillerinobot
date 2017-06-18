@@ -63,7 +63,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             int count = 0;
             for (Highscore newHighscore : newHighscores) {
                 if (count <= 2) {
-                    highscoreMessageBuilder.append(String.format("[https://osu.ppy.sh/b/%d #%d]: %1.2fpp; ",
+                    highscoreMessageBuilder.append(String.format(Locale.US, "[https://osu.ppy.sh/b/%d #%d]: %1.2fpp; ",
                             newHighscore.getBeatmapId(),
                             newHighscore.getRanking() + 1,
                             newHighscore.getPp()

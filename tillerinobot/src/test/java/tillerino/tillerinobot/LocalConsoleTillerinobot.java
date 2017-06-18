@@ -81,6 +81,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
+		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
+				.toInstance(Executors.newSingleThreadExecutor(r -> { Thread thread = new Thread(r); thread.setDaemon(true); return thread; }));
 	}
 
 	@Provides
