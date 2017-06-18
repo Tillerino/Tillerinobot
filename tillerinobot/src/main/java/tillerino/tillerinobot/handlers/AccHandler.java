@@ -47,17 +47,17 @@ public class AccHandler implements CommandHandler {
 		if (lastSongInfo == null) {
 			throw new UserException(lang.noLastSongInfo());
 		}
+		BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
+		if (beatmap == null) {
+			throw new RareUserException(lang.excuseForError());
+		}
+
 		message = message.substring(3).trim().replace(',', '.');
 		Matcher extendedMatcher = extended.matcher(message);
 		if(extendedMatcher.matches()) {
 			double acc = parseAcc(extendedMatcher.group(1), lang);
 			int combo = parseInt(extendedMatcher.group(2), lang);
 			int misses = parseInt(extendedMatcher.group(3), lang);
-
-			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
-			if (beatmap == null) {
-				throw new RareUserException(lang.excuseForError());
-			}
 			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
 		} else if((extendedMatcher = superExtended.matcher(message)).matches()) {
 			// we're now in superExtended matching, aka drop % and add x100 and x50
@@ -66,22 +66,12 @@ public class AccHandler implements CommandHandler {
 			int x50 = group2 == null ? 0 : parseInt(group2, lang);
 			int combo = parseInt(extendedMatcher.group(3), lang);
 			int misses = parseInt(extendedMatcher.group(4), lang);
-
-			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
-			if (beatmap == null) {
-				throw new RareUserException(lang.excuseForError());
-			}
-
 			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), x100, x50, combo, misses));
 		} else {
 			if(message.endsWith("%")) {
 				message = message.substring(0, message.length() - 1);
 			}
 			double acc = parseAcc(message, lang);
-			BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), lastSongInfo.getMods(), lang);
-			if (beatmap == null) {
-				throw new RareUserException(lang.excuseForError());
-			}
 			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, null, null));
 		}
 	}
