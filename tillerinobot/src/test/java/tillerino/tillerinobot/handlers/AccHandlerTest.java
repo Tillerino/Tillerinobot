@@ -58,8 +58,11 @@ public class AccHandlerTest {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(new Default());
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
+
+		BotBackend backend = mock(BotBackend.class);
+		when(backend.loadBeatmap(anyInt(), anyLong(), any())).thenReturn(new BeatmapMeta(null, null, null));
 		try {
-			new AccHandler(null).handle("acc 99 80000000000000000000x 1m", null, userData);
+			new AccHandler(backend).handle("acc 99 80000000000000000000x 1m", null, userData);
 			fail();
 		} catch (Exception e) {
 			assertThat(e.getMessage(), new Contains("800000000000"));
