@@ -114,7 +114,7 @@ public class BeatmapInfoService {
 					info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
 				}
 			} else {
-				for (double acc : requestedAccs}) {
+				for (double acc : requestedAccs) {
 					info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
 				}
 			}
