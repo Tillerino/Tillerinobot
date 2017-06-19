@@ -90,7 +90,7 @@ public class BeatmapInfoService {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("acc") Double requestedAcc, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
+	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("acc") Double[] requestedAccs, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
 		BotAPIServer.throwUnautorized(backend.verifyGeneralKey(key));
 		
 		mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
@@ -114,7 +114,9 @@ public class BeatmapInfoService {
 					info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
 				}
 			} else {
-				info.ppForAcc.put(requestedAcc, estimates.getPPForAcc(requestedAcc));
+				for (double acc : requestedAccs}) {
+					info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
+				}
 			}
 			
 			return info;
