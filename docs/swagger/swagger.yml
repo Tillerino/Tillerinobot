@@ -40,6 +40,14 @@ paths:
           schema:
             type: integer
         - in: query
+          name: acc
+          description: >-
+            Custom accuracy value, number between 0 and 1.
+            When provided the response will only contain the pp for this accuracy value!
+          required: false
+          schema:
+            type: double
+        - in: query
           name: wait
           description: >-
             maximum time to wait for computation of the result. Usually, the
