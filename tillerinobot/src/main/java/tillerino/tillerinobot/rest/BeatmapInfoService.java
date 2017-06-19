@@ -90,7 +90,7 @@ public class BeatmapInfoService {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
+	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("acc") Double requestedAcc, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
 		BotAPIServer.throwUnautorized(backend.verifyGeneralKey(key));
 		
 		mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
@@ -109,8 +109,12 @@ public class BeatmapInfoService {
 			info.oppaiOnly = estimates.isOppaiOnly();
 			info.starDiff = estimates.getStarDiff();
 
-			for (double acc : new double[] { 1, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75 }) {
-				info.ppForAcc.put(acc, estimates.getPP(acc));
+			if(requestedAcc == null) {
+				for (double acc : new double[]{1, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75}) {
+					info.ppForAcc.put(acc, estimates.getPP(acc));
+				}
+			} else {
+				info.ppForAcc.put(requestedAcc, estimates.getPP(requestedAcc));
 			}
 			
 			return info;
