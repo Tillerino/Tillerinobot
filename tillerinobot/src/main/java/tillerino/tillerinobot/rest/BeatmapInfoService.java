@@ -1,6 +1,8 @@
 package tillerino.tillerinobot.rest;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
@@ -90,11 +92,11 @@ public class BeatmapInfoService {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("acc") Double[] requestedAccs, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
+	public BeatmapInfo getBeatmapInfo(@QueryParam("k") String key, @QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("acc") List<Double> requestedAccs, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
 		BotAPIServer.throwUnautorized(backend.verifyGeneralKey(key));
 		
 		mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
-		
+
 		BeatmapMeta beatmapMeta;
 
 		try {
@@ -109,16 +111,14 @@ public class BeatmapInfoService {
 			info.oppaiOnly = estimates.isOppaiOnly();
 			info.starDiff = estimates.getStarDiff();
 
-			if(requestedAccs == null) {
-				for (double acc : new double[]{1, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75}) {
-					info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
-				}
-			} else {
-				for (double acc : requestedAccs) {
-					info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
-				}
+			if(requestedAccs.isEmpty()) {
+				requestedAccs.addAll(Arrays.asList(1.0, .995, .99, .985, .98, .975, .97, .96, .95, .93, .9, .85, .8, .75));
 			}
-			
+
+			for (double acc : requestedAccs) {
+				info.ppForAcc.put(acc, estimates.getPPForAcc(acc));
+			}
+
 			return info;
 		} catch (InterruptedException e) {
 			throw BotAPIServer.getInterrupted();
