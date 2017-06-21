@@ -1,5 +1,6 @@
 package tillerino.tillerinobot;
 
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -40,6 +41,8 @@ import org.pircbotx.output.OutputUser;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.rest.BeatmapResource;
+import tillerino.tillerinobot.rest.BeatmapsService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -83,6 +86,19 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				true);
 		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
 				.toInstance(Executors.newSingleThreadExecutor(r -> { Thread thread = new Thread(r); thread.setDaemon(true); return thread; }));
+	}
+
+	@Provides
+	@Singleton
+	public BeatmapsService getBeatmapsService(BotBackend backend) {
+		BeatmapsService beatService = mock(BeatmapsService.class);
+		when(beatService.byId(anyInt())).thenAnswer(req -> {
+			BeatmapResource res = mock(BeatmapResource.class);
+			doAnswer(x -> backend.getBeatmap((Integer) req.getArguments()[0])).when(res).get();
+			doAnswer(x -> { System.out.println("Beatmap uploaded: " + x.getArguments()[0]); return null; }).when(res).setFile(anyString());
+			return res;
+		});
+		return beatService;
 	}
 
 	@Provides

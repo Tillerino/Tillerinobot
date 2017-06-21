@@ -110,6 +110,133 @@ paths:
           description: User not found.
         '502':
           $ref: '#/responses/upstream'
+  '/beatmaps/byHash/{hash}':
+    get:
+      tags:
+        - public
+      summary: Get a beatmap object
+      description: ''
+      operationId: getBeatmapByHash
+      produces:
+        - application/json
+      parameters:
+        - name: hash
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - api_key: []
+  '/beatmaps/byHash/{hash}/file':
+    get:
+      tags:
+        - public
+      summary: Get a beatmap file
+      description: ''
+      operationId: getBeatmapFileByHash
+      produces:
+        - text/plain
+      parameters:
+        - name: hash
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: string
+      security:
+        - api_key: []
+    put:
+      tags:
+        - public
+      summary: Update a beatmap file
+      description: ''
+      operationId: setBeatmapFileByHash
+      consumes:
+        - text/plain
+      produces:
+        - application/json
+      parameters:
+        - name: hash
+          in: path
+          required: true
+          type: string
+      responses:
+        '204':
+          description: Beatmap file saved
+        '403':
+          description: The supplied beatmap file did not have the required hash value
+      security:
+        - api_key: []
+  '/beatmaps/byId/{id}':
+    get:
+      tags:
+        - public
+      summary: Get a beatmap object
+      description: ''
+      operationId: getBeatmapById
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - api_key: []
+  '/beatmaps/byId/{id}/file':
+    get:
+      tags:
+        - public
+      summary: Get a beatmap file
+      description: ''
+      operationId: getBeatmapFileById
+      produces:
+        - text/plain
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: string
+      security:
+        - api_key: []
+    put:
+      tags:
+        - public
+      summary: Update a beatmap file
+      description: ''
+      operationId: setBeatmapFileById
+      consumes:
+        - text/plain
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Beatmap file saved
+        '403':
+          description: The supplied beatmap file did not have the required hash value
+      security:
+        - api_key: []
 securityDefinitions:
   api_key:
     type: apiKey

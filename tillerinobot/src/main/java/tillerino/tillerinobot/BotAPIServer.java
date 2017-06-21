@@ -14,7 +14,9 @@ import javax.ws.rs.core.Response.Status;
 import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
 import tillerino.tillerinobot.rest.AuthenticationFilter;
 import tillerino.tillerinobot.rest.BeatmapInfoService;
+import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotInfoService;
+import tillerino.tillerinobot.rest.DelegatingBeatmapsService;
 import tillerino.tillerinobot.rest.PrintMessageExceptionMapper;
 import tillerino.tillerinobot.rest.UserByIdService;
 
@@ -26,7 +28,7 @@ public class BotAPIServer extends Application {
 
 	@Inject
 	public BotAPIServer(BotInfoService botInfo, BeatmapInfoService beatmapInfo,
-			UserByIdService userById, EntityManagerProxyFeature proxyFeature,
+			UserByIdService userById, EntityManagerProxyFeature proxyFeature, BeatmapsService beatmaps,
 			AuthenticationFilter authentication) {
 		super();
 
@@ -34,6 +36,7 @@ public class BotAPIServer extends Application {
 		resourceInstances.add(beatmapInfo);
 		resourceInstances.add(userById);
 		resourceInstances.add(proxyFeature);
+		resourceInstances.add(new DelegatingBeatmapsService(beatmaps));
 		resourceInstances.add(authentication);
 	}
 
