@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -48,12 +50,20 @@ import tillerino.tillerinobot.lang.Default;
 public class BeatmapInfoService {
 	private BotBackend backend;
 
+	private final ExecutorService executorService;
+	{
+		ThreadPoolExecutor tpe = new ThreadPoolExecutor(2, 2,
+				5L, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>());
+		tpe.allowCoreThreadTimeOut(true);
+		executorService = tpe;
+	}
+
 	@Inject
 	public BeatmapInfoService(BotBackend server) {
 		this.backend = server;
 	}
 
-	ExecutorService executorService = Executors.newFixedThreadPool(2);
 	
 	LoadingCache<BeatmapWithMods, Future<BeatmapMeta>> cache = CacheBuilder
 			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).softValues()
