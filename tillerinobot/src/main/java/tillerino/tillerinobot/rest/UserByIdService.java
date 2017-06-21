@@ -11,28 +11,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import lombok.RequiredArgsConstructor;
-
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BotAPIServer;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IrcNameResolver;
 
 @Singleton
 @Path("/userbyid")
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UserByIdService {
-    private final BotBackend backend;
-
     private final IrcNameResolver resolver;
 
+    @KeyRequired
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public OsuApiUser getUserById(@QueryParam("k") String key,
-            @QueryParam("id") @UserId int id) throws SQLException {
-        BotAPIServer.throwUnautorized(backend.verifyGeneralKey(key));
+    public OsuApiUser getUserById(@QueryParam("id") @UserId int id) throws SQLException {
         try {
             OsuApiUser user = resolver.resolveManually(id);
             if (user == null) {

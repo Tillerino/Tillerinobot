@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
+import tillerino.tillerinobot.rest.AuthenticationFilter;
 import tillerino.tillerinobot.rest.BeatmapInfoService;
 import tillerino.tillerinobot.rest.BotInfoService;
 import tillerino.tillerinobot.rest.UserByIdService;
@@ -23,13 +24,15 @@ public class BotAPIServer extends Application {
 
 	@Inject
 	public BotAPIServer(BotInfoService botInfo, BeatmapInfoService beatmapInfo,
-			UserByIdService userById, EntityManagerProxyFeature proxyFeature) {
+			UserByIdService userById, EntityManagerProxyFeature proxyFeature,
+			AuthenticationFilter authentication) {
 		super();
 
 		resourceInstances.add(botInfo);
 		resourceInstances.add(beatmapInfo);
 		resourceInstances.add(userById);
 		resourceInstances.add(proxyFeature);
+		resourceInstances.add(authentication);
 	}
 
 	@Override
@@ -37,13 +40,6 @@ public class BotAPIServer extends Application {
 		return resourceInstances;
 	}
 
-	public static void throwUnautorized(boolean authorized) throws WebApplicationException {
-		if(authorized)
-			return;
-		
-		throw exceptionFor(Status.UNAUTHORIZED, "Your key is not authorized for this method.");
-	}
-	
 	public static WebApplicationException getBadGateway(IOException e) {
 		return exceptionFor(Status.fromStatusCode(502), e != null ? e.getMessage() : "Communication with the osu API server failed.");
 	}
