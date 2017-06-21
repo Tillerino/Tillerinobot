@@ -1,6 +1,7 @@
 package tillerino.tillerinobot;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
 import tillerino.tillerinobot.rest.AuthenticationFilter;
 import tillerino.tillerinobot.rest.BeatmapInfoService;
 import tillerino.tillerinobot.rest.BotInfoService;
+import tillerino.tillerinobot.rest.PrintMessageExceptionMapper;
 import tillerino.tillerinobot.rest.UserByIdService;
 
 /**
@@ -38,6 +40,11 @@ public class BotAPIServer extends Application {
 	@Override
 	public Set<Object> getSingletons() {
 		return resourceInstances;
+	}
+
+	@Override
+	public Set<Class<?>> getClasses() {
+		return Collections.singleton(PrintMessageExceptionMapper.class);
 	}
 
 	public static WebApplicationException getBadGateway(IOException e) {
