@@ -2,6 +2,7 @@ package tillerino.tillerinobot.data.util;
 
 import java.io.IOException;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -16,9 +17,12 @@ import lombok.RequiredArgsConstructor;
 
 @AllArgsConstructor(onConstructor = @__(@Inject))
 public class EntityManagerProxyFeature implements Feature {
+	private static final String EMKEY = "A thread-local entity manager was set";
+
 	private final SetEntityManagerProxy set;
 	private final CloseEntityManagerProxy close;
 
+	@Priority(0)
 	@RequiredArgsConstructor(onConstructor = @__(@Inject))
 	public static class SetEntityManagerProxy implements ContainerRequestFilter {
 		private final EntityManagerFactory emf;
@@ -27,11 +31,12 @@ public class EntityManagerProxyFeature implements Feature {
 		@Override
 		public void filter(ContainerRequestContext requestContext)
 				throws IOException {
-			System.out.println("AAAAAAAAAAHHHHHHHHHH");
 			em.setThreadLocalEntityManager(emf.createEntityManager());
+			requestContext.setProperty(EMKEY, true);
 		}
 	}
 
+	@Priority(0)
 	@RequiredArgsConstructor(onConstructor = @__(@Inject))
 	public static class CloseEntityManagerProxy implements
 			ContainerResponseFilter {
@@ -40,7 +45,9 @@ public class EntityManagerProxyFeature implements Feature {
 		@Override
 		public void filter(ContainerRequestContext requestContext,
 				ContainerResponseContext responseContext) throws IOException {
-			em.close();
+			if (requestContext.getProperty(EMKEY) != null) {
+				em.close();
+			}
 		}
 	}
 
