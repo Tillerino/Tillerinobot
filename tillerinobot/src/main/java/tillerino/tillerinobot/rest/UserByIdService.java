@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -31,7 +32,7 @@ public class UserByIdService {
         try {
             OsuApiUser user = resolver.resolveManually(id);
             if (user == null) {
-                throw BotAPIServer.getNotFound("user with that id does not exist");
+                throw new NotFoundException("user with that id does not exist");
             } else {
                 return user;
             }

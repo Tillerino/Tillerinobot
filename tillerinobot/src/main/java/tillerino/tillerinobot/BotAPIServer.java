@@ -48,23 +48,11 @@ public class BotAPIServer extends Application {
 	}
 
 	public static WebApplicationException getBadGateway(IOException e) {
-		return exceptionFor(Status.fromStatusCode(502), e != null ? e.getMessage() : "Communication with the osu API server failed.");
+		return new WebApplicationException(e != null ? e.getMessage() : "Communication with the osu API server failed.", Status.fromStatusCode(502));
 	}
 	
-	public static WebApplicationException getNotFound(String message) {
-		return exceptionFor(Status.NOT_FOUND, message);
-	}
-
-	public static WebApplicationException getUserMessage(UserException exception) {
-		return getNotFound(exception.getMessage());
-	}
-
-	public static WebApplicationException exceptionFor(Status status, String message) {
-		return new WebApplicationException(Response.status(status).entity(message).build());
-	}
-
 	public static WebApplicationException getInterrupted() {
-		return exceptionFor(Status.SERVICE_UNAVAILABLE, "The server is being shutdown for maintenance");
+		return new WebApplicationException("The server is being shutdown for maintenance", Status.SERVICE_UNAVAILABLE);
 	}
 	
 	public static Throwable refreshWebApplicationException(Throwable t) {

@@ -17,9 +17,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -67,14 +69,14 @@ public class BeatmapInfoService {
 										new Default());
 								
 								if(beatmap == null) {
-									throw BotAPIServer.getNotFound("Beatmap " + key.getBeatmap() + " not found.");
+									throw new NotFoundException("Beatmap " + key.getBeatmap() + " not found.");
 								}
 								
 								return beatmap;
 							} catch (IOException e) {
 								throw BotAPIServer.getBadGateway(null);
 							} catch (UserException e) {
-								throw BotAPIServer.getUserMessage(e);
+								throw new NotFoundException(e.getMessage());
 							}
 						}
 					});
@@ -124,7 +126,7 @@ public class BeatmapInfoService {
 		} catch (ExecutionException e) {
 			throw BotAPIServer.refreshWebApplicationException(e.getCause());
 		} catch (TimeoutException e) {
-			throw BotAPIServer.exceptionFor(Status.ACCEPTED, "The request is being processed. Please try again in a few moments.");
+			throw new WebApplicationException("The request is being processed. Please try again in a few moments.", Status.ACCEPTED);
 		}
 	}
 }
