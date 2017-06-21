@@ -43,7 +43,8 @@ paths:
           name: acc
           description: >-
             Custom accuracy value, number between 0 and 1.
-            When provided the response will only contain the pp for this accuracy value!
+            When provided the response will only contain the pp for this accuracy value.
+            Repeat the parameter for multiple values.
           required: false
           schema:
             type: double
