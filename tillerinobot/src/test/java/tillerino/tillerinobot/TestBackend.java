@@ -264,7 +264,7 @@ public class TestBackend implements BotBackend {
 		for (int i : setIds.keySet()) {
 			for(long m : mods) {
 				BeatmapMeta meta = loadBeatmap(i, m, null);
-				if(Math.abs(1 - ((PercentageEstimates) meta.getEstimates()).getPPForAcc(.98) / equivalent) < .15) {
+				if(Math.abs(1 - ((PercentageEstimates) meta.getEstimates()).getPP(.98) / equivalent) < .15) {
 					maps.add(meta);
 				}
 			}
@@ -275,12 +275,12 @@ public class TestBackend implements BotBackend {
 			recommendations.add(new BareRecommendation() {
 				@Override
 				public double getProbability() {
-					return .15 - Math.abs(1 - est.getPPForAcc(.98) / equivalent);
+					return .15 - Math.abs(1 - est.getPP(.98) / equivalent);
 				}
 				
 				@Override
 				public Integer getPersonalPP() {
-					return (int) Math.ceil((est.getPPForAcc(.98) + equivalent) / 2);
+					return (int) Math.ceil((est.getPP(.98) + equivalent) / 2);
 				}
 				
 				@Override

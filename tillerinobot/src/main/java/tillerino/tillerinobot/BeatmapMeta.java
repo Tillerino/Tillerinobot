@@ -1,21 +1,19 @@
 package tillerino.tillerinobot;
 
-import static java.lang.String.format;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import org.tillerino.osuApiModel.Mods;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.types.BitwiseMods;
+import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-import org.apache.commons.lang3.StringUtils;
-import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.osuApiModel.types.BitwiseMods;
-
-import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.diff.PercentageEstimates;
+import static java.lang.String.format;
 
 @Data
 @AllArgsConstructor
@@ -31,6 +29,14 @@ public class BeatmapMeta {
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#", new DecimalFormatSymbols(Locale.US));
 
 	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) throws UserException {
+		return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(acc, combo, misses));
+	}
+
+	public String formInfoMessage(boolean formLink, String addition, int hearts, int x100, int x50, int combo, int misses) throws UserException {
+		return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(x100, x50, combo, misses));
+	}
+
+	public String formInfoMessage(boolean formLink, String addition, int hearts, PpMessageBuilder ppMessageBuilder) throws UserException {
 		if (beatmap.getMaxCombo() <= 0) {
 			// This is kind of an awkward place to warn about this, but we don't want to be throwing UserExceptions from the backend.
 			throw new UserException(
@@ -64,25 +70,13 @@ public class BeatmapMeta {
 			estimateMessage += "future you: " + future + "pp | ";
 		}
 
-		if (acc != null) {
-			estimateMessage += format.format(acc * 100) + "%";
-			if(combo != null && misses != null) {
-				estimateMessage += " " + combo + "x " + misses + "miss";
-				estimateMessage += ": " + noDecimalsFormat.format(percentageEstimates.getPP(acc, combo, misses)) + "pp";
-			} else {
-				estimateMessage += ": " + noDecimalsFormat.format(getPpForAcc(acc)) + "pp";
-			}
-		} else {
-			estimateMessage += "95%: " + noDecimalsFormat.format(getPpForAcc(.95)) + "pp";
-			estimateMessage += " | 98%: " + noDecimalsFormat.format(getPpForAcc(.98)) + "pp";
-			estimateMessage += " | 99%: " + noDecimalsFormat.format(getPpForAcc(.99)) + "pp";
-			estimateMessage += " | 100%: " + noDecimalsFormat.format(getPpForAcc(1)) + "pp";
-		}
-		if (percentageEstimates.isShaky()) {
-			estimateMessage += " (rough estimates)";
-		}
-		
-		estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(mods));
+        estimateMessage += ppMessageBuilder.buildMessage(percentageEstimates);
+
+        if (percentageEstimates.isShaky()) {
+            estimateMessage += " (rough estimates)";
+        }
+
+        estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(mods));
 
 		Double starDiff = null;
 		if (mods == 0) {
@@ -129,6 +123,86 @@ public class BeatmapMeta {
 	}
 
 	double getPpForAcc(double acc) {
-		return getEstimates().getPPForAcc(acc);
+		return getEstimates().getPP(acc);
 	}
+
+	public interface PpMessageBuilder {
+	    String buildMessage(PercentageEstimates estimates);
+
+        static PpMessageBuilder getFor(Double acc, Integer combo, Integer misses) {
+            if(acc == null) {
+                return new DefaultPpMessageBuilder();
+            }
+            if(combo == null || misses == null) {
+                return new AccPpMessageBuilder(acc);
+            }
+            return new AccComboMissesPpMessageBuilder(acc, combo, misses);
+        }
+
+        static PpMessageBuilder getFor(int x100, int x50, int combo, int misses) {
+            return new HitPointsComboMissesPpMessageBuilder(x100, x50, combo, misses);
+        }
+    }
+
+    public static class DefaultPpMessageBuilder implements PpMessageBuilder {
+        @Override
+        public String buildMessage(PercentageEstimates estimates) {
+            return "95%: " + noDecimalsFormat.format(estimates.getPP(.95)) + "pp" +
+                    " | 98%: " + noDecimalsFormat.format(estimates.getPP(.98)) + "pp" +
+                    " | 99%: " + noDecimalsFormat.format(estimates.getPP(.99)) + "pp" +
+                    " | 100%: " + noDecimalsFormat.format(estimates.getPP(1)) + "pp";
+        }
+    }
+
+    public static class AccPpMessageBuilder implements PpMessageBuilder {
+	    private final double acc;
+
+        public AccPpMessageBuilder(double acc) {
+            this.acc = acc;
+        }
+
+        @Override
+        public String buildMessage(PercentageEstimates estimates) {
+            return format.format(acc * 100) + "%: " +
+                    noDecimalsFormat.format(estimates.getPP(acc)) + "pp";
+        }
+    }
+
+    public static class AccComboMissesPpMessageBuilder implements PpMessageBuilder {
+	    private final double acc;
+        private final int combo;
+        private final int misses;
+
+        public AccComboMissesPpMessageBuilder(double acc, int combo, int misses) {
+            this.acc = acc;
+            this.combo = combo;
+            this.misses = misses;
+        }
+
+        @Override
+        public String buildMessage(PercentageEstimates estimates) {
+            return format.format(acc * 100) + "% " + combo + "x " + misses + "miss: " +
+                    noDecimalsFormat.format(estimates.getPP(acc, combo, misses)) + "pp";
+        }
+    }
+
+    public static class HitPointsComboMissesPpMessageBuilder implements PpMessageBuilder {
+	    private final int x100;
+        private final int x50;
+        private final int combo;
+        private final int misses;
+
+        public HitPointsComboMissesPpMessageBuilder(int x100, int x50, int combo, int misses) {
+            this.x100 = x100;
+            this.x50 = x50;
+            this.combo = combo;
+            this.misses = misses;
+        }
+
+        @Override
+        public String buildMessage(PercentageEstimates estimates) {
+            return x100 + "x100 " + x50 + "x50 " + combo + "x " + misses + "miss: " +
+                    noDecimalsFormat.format(estimates.getPP(x100, x50, combo, misses)) + "pp";
+        }
+    }
 }

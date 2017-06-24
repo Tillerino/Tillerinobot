@@ -1,8 +1,8 @@
 package tillerino.tillerinobot.diff;
 
-import javax.annotation.CheckForNull;
-
 import org.tillerino.osuApiModel.types.BitwiseMods;
+
+import javax.annotation.CheckForNull;
 
 /**
  * Provides pp values for a beatmap played with a specified mod.
@@ -10,9 +10,11 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
  * that the value is estimated although the value is usually quite accurate.
  */
 public interface PercentageEstimates {
-	public double getPPForAcc(double acc);
+	public double getPP(double acc);
 
 	public double getPP(double acc, int combo, int misses);
+
+	public double getPP(int x100, int x50, int combo, int misses);
 
 	@BitwiseMods
 	long getMods();

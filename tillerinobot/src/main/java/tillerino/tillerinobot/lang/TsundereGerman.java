@@ -257,9 +257,9 @@ public class TsundereGerman extends TsundereBase {
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20.0);
-		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
+		if (estimates.getPP(.95) / typicalPP > 2.0) {
 			return new Message("Ist das dein Ernst!? Wenn dich diese Map nicht umbringt, werde ich es machen.");
-		} else if (estimates.getPPForAcc(1) / typicalPP < 0.333) {
+		} else if (estimates.getPP(1) / typicalPP < 0.333) {
 			return new Message("Diese Map zu spielen wird mich nicht sonderlich beeindrucken... n-n-nicht dass ich das wollen würde.");
 		}
 		return new NoResponse();
@@ -273,9 +273,9 @@ public class TsundereGerman extends TsundereBase {
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20);
-		if (estimates.getPPForAcc(.95) / typicalPP > 2.0) {
+		if (estimates.getPP(.95) / typicalPP > 2.0) {
 			return new Message("Idiot! Du wirst dich noch verletzen wenn du diese Mods benutzt!");
-		} else if (estimates.getPPForAcc(1) / typicalPP < 0.5) {
+		} else if (estimates.getPP(1) / typicalPP < 0.5) {
 			return new Message("Wenn du wie ein Baby behandelt werden willst, hättest du einfach fragen müssen... Nein, fang einfach an zu spielen.");
 		}
 		return new NoResponse();
