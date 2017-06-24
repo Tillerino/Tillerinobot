@@ -31,15 +31,14 @@ import org.tillerino.ppaddict.shared.BeatmapRangeRequest.Sort;
 import org.tillerino.ppaddict.shared.PpaddictException;
 import org.tillerino.ppaddict.shared.Settings;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.PercentageEstimates;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * The server-side implementation of the RPC service.
@@ -106,9 +105,8 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
       commentSearchNeedle = null;
     }
 
-    boolean useRangeFilters =
-        (textSearchNeedle == null && commentSearchNeedle == null)
-            || (settings.isApplyOtherFiltersWithTextFilter());
+    boolean useRangeFilters = (textSearchNeedle == null && commentSearchNeedle == null)
+        || (settings.isApplyOtherFiltersWithTextFilter());
 
     Collection<BeatmapData> selection = new ArrayList<>();
 
@@ -129,9 +127,8 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
        * search in name
        */
       if (textSearchNeedle != null) {
-        String longTitle =
-            apiBeatmap.getArtist() + " - " + apiBeatmap.getTitle() + " [" + apiBeatmap.getVersion()
-                + "]";
+        String longTitle = apiBeatmap.getArtist() + " - " + apiBeatmap.getTitle() + " ["
+            + apiBeatmap.getVersion() + "]";
         if (!longTitle.toLowerCase().contains(textSearchNeedle)) {
           continue;
         }
@@ -182,19 +179,19 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
           continue;
         }
         if (request.perfectPP.min != null
-            && (estimate.getPPForAcc(settings.getHighAccuracy() / 100d) < request.perfectPP.min)) {
+            && (estimate.getPP(settings.getHighAccuracy() / 100d) < request.perfectPP.min)) {
           continue;
         }
         if (request.perfectPP.max != null
-            && (estimate.getPPForAcc(settings.getHighAccuracy() / 100d) > request.perfectPP.max)) {
+            && (estimate.getPP(settings.getHighAccuracy() / 100d) > request.perfectPP.max)) {
           continue;
         }
         if (request.expectedPP.min != null
-            && estimate.getPPForAcc(settings.getLowAccuracy() / 100d) < request.expectedPP.min) {
+            && estimate.getPP(settings.getLowAccuracy() / 100d) < request.expectedPP.min) {
           continue;
         }
         if (request.expectedPP.max != null
-            && estimate.getPPForAcc(settings.getLowAccuracy() / 100d) > request.expectedPP.max) {
+            && estimate.getPP(settings.getLowAccuracy() / 100d) > request.expectedPP.max) {
           continue;
         }
         if (request.bpm.min != null && apiBeatmap.getBpm(estimate.getMods()) < request.bpm.min) {
@@ -298,9 +295,9 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     beatmap.beatmapid = apiBeatmap.getBeatmapId();
     beatmap.bpm = apiBeatmap.getBpm(mods);
     beatmap.circleSize = apiBeatmap.getCircleSize(mods);
-    beatmap.lowPP = estimates.getPPForAcc(settings.getLowAccuracy() / 100);
+    beatmap.lowPP = estimates.getPP(settings.getLowAccuracy() / 100);
     beatmap.length = apiBeatmap.getTotalLength(mods);
-    beatmap.highPP = estimates.getPPForAcc(settings.getHighAccuracy() / 100);
+    beatmap.highPP = estimates.getPP(settings.getHighAccuracy() / 100);
     if (userData != null) {
       Comment comment = userData.getBeatMapComment(beatmap.beatmapid, mods);
       if (comment != null) {
@@ -384,7 +381,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         comparator = new ToDoubleFunction<BeatmapData>() {
           @Override
           public double applyAsDouble(BeatmapData value) {
-            return value.getEstimates().getPPForAcc(settings.getLowAccuracy() / 100);
+            return value.getEstimates().getPP(settings.getLowAccuracy() / 100);
           }
         };
         break;
@@ -392,7 +389,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         comparator = new ToDoubleFunction<BeatmapData>() {
           @Override
           public double applyAsDouble(BeatmapData value) {
-            return value.getEstimates().getPPForAcc(settings.getHighAccuracy() / 100);
+            return value.getEstimates().getPP(settings.getHighAccuracy() / 100);
           }
         };
         break;
@@ -429,8 +426,8 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
   public static Beatmap fromRecord(CSVRecord record) {
     if (record.size() != 12) {
-      throw new RuntimeException("unexpected line length: " + record.size() + " in record "
-          + record.getRecordNumber());
+      throw new RuntimeException(
+          "unexpected line length: " + record.size() + " in record " + record.getRecordNumber());
     }
     Beatmap b = new Beatmap();
     b.title = record.get("Title");
