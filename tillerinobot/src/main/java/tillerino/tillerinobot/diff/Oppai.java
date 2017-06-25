@@ -65,7 +65,7 @@ public class Oppai {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		executor.setStreamHandler(new PumpStreamHandler(baos, baos, byis));
 		try {
-			CommandLine command = new CommandLine("oppai").addArgument("-").addArgument("-ojson");
+			CommandLine command = new CommandLine("oppai").addArgument("-").addArgument("-ojson").addArgument("-no-cache");
 			if (!mods.isEmpty()) {
 				command = command.addArgument("+" + Mods.toShortNamesContinuous(mods));
 			}
