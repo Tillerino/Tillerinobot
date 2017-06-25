@@ -78,8 +78,8 @@ public class Oppai {
 		}
 		try {
 			return new Gson().fromJson(baos.toString("UTF-8"), OppaiResults.class);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new RuntimeException("Error running Oppai: " + baos.toString("UTF-8"), e);
 		}
 	}
 }
