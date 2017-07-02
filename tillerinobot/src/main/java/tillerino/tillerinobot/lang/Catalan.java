@@ -19,7 +19,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Underforest https://osu.ppy.sh/u/6753180
  */
-public class Default implements Language {
+public class Catalan implements Language {
 	static final Random rnd = new Random();
 
 	@Override
