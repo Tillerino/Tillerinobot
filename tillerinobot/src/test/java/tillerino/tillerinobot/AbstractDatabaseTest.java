@@ -11,6 +11,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
+import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
@@ -46,6 +47,7 @@ public class AbstractDatabaseTest {
 	protected static UserNameMappingRepository userNameMappingRepo;
 	protected static GivenRecommendationRepository recommendationsRepo;
 	protected static BotUserDataRepository userDataRepository;
+	protected static ActualBeatmapRepository beatmapFilesRepo;
 	
 	@BeforeClass
 	public static void injectAll() {
@@ -58,6 +60,7 @@ public class AbstractDatabaseTest {
 		userNameMappingRepo = injector.getInstance(UserNameMappingRepository.class);
 		recommendationsRepo = injector.getInstance(GivenRecommendationRepository.class);
 		userDataRepository = injector.getInstance(BotUserDataRepository.class);
+		beatmapFilesRepo = injector.getInstance(ActualBeatmapRepository.class);
 	}
 	
 	@AfterClass

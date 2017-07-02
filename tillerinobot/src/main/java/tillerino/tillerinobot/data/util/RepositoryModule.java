@@ -6,6 +6,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 
+import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
@@ -24,6 +25,7 @@ public class RepositoryModule extends AbstractModule {
 	private UserNameMappingRepository userNameRepo;
 	private GivenRecommendationRepository recRepo;
 	private BotUserDataRepository userDataRepo;
+	private ActualBeatmapRepository beatmapFilesRepo;
 
 	@Provides
 	@Singleton
@@ -47,6 +49,7 @@ public class RepositoryModule extends AbstractModule {
 		userNameRepo = factory.getRepository(UserNameMappingRepository.class);
 		recRepo = factory.getRepository(GivenRecommendationRepository.class);
 		userDataRepo = factory.getRepository(BotUserDataRepository.class);
+		beatmapFilesRepo = factory.getRepository(ActualBeatmapRepository.class);
 	}
 
 	@Provides
@@ -65,5 +68,11 @@ public class RepositoryModule extends AbstractModule {
 	@Singleton
 	public BotUserDataRepository userDataRepo(JpaRepositoryFactory factory) {
 		return userDataRepo;
+	}
+
+	@Provides
+	@Singleton
+	public ActualBeatmapRepository beatmapsRepository(JpaRepositoryFactory factory) {
+		return beatmapFilesRepo;
 	}
 }

@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
+import javax.ws.rs.WebApplicationException;
 
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -297,7 +298,7 @@ public class IRCBot extends CoreHooks {
 				} else {
 					String string = logException(e, log);
 	
-					if (e instanceof IOException) {
+					if ((e instanceof IOException) || isExternalException(e)) {
 						user.message(lang.externalException(string), false);
 					} else {
 						user.message(lang.internalException(string), false);
@@ -307,6 +308,23 @@ public class IRCBot extends CoreHooks {
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
 		}
+	}
+
+	/**
+	 * Checks if this is a JAX-RS exception that would have been thrown because
+	 * an external osu resource is not available.
+	 */
+	public static boolean isExternalException(Throwable e) {
+		if (!(e instanceof WebApplicationException)) {
+			return false;
+		}
+		int code = ((WebApplicationException) e).getResponse().getStatus();
+		/*
+		 * 502 = Bad Gateway
+		 * 504 = Gateway timeout
+		 * 520 - 527 = Cloudflare, used by osu's web endpoints
+		 */
+		return code == 502 || code == 504 || (code >= 520 && code <= 527);
 	}
 
 	public static boolean isTimeout(Throwable e) {
