@@ -30,7 +30,7 @@ public class Catalan implements Language {
 	@Override
 	public String internalException(String marker) {
 		return "Ugh... Sembla que Tillerino humà va espatllar meu cablejat."
-				+ " Si no s'adona aviat, pots  [https://github.com/Tillerino/Tillerinobot/wiki/Contact informar]? (referència "
+				+ " Si no s'adona aviat, pots [https://github.com/Tillerino/Tillerinobot/wiki/Contact informar]? (referència "
 				+ marker + ")";
 	}
 
@@ -195,7 +195,7 @@ public class Catalan implements Language {
 	public String apiTimeoutException() {
 		final String message = "Els servidors de osu! estan molt lents ara mateix, pel que no puc ajudar-te amb res a hores d'ara. ";
 		return message + doSomething.get(
-				"I digues-me... quan va ser l'última vegada que vas parlar amb la teva àvia?",
+				"I digues-me... quan va ser l'última vegada que vas parlar amb teva àvia?",
 				"Què tal si ordenes una mica teva habitació i després em preguntes novament?",
 				"Aposto a que et encantaria fer una passejada, ja saps ... fora?",
 				"Estic segur que tens altres coses a fer. Què et sembla fer-les ara mateix?",
