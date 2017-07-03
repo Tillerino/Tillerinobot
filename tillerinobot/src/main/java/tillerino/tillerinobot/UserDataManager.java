@@ -94,6 +94,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Norsk(Norwegian.class),
 			Indonesian(Indonesian.class),
 			简体中文(ChineseSimple.class),
+			Català(Catalan.class),
 			; // please end identifier entries with a comma and leave this semicolon here
 			
 			Class<? extends Language> cls;
