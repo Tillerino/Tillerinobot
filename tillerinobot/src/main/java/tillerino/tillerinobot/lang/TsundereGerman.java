@@ -176,8 +176,9 @@ public class TsundereGerman extends TsundereBase {
 		//Responses move from tsun to dere with more hug attempts and recommendations
 		recentHugs++;
 		int baseLevel = (int)(Math.log(recentHugs) / Math.log(2.236) + Math.log(recentRecommendations+1) / Math.log(5)); //Sum logs base sqrt(5) and 5
+		int hugLevel = 0;
 		do{
-		int hugLevel = (baseLevel<8?baseLevel:8) + rnd.nextInt(3) + rnd.nextInt(3) - 2;  //Ranges from -2 to 10
+			hugLevel = (baseLevel<8?baseLevel:8) + rnd.nextInt(3) + rnd.nextInt(3) - 2;  //Ranges from -2 to 10
 		}while (lastHug == hugLevel);
 		String username = apiUser.getUserName();
 		switch (hugLevel) {
