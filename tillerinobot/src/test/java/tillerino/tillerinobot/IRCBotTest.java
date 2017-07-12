@@ -137,7 +137,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
 				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
-				emf, resolver, new TestOsutrackDownloader(), new SynchronousExecutorService());
+				emf, resolver, new TestOsutrackDownloader(), new SynchronousExecutorService(), new RateLimiter());
 		return ircBot;
 	}
 	

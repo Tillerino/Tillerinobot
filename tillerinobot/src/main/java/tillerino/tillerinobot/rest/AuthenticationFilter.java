@@ -12,6 +12,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
+import org.slf4j.MDC;
+
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BotBackend;
 
@@ -31,5 +33,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		} catch (SQLException e) {
 			throw new InternalServerErrorException();
 		}
+		MDC.put("apiKey", keys.get(0));
 	}
 }

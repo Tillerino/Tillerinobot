@@ -18,6 +18,7 @@ import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotInfoService;
 import tillerino.tillerinobot.rest.DelegatingBeatmapsService;
 import tillerino.tillerinobot.rest.PrintMessageExceptionMapper;
+import tillerino.tillerinobot.rest.ApiLoggingFeature;
 import tillerino.tillerinobot.rest.UserByIdService;
 
 /**
@@ -29,7 +30,7 @@ public class BotAPIServer extends Application {
 	@Inject
 	public BotAPIServer(BotInfoService botInfo, BeatmapInfoService beatmapInfo,
 			UserByIdService userById, EntityManagerProxyFeature proxyFeature, BeatmapsService beatmaps,
-			AuthenticationFilter authentication) {
+			AuthenticationFilter authentication, ApiLoggingFeature logging) {
 		super();
 
 		resourceInstances.add(botInfo);
@@ -38,6 +39,7 @@ public class BotAPIServer extends Application {
 		resourceInstances.add(proxyFeature);
 		resourceInstances.add(new DelegatingBeatmapsService(beatmaps));
 		resourceInstances.add(authentication);
+		resourceInstances.add(logging);
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 
 import org.pircbotx.PircBotX;
@@ -79,7 +80,6 @@ import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
-
 	interface IRCBotUser {
 		/**
 		 * @return the user's IRC nick, not their actual user name.
@@ -105,6 +105,7 @@ public class IRCBot extends CoreHooks {
 	public static final String MDC_STATE = "state";
 	public static final String MDC_SUCCESS = "success";
 	public static final String MDC_DURATION = "duration";
+	public static final String MCD_OSU_API_RATE_BLOCKED_TIME = "osuApiRateBlockedTime";
 	
 	final BotBackend backend;
 	final private boolean silent;
@@ -116,6 +117,7 @@ public class IRCBot extends CoreHooks {
 	final EntityManagerFactory emf;
 	final IrcNameResolver resolver;
 	final OsutrackDownloader osutrackDownloader;
+	private final RateLimiter rateLimiter;
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
@@ -123,7 +125,7 @@ public class IRCBot extends CoreHooks {
 			Pinger pinger, @Named("tillerinobot.ignore") boolean silent,
 			ThreadLocalAutoCommittingEntityManager em,
 			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
-			@Named("tillerinobot.maintenance") ExecutorService exec) {
+			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter) {
 		this.backend = backend;
 		this.manager = manager;
 		this.botInfo = botInfo;
@@ -135,6 +137,7 @@ public class IRCBot extends CoreHooks {
 		this.resolver = resolver;
 		this.osutrackDownloader = osutrackDownloader;
 		this.exec = exec;
+		this.rateLimiter = rateLimiter;
 		
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(manager));
@@ -158,6 +161,7 @@ public class IRCBot extends CoreHooks {
 	public void onAction(ActionEvent event) throws Exception {
 		if(silent)
 			return;
+		rateLimiter.setThreadPriority(RateLimiter.REQUEST);
 		
 		if (event.getChannel() == null || event.getUser().getNick().equals("Tillerino")) {
 			processPrivateAction(fromIRC(event.getUser(), event), event.getMessage());
@@ -292,7 +296,9 @@ public class IRCBot extends CoreHooks {
 				}
 				user.message(e.getMessage(), false);
 			} else {
-				if (isTimeout(e)) {
+				if (e instanceof ServiceUnavailableException) {
+					// We're shutting down. Nothing to do here.
+				} else if (isTimeout(e)) {
 					user.message(lang.apiTimeoutException(), false);
 					log.debug("osu api timeout");
 				} else {
@@ -352,6 +358,7 @@ public class IRCBot extends CoreHooks {
 	public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
 		if(silent)
 			return;
+		rateLimiter.setThreadPriority(RateLimiter.REQUEST);
 		
 		processPrivateMessage(fromIRC(event.getUser(), event), event.getMessage());
 	}
@@ -378,6 +385,7 @@ public class IRCBot extends CoreHooks {
 					if (success) {
 						MDC.put(MDC_DURATION, System.currentTimeMillis() - event.getTimestamp() + "");
 						MDC.put(MDC_SUCCESS, "true");
+						MDC.put(MCD_OSU_API_RATE_BLOCKED_TIME, String.valueOf(rateLimiter.blockedTime()));
 					}
 					log.debug("sent: " + msg);
 					botInfo.setLastSentMessage(System.currentTimeMillis());
@@ -388,6 +396,7 @@ public class IRCBot extends CoreHooks {
 				} finally {
 					MDC.remove(MDC_DURATION);
 					MDC.remove(MDC_SUCCESS);
+					MDC.remove(MCD_OSU_API_RATE_BLOCKED_TIME);
 					senderSemaphore.release();
 				}
 			}
@@ -534,6 +543,9 @@ public class IRCBot extends CoreHooks {
 		em.setThreadLocalEntityManager(emf.createEntityManager());
 		try {
 			botInfo.setLastInteraction(System.currentTimeMillis());
+			rateLimiter.setThreadPriority(RateLimiter.EVENT);
+			// clear blocked time in case it wasn't cleared by the last thread
+			rateLimiter.blockedTime();
 
 			if (lastListTime < System.currentTimeMillis() - 60 * 60 * 1000) {
 				lastListTime = System.currentTimeMillis();
@@ -561,6 +573,9 @@ public class IRCBot extends CoreHooks {
 			}
 		} finally {
 			em.close();
+			rateLimiter.clearThreadPriority();
+			// clear blocked time so it isn't carried over to the next request under any circumstances
+			rateLimiter.blockedTime();
 			MDC.clear();
 		}
 	}
