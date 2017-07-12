@@ -14,6 +14,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.MDC;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Rate limiter for the osu! API with multiple urgency levels. It keeps one
  * (bounded) queue per priority, adding 1200 permits per second to the queues,
@@ -24,6 +26,7 @@ import org.slf4j.MDC;
  * documentation of the rate limit of the API.
  */
 @Singleton
+@Slf4j
 public class RateLimiter {
 	/**
 	 * We're answering a direct request. This has highest priority.
@@ -78,10 +81,11 @@ public class RateLimiter {
 	public void limitRate() throws InterruptedException {
 		/*
 		 * attempt to get a permit from a queue with the lowest possible
-		 * priority
+		 * priority. Make sure to go down to the allowed priority to
+		 * correctly log blocking.
 		 */
 		int priority = threadPriority.get();
-		for (int i = MAINTENANCE; i > priority; i--) {
+		for (int i = MAINTENANCE; i >= priority; i--) {
 			Object permit = permits.get(i).poll();
 			if (permit != null) {
 				return;
@@ -89,9 +93,11 @@ public class RateLimiter {
 		}
 		long startTime = System.currentTimeMillis();
 		try {
+			log.trace("Blocking");
 			permits.get(priority).take();
 		} finally {
 			blockedTime.set(blockedTime.get() + (System.currentTimeMillis() - startTime));
+			log.trace("Unblocked");
 		}
 	}
 
