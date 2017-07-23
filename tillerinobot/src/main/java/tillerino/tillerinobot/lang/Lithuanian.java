@@ -182,6 +182,8 @@ public class Lithuanian implements Language {
 		return "Komanda, kuri nustato parametrą yra !set nustatymo reikšmė. Pabandyk !help, jeigu tau reikia daugiau patarimų. ";
 	}
 	
+	StringShuffler doSomething = new StringShuffler(rnd);
+	
 	@Override
 	public String apiTimeoutException() {
 		final String message = "osu! serveriai labai sulėtėjo ir šiuo momentu niekuo negaliu padėt. ";
