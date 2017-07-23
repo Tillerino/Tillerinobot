@@ -70,7 +70,7 @@ public class Lithuanian implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "unknown command \"" + command
+		return "nežinoma komanda \"" + command
 				+ "\". Įvesk !help, jei nori pagalbos!";
 	}
 
@@ -184,21 +184,21 @@ public class Lithuanian implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		return "osu! serveriai labai sulėtėjo ir šiuo momentu niekuo negaliu padėt";
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Pažaisk kažkiek.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Man reikia nuorodos į konkretų sudėtingumą, o ne visą packą.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Nu pala šiek tiek.";
 	}
 }
