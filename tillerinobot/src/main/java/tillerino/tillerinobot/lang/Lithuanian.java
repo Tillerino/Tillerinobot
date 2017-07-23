@@ -184,7 +184,19 @@ public class Lithuanian implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return "osu! serveriai labai sulėtėjo ir šiuo momentu niekuo negaliu padėt";
+		final String message = "osu! serveriai labai sulėtėjo ir šiuo momentu niekuo negaliu padėt. ";
+		return message + doSomething.get(
+				"Gal susitvarkom kambarį ir pamėginam vėliau?",
+				"Manau reiktų išeit pasivaikščiot arba pasivažinėt. Žinai... į lauką?",
+				"Esu įsitikinęs, kad turi darbų kuriuos tu turi atlikt. Davai pasidarom bent vieną dabar?",
+				"Žinai, šiuo metu tau reiktų nusnūst.",
+				"Tuo tarpu paskaitom [https://lt.wikipedia.org/wiki/Special:Random šitą] iš Vikipedijos!",
+				"Reiktų pažiūrėt ar kas įdomesnio [http://www.twitch.tv/directory/game/Osu! streamina] osu!",
+				"Pažiūrėk gal kažko nežinai [https://github.com/Tillerino/Tillerinobot/wiki apie mane].",
+				"Be baimės, [https://www.reddit.com/r/osugame čia] rasim kaip pratempt laiką.",
+				"Ė, žie, davai pažiūrim ką kiti [https://osu.ppy.sh/forum/t/117708 mūsiškiai] šneka forume?",
+				"Eik ką nors kitą nuveik, bo kitaip mudu čia sėdėsim tyliai nieko neveikdami."
+				);
 	}
 	
 	@Override
