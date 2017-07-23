@@ -14,7 +14,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * @author Haganenno https://osu.ppy.sh/u/4692344 https://github.com/peraz
  */
 public class Lithuanian implements Language {
-
+	static final Random rnd = new Random();
+	
 	@Override
 	public String unknownBeatmap() {
 		return "Atsiprašau, aš nežinau šito grajaus. Jis yra naujas, labai sunkus, nepatvirtintas arba ne standartiniame Osu žaidimo režime.";
@@ -60,9 +61,7 @@ public class Lithuanian implements Language {
 					"ką ruošiesi šiandien veikti?",
 			};
 			
-			Random random = new Random();
-			
-			String message = messages[random.nextInt(messages.length)];
+			String message = messages[rnd.nextInt(messages.length)];
 			
 			return new Message(apiUser.getUserName() + ", " + message);
 		}
@@ -70,7 +69,7 @@ public class Lithuanian implements Language {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "unknown command \"" + command
+		return "nežinoma komanda \"" + command
 				+ "\". Įvesk !help, jei nori pagalbos!";
 	}
 
@@ -182,23 +181,37 @@ public class Lithuanian implements Language {
 		return "Komanda, kuri nustato parametrą yra !set nustatymo reikšmė. Pabandyk !help, jeigu tau reikia daugiau patarimų. ";
 	}
 	
+	StringShuffler doSomething = new StringShuffler(rnd);
+	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		final String message = "osu! serveriai labai sulėtėjo ir šiuo momentu niekuo negaliu padėt. ";
+		return message + doSomething.get(
+				"Gal susitvarkom kambarį ir pamėginam vėliau?",
+				"Manau reiktų išeit pasivaikščiot arba pasivažinėt. Žinai... į lauką?",
+				"Esu įsitikinęs, kad turi darbų kuriuos tu turi atlikt. Davai pasidarom bent vieną dabar?",
+				"Žinai, šiuo metu tau reiktų nusnūst.",
+				"Tuo tarpu paskaitom [https://lt.wikipedia.org/wiki/Special:Random šitą] iš Vikipedijos!",
+				"Reiktų pažiūrėt ar kas įdomesnio [http://www.twitch.tv/directory/game/Osu! streamina] osu!",
+				"Pažiūrėk gal kažko nežinai [https://github.com/Tillerino/Tillerinobot/wiki apie mane].",
+				"Be baimės, [https://www.reddit.com/r/osugame čia] rasim kaip pratempt laiką.",
+				"Ė, žie, davai pažiūrim ką kiti [https://osu.ppy.sh/forum/t/117708 mūsiškiai] šneka forume?",
+				"Eik ką nors kitą nuveik, bo kitaip mudu čia sėdėsim tyliai nieko neveikdami."
+				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Pažaisk kažkiek.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Man reikia nuorodos į konkretų sudėtingumą, o ne visą packą.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "Nu pala šiek tiek.";
 	}
 }
