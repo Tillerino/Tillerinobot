@@ -14,7 +14,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * @author Haganenno https://osu.ppy.sh/u/4692344 https://github.com/peraz
  */
 public class Lithuanian implements Language {
-
+	static final Random rnd = new Random();
+	
 	@Override
 	public String unknownBeatmap() {
 		return "Atsiprašau, aš nežinau šito grajaus. Jis yra naujas, labai sunkus, nepatvirtintas arba ne standartiniame Osu žaidimo režime.";
@@ -60,9 +61,7 @@ public class Lithuanian implements Language {
 					"ką ruošiesi šiandien veikti?",
 			};
 			
-			Random random = new Random();
-			
-			String message = messages[random.nextInt(messages.length)];
+			String message = messages[rnd.nextInt(messages.length)];
 			
 			return new Message(apiUser.getUserName() + ", " + message);
 		}
