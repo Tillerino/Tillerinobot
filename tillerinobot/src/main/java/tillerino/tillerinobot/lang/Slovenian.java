@@ -19,7 +19,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Anze Jensterle hello@craftbyte.net https://github.com/CraftByte https://osu.ppy.sh/u/CraftByte
  */
-public class Default implements Language {
+public class Slovenian implements Language {
 	static final Random rnd = new Random();
 
 	@Override
