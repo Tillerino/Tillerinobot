@@ -194,7 +194,7 @@ public class Hungarian implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		return new Message("[http://osu.ppy.sh/u/BakaHarcos BakaHarcos]([http://github.com/ApeConfirmed ApeConfirmed]) megtanított magyarul beszélni :)");
+		return new Message("Kicsit nehéz volt megtanulni... de megcsináltam! (fordító: [https://osu.ppy.sh/u/skiilaa skiilaa])");
 	}
 
 	@Override
