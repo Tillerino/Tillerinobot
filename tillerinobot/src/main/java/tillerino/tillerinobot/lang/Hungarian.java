@@ -11,7 +11,7 @@ import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
- * @author https://github.com/ApeConfirmed https://osu.ppy.sh/u/BakaHarcos
+ * @author https://github.com/moriczgergo https://osu.ppy.sh/u/skiilaa
  */
 public class Hungarian implements Language {
 	static final Random rnd = new Random();
