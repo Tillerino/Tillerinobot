@@ -11,7 +11,7 @@ import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
- * @author https://github.com/ApeConfirmed https://osu.ppy.sh/u/BakaHarcos
+ * @author https://github.com/moriczgergo https://osu.ppy.sh/u/skiilaa
  */
 public class Hungarian implements Language {
 	static final Random rnd = new Random();
@@ -82,12 +82,12 @@ public class Hungarian implements Language {
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Ezek a modok összezavarnak. A modok bárhogy kombinálhatóak ezek közül: DT HR HD HT EZ NC FL SO NF. Írd le őket szóköz vagy speciális karakter(pl. vessző) nélkül. Példa: !with HDHR, !with DTEZ";
+		return "Ezek a modok összezavarnak. A modok bárhogy kombinálhatóak ezek közül: DT HR HD HT EZ NC FL SO NF. Írd le őket szóköz vagy speciális karakter(pl. vessző) nélkül. Például !with HDHR, vagy !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "Nem emlékszem hogy adtam volna neked bármilyen infót egy dalról... Ha kilépsz, újra be kell olvasnod, erre vigyázz!";
+		return "Nem emlékszem hogy adtam volna neked bármilyen infót egy dalról... Ha kilépsz, újra meg kell kérdezned, erre vigyázz!";
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class Hungarian implements Language {
 
 	@Override
 	public String complaint() {
-		return "Az üzeneted ki van töltve. Tillerino megnézi, amint tudja.";
+		return "A jelentésedet elküldtem. Tillerino megnézi, amint tudja.";
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public class Hungarian implements Language {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		return new Message("[http://osu.ppy.sh/u/BakaHarcos BakaHarcos]([http://github.com/ApeConfirmed ApeConfirmed]) megtanított magyarul beszélni :)");
+		return new Message("Kicsit nehéz volt megtanulni... de megcsináltam! (fordító: [https://osu.ppy.sh/u/BakaHarcos BakaHarcos], [https://osu.ppy.sh/u/10148621 skiilaa])");
 	}
 
 	@Override
@@ -224,7 +224,7 @@ public class Hungarian implements Language {
 				"Nézd, itt egy másik [http://dagobah.net/flash/Cursor_Invisible.swf játék] amiben garantálom hogy szar vagy!",
 				"Ebben az időben átnézheted az [https://github.com/Tillerino/Tillerinobot/wiki útmutatómat]. Legalább nem fogsz értelmetlen parancsokat küldözgetni.",
 				"Ne szomorkodj, ezek a [https://www.reddit.com/r/osugame hülye mémek] biztos elütik az időt.",
-				"Amíg unatkozol, próbáld ki az [http://gabrielecirulli.github.io/2048/ 2048]-at. (Reklám confirmed.)",
+				"Amíg unatkozol, próbáld ki az [http://gabrielecirulli.github.io/2048/ 2048]-at. (Ez az üzenet termékmegjelenítést tartalmaz.)",
 				"Vicces kérdés: Ha a merevlemezed meghalna, mennyi személyes adat veszne el? (Muhahahahaha...)",
 				"Kipróbáltad már a [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up kihívás]t?",
 				"Csinálhatsz valamit, vagy nézhetünk farkas-szemet. Csöndben."
@@ -246,3 +246,4 @@ public class Hungarian implements Language {
 		return "Csak egy pillanat... Jaj, de várom már hogy az igazi Tillerino megszerelje a netkábelt.";
 	}
 }
+
