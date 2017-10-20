@@ -3,26 +3,26 @@ package tillerino.tillerinobot.diff;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
-
-import lombok.SneakyThrows;
-import lombok.Value;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.tillerino.osuApiModel.Mods;
 
-import tillerino.tillerinobot.UserException;
-
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import lombok.SneakyThrows;
+import lombok.Value;
+import tillerino.tillerinobot.UserException;
 
-public class Oppai {
+
+public class Oppai implements DifficultyCalculator {
 	@Value
-	public class OppaiResults {
+	public class OppaiResults implements DifficultyProperties {
 		@SerializedName("oppai_version")
 		String oppaiVersion;
 		String artist;
@@ -58,12 +58,19 @@ public class Oppai {
 		}
 	}
 
-	@SneakyThrows(UnsupportedEncodingException.class)
+	@SneakyThrows({ UnsupportedEncodingException.class, IOException.class })
 	public OppaiResults runOppai(byte[] beatmap, Collection<Mods> mods) throws UserException {
 		ByteArrayInputStream byis = new ByteArrayInputStream(beatmap);
+		return calculate(byis, mods);
+	}
+
+	@Override
+	public OppaiResults calculate(InputStream is, Collection<Mods> mods)
+			throws UserException, IOException {
+		final int size = is.available();
 		DefaultExecutor executor = new DefaultExecutor();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		executor.setStreamHandler(new PumpStreamHandler(baos, baos, byis));
+		executor.setStreamHandler(new PumpStreamHandler(baos, baos, is));
 		try {
 			CommandLine command = new CommandLine("oppai").addArgument("-").addArgument("-ojson").addArgument("-no-cache");
 			if (!mods.isEmpty()) {
@@ -71,7 +78,7 @@ public class Oppai {
 			}
 			executor.execute(command);
 		} catch (IOException e) {
-			if (beatmap.length == 1024 * 1024) {
+			if (size == 1024 * 1024) {
 				throw new UserException("Beatmap file truncated, see https://github.com/ppy/osu-api/issues/131");
 			}
 			throw new RuntimeException("error running oppai: " + baos.toString("UTF-8"), e);

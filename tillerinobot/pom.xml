@@ -223,6 +223,11 @@
 			<version>5.1.0.Final</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.francesco149</groupId>
+			<artifactId>koohii</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
