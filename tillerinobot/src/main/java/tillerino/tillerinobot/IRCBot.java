@@ -6,6 +6,7 @@ import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +33,7 @@ import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.JoinEvent;
+import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
@@ -257,6 +259,7 @@ public class IRCBot extends CoreHooks {
 	void processPrivateAction(IRCBotUser user, String message) {
 		MDC.put(MDC_STATE, "action");
 		log.debug("action: " + message);
+		botInfo.setLastReceivedMessage(System.currentTimeMillis());
 		
 		Language lang = new Default();
 
@@ -362,6 +365,11 @@ public class IRCBot extends CoreHooks {
 		
 		processPrivateMessage(fromIRC(event.getUser(), event), event.getMessage());
 	}
+
+	@Override
+	public void onMessage(MessageEvent event) throws Exception {
+		botInfo.setLastReceivedMessage(System.currentTimeMillis());
+	}
 	
 	Semaphore senderSemaphore = new Semaphore(1, true);
 	
@@ -386,6 +394,9 @@ public class IRCBot extends CoreHooks {
 						MDC.put(MDC_DURATION, System.currentTimeMillis() - event.getTimestamp() + "");
 						MDC.put(MDC_SUCCESS, "true");
 						MDC.put(MCD_OSU_API_RATE_BLOCKED_TIME, String.valueOf(rateLimiter.blockedTime()));
+						if (Objects.equals(MDC.get(MDC_HANDLER), RecommendHandler.MDC_FLAG)) {
+							botInfo.setLastRecommendation(System.currentTimeMillis());
+						}
 					}
 					log.debug("sent: " + msg);
 					botInfo.setLastSentMessage(System.currentTimeMillis());
@@ -467,6 +478,7 @@ public class IRCBot extends CoreHooks {
 	void processPrivateMessage(final IRCBotUser user, String originalMessage) {
 		MDC.put(MDC_STATE, "msg");
 		log.debug("received: " + originalMessage);
+		botInfo.setLastReceivedMessage(System.currentTimeMillis());
 
 		Language lang = new Default();
 
@@ -539,10 +551,10 @@ public class IRCBot extends CoreHooks {
 	
 	@Override
 	public void onEvent(Event event) throws Exception {
+		botInfo.setLastInteraction(System.currentTimeMillis());
 		MDC.put("event", "" + lastSerial.incrementAndGet());
 		em.setThreadLocalEntityManager(emf.createEntityManager());
 		try {
-			botInfo.setLastInteraction(System.currentTimeMillis());
 			rateLimiter.setThreadPriority(RateLimiter.EVENT);
 			// clear blocked time in case it wasn't cleared by the last thread
 			rateLimiter.blockedTime();

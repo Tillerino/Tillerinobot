@@ -3,6 +3,7 @@ package tillerino.tillerinobot.rest;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -27,11 +28,13 @@ public class BotInfoService {
 	@Data
 	@Singleton
 	public static class BotInfo {
-		boolean isConnected;
-		long runningSince;
-		long lastPingDeath;
-		long lastInteraction;
-		long lastSentMessage;
+		private boolean isConnected;
+		private long runningSince;
+		private long lastPingDeath;
+		private long lastInteraction;
+		private long lastReceivedMessage;
+		private long lastSentMessage;
+		private long lastRecommendation;
 	}
 
 	private final BotInfo botInfo;
@@ -41,10 +44,45 @@ public class BotInfoService {
 	public BotInfo botinfo() {
 		PircBotX pircBot = bot.getBot();
 		if (pircBot != null) {
-			botInfo.isConnected = pircBot.isConnected();
+			botInfo.setConnected(pircBot.isConnected());
 		} else {
-			botInfo.isConnected = false;
+			botInfo.setConnected(false);
 		}
 		return botInfo;
+	}
+
+	/*
+	 * The following are endpoints for automated health checks, so they don't return anything
+	 * valuable other than a 200 or 404.
+	 */
+
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/isReceiving")
+	public boolean isReceiving() {
+		if (botInfo.getLastReceivedMessage() < System.currentTimeMillis() - 10000) {
+			throw new NotFoundException();
+		}
+		return true;
+	}
+
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/isSending")
+	public boolean isSending() {
+		if (botInfo.getLastSentMessage() < System.currentTimeMillis() - 60000) {
+			throw new NotFoundException();
+		}
+		return true;
+	}
+
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/isRecommending")
+	public boolean isRecommending() {
+		if (botInfo.getLastRecommendation() < System.currentTimeMillis() - 60000) {
+			throw new NotFoundException();
+		}
+		return true;
 	}
 }

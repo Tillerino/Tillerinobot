@@ -9,7 +9,6 @@ import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler;
@@ -24,6 +23,8 @@ import tillerino.tillerinobot.lang.Language;
 
 @Slf4j
 public class RecommendHandler extends CommandHandler.WithShorthand {
+	public static final String MDC_FLAG = "r";
+
 	RecommendationsManager manager;
 
 	@Inject
@@ -36,7 +37,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 	public Response handleArgument(String remaining, OsuApiUser apiUser,
 								   UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
-		MDC.put(IRCBot.MDC_HANDLER, "r");
+		MDC.put(IRCBot.MDC_HANDLER, MDC_FLAG);
 
 		Language lang = userData.getLanguage();
 
