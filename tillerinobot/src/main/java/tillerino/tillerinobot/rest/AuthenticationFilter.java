@@ -25,14 +25,24 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
+		String apiKey = null;
+
+		// try fetch from query params
 		List<String> keys = requestContext.getUriInfo().getQueryParameters().get("k");
+		if(keys != null && !keys.isEmpty()) {
+			apiKey = keys.get(0);
+		} else {
+			// try fetch from header
+			apiKey = requestContext.getHeaderString("api-key");
+		}
 		try {
-			if (keys == null || keys.isEmpty() || !backend.verifyGeneralKey(keys.get(0))) {
+			if (apiKey == null || !backend.verifyGeneralKey(apiKey)) {
 				throw new WebApplicationException("Please provide an API key", 401);
 			}
 		} catch (SQLException e) {
 			throw new InternalServerErrorException();
 		}
-		MDC.put("apiKey", keys.get(0));
+		MDC.put("apiKey", apiKey);
+
 	}
 }
