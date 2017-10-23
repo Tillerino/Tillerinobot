@@ -2,7 +2,7 @@ package tillerino.tillerinobot.rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -25,24 +25,16 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
-		String apiKey = null;
+		String apiKey = Optional.ofNullable(requestContext.getUriInfo().getQueryParameters().get("k"))
+				.flatMap(l -> l.stream().findFirst()).orElse(requestContext.getHeaderString("k"));
 
-		// try fetch from query params
-		List<String> keys = requestContext.getUriInfo().getQueryParameters().get("k");
-		if(keys != null && !keys.isEmpty()) {
-			apiKey = keys.get(0);
-		} else {
-			// try fetch from header
-			apiKey = requestContext.getHeaderString("api-key");
-		}
 		try {
 			if (apiKey == null || !backend.verifyGeneralKey(apiKey)) {
 				throw new WebApplicationException("Please provide an API key", 401);
 			}
 		} catch (SQLException e) {
-			throw new InternalServerErrorException();
+			throw new InternalServerErrorException(e);
 		}
 		MDC.put("apiKey", apiKey);
-
 	}
 }
