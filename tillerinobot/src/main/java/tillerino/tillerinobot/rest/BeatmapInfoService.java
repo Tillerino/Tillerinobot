@@ -1,4 +1,9 @@
 package tillerino.tillerinobot.rest;
+import static org.tillerino.osuApiModel.Mods.fixNC;
+import static org.tillerino.osuApiModel.Mods.getEffectiveMods;
+import static org.tillerino.osuApiModel.Mods.getMask;
+import static org.tillerino.osuApiModel.Mods.getMods;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -8,7 +13,6 @@ import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -17,6 +21,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -30,41 +35,38 @@ import javax.ws.rs.core.Response.Status;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
-import static org.tillerino.osuApiModel.Mods.*;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
 @Singleton
 @Path("/beatmapinfo")
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BeatmapInfoService {
-	private BotBackend backend;
+	private final BotBackend backend;
+	private final ThreadLocalAutoCommittingEntityManager em;
+	private final EntityManagerFactory emf;
 
-	private final ExecutorService executorService;
-	{
+	private final ExecutorService executorService = createExec();
+	private static ExecutorService createExec() {
 		ThreadPoolExecutor tpe = new ThreadPoolExecutor(2, 2,
 				5L, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>());
 		tpe.allowCoreThreadTimeOut(true);
-		executorService = tpe;
+		return tpe;
 	}
 
-	@Inject
-	public BeatmapInfoService(BotBackend server) {
-		this.backend = server;
-	}
-
-	
 	LoadingCache<BeatmapWithMods, Future<BeatmapMeta>> cache = CacheBuilder
 			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).softValues()
 			.build(new CacheLoader<BeatmapWithMods, Future<BeatmapMeta>>() {
@@ -73,6 +75,7 @@ public class BeatmapInfoService {
 					return executorService.submit(new Callable<BeatmapMeta>() {
 						@Override
 						public BeatmapMeta call() throws SQLException, InterruptedException {
+							em.setThreadLocalEntityManager(emf.createEntityManager());
 							try {
 								BeatmapMeta beatmap = backend.loadBeatmap(
 										key.getBeatmap(), key.getMods(),
@@ -87,6 +90,8 @@ public class BeatmapInfoService {
 								throw BotAPIServer.getBadGateway(null);
 							} catch (UserException e) {
 								throw new NotFoundException(e.getMessage());
+							} finally {
+								em.close();
 							}
 						}
 					});
