@@ -52,6 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.CommandHandler.Action;
+import tillerino.tillerinobot.CommandHandler.AsyncTask;
 import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.CommandHandler.ResponseList;
@@ -460,6 +461,16 @@ public class IRCBot extends CoreHooks {
 		} 
 		if (response instanceof Task) {
 			((Task) response).run();
+		}
+		if (response instanceof AsyncTask) {
+			exec.submit(() -> {
+				em.setThreadLocalEntityManager(emf.createEntityManager());
+				try {
+					((AsyncTask) response).run();
+				} finally {
+					em.close();
+				}
+			});
 		}
 	}
 	

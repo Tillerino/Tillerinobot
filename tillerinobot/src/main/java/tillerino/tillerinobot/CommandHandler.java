@@ -54,6 +54,10 @@ public interface CommandHandler {
 		default Response thenRun(Task task) {
 			return then(task);
 		}
+
+		default Response thenRunAsync(AsyncTask task) {
+			return then(task);
+		}
 	}
 	
 	/**
@@ -103,7 +107,11 @@ public interface CommandHandler {
 	interface Task extends Response {
 		void run();
 	}
-	
+
+	interface AsyncTask extends Response {
+		void run();
+	}
+
 	/**
 	 * A special command handler, which will handle any input. It will at most
 	 * throw a {@link UserException} if the input is somehow invalid.

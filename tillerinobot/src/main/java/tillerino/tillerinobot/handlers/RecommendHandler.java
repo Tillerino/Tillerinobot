@@ -64,14 +64,15 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 		}
 
 		return new Success(beatmap.formInfoMessage(true, addition,
-				userData.getHearts(), null, null, null)).thenRun(
-				() -> {
+						userData.getHearts(), null, null, null))
+				.thenRun(() -> 
 					userData.setLastSongInfo(new BeatmapWithMods(beatmap
-							.getBeatmap().getBeatmapId(), beatmap.getMods()));
+							.getBeatmap().getBeatmapId(), beatmap.getMods())))
+				.thenRunAsync(() -> 
 					manager.saveGivenRecommendation(apiUser.getUserId(),
 							beatmap.getBeatmap().getBeatmapId(),
-							recommendation.bareRecommendation.getMods());
-				}).then(lang.optionalCommentOnRecommendation(apiUser, recommendation));
+							recommendation.bareRecommendation.getMods())).
+				then(lang.optionalCommentOnRecommendation(apiUser, recommendation));
 	}
 
 }
