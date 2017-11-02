@@ -16,11 +16,13 @@ import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.slf4j.MDC;
 
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
 import tillerino.tillerinobot.mbeans.PingerMXBean;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
+@Slf4j
 public class Pinger {
 	@Singleton
 	public static class MXBean extends AbstractMBeanRegistration.WithNotifications implements
@@ -123,6 +125,7 @@ public class Pinger {
 				pingMessage = IRCBot.getRandomString(16);
 			}
 
+			log.debug("PING {}", pingMessage);
 			Utils.sendRawLineToServer(bot, "PING " + pingMessage);
 
 			if(!pingLatch.await(10, TimeUnit.SECONDS)) {
@@ -163,9 +166,11 @@ public class Pinger {
 
 			boolean contains = event.getLine().contains(" PONG ");
 			boolean endsWith = event.getLine().endsWith(pingMessage);
-			if (contains
-					&& endsWith) {
+			if (contains && endsWith) {
+				log.debug("PONG {}", pingMessage);
 				pingLatch.countDown();
+			} else if(contains) {
+				log.warn("unknown pong: {}", event.getLine());
 			}
 		}
 	}
