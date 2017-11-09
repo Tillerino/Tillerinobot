@@ -91,14 +91,6 @@ public interface BotBackend {
 			@Nonnull Model model, boolean nomod, @BitwiseMods long requestMods) throws SQLException, IOException, UserException;
 	
 	/**
-	 * verifies a key for general data queries
-	 * @param key
-	 * @return
-	 * @throws SQLException
-	 */
-	public boolean verifyGeneralKey(String key) throws SQLException;
-	
-	/**
 	 * Retreives beatmap. Implementation hint: this might be called a *lot* when
 	 * checking recommendation predicates and should probably be cached.
 	 * 

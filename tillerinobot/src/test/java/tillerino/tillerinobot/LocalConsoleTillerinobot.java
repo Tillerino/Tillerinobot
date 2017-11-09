@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.UriBuilder;
 
 import org.eclipse.jetty.server.Server;
@@ -37,6 +38,8 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.output.OutputIRC;
 import org.pircbotx.output.OutputUser;
+import org.tillerino.ppaddict.rest.AuthenticationService;
+import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
@@ -86,6 +89,12 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				true);
 		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
 				.toInstance(Executors.newSingleThreadExecutor(r -> { Thread thread = new Thread(r); thread.setDaemon(true); return thread; }));
+		bind(AuthenticationService.class).toInstance(key -> {
+			if (key.equals("testKey")) {
+				return new Authorization(false);
+			}
+			throw new NotFoundException();
+		});
 	}
 
 	@Provides

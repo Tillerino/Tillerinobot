@@ -303,11 +303,6 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public boolean verifyGeneralKey(String key) throws SQLException {
-		return "testkey".equals(key);
-	}
-
-	@Override
 	public String tryLinkToPpaddict(String token, OsuApiUser user) throws SQLException {
 		return null;
 	}
