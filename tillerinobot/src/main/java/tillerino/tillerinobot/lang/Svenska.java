@@ -182,6 +182,8 @@ public class Svenska implements Language {
 		return "Syntaxen för att ställa en parameter är !set. Testa !help om du behöver mer hjälp.";
 	}
 	
+	StringShuffler doSomething = new StringShuffler(rnd);
+	
 	@Override
 	public String apiTimeoutException() {
 		final String message = "osu! servrarna är jätte sakta just nu, så jag kan inte göra något för dig just nu.";
