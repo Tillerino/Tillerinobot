@@ -14,6 +14,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * @author https://osu.ppy.sh/u/3258429 SnickarN https://github.com/SnickarN-
  */
 public class Svenska implements Language {
+	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
