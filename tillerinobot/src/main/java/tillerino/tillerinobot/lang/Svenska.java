@@ -187,7 +187,7 @@ public class Svenska implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		final String message = "osu! servrarna är jätte sakta just nu, så jag kan inte göra något för dig just nu.";
+		final String message = "osu! servrarna är jätte sakta just nu, så jag kan inte göra något för dig just nu. ";
         return message + doSomething.get(
 				"Så... När var senaste gången du pratade med din mormor eller farmor?",
 				"Vad sägs som att du städar ditt rum och frågar mig igen efter det?",
