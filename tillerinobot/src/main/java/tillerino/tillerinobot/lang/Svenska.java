@@ -194,7 +194,7 @@ public class Svenska implements Language {
 				"Jag slår vad om att du skulle älska att gå en runda. Du vet... utomhus?",
 				"Jag vet om att du måste göra en massa andra saker. Vad sägs som att göra dem nu?",
 				"Det ser ändå ut som att du behöver vila.",
-				"Men kolla in denna super intressanta sidan på [https://en.wikipedia.org/wiki/Special:Random wikipedia]!",
+				"Men kolla in denna super intressanta sidan på [https://sv.wikipedia.org/wiki/Special:Random wikipedia]!",
 				"Låt oss kolla om det är någon bra som [http://www.twitch.tv/directory/game/Osu! streamar] just nu!",
 				"Kolla, här är ett annat [http://dagobah.net/flash/Cursor_Invisible.swf spel] som du säkert suger på!",
                 "Detta ger dig mycket tid att läsa igenom [https://github.com/Tillerino/Tillerinobot/wiki min manual].",
