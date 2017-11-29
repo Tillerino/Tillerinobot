@@ -14,6 +14,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * @author https://osu.ppy.sh/u/3258429 SnickarN https://github.com/SnickarN-
  */
 public class Svenska implements Language {
+	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
@@ -168,7 +169,7 @@ public class Svenska implements Language {
 
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("[https://osu.ppy.sh/u/3258429 SnickarN] hjälpte mig att lära mig svenska!");
+        return new Message("[https://osu.ppy.sh/u/3258429 SnickarN] och [https://osu.ppy.sh/u/8116579 Padnezz] hjälpte mig att lära mig svenska!");
 	}
 
 	@Override
@@ -182,23 +183,41 @@ public class Svenska implements Language {
 		return "Syntaxen för att ställa en parameter är !set. Testa !help om du behöver mer hjälp.";
 	}
 	
+	StringShuffler doSomething = new StringShuffler(rnd);
+	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		final String message = "osu! servrarna är jätte sakta just nu, så jag kan inte göra något för dig just nu. ";
+        return message + doSomething.get(
+				"Så... När var senaste gången du pratade med din mormor eller farmor?",
+				"Vad sägs som att du städar ditt rum och frågar mig igen efter det?",
+				"Jag slår vad om att du skulle älska att gå en runda. Du vet... utomhus?",
+				"Jag vet om att du måste göra en massa andra saker. Vad sägs som att göra dem nu?",
+				"Det ser ändå ut som att du behöver vila.",
+				"Men kolla in denna super intressanta sidan på [https://sv.wikipedia.org/wiki/Special:Random wikipedia]!",
+				"Låt oss kolla om det är någon bra som [http://www.twitch.tv/directory/game/Osu! streamar] just nu!",
+				"Kolla, här är ett annat [http://dagobah.net/flash/Cursor_Invisible.swf spel] som du säkert suger på!",
+                "Detta ger dig mycket tid att läsa igenom [https://github.com/Tillerino/Tillerinobot/wiki min manual].",
+				"Oroa dig inte, dessa [https://www.reddit.com/r/osugame dank memes] borde fördriva tiden!",
+				"Nu när du ändå är uttråkad, testa [http://gabrielecirulli.github.io/2048/ 2048]!",
+				"Rolig fråga: Om din hårddisk skulle krasha nu, hur mycket av din personliga data skulle du förlora?",
+                "Så... Har du någonsin testat [https://www.google.se/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up utmaningen]?",
+				"Du kan gå och göra något annat eller så kan vi stirra in i varandras ögon. I tystnad."
+				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "Jag har inte sett dig spela på ett tag.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "Detta refererar en grupp med beatmaps, inte en enda beatmap.";
 	}
 	
 	@Override
 	public String getPatience() {
-		return new Default().getPatience();
+		return "En sekund bara...";
 	}
 }
