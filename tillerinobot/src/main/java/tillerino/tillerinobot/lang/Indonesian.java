@@ -247,9 +247,4 @@ public class Indonesian implements Language {
 	public String isSetId() {
 		return "Ini merefrensikan sebuah set beatmap, bukan satu beatmap.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Tunggu sebentar...";
-	}
 }

@@ -239,9 +239,4 @@ public class ChineseSimple implements Language {
 	public String isSetId() {
 		return "这似乎是一个图包，不是一张图。";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "少女祈祷中...";
-	}
 }

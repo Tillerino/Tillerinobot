@@ -246,9 +246,4 @@ public class Czech implements Language {
 	public String isSetId() {
 		return "Tohle odkazuje na balíček beatmap a ne na určitou beatmapu.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Moment...";
-	}
 }

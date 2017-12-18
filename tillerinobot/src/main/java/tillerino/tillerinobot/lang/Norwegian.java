@@ -246,9 +246,4 @@ public class Norwegian implements Language {
 	public String isSetId() {
 		return "Denne refererer til et set med maps ikke en enkelt map.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Et øyeblikk.";
-	}
 }

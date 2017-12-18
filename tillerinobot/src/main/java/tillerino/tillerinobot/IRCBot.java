@@ -236,7 +236,7 @@ public class IRCBot extends CoreHooks {
 		}
 	});
 	
-	void handleSemaphoreInUse(String purpose, TimingSemaphore semaphore, Language lang, IRCBotUser user) {
+	void handleSemaphoreInUse(String purpose, TimingSemaphore semaphore, IRCBotUser user) {
 		double processing = (System.currentTimeMillis() - semaphore.getLastAcquired()) / 1000d;
 		if(processing > 5) {
 			StackTraceElement[] stackTrace = semaphore.getLastAcquiredThread().getStackTrace();
@@ -247,7 +247,7 @@ public class IRCBot extends CoreHooks {
 			t.setStackTrace(stackTrace);
 			log.warn(purpose + " - request has been processing for " + processing, t);
 			if(!semaphore.isSentWarning()) {
-				user.message(lang.getPatience(), false);
+				user.message("Just a second...", false);
 			}
 		} else {
 			log.debug(purpose);
@@ -262,14 +262,13 @@ public class IRCBot extends CoreHooks {
 		log.debug("action: " + message);
 		botInfo.setLastReceivedMessage(System.currentTimeMillis());
 		
-		Language lang = new Default();
-
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
-			handleSemaphoreInUse("concurrent action", semaphore, lang, user);
+			handleSemaphoreInUse("concurrent action", semaphore, user);
 			return;
 		}
 
+		Language lang = new Default();
 		try {
 			OsuApiUser apiUser = getUserOrThrow(user);
 			UserData userData = userDataManager.getData(apiUser.getUserId());
@@ -491,14 +490,13 @@ public class IRCBot extends CoreHooks {
 		log.debug("received: " + originalMessage);
 		botInfo.setLastReceivedMessage(System.currentTimeMillis());
 
-		Language lang = new Default();
-
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
-			handleSemaphoreInUse("concurrent message", semaphore, lang, user);
+			handleSemaphoreInUse("concurrent message", semaphore, user);
 			return;
 		}
 
+		Language lang = new Default();
 		try {
 			if (tryHandleAndRespond(new FixIDHandler(resolver), originalMessage, null, null, user)) {
 				return;

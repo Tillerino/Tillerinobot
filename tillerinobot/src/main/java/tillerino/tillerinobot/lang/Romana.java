@@ -246,9 +246,4 @@ public class Romana implements Language {
 	public String isSetId() {
 		return "Aceasta se referă la un set de hărti, nu o singură hartă";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Doar o secundă...";
-	}
 }

@@ -246,9 +246,4 @@ public class Slovenian implements Language {
 	public String isSetId() {
 		return "To je zbirka map, ne ena mapa.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Samo sekundo...";
-	}
 }

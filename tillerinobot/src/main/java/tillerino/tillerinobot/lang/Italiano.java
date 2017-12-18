@@ -219,9 +219,4 @@ public class Italiano implements Language {
 	public String isSetId() {
 		return "Questo indica un set di mappe, non una singola.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Solo un secondo...";
-        }
 }

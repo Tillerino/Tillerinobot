@@ -215,9 +215,4 @@ public class Svenska implements Language {
 	public String isSetId() {
 		return "Detta refererar en grupp med beatmaps, inte en enda beatmap.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "En sekund bara...";
-	}
 }

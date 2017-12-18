@@ -193,9 +193,4 @@ public class Deutsch implements Language {
 	public String isSetId() {
 		return "Das bezieht sich auf ein Set von Beatmaps statt auf eine einzelne Beatmap.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Gib mir einen Moment...";
-	}
 }

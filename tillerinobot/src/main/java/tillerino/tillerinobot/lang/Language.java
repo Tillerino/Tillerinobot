@@ -308,11 +308,4 @@ public interface Language {
 	 * @return
 	 */
 	String isSetId();
-
-	/**
-	 * Bot is doing things. Please have patience.
-	 * 
-	 * @return
-	 */
-	String getPatience();
 }

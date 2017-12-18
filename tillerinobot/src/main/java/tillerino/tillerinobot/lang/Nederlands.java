@@ -213,9 +213,4 @@ public class Nederlands implements Language {
 	public String isSetId() {
 		return "Dit refereerd naar een beatmap-verzameling in plaats van een beatmap zelf.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Momentje geduld asjeblieft...";
-	}
 }

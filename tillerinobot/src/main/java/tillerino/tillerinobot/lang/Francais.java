@@ -199,9 +199,4 @@ public class Francais implements Language {
 	public String isSetId() {
 		return "Ce n'est pas une seule beatmap, mais un ensemble.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Attends un peu...";
-	}
 }
