@@ -749,22 +749,33 @@ public class IRCBot extends CoreHooks {
 	OsuApiUser getUserOrThrow(IRCBotUser user) throws UserException, SQLException, IOException, InterruptedException {
 		Integer userId = resolver.resolveIRCName(user.getNick());
 		
-		if(userId == null) {
-			String string = IRCBot.getRandomString(8);
-			log.error("bot user not resolvable " + string + " name: " + user.getNick());
+		if(userId != null) {
+			OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000);
+			
+			if(apiUser != null) {
+				String apiUserIrcName = IrcNameResolver.getIrcUserName(apiUser);
+				if (!user.getNick().equals(apiUserIrcName)) {
+					// oh no, detected wrong mapping, mismatch between API user and IRC user
+					
+					// sets the mapping according to the API user (who doesnt belong to the current IRC user)
+					resolver.setMapping(apiUserIrcName, apiUser.getUserId());
+					
+					// fix the now known broken mapping with the current irc user
+					apiUser = resolver.redownloadUser(user.getNick());
+				}
+			}
 
-			// message not in language-files, since we cant possible know language atm
-			throw new UserException("Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
-						+ " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
-						+ string + ")");
+			if (apiUser != null) {
+				return apiUser;
+			}
 		}
 		
-		OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000);
+		String string = IRCBot.getRandomString(8);
+		log.error("bot user not resolvable " + string + " name: " + user.getNick());
 		
-		if(apiUser == null) {
-			throw new RuntimeException("nickname was resolved, but user not found in api: " + userId);
-		}
-		
-		return apiUser;
+		// message not in language-files, since we cant possible know language atm
+		throw new UserException("Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
+				+ " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
+				+ string + ")");
 	}
 }

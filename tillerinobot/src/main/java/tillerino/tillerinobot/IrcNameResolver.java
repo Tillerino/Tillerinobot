@@ -19,6 +19,7 @@ import com.google.common.cache.LoadingCache;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.data.UserNameMapping;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
 
@@ -41,7 +42,7 @@ public class IrcNameResolver {
 	 */
 	@SuppressFBWarnings(value = "TQ", justification = "producer")
 	@CheckForNull
-	public @UserId Integer resolveIRCName(String ircName) throws SQLException,
+	public @UserId Integer resolveIRCName(@IRCName String ircName) throws SQLException,
 			IOException, InterruptedException {
 		Semaphore semaphore = semaphores.getUnchecked(ircName);
 		semaphore.acquire();
@@ -64,7 +65,7 @@ public class IrcNameResolver {
 	}
 
 	@CheckForNull
-	public Integer getIDByUserName(String userName) throws IOException,
+	public Integer getIDByUserName(@IRCName String userName) throws IOException,
 			SQLException {
 		UserNameMapping mapping = repo.findOne(userName);
 
@@ -121,26 +122,63 @@ public class IrcNameResolver {
 	/**
 	 * Tries to resolve a user manually by checking their user id.
 	 * 
-	 * @param userid
+	 * @param userId
 	 *            the user id to be checked. Information about this will be
-	 *            pulled from the osu api.
+	 *            pulled from the osu API.
 	 * @return the resolved user or null if the user id does not exist in the
 	 *         API.
 	 */
 	@CheckForNull
-	public OsuApiUser resolveManually(@UserId int userid) throws SQLException,
+	public OsuApiUser resolveManually(@UserId int userId) throws SQLException,
 			IOException {
-		OsuApiUser user = backend.getUser(userid, 1l);
+		OsuApiUser user = backend.getUser(userId, 1l);
 		if (user == null) {
 			return null;
 		}
+		String ircName = getIrcUserName(user);
+		setMapping(ircName, userId);
+		return user;
+	}
+
+	@SuppressFBWarnings(value = "TQ", justification = "Producer")
+	public static @IRCName String getIrcUserName(OsuApiUser user) {
+		return user.getUserName().replace(' ', '_');
+	}
+
+	/**
+	 * Explicitly maps an IRC name to an osu! user id.
+	 * 
+	 * @param ircName
+	 *            the IRC nickname of the user
+	 * @param userId
+	 *            the osu! user id
+	 */
+	public void setMapping(@IRCName String ircName, @UserId int userId) {
 		UserNameMapping mapping = new UserNameMapping();
 		mapping.setResolved(System.currentTimeMillis());
-		mapping.setUserid(userid);
-		String ircName = user.getUserName().replace(' ', '_');
+		mapping.setUserid(userId);
 		mapping.setUserName(ircName);
 		repo.save(mapping);
 		resolvedIRCNames.invalidate(ircName);
-		return user;
+	}
+
+	/**
+	 * Force a redownload and remapping of an IRC user based on her IRC name.
+	 * 
+	 * @param ircName
+	 *            The IRC name of the user. This is passed directly to the osu! API.
+	 *            This will work most of the time even if spaces were replaced by
+	 *            underscores in the IRC name.
+	 * @return if found, the osuApiUser belonging to the IRC user. Null otherwise.
+	 */
+	@CheckForNull
+	public OsuApiUser redownloadUser(@IRCName String ircName) throws IOException, SQLException {
+		OsuApiUser apiUser = backend.downloadUser(ircName);
+		if (apiUser == null) {
+			setMapping(ircName, -1);
+		} else {
+			setMapping(ircName, apiUser.getUserId());
+		}
+		return apiUser;
 	}
 }
