@@ -1,4 +1,5 @@
 package tillerino.tillerinobot;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -38,6 +39,8 @@ import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.osuApiModel.types.OsuName;
+import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.CommandHandler.AsyncTask;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
@@ -336,5 +339,34 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			executed.set(true);
 		}, null);
 		assertTrue(executed.get());
+	}
+
+	@Test
+	public void testAutomaticNameChangeRemapping() throws Exception {
+		// override test backend because we need more control
+		BotBackend backend = mock(BotBackend.class);
+		resolver = new IrcNameResolver(userNameMappingRepo, backend);
+		IRCBot bot = getTestBot(backend);
+
+		when(backend.downloadUser("user1_old")).thenReturn(user(1, "user1 old"));
+		when(backend.getUser(eq(1), anyLong())).thenReturn(user(1, "user1 old"));
+		assertEquals(1, (int) bot.getUserOrThrow(mockBotUser("user1_old")).getUserId());
+
+		// meanwhile, user 1 changed her name
+		when(backend.downloadUser("user1_new")).thenReturn(user(1, "user1 new"));
+		when(backend.getUser(eq(1), anyLong())).thenReturn(user(1, "user1 new"));
+		// and user 2 hijacked her old name
+		when(backend.downloadUser("user1_old")).thenReturn(user(2, "user1 old"));
+		when(backend.getUser(eq(2), anyLong())).thenReturn(user(2, "user1 new"));
+
+		assertEquals(2, (int) bot.getUserOrThrow(mockBotUser("user1_old")).getUserId());
+		assertEquals(1, (int) bot.getUserOrThrow(mockBotUser("user1_new")).getUserId());
+	}
+
+	OsuApiUser user(@UserId int id, @OsuName String name) {
+		OsuApiUser user = new OsuApiUser();
+		user.setUserId(id);
+		user.setUserName(name);
+		return user;
 	}
 }
