@@ -379,9 +379,4 @@ public class TsundereGerman extends TsundereBase {
 	public String isSetId() {
 		return new Deutsch().isSetId();
 	}
-	
-	@Override
-	public String getPatience() {
-		return new Deutsch().getPatience();
-	}
 }

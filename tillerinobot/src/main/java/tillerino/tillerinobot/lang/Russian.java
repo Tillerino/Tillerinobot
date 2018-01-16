@@ -196,9 +196,4 @@ public class Russian implements Language {
 	public String isSetId() {
 		return "Эта ссылка указывает на набор карт, а не одну конкретную.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Одну секундочку....";
-	}
 }

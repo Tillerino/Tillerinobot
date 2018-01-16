@@ -206,9 +206,4 @@ public class ChineseTraditional implements Language {
 	public String isSetId() {
 		return "這似乎是好幾個譜面的資料組成，而不是單一譜面。";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "請稍後...";
-	}
 }

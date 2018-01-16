@@ -240,10 +240,5 @@ public class Hungarian implements Language {
 	public String isSetId() {
 		return "Ez egy beatmap set, és nem egy beatmap.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Csak egy pillanat... Jaj, de várom már hogy az igazi Tillerino megszerelje a netkábelt.";
-	}
 }
 

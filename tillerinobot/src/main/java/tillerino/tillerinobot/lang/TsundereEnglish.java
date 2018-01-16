@@ -378,9 +378,4 @@ public class TsundereEnglish extends TsundereBase {
 	public String isSetId() {
 		return new Default().isSetId();
 	}
-	
-	@Override
-	public String getPatience() {
-		return new Default().getPatience();
-	}
 }

@@ -246,9 +246,4 @@ public class Bulgarian implements Language {
 	public String isSetId() {
 		return " Това ще те препрати към няколко песни, не една.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return " Само секунда...";
-	}
 }

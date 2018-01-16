@@ -210,9 +210,4 @@ public class Portuguese implements Language {
 	public String isSetId() {
 		return "Isto faz referência a um conjunto de mapas, não à apenas um.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Só um segundo";
-	}
 }

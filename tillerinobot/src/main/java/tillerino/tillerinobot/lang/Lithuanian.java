@@ -209,9 +209,4 @@ public class Lithuanian implements Language {
 	public String isSetId() {
 		return "Man reikia nuorodos į konkretų sudėtingumą, o ne visą packą.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Nu pala šiek tiek.";
-	}
 }

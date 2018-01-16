@@ -216,9 +216,4 @@ public class Spanish implements Language {
 	public String isSetId() {
 		return "Esto hace referencia a un grupo de mapas, no a uno solo.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Un momento...";
-	}
 }

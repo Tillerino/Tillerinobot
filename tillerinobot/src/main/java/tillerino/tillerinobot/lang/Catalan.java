@@ -221,9 +221,4 @@ public class Catalan implements Language {
 	public String isSetId() {
 		return "Això fa referència un grup de beatmaps, no un beatmap únic.";
 	}
-	
-	@Override
-	public String getPatience() {
-		return "Un segon...";
-	}
 }
