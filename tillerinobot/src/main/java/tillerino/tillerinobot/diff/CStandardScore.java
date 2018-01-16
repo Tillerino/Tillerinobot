@@ -1,6 +1,8 @@
 package tillerino.tillerinobot.diff;
 
 import static java.lang.Math.log10;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.pow;
 import static org.tillerino.osuApiModel.Mods.Autoplay;
 import static org.tillerino.osuApiModel.Mods.Flashlight;
@@ -9,10 +11,9 @@ import static org.tillerino.osuApiModel.Mods.NoFail;
 import static org.tillerino.osuApiModel.Mods.Relax;
 import static org.tillerino.osuApiModel.Mods.Relax2;
 import static org.tillerino.osuApiModel.Mods.SpunOut;
+import static org.tillerino.osuApiModel.Mods.TouchDevice;
 import static tillerino.tillerinobot.diff.MathHelper.clamp;
 import static tillerino.tillerinobot.diff.MathHelper.static_cast;
-import static java.lang.Math.min;
-import static java.lang.Math.max;
 
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -22,7 +23,7 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
  * to compute the pp for given play, aim and speed values of a osu standard
  * score. It can be found here: https://github.com/ppy/osu-performance.git.
  * 
- * This version is based on the commit 8ad46e43f0daa1e7e17c9f4659d378ac7c406b3c.
+ * This version is based on the commit 6890a5d6151e1c0bb5af438b0fd0079eebb26306.
  * 
  * This file violates all Java coding standards to be as easily comparable to
  * the original as possible.
@@ -128,7 +129,12 @@ void ComputeTotalValue()
 
 void ComputeAimValue(CBeatmap beatmap)
 {
-	_aimValue = pow(5.0f * max(1.0f, beatmap.DifficultyAttribute(_mods, CBeatmap.Aim) / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+	double rawAim = beatmap.DifficultyAttribute(_mods, CBeatmap.Aim);
+
+	if(TouchDevice.is(_mods))
+		rawAim = pow(rawAim, 0.8f);
+
+	_aimValue = pow(5.0f * max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
 	int amountTotalHits = TotalHits();
 
