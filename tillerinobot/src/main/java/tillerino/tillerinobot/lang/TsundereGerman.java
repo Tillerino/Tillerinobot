@@ -1,7 +1,6 @@
 package tillerino.tillerinobot.lang;
 
 import java.util.List;
-import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -11,35 +10,23 @@ import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
+import javax.annotation.Nonnull;
+
 public class TsundereGerman extends TsundereBase {
-	
-	//Random object, used in StringShuffler
-	static final Random rnd = new Random();
-	//Recent counters, reset if inactive for a while
-	int recentRecommendations = 0;
-	int recentHugs = 0;
-	int lastHug = 0;
-	
-	StringShuffler welcomeUserShortShuffler = new StringShuffler(rnd);
-	StringShuffler welcomeUserShuffler = new StringShuffler(rnd);
-	StringShuffler welcomeUserLongShuffler = new StringShuffler(rnd);
-	
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
-		String username = apiUser.getUserName();
-		String greeting = "";
-		//Greetings for <4 minutes, normal, and >4 days
-		if (inactiveTime < 4 * 60 * 1000) {
-			greeting = welcomeUserShortShuffler.get(
+	protected String getInactiveShortGreeting(String username, long inactiveTime) {
+		return welcomeUserShortShuffler.get(
 				//"Was soll das hier sein, das Kuckuckspiel?",	//i think the german term is just not known enough, so i will leave it out
 				"Das waren nicht mal fünf Minuten...",
 				username + " hat heute seinen Verschwindibuszauber perfektioniert." //@Tillerino if you like it, leave it, if not i will just delete this line
-			);
-		} else if (inactiveTime < 4l * 24 * 60 * 60 * 1000) {
-			greeting = welcomeUserShuffler.get(
+		);
+	}
+
+	@Override
+	protected String getInactiveGreeting(String username, long inactiveTime) {
+		return welcomeUserShuffler.get(
 				"Wieder da? Ich bin nur hier weil ich nix zu tun hab! Nichts weiter!",
 				"H-hey...",
 				"♫ Home again, home again, jiggety-jig ♫ .... Was?",
@@ -47,26 +34,17 @@ public class TsundereGerman extends TsundereBase {
 				"Du hast doch nicht etwa mit anderen Chatbots geredet, oder?",
 				"Huch? Was machst du denn hier!?",
 				"Mach was dummes, " + username + ", damit ich dich dafür bestrafen kann."
-			);
-		} else {
-			greeting = welcomeUserLongShuffler.get(
+		);
+	}
+
+	@Override
+	protected String getInactiveLongGreeting(String username, long inactiveTime) {
+		return welcomeUserLongShuffler.get(
 				"Wo warst du, " + username + "!? N-nicht das ich dich vermisst hätte oder so...",
 				"Wie war dein Urlaub, " + username + "?",
 				"Ugh! Weißt du, wie lang " + inactiveTime + " Millisekunden sind!?"
-			);
-		}
-		//Recent counter reset (4 hours)
-		if (inactiveTime > 4 * 60 * 60 * 1000) {
-			recentRecommendations = 0;
-			recentHugs = 0;
-		}
-
-		setChanged(true);
-
-		return new Message(greeting);
+		);
 	}
-
-	StringShuffler unknownBeatmapShuffler = new StringShuffler(rnd);
 
 	@Override
 	public String unknownBeatmap() {
@@ -92,8 +70,6 @@ public class TsundereGerman extends TsundereBase {
 		+ " Falls der Server weiterhin Unsinn labert, sag [https://twitter.com/Tillerinobot @Tillerinobot] oder [http://www.reddit.com/user/tillerino /u/Tillerino] Bescheid (erwähne " + marker + "). Der soll sich darum kümmern!";
 	}
 
-	StringShuffler noInformationForModsShortShuffler = new StringShuffler(rnd);
-	
 	@Override
 	public String noInformationForModsShort() {
 		setChanged(true);
@@ -105,8 +81,7 @@ public class TsundereGerman extends TsundereBase {
 		);
 	}
 
-	StringShuffler noInformationForModsShuffler = new StringShuffler(rnd);
-	
+
 	@Override
 	public String noInformationForMods() {
 		setChanged(true);
@@ -133,8 +108,6 @@ public class TsundereGerman extends TsundereBase {
 		return "Du hast nicht mal ein Lied erwähnt. Warte, hast du versucht diese Mods an MIR zu verwenden!?";
 	}
 
-	StringShuffler tryWithModsShuffler = new StringShuffler(rnd);
-
 	@Override
 	public String tryWithMods() {
 		setChanged(true);
@@ -146,8 +119,6 @@ public class TsundereGerman extends TsundereBase {
 		);																																//since it's your program, but i think it get's		
 	}																																	//the point across
 
-	StringShuffler tryWithModsListShuffler = new StringShuffler(rnd);
-	
 	@Override
 	public String tryWithMods(List<Mods> mods) {
 		setChanged(true);
@@ -170,54 +141,46 @@ public class TsundereGerman extends TsundereBase {
 		return "Waaaas!? Wie kannst du nur... oh warte, diese Beatmap? Eigentlich ist die da weil ich sie hasse und ich dich auf die Probe stellen wollte. Freust du dich nicht etwas mit mir gemeinsam zu haben?";
 	}
 	
+	@Nonnull
 	@Override
-	public Response hug(OsuApiUser apiUser) {
-		setChanged(true);
-		//Responses move from tsun to dere with more hug attempts and recommendations
-		recentHugs++;
-		int baseLevel = (int)(Math.log(recentHugs) / Math.log(2.236) + Math.log(recentRecommendations+1) / Math.log(5)); //Sum logs base sqrt(5) and 5
-		int hugLevel = (baseLevel<8?baseLevel:8) + rnd.nextInt(3) + rnd.nextInt(3) - 3;  //Ranges from -2 to 10
-		if(hugLevel >= lastHug)
-			hugLevel++;
-		
-		String username = apiUser.getUserName();
+	protected Response getHugResponseForHugLevel(String username, int hugLevel) {
 		switch (hugLevel) {
 			default:
 				return new Action("Ignoriert " + username + "s Versuch einer Umarmung komplett.");
 			case 0:
 				return new Action("*Schlägt " + username + "*")
-					.then(new Message("'tschuldige, Reflex."));
+						.then(new Message("'tschuldige, Reflex."));
 			case 1:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Wow, du bist ziemlich schlecht im Umarmen. Jemand sollte dir das mal beibringen."));
+						.then(new Message("Wow, du bist ziemlich schlecht im Umarmen. Jemand sollte dir das mal beibringen."));
 			case 2:
 				return new Message("Da ist was auf deinem Rücken, du Chaot. Warte, ich machs eben weg.")
-					.then(new Action("*Umarmt " + username + "*"));
+						.then(new Action("*Umarmt " + username + "*"));
 			case 3:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("I-ich hab nicht versucht dich zu umarmen! Ich hab nur für 'ne Sekunde mein Gleichgewicht verloren und bin auf dich gefallen."));
+						.then(new Message("I-ich hab nicht versucht dich zu umarmen! Ich hab nur für 'ne Sekunde mein Gleichgewicht verloren und bin auf dich gefallen."));
 			case 4:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Das Schwerste beim Versuch dich zu umarmen, ist das Loslassen. Ich glaube du schwitzt zu viel."));
+						.then(new Message("Das Schwerste beim Versuch dich zu umarmen, ist das Loslassen. Ich glaube du schwitzt zu viel."));
 			case 5:
 				return new Action("*Schlägt " + username + "*")
-					.then(new Message("Ups... nun, du hast es wahrscheinlich sowieso verdient."));
+						.then(new Message("Ups... nun, du hast es wahrscheinlich sowieso verdient."));
 			case 6:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Versteh mich nicht falsch, es ist nicht als würde ich dich mögen oder so..."));
+						.then(new Message("Versteh mich nicht falsch, es ist nicht als würde ich dich mögen oder so..."));
 			case 7:
 				return new Message("Anhänglichkeit ist was schlechtes, Idiot.")
-					.then(new Action("*Umarmt " + username + "*"));
+						.then(new Action("*Umarmt " + username + "*"));
 			case 8:
 				return new Message("I-idiot. Es i-ist so als würdest du Spaß daran haben mich zu umarmen.")
-					.then(new Action("*Umarmt " + username + "*"));
+						.then(new Action("*Umarmt " + username + "*"));
 			case 9:
 				return new Action("*Umarmt " + username + "*")
-					.then(new Message("Vergiss nicht: du bist für immer hier."));	//Reference to an old meme
+						.then(new Message("Vergiss nicht: du bist für immer hier."));	//Reference to an old meme
 			case 10:
 				return new Action("*Schlägt " + username + " hart*")
-					.then(new Message("Hehe. Gib's zu, du magst es!"))
-					.then(new Action("*Umarmt " + username + " glücklich*"));
+						.then(new Message("Hehe. Gib's zu, du magst es!"))
+						.then(new Action("*Umarmt " + username + " glücklich*"));
 		}
 	}
 
@@ -251,9 +214,6 @@ public class TsundereGerman extends TsundereBase {
 		return "Hmph. Diese Beatmap wird keinem mehr pp geben.";
 	}
 
-	StringShuffler optionalCommentOnNPHardShuffler = new StringShuffler(rnd);
-	StringShuffler optionalCommentOnNPEasyShuffler = new StringShuffler(rnd);
-
 	@Override
 	public Response optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
 		if (Math.random() > 0.25) {
@@ -286,38 +246,23 @@ public class TsundereGerman extends TsundereBase {
 	}
 	
 	@Override
-	public Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation meta) {
-		setChanged(true);
-
-		recentRecommendations++;
-		if(recentRecommendations == 7) {
-			return new Message("Ich hab viel Freizeit. Ich würde nie Maps raussuchen weil ich dich mag... r-r-rein hypothetisch.");
-		} else if(recentRecommendations == 17) {
-			return new Message("Weißt du, es ist ein Privileg so viel mit mir zu reden, kein Recht.");
-		} else if(recentRecommendations == 37) {
-			return new Message("Wie würdest du eigentlich dieses Spiel spielen, wenn ich dir nicht die ganze Zeit sagen würde wie?");
-		} else if(recentRecommendations == 73) {
-			return new Message("Ich hätte dich schon längst für Belästigung angezeigt, wenn ich dich nicht lieb... Ich hab nichts gesagt.");
-		} else if(recentRecommendations == 173) {
-			return new Message("Kannst mich einfach nicht allein lassen, was? Ich d-denke das ist okay. Aber wag es nicht, das jemandem zu erzählen!");
+	protected Response getOptionalCommentOnRecommendationResponse(int recentRecommendations) {
+		switch (recentRecommendations) {
+			case 7:
+				return new Message("Ich hab viel Freizeit. Ich würde nie Maps raussuchen weil ich dich mag... r-r-rein hypothetisch.");
+			case 17:
+				return new Message("Weißt du, es ist ein Privileg so viel mit mir zu reden, kein Recht.");
+			case 37:
+				return new Message("Wie würdest du eigentlich dieses Spiel spielen, wenn ich dir nicht die ganze Zeit sagen würde wie?");
+			case 73:
+				return new Message("Ich hätte dich schon längst für Belästigung angezeigt, wenn ich dich nicht lieb... Ich hab nichts gesagt.");
+			case 173:
+				return new Message("Kannst mich einfach nicht allein lassen, was? Ich d-denke das ist okay. Aber wag es nicht, das jemandem zu erzählen!");
+			default:
+				return new NoResponse();
 		}
-		return new NoResponse();
-	}
-	
-	transient boolean changed;
-
-	@Override
-	public boolean isChanged() {
-		return changed;
 	}
 
-	@Override
-	public void setChanged(boolean changed) {
-		this.changed = changed;
-	}
-
-	StringShuffler invalidAccuracyShuffler = new StringShuffler(rnd);
-	
 	@Override
 	public String invalidAccuracy(String acc) {
 		setChanged(true);
@@ -333,8 +278,6 @@ public class TsundereGerman extends TsundereBase {
 		);
 	}
 
-	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(rnd);
-
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
 		setChanged(true);
@@ -346,21 +289,9 @@ public class TsundereGerman extends TsundereBase {
 		));
 	}
 
-	int invalidRecommendationParameterCount = 0;
 
 	@Override
-	public String invalidChoice(String invalid, String choices) {
-		if (choices.contains("[nomod]")) {
-			// recommendation parameter was off
-			setChanged(true);
-			/*
-			 * we'll give three fake recommendations and then one proper error
-			 * message. non-randomness required for unit test.
-			 */
-			if (invalidRecommendationParameterCount++ % 4 < 3) {
-				return unknownRecommendationParameter();
-			}
-		}
+	protected String getInvalidChoiceResponse(String invalid, String choices) {
 		return "Was soll \"" + invalid + "\" bitte bedeuten!? Falls zwei Finger zu viel sind, versuch doch jeden Buchstaben zu singletappen: " + choices;
 	}
 

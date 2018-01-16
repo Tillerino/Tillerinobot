@@ -1,7 +1,6 @@
 package tillerino.tillerinobot.lang;
 
 import java.util.List;
-import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -11,35 +10,23 @@ import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
+import javax.annotation.Nonnull;
+
 public class TsundereEnglish extends TsundereBase {
-	
-	//Random object, used in StringShuffler
-	static final Random rnd = new Random();
-	//Recent counters, reset if inactive for a while
-	int recentRecommendations = 0;
-	int recentHugs = 0;
-	int lastHug = 0;
-	
-	StringShuffler welcomeUserShortShuffler = new StringShuffler(rnd);
-	StringShuffler welcomeUserShuffler = new StringShuffler(rnd);
-	StringShuffler welcomeUserLongShuffler = new StringShuffler(rnd);
-	
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
-		String username = apiUser.getUserName();
-		String greeting = "";
-		//Greetings for <4 minutes, normal, and >4 days
-		if (inactiveTime < 4 * 60 * 1000) {
-			greeting = welcomeUserShortShuffler.get(
+	protected String getInactiveShortGreeting(String username, long inactiveTime) {
+		return welcomeUserShortShuffler.get(
 				"What is this? Peekaboo?",
 				"It hasn't even been 5 minutes...",
 				"Today, " + username + " worked on their disappearing act."
-			);
-		} else if (inactiveTime < 4l * 24 * 60 * 60 * 1000) {
-			greeting = welcomeUserShuffler.get(
+		);
+	}
+
+	@Override
+	protected String getInactiveGreeting(String username, long inactiveTime) {
+		return welcomeUserShuffler.get(
 				"Back again? I'm just here because I have nothing else to do! Don't read into it!",
 				"H-hey...",
 				"♫ Home again, home again, jiggety-jig ♫ .... What?",
@@ -47,26 +34,17 @@ public class TsundereEnglish extends TsundereBase {
 				"You haven't been talking to any other chatbots, have you?",
 				"Huh? What are you doing here!?",
 				username + ", go do something stupid so I can scold you for it."
-			);
-		} else {
-			greeting = welcomeUserLongShuffler.get(
+		);
+	}
+
+	@Override
+	protected String getInactiveLongGreeting(String username, long inactiveTime) {
+		return welcomeUserLongShuffler.get(
 				"Where have you been, " + username + "!? I-it's not like I missed you or anything...",
 				"How was your vacation, " + username + "?",
 				"Ugh! Do you have any idea how long " + inactiveTime + " milliseconds is !?"
-			);
-		}
-		//Recent counter reset (4 hours)
-		if (inactiveTime > 4 * 60 * 60 * 1000) {
-			recentRecommendations = 0;
-			recentHugs = 0;
-		}
-
-		setChanged(true);
-
-		return new Message(greeting);
+		);
 	}
-
-	StringShuffler unknownBeatmapShuffler = new StringShuffler(rnd);
 
 	@Override
 	public String unknownBeatmap() {
@@ -91,8 +69,6 @@ public class TsundereEnglish extends TsundereBase {
 		+ " If the server doesn't shut up, ask [https://twitter.com/Tillerinobot @Tillerinobot] or [http://www.reddit.com/user/tillerino /u/Tillerino] (reference " + marker + ") to take care of it.";
 	}
 
-	StringShuffler noInformationForModsShortShuffler = new StringShuffler(rnd);
-	
 	@Override
 	public String noInformationForModsShort() {
 		setChanged(true);
@@ -104,8 +80,6 @@ public class TsundereEnglish extends TsundereBase {
 		);
 	}
 
-	StringShuffler noInformationForModsShuffler = new StringShuffler(rnd);
-	
 	@Override
 	public String noInformationForMods() {
 		setChanged(true);
@@ -132,8 +106,6 @@ public class TsundereEnglish extends TsundereBase {
 		return "You didn't even mention a song. Wait, were you trying to use those mods on ME!?";
 	}
 
-	StringShuffler tryWithModsShuffler = new StringShuffler(rnd);
-
 	@Override
 	public String tryWithMods() {
 		setChanged(true);
@@ -145,8 +117,7 @@ public class TsundereEnglish extends TsundereBase {
 		);
 	}
 
-	StringShuffler tryWithModsListShuffler = new StringShuffler(rnd);
-	
+
 	@Override
 	public String tryWithMods(List<Mods> mods) {
 		setChanged(true);
@@ -168,19 +139,10 @@ public class TsundereEnglish extends TsundereBase {
 	public String complaint() {
 		return "Whaaaat!? How could you say something like... oh, that beatmap? Actually that's there because I hated it and wanted to test you. Aren't you glad having something in common with me?";
 	}
-	
+
+	@Nonnull
 	@Override
-	public Response hug(OsuApiUser apiUser) {
-		setChanged(true);
-		//Responses move from tsun to dere with more hug attempts and recommendations
-		recentHugs++;
-		int baseLevel = (int)(Math.log(recentHugs) / Math.log(2.236) + Math.log(recentRecommendations+1) / Math.log(5)); //Sum logs base sqrt(5) and 5
-		int hugLevel = (baseLevel<8?baseLevel:8) + rnd.nextInt(3) + rnd.nextInt(3) - 3;  //Ranges from -2 to 10
-		
-		if(hugLevel >= lastHug)
-			hugLevel++;
-		
-		String username = apiUser.getUserName();
+	protected Response getHugResponseForHugLevel(String username, int hugLevel) {
 		switch (hugLevel) {
 			default:
 				return new Action("completely ignores " + username + "'s request for a hug");
@@ -251,9 +213,6 @@ public class TsundereEnglish extends TsundereBase {
 		return "Hmph. That beatmap isn't going to make anyone's pp bigger.";
 	}
 
-	StringShuffler optionalCommentOnNPHardShuffler = new StringShuffler(rnd);
-	StringShuffler optionalCommentOnNPEasyShuffler = new StringShuffler(rnd);
-
 	@Override
 	public Response optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
 		if (Math.random() > 0.25) {
@@ -286,38 +245,23 @@ public class TsundereEnglish extends TsundereBase {
 	}
 	
 	@Override
-	public Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation meta) {
-		setChanged(true);
-
-		recentRecommendations++;
-		if(recentRecommendations == 7) {
-			return new Message("I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.");
-		} else if(recentRecommendations == 17) {
-			return new Message("You know, it's a privilege to talk to me this much, not a right.");
-		} else if(recentRecommendations == 37) {
-			return new Message("How would you even play this game if I wasn't telling you what to do?");
-		} else if(recentRecommendations == 73) {
-			return new Message("I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything.");
-		} else if(recentRecommendations == 173) {
-			return new Message("Just can't leave me alone, huh? I guess t-that's okay. But don't you dare tell anyone!");
+	protected Response getOptionalCommentOnRecommendationResponse(int recentRecommendations) {
+		switch (recentRecommendations) {
+			case 7:
+				return new Message("I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.");
+			case 17:
+				return new Message("You know, it's a privilege to talk to me this much, not a right.");
+			case 37:
+				return new Message("How would you even play this game if I wasn't telling you what to do?");
+			case 73:
+				return new Message("I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything.");
+			case 173:
+				return new Message("Just can't leave me alone, huh? I guess t-that's okay. But don't you dare tell anyone!");
+			default:
+				return new NoResponse();
 		}
-		return new NoResponse();
-	}
-	
-	transient boolean changed;
-
-	@Override
-	public boolean isChanged() {
-		return changed;
 	}
 
-	@Override
-	public void setChanged(boolean changed) {
-		this.changed = changed;
-	}
-
-	StringShuffler invalidAccuracyShuffler = new StringShuffler(rnd);
-	
 	@Override
 	public String invalidAccuracy(String acc) {
 		setChanged(true);
@@ -333,8 +277,6 @@ public class TsundereEnglish extends TsundereBase {
 		);
 	}
 
-	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(rnd);
-
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
 		setChanged(true);
@@ -346,21 +288,8 @@ public class TsundereEnglish extends TsundereBase {
 		));
 	}
 
-	int invalidRecommendationParameterCount = 0;
-
 	@Override
-	public String invalidChoice(String invalid, String choices) {
-		if (choices.contains("[nomod]")) {
-			// recommendation parameter was off
-			setChanged(true);
-			/*
-			 * we'll give three fake recommendations and then one proper error
-			 * message. non-randomness required for unit test.
-			 */
-			if (invalidRecommendationParameterCount++ % 4 < 3) {
-				return unknownRecommendationParameter();
-			}
-		}
+	protected String getInvalidChoiceResponse(String invalid, String choices) {
 		return "What does \"" + invalid + "\" even mean!? If using two fingers is too much, try singletapping each letter: " + choices;
 	}
 

@@ -1,25 +1,109 @@
 package tillerino.tillerinobot.lang;
 
-import java.util.List;
 import java.util.Random;
 
-import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.RecommendationsManager.Recommendation;
-import tillerino.tillerinobot.diff.PercentageEstimates;
+
+import javax.annotation.Nonnull;
 
 public abstract class TsundereBase implements Language {
-
 	//random object
 	static final Random rnd = new Random();
+	//Recent counters, reset if inactive for a while
+	private int recentRecommendations = 0;
+	private int recentHugs = 0;
+	private int lastHug = 0;
+	private int invalidRecommendationParameterCount = 0;
 
-	public String unknownRecommendationParameter() {
+	StringShuffler welcomeUserShortShuffler = new StringShuffler(rnd);
+	StringShuffler welcomeUserShuffler = new StringShuffler(rnd);
+	StringShuffler welcomeUserLongShuffler = new StringShuffler(rnd);
+	StringShuffler invalidAccuracyShuffler = new StringShuffler(rnd);
+	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(rnd);
+	StringShuffler tryWithModsShuffler = new StringShuffler(rnd);
+	StringShuffler tryWithModsListShuffler = new StringShuffler(rnd);
+	StringShuffler noInformationForModsShortShuffler = new StringShuffler(rnd);
+	StringShuffler noInformationForModsShuffler = new StringShuffler(rnd);
+	StringShuffler unknownBeatmapShuffler = new StringShuffler(rnd);
+
+	transient boolean changed;
+
+	@Override
+	public boolean isChanged() {
+		return changed;
+	}
+
+	@Override
+	public void setChanged(boolean changed) {
+		this.changed = changed;
+	}
+
+	@Override
+	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+		String username = apiUser.getUserName();
+		String greeting;
+		//Greetings for <4 minutes, normal, and >4 days
+		if (inactiveTime < 4 * 60 * 1000) {
+			greeting = getInactiveShortGreeting(username, inactiveTime);
+		} else if (inactiveTime < 4l * 24 * 60 * 60 * 1000) {
+			greeting = getInactiveGreeting(username, inactiveTime);
+		} else {
+			greeting = getInactiveLongGreeting(username, inactiveTime);
+		}
+		//Recent counter reset (4 hours)
+		if (inactiveTime > 4 * 60 * 60 * 1000) {
+			recentRecommendations = 0;
+			recentHugs = 0;
+		}
+
+		setChanged(true);
+
+		return new Message(greeting);
+	}
+
+	protected abstract String getInactiveShortGreeting(String username, long inactiveTime);
+	protected abstract String getInactiveGreeting(String username, long inactiveTime);
+	protected abstract String getInactiveLongGreeting(String username, long inactiveTime);
+
+	@Nonnull
+	@Override
+	public Response hug(OsuApiUser apiUser) {
+		setChanged(true);
+		//Responses move from tsun to dere with more hug attempts and recommendations
+		recentHugs++;
+		int baseLevel = (int)(Math.log(recentHugs) / Math.log(2.236) + Math.log(recentRecommendations+1) / Math.log(5)); //Sum logs base sqrt(5) and 5
+
+		// do some random stuff
+		// Ranges from -2 to 10 (but it intentionally never reaches max)
+		int hugLevel = (baseLevel<8?baseLevel:8) + rnd.nextInt(3) + rnd.nextInt(3) - 3;
+		// because where we check if its the last thing, and if it is we ++
+		if(hugLevel >= lastHug) {
+			hugLevel++;
+		}
+		// so basically above is a random gen with an exclude of the last one
+
+		lastHug = hugLevel;
+		return getHugResponseForHugLevel(apiUser.getUserName(), hugLevel);
+	}
+
+	@Nonnull
+	protected abstract Response getHugResponseForHugLevel(String username, int hugLevel);
+
+	@Override
+	public Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
+		setChanged(true);
+		recentRecommendations++;
+		return getOptionalCommentOnRecommendationResponse(recentRecommendations);
+	}
+
+	protected abstract Response getOptionalCommentOnRecommendationResponse(int recentRecommendations);
+
+
+	String unknownRecommendationParameter() {
 		String[] fakes = {
 			//CLUBS
 			"[http://osu.ppy.sh/b/80 Scatman John - Scatman [Insane]]   95%: 40pp | 98%: 43pp | 99%: 45pp | 100%: 48pp | 3:04 ★ 3.61 ♫ 136.02 AR4 ♣",
@@ -280,4 +364,22 @@ public abstract class TsundereBase implements Language {
 		};
 		return fakes[rnd.nextInt(fakes.length)];
 	}
+
+	@Override
+	public String invalidChoice(String invalid, String choices) {
+		if (choices.contains("[nomod]")) {
+			// recommendation parameter was off
+			setChanged(true);
+			/*
+			 * we'll give three fake recommendations and then one proper error
+			 * message. non-randomness required for unit test.
+			 */
+			if (invalidRecommendationParameterCount++ % 4 < 3) {
+				return unknownRecommendationParameter();
+			}
+		}
+		return getInvalidChoiceResponse(invalid, choices);
+	}
+
+	protected abstract String getInvalidChoiceResponse(String invalid, String choices);
 }
