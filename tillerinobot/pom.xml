@@ -107,7 +107,7 @@
 		<dependency>
 			<groupId>com.github.tillerino</groupId>
 			<artifactId>osu-api-connector</artifactId>
-			<version>0.12.0</version>
+			<version>0.12.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pircbotx</groupId>
