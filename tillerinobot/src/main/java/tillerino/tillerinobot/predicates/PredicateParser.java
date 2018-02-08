@@ -26,7 +26,7 @@ public class PredicateParser {
 	List<PredicateBuilder<?>> builders = new ArrayList<>();
 
 	public PredicateParser() {
-		List<NumericBeatmapProperty> properties = Arrays.asList(new ApproachRate(), new BeatsPerMinute(), new OverallDifficulty(), new MapLength(), new CircleSize());
+		List<NumericBeatmapProperty> properties = Arrays.asList(new ApproachRate(), new BeatsPerMinute(), new OverallDifficulty(), new MapLength(), new CircleSize(), new StarDiff());
 
 		for (NumericBeatmapProperty property : properties) {
 			builders.add(new NumericPredicateBuilder<>(property));
