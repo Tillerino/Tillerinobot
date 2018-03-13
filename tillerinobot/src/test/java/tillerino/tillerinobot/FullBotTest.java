@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.Stopwatch;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
@@ -114,13 +113,9 @@ public class FullBotTest {
 		}
 	}
 
-	private static final int USERS = 100;
+	private static final int USERS = 10;
 
-	private static final int RECOMMENDATIONS_PER_USER = 20;
-
-	@Rule
-	public final Stopwatch stopwatch = new Stopwatch() {
-	};
+	private static final int RECOMMENDATIONS_PER_USER = 5;
 
 	@Rule
 	public final EmbeddedIrcServerRule server = new EmbeddedIrcServerRule();
