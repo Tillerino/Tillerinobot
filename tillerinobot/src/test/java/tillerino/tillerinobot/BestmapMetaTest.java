@@ -13,6 +13,18 @@ import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 public class BestmapMetaTest {
 	@Test
 	public void testFuturePpSwitch() throws Exception {
+		BeatmapMeta meta = fakeBeatmapMeta(101);
+		assertEquals(
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 100pp | 95%: 32pp | 98%: 61pp | 99%: 78pp | 100%: 100pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
+				meta.formInfoMessage(true, null, -1, null, null, null));
+
+		meta = fakeBeatmapMeta(110);
+		assertEquals(
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 32pp | 98%: 61pp | 99%: 78pp | 100%: 100pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
+				meta.formInfoMessage(true, null, -1, null, null, null));
+	}
+
+	public static BeatmapMeta fakeBeatmapMeta(Integer personalPp) {
 		OsuApiBeatmap beatmap = new OsuApiBeatmap();
 		CBeatmapImpl cBeatmap = new CBeatmapImpl(beatmap, 1.45, 1, 200, 250, false, false, true);
 		beatmap.setArtist("Artist");
@@ -26,14 +38,6 @@ public class BestmapMetaTest {
 		beatmap.setStarDifficulty(cBeatmap.getStarDiff());
 		beatmap.setMaxCombo(100);
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, Mods.getMask(Mods.DoubleTime));
-		BeatmapMeta meta = new BeatmapMeta(beatmap, 101, estimates);
-		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 100pp | 95%: 32pp | 98%: 61pp | 99%: 78pp | 100%: 100pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
-				meta.formInfoMessage(true, null, -1, null, null, null));
-
-		meta = new BeatmapMeta(beatmap, 110, estimates);
-		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 32pp | 98%: 61pp | 99%: 78pp | 100%: 100pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
-				meta.formInfoMessage(true, null, -1, null, null, null));
+		return new BeatmapMeta(beatmap, personalPp, estimates);
 	}
 }

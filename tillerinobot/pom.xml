@@ -4,6 +4,11 @@
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot</artifactId>
 	<version>0.11.0</version>
+
+	<properties>
+		<jacoco.version>0.8.0</jacoco.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -100,6 +105,25 @@
 						</apiSource>
 					</apiSources>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -227,6 +251,12 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>5.1.0.Final</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.9.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
