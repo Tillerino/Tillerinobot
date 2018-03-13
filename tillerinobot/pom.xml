@@ -254,6 +254,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.9.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.github.francesco149</groupId>
 			<artifactId>koohii</artifactId>
 			<version>1.0.12</version>

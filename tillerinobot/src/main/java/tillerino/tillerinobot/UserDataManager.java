@@ -98,7 +98,7 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 			Slovenščina(Slovenian.class),
 			; // please end identifier entries with a comma and leave this semicolon here
 			
-			Class<? extends Language> cls;
+			public final Class<? extends Language> cls;
 
 			private LanguageIdentifier(Class<? extends Language> cls) {
 				this.cls = cls;
