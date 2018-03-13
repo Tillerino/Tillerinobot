@@ -48,12 +48,13 @@ import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
+import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
 public class IRCBotTest extends AbstractDatabaseTest {
 	UserDataManager userDataManager;
 
 	@Rule
-	public SynchronousExecutorService exec = new SynchronousExecutorService();
+	public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
 	
 	@Test
 	public void testVersionMessage() throws IOException, SQLException, UserException {

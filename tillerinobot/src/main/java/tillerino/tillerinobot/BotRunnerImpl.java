@@ -33,6 +33,9 @@ import com.google.common.collect.Lists;
 @Slf4j
 @Singleton
 public class BotRunnerImpl implements BotRunner, TidyObject {
+	static final int DEFAULT_MESSAGE_DELAY = 250;
+	static int MESSAGE_DELAY = DEFAULT_MESSAGE_DELAY;
+
 	public static class CloseableBot extends PircBotX {
 		public CloseableBot(Configuration<? extends PircBotX> configuration) {
 			super(configuration);
@@ -206,7 +209,8 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 					listenerManager.addListener(listener);
 					
 					Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
-							.setServer(server[i % server.length], port).setMessageDelay(250)
+							.setServer(server[i % server.length], port)
+							.setMessageDelay(MESSAGE_DELAY)
 							.setListenerManager(listenerManager)
 							.setName(nickname)
 							.setEncoding(Charset.forName("UTF-8"))
