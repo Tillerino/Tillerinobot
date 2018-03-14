@@ -19,11 +19,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
@@ -32,23 +27,21 @@ import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
-import tillerino.tillerinobot.mbeans.CacheMXBean;
-import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
-import tillerino.tillerinobot.mbeans.RecommendationsManagerMXBean;
 import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 /**
  * Communicates with the backend and creates recommendations samplers as well as caching information.
@@ -57,7 +50,7 @@ import com.google.common.cache.LoadingCache;
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class RecommendationsManager extends AbstractMBeanRegistration implements RecommendationsManagerMXBean {
+public class RecommendationsManager {
 	/**
 	 * Recommendation as returned by the backend. Needs to be enriched before being displayed.
 	 * 
@@ -194,15 +187,6 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 
 	PredicateParser parser = new PredicateParser();
 
-	@Override
-	public ObjectName preRegister(MBeanServer server, ObjectName objectName)
-			throws Exception {
-		server.registerMBean(givenRecomendationsMXBean, null);
-		server.registerMBean(samplersMXBean, null);
-
-		return super.preRegister(server, objectName);
-	}
-
 	public Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
 			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).recordStats().build();
 
@@ -210,24 +194,10 @@ public class RecommendationsManager extends AbstractMBeanRegistration implements
 			.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).recordStats()
 			.build(CacheLoader.from(this::doLoadGivenRecommendations));
 	
-	public CacheMXBean givenRecomendationsMXBean = new CacheMXBeanImpl(givenRecomendations, getClass(), "givenRecommendations");
-	
-	@Override
-	public CacheMXBean fetchGivenRecommendations() {
-		return givenRecomendationsMXBean;
-	}
-
 	/**
 	 * These take long to calculate, so we want to keep them for a bit, but they also take a lot of space. 100 should be a good balance.
 	 */
 	public Cache<Integer, Sampler> samplers = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).maximumSize(100).build();
-
-	public CacheMXBean samplersMXBean = new CacheMXBeanImpl(samplers, getClass(), "samplers");
-
-	@Override
-	public CacheMXBean fetchSamplers() {
-		return samplersMXBean;
-	}
 
 	@CheckForNull
 	public Recommendation getLastRecommendation(Integer userid) {

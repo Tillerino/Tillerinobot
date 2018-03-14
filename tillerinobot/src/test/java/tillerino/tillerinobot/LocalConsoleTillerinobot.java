@@ -302,15 +302,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	public static void main(String[] args) throws Exception {
 		Injector injector = Guice.createInjector(new LocalConsoleTillerinobot());
 
-		ManagementFactory.getPlatformMBeanServer().registerMBean(
-				injector.getInstance(RecommendationsManager.class), null);
-
-		ManagementFactory.getPlatformMBeanServer().registerMBean(
-				injector.getInstance(UserDataManager.class), null);
-
-		ManagementFactory.getPlatformMBeanServer().registerMBean(
-				injector.getInstance(Pinger.MXBean.class), null);
-
 		URI baseUri = UriBuilder.fromUri("http://localhost/")
 				.port(Integer.parseInt(Stream.of(args).findAny().orElse("0"))).build();
 		Server apiServer = JettyHttpContainerFactory.createServer(baseUri, 

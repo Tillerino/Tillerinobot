@@ -10,8 +10,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,15 +17,6 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
-
-import tillerino.tillerinobot.data.BotUserData;
-import tillerino.tillerinobot.data.repos.BotUserDataRepository;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.lang.*;
-import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
-import tillerino.tillerinobot.mbeans.CacheMXBean;
-import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
-import tillerino.tillerinobot.mbeans.UserDataManagerMXBean;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -43,6 +32,10 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import tillerino.tillerinobot.data.BotUserData;
+import tillerino.tillerinobot.data.repos.BotUserDataRepository;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.lang.*;
 
 /**
  * Manager for serializing and caching user data. Since user data can be
@@ -54,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Singleton
-public class UserDataManager extends AbstractMBeanRegistration implements UserDataManagerMXBean, TidyObject {
+public class UserDataManager implements TidyObject {
 	/**
 	 * Bot-specific user data. It is only saved when changed and responsible for
 	 * determining if it has been changed. Manual getters and setters must be
@@ -258,13 +251,6 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		hook.add();
 	}
 
-	@Override
-	public ObjectName preRegister(MBeanServer server, ObjectName objectName)
-			throws Exception {
-		server.registerMBean(cacheMXBean, null);
-		return super.preRegister(server, objectName);
-	}
-
 	public UserData getData(int userid) throws SQLException {
 		try {
 			return cache.get(userid);
@@ -297,13 +283,6 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 					return UserDataManager.this.load(key);
 				}
 			});
-	
-	CacheMXBean cacheMXBean = new CacheMXBeanImpl(cache, getClass(), "userDataCache");
-
-	@Override
-	public CacheMXBean fetchCache() {
-		return cacheMXBean;
-	}
 	
 	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
 			.create();
