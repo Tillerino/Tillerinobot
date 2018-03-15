@@ -3,6 +3,8 @@ package tillerino.tillerinobot.diff;
 /**
  * This interface imitates the CBeatmap class used by {@link CStandardScore}.
  */
+//suppress all found Sonar warnings, since we are trying to copy C# code
+@SuppressWarnings({ "squid:S00100", "squid:S1214", "squid:S00115" })
 public interface CBeatmap {
 	public enum EScoreVersion {
 		ScoreV1, ScoreV2

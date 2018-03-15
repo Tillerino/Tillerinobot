@@ -29,11 +29,7 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 		if(value > max) {
 			return false;
 		}
-		if(value >= max && !includeMax) {
-			return false;
-		}
-		
-		return true;
+		return value < max || includeMax;
 	}
 
 	@Override

@@ -259,7 +259,7 @@ public interface CommandHandler {
 		};
 	}
 
-	public static abstract class WithShorthand implements CommandHandler {
+	public abstract static class WithShorthand implements CommandHandler {
 		private final String command;
 		private final String alias;
 		private final String aliasWithSpace;

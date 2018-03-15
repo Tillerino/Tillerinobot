@@ -1,6 +1,7 @@
 package tillerino.tillerinobot;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -56,9 +57,13 @@ public class UserDataManager implements TidyObject {
 	 * 
 	 * @author Tillerino
 	 */
-	public static class UserData {
+	public static class UserData implements Serializable {
+		private static final long serialVersionUID = 1L;
+
 		@Data
-		public static class BeatmapWithMods {
+		public static class BeatmapWithMods implements Serializable {
+			private static final long serialVersionUID = 1L;
+
 			public BeatmapWithMods(@BeatmapId int beatmap,
 					@BitwiseMods long mods) {
 				super();
@@ -157,6 +162,8 @@ public class UserDataManager implements TidyObject {
 		 * accessed from outside of UserDataManager. This field should be kept
 		 * at the end because it may get large.
 		 */
+		@SuppressWarnings("squid:S1948")
+		@SuppressFBWarnings("SE_BAD_FIELD")
 		JsonObject serializedLanguage;
 
 		transient BotBackend backend;

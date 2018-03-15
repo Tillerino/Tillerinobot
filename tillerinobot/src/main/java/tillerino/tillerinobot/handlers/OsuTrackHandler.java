@@ -51,7 +51,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
                 update.getUsername()
         );
         Response response = new Success(mainMessage);
-        if (update.getNewHighscores() != null && update.getNewHighscores().size() > 0) {
+        if (update.getNewHighscores() != null && !update.getNewHighscores().isEmpty()) {
             List<Highscore> newHighscores = update.getNewHighscores();
             StringBuilder highscoreMessageBuilder = new StringBuilder();
             highscoreMessageBuilder.append(newHighscores.size());

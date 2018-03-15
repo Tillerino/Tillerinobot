@@ -21,7 +21,7 @@ public class Pinger {
 	volatile String pingMessage = null;
 	volatile CountDownLatch pingLatch = null;
 	final AtomicBoolean quit = new AtomicBoolean(false);
-	
+
 	final BotInfo botInfo;
 
 	@Inject
@@ -30,7 +30,7 @@ public class Pinger {
 	}
 
 	long lastquit = 0l;
-	
+
 	final AtomicInteger pingCalls = new AtomicInteger();
 
 	/*
@@ -40,56 +40,33 @@ public class Pinger {
 		if (pingCalls.incrementAndGet() % 10 != 0) {
 			return;
 		}
-		/*try {*/
-			if(quit.get()) {
-				throw new IOException("ping gate closed");
-			}
-			
-			if(!bot.isConnected()) {
-				throw new IOException("bot is no longer connected");			
-			}
+		if(quit.get()) {
+			throw new IOException("ping gate closed");
+		}
 
-			long time = System.currentTimeMillis();
+		if(!bot.isConnected()) {
+			throw new IOException("bot is no longer connected");			
+		}
 
-			synchronized (this) {
-				pingLatch = new CountDownLatch(1);
-				pingMessage = IRCBot.getRandomString(16);
-			}
+		long time = System.currentTimeMillis();
 
-			log.debug("PING {}", pingMessage);
-			Utils.sendRawLineToServer(bot, "PING " + pingMessage);
+		synchronized (this) {
+			pingLatch = new CountDownLatch(1);
+			pingMessage = IRCBot.getRandomString(16);
+		}
 
-			if(!pingLatch.await(10, TimeUnit.SECONDS)) {
-				MDC.put("ping", 10000 + "");
-				throw new IOException("ping timed out");
-			}
+		log.debug("PING {}", pingMessage);
+		Utils.sendRawLineToServer(bot, "PING " + pingMessage);
 
-			long ping = System.currentTimeMillis() - time;
-			MDC.put("ping", ping + "");
+		if(!pingLatch.await(10, TimeUnit.SECONDS)) {
+			MDC.put("ping", 10000 + "");
+			throw new IOException("ping timed out");
+		}
 
-			/*if (bean.getLastPing() > 1500) {
-				if (botInfoService != null) {
-					bean.setLastPingDeath(System.currentTimeMillis());
-					botInfoService.setLastPingDeath(System
-							.currentTimeMillis());
-				}
-				throw new IOException("death ping: " + bean.getLastPing());
-			}
-		} catch(IOException e) {
-			if (lastquit < System.currentTimeMillis() - 1000 || !quit.get()) {
-				quit.set(true);
-				bot.sendIRC().quitServer();
-				try {
-					bot.getSocket().close();
-				} catch (IOException e1) {
-					// swallow
-				}
-				lastquit = System.currentTimeMillis();
-			}
-			throw e;
-		}*/
+		long ping = System.currentTimeMillis() - time;
+		MDC.put("ping", ping + "");
 	}
-	
+
 	void handleUnknownEvent(@SuppressWarnings("rawtypes") UnknownEvent event) {
 		synchronized(this) {
 			if (pingMessage == null)

@@ -17,7 +17,6 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BestmapMetaTest;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.lang.LanguageIdentifier;
 
 @RequiredArgsConstructor
 @RunWith(Parameterized.class)

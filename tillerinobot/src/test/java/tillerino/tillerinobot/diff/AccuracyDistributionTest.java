@@ -22,8 +22,8 @@ public class AccuracyDistributionTest {
 					_300s + _100s + _50s + misses, misses,
 					acc);
 			
-			double rec = OsuApiScore.getAccuracy(accuracyDistribution.get_300(),
-					accuracyDistribution.get_100(), accuracyDistribution.get_50(),
+			double rec = OsuApiScore.getAccuracy(accuracyDistribution.getX300(),
+					accuracyDistribution.getX100(), accuracyDistribution.getX50(),
 					accuracyDistribution.getMiss());
 			
 			assertEquals(acc, rec, 0d);

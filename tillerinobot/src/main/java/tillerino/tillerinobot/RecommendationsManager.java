@@ -32,9 +32,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
@@ -42,6 +40,8 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
+import tillerino.tillerinobot.recommendations.RecommendationRequest;
+import tillerino.tillerinobot.recommendations.RecommendationRequest.RecommendationRequestBuilder;
 
 /**
  * Communicates with the backend and creates recommendations samplers as well as caching information.
@@ -125,19 +125,11 @@ public class RecommendationsManager {
 	 * @author Tillerino
 	 */
 	public static class Sampler {
-		@EqualsAndHashCode
-		public static class Settings {
-			public boolean nomod;
-			public Model model;
-			@BitwiseMods
-			public long requestedMods;
-			public List<RecommendationPredicate> predicates = new ArrayList<>();
-		}
 		final SortedMap<Double, BareRecommendation> distribution = new TreeMap<>();
 		double sum = 0;
 		final Random random = new Random();
-		final Settings settings;
-		public Sampler(Collection<BareRecommendation> recommendations, Settings settings) {
+		final RecommendationRequest settings;
+		public Sampler(Collection<BareRecommendation> recommendations, RecommendationRequest settings) {
 			for (BareRecommendation bareRecommendation : recommendations) {
 				sum += bareRecommendation.getProbability();
 				distribution.put(sum, bareRecommendation);
@@ -187,10 +179,10 @@ public class RecommendationsManager {
 
 	PredicateParser parser = new PredicateParser();
 
-	public Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
+	private final Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
 			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).recordStats().build();
 
-	public LoadingCache<Integer, List<GivenRecommendation>> givenRecomendations = CacheBuilder
+	private final LoadingCache<Integer, List<GivenRecommendation>> givenRecomendations = CacheBuilder
 			.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).recordStats()
 			.build(CacheLoader.from(this::doLoadGivenRecommendations));
 	
@@ -232,19 +224,19 @@ public class RecommendationsManager {
 			 * parse arguments
 			 */
 
-			Settings settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
+			RecommendationRequest settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
 
 			if (sampler == null || !sampler.settings.equals(settings)) {
 				List<Integer> exclude = loadGivenRecommendations(userid)
 						.stream().map(GivenRecommendation::getBeatmapid)
 						.collect(Collectors.toList());
 				Collection<BareRecommendation> recommendations = backend
-						.loadRecommendations(userid, exclude, settings.model,
-								settings.nomod, settings.requestedMods);
+						.loadRecommendations(userid, exclude, settings.getModel(),
+								settings.isNomod(), settings.getRequestedMods());
 
 				// only keep the 1k most probable recommendations to save some
 				// memory
-				recommendations = getTopRecommendations(recommendations, settings.predicates);
+				recommendations = getTopRecommendations(recommendations, settings.getPredicates());
 
 				sampler = new Sampler(recommendations, settings);
 
@@ -301,13 +293,13 @@ public class RecommendationsManager {
 				System.currentTimeMillis(), sample.getMods());
 	}
 
-	public Settings parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message,
+	public RecommendationRequest parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message,
 			Language lang) throws UserException, SQLException, IOException {
 		String[] remaining = message.split(" ");
 		
-		Settings settings = new Settings();
+		RecommendationRequestBuilder settingsBuilder = RecommendationRequest.builder();
 		
-		settings.model = Model.GAMMA;
+		settingsBuilder.model(Model.GAMMA);
 
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
@@ -315,40 +307,40 @@ public class RecommendationsManager {
 			if(lowerCase.length() == 0)
 				continue;
 			if(getLevenshteinDistance(lowerCase, "nomod") <= 2) {
-				settings.nomod = true;
+				settingsBuilder.nomod(true);
 				continue;
 			}
 			if(getLevenshteinDistance(lowerCase, "relax") <= 2) {
-				settings.model = Model.ALPHA;
+				settingsBuilder.model(Model.ALPHA);
 				continue;
 			}
 			if(getLevenshteinDistance(lowerCase, "beta") <= 1) {
-				settings.model = Model.BETA;
+				settingsBuilder.model(Model.BETA);
 				continue;
 			}
 			if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
-				settings.model = Model.GAMMA;
+				settingsBuilder.model(Model.GAMMA);
 				continue;
 			}
-			if(settings.model == Model.GAMMA && (lowerCase.equals("dt") || lowerCase.equals("nc"))) {
-				settings.requestedMods = Mods.add(settings.requestedMods, Mods.DoubleTime);
+			if(settingsBuilder.getModel() == Model.GAMMA && (lowerCase.equals("dt") || lowerCase.equals("nc"))) {
+				settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), Mods.DoubleTime));
 				continue;
 			}
-			if(settings.model == Model.GAMMA &&  lowerCase.equals("hr")) {
-				settings.requestedMods = Mods.add(settings.requestedMods, Mods.HardRock);
+			if(settingsBuilder.getModel() == Model.GAMMA &&  lowerCase.equals("hr")) {
+				settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), Mods.HardRock));
 				continue;
 			}
-			if(settings.model == Model.GAMMA &&  lowerCase.equals("hd")) {
-				settings.requestedMods = Mods.add(settings.requestedMods, Mods.Hidden);
+			if(settingsBuilder.getModel() == Model.GAMMA &&  lowerCase.equals("hd")) {
+				settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), Mods.Hidden));
 				continue;
 			}
-			if (settings.model == Model.GAMMA) {
+			if (settingsBuilder.getModel() == Model.GAMMA) {
 				Long mods = Mods.fromShortNamesContinuous(lowerCase);
 				if (mods != null) {
 					mods = Mods.fixNC(mods);
 					if (mods == (mods & Mods.getMask(Mods.DoubleTime, Mods.HardRock, Mods.Hidden))) {
 						for (Mods mod : Mods.getMods(mods)) {
-							settings.requestedMods = Mods.add(settings.requestedMods, mod);
+							settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), mod));
 						}
 						continue;
 					}
@@ -357,7 +349,7 @@ public class RecommendationsManager {
 			if (backend.getDonator(apiUser) > 0) {
 				RecommendationPredicate predicate = parser.tryParse(param, lang);
 				if (predicate != null) {
-					for (RecommendationPredicate existingPredicate : settings.predicates) {
+					for (RecommendationPredicate existingPredicate : settingsBuilder.getPredicates()) {
 						if (existingPredicate.contradicts(predicate)) {
 							throw new UserException(lang.invalidChoice(
 									existingPredicate.getOriginalArgument() + " with "
@@ -366,23 +358,24 @@ public class RecommendationsManager {
 											+ predicate.getOriginalArgument()));
 						}
 					}
-					settings.predicates.add(predicate);
+					settingsBuilder.predicate(predicate);
 					continue;
 				}
 			}
 			throw new UserException(lang.invalidChoice(param,
 					"[nomod] [relax|beta|gamma] [dt] [hr] [hd]"));
 		}
-		
+
+		RecommendationRequest request = settingsBuilder.build();
 		/*
 		 * verify the arguments
 		 */
 		
-		if(settings.nomod && settings.requestedMods != 0) {
+		if(request.isNomod() && request.getRequestedMods() != 0) {
 			throw new UserException(lang.mixedNomodAndMods());
 		}
 		
-		return settings;
+		return request;
 	}
 
 	/**
@@ -411,13 +404,8 @@ public class RecommendationsManager {
 			}
 			list.add(bareRecommendation);
 		}
-		
-		Collections.sort(list, new Comparator<BareRecommendation>() {
-			@Override
-			public int compare(BareRecommendation o1, BareRecommendation o2) {
-				return (int) Math.signum(o2.getProbability() - o1.getProbability());
-			}
-		});
+
+		Collections.sort(list, Comparator.comparingDouble(BareRecommendation::getProbability).reversed());
 
 		int size = Math.min(list.size(), 1000);
 		ArrayList<BareRecommendation> arrayList = new ArrayList<>(size);
@@ -464,9 +452,7 @@ public class RecommendationsManager {
 	 * Hide a recommendation. It will no longer be displayed in ppaddict, but
 	 * still taken into account when generating new recommendations.
 	 */
-	public void hideRecommendation(@UserId int userId,
-			@BeatmapId int beatmapid, @BitwiseMods long mods)
-			throws SQLException {
+	public void hideRecommendation(@UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods) {
 		em.ensureTransaction(() -> recommendationsRepo.hideRecommendations(userId, beatmapid, mods));
 	}
 

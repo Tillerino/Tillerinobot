@@ -1,12 +1,12 @@
 package tillerino.tillerinobot.handlers;
 
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
-import static org.apache.commons.lang3.StringUtils.join;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -17,9 +17,9 @@ import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.lang.LanguageIdentifier;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class OptionsHandler implements CommandHandler {
@@ -60,15 +60,11 @@ public class OptionsHandler implements CommandHandler {
 				try {
 					ident = find(LanguageIdentifier.values(), value);
 				} catch (IllegalArgumentException e) {
-					LanguageIdentifier[] values = LanguageIdentifier.values();
-					Arrays.sort(values, new Comparator<LanguageIdentifier>() {
-						@Override
-						public int compare(LanguageIdentifier o1, LanguageIdentifier o2) {
-							return o1.toString().compareTo(o2.toString());
-						}
-					});
-					throw new UserException(userData.getLanguage().invalidChoice(value,
-							join(values, ", ")));
+					String choices = Stream.of(LanguageIdentifier.values())
+							.sorted(Comparator.comparing(Object::toString))
+							.map(Object::toString)
+							.collect(joining(", "));
+					throw new UserException(userData.getLanguage().invalidChoice(value, choices));
 				}
 
 				userData.setLanguage(ident);

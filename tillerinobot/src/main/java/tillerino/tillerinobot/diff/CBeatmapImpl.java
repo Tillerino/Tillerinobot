@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(onConstructor = @__(@Deprecated))
+// suppress warning about case-insensitive field collision, because we cannot change the names in CBeatmap
+@SuppressWarnings("squid:S1845")
 public class CBeatmapImpl implements CBeatmap {
 	private OsuApiBeatmap beatmap;
 	private double speed;

@@ -76,7 +76,7 @@ public class Hebrew implements Language {
 	@Override
 	public String malformattedMods(String mods) {
 		return "!with HDHR !with DTEZ :חבר אותם ללא רווחים או תווים מיוחדים. לדוגמה ,DT HR HD HT EZ NC FL SO NF משהו במודים האלה לא נראה נכון. החיבורים האפשריים הם";
-	};
+	}
 
 	@Override
 	public String noLastSongInfo() {

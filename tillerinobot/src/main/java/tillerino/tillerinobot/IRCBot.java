@@ -110,16 +110,15 @@ public class IRCBot extends CoreHooks {
 	public static final String MDC_DURATION = "duration";
 	public static final String MCD_OSU_API_RATE_BLOCKED_TIME = "osuApiRateBlockedTime";
 	
-	final BotBackend backend;
-	final private boolean silent;
-	final RecommendationsManager manager;
-	final BotInfo botInfo;
-	final UserDataManager userDataManager;
-	final List<CommandHandler> commandHandlers = new ArrayList<>();
-	final ThreadLocalAutoCommittingEntityManager em;
-	final EntityManagerFactory emf;
-	final IrcNameResolver resolver;
-	final OsutrackDownloader osutrackDownloader;
+	private final BotBackend backend;
+	private final boolean silent;
+	private final BotInfo botInfo;
+	private final UserDataManager userDataManager;
+	private final List<CommandHandler> commandHandlers = new ArrayList<>();
+	private final ThreadLocalAutoCommittingEntityManager em;
+	private final EntityManagerFactory emf;
+	private final IrcNameResolver resolver;
+	private final OsutrackDownloader osutrackDownloader;
 	private final RateLimiter rateLimiter;
 	
 	@Inject
@@ -130,7 +129,6 @@ public class IRCBot extends CoreHooks {
 			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
 			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter) {
 		this.backend = backend;
-		this.manager = manager;
 		this.botInfo = botInfo;
 		this.userDataManager = userDataManager;
 		this.pinger = pinger;
@@ -353,8 +351,7 @@ public class IRCBot extends CoreHooks {
 		for (int j = 0; j < chars.length; j++) {
 			chars[j] = (char) ('A' + r.nextInt(26));
 		}
-		String string = new String(chars);
-		return string;
+		return new String(chars);
 	}
 
 	@Override
@@ -507,11 +504,9 @@ public class IRCBot extends CoreHooks {
 			
 			Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
 			
-			if(hugPattern.matcher(originalMessage).find()) {
-				if (apiUser != null && userData.getHearts() > 0) {
-					sendResponse(lang.hug(apiUser), user);
-					return;
-				}
+			if(hugPattern.matcher(originalMessage).find() && userData.getHearts() > 0) {
+				sendResponse(lang.hug(apiUser), user);
+				return;
 			}
 			
 			if(tryHandleAndRespond(new LinkPpaddictHandler(backend), originalMessage, apiUser, userData, user)) {
@@ -544,9 +539,9 @@ public class IRCBot extends CoreHooks {
 
 	private void checkVersionInfo(final IRCBotUser user) throws SQLException, UserException {
 		int userVersion = backend.getLastVisitedVersion(user.getNick());
-		if(userVersion < currentVersion) {
-			if(versionMessage == null || user.message(versionMessage, false)) {
-				backend.setLastVisitedVersion(user.getNick(), currentVersion);
+		if(userVersion < CURRENT_VERSION) {
+			if(VERSION_MESSAGE == null || user.message(VERSION_MESSAGE, false)) {
+				backend.setLastVisitedVersion(user.getNick(), CURRENT_VERSION);
 			}
 		}
 	}
@@ -606,8 +601,8 @@ public class IRCBot extends CoreHooks {
 		pinger.handleUnknownEvent(event);
 	}
 
-	static final int currentVersion = 12;
-	static final String versionMessage = "Quick update: You might have heard of a sweet tool called [https://ameobea.me/osutrack/ osu!track] made by [https://osu.ppy.sh/u/Ameo Ameo]."
+	static final int CURRENT_VERSION = 12;
+	static final String VERSION_MESSAGE = "Quick update: You might have heard of a sweet tool called [https://ameobea.me/osutrack/ osu!track] made by [https://osu.ppy.sh/u/Ameo Ameo]."
 			+ " Starting now, I can query it for you. Give it a go! Just type !u."
 			+ " For more info check out the [https://github.com/Tillerino/Tillerinobot/wiki/osu!track wiki].";
 

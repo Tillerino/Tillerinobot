@@ -36,8 +36,6 @@ public interface BotBackend {
 	 * @param mods
 	 *            mods for {@link PercentageEstimates}. These might be ignored
 	 *            if they can't be satisfied
-	 * @param lang
-	 *            TODO
 	 * @return null if not found
 	 * @throws SQLException
 	 * @throws IOException
