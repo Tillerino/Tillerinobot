@@ -20,7 +20,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * @author "Rumberkren" rrr.ee.uu.bb.ee.nnn@gmail.com https://github.com/Rumberkren https://osu.ppy.sh/u/3925053
  * @author "Rendyindo" rendyarya22@gmail.com https://github.com/Rendyindo https://osu.ppy.sh/u/3378391
  */
-public class Indonesian implements Language {
+public class Indonesian extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -160,16 +161,6 @@ public class Indonesian implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Akurasi yang tidak sah: \"" + acc + "\"";
 	}
@@ -215,12 +206,13 @@ public class Indonesian implements Language {
 		return "Syntax untuk mengeset parameter adalah !set opsi nilai. Coba !help jika anda membutuhkan petunjuk.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "Server osu! sedang sangat lambat sekarang, jadi tidak ada yang bisa saya lakukan sekarang. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Kapan kau terakhir kali bercakap dengan nenekmu?",
 				"Bagaimana jika kau membersihkan kamarmu dan tanya lagi?",
 				"Kau akan suka untuk jalan-jalan sekarang. Kau tahu... keluar?",

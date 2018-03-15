@@ -13,7 +13,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * @author https://github.com/moriczgergo https://osu.ppy.sh/u/skiilaa
  */
-public class Hungarian implements Language {
+public class Hungarian extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -153,16 +154,6 @@ public class Hungarian implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Hamis pontosság: \"" + acc + "\"";
 	}
@@ -208,12 +199,13 @@ public class Hungarian implements Language {
 		return "A parancs a paraméter meghatározására a !set. Példa: !set Language Hungarian. Kukkantsd meg a !help-et.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "Az osu! szerverek naaagggyyyooonnn lasssúúúaaakkk, úgyhogy most nem sok dolgot tudok csinálni. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Mikor beszéltél utóljára a nagyiddal?",
 				"Takarítsd ki a szobádat. Amire végzel, akkor hátha működik.",
 				"Jó lenne kimenni sétálni, az elvinné az időt. Tudod...az utcán...",

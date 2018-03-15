@@ -15,6 +15,8 @@ import tillerino.tillerinobot.diff.PercentageEstimates;
 import javax.annotation.Nonnull;
 
 public class TsundereEnglish extends TsundereBase {
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected String getInactiveShortGreeting(String username, long inactiveTime) {
 		return welcomeUserShortShuffler.get(
@@ -48,7 +50,7 @@ public class TsundereEnglish extends TsundereBase {
 
 	@Override
 	public String unknownBeatmap() {
-		setChanged(true);
+		registerModification();
 
 		return unknownBeatmapShuffler.get(
 			"Are you stupid? No one plays that map!",
@@ -71,7 +73,7 @@ public class TsundereEnglish extends TsundereBase {
 
 	@Override
 	public String noInformationForModsShort() {
-		setChanged(true);
+		registerModification();
 
 		return noInformationForModsShortShuffler.get(
 			"Those mods? You wish!",
@@ -82,7 +84,7 @@ public class TsundereEnglish extends TsundereBase {
 
 	@Override
 	public String noInformationForMods() {
-		setChanged(true);
+		registerModification();
 
 		return noInformationForModsShuffler.get(
 			"What!? You can't possibly expect me to know the answer to that!",
@@ -108,7 +110,7 @@ public class TsundereEnglish extends TsundereBase {
 
 	@Override
 	public String tryWithMods() {
-		setChanged(true);
+		registerModification();
 
 		return tryWithModsShuffler.get(
 			"An idiot like you wouldn't know to try this with mods. You should thank me.",
@@ -120,7 +122,7 @@ public class TsundereEnglish extends TsundereBase {
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		setChanged(true);
+		registerModification();
 
 		String modnames = Mods.toShortNamesContinuous(mods);
 		return tryWithModsListShuffler.get(
@@ -264,7 +266,7 @@ public class TsundereEnglish extends TsundereBase {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		setChanged(true);
+		registerModification();
 
 		return invalidAccuracyShuffler.get(
 			"\"The first principle is that you must not fool yourself - and you are the easiest person to fool.\"",
@@ -279,7 +281,7 @@ public class TsundereEnglish extends TsundereBase {
 
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		setChanged(true);
+		registerModification();
 
 		return new Message(optionalCommentOnLanguageShuffler.get(
 			"You seem like just the sort of idiot that wouldn't believe me if I said I wasn't tsundere.",

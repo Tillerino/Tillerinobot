@@ -10,7 +10,8 @@ import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 
 import javax.annotation.Nonnull;
 
-public abstract class TsundereBase implements Language {
+public abstract class TsundereBase extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	//random object
 	static final Random rnd = new Random();
 	//Recent counters, reset if inactive for a while
@@ -30,18 +31,6 @@ public abstract class TsundereBase implements Language {
 	StringShuffler noInformationForModsShuffler = new StringShuffler(rnd);
 	StringShuffler unknownBeatmapShuffler = new StringShuffler(rnd);
 
-	transient boolean changed;
-
-	@Override
-	public boolean isChanged() {
-		return changed;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		this.changed = changed;
-	}
-
 	@Override
 	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		String username = apiUser.getUserName();
@@ -60,7 +49,7 @@ public abstract class TsundereBase implements Language {
 			recentHugs = 0;
 		}
 
-		setChanged(true);
+		registerModification();
 
 		return new Message(greeting);
 	}
@@ -72,7 +61,7 @@ public abstract class TsundereBase implements Language {
 	@Nonnull
 	@Override
 	public Response hug(OsuApiUser apiUser) {
-		setChanged(true);
+		registerModification();
 		//Responses move from tsun to dere with more hug attempts and recommendations
 		recentHugs++;
 		int baseLevel = (int)(Math.log(recentHugs) / Math.log(2.236) + Math.log(recentRecommendations+1) / Math.log(5)); //Sum logs base sqrt(5) and 5
@@ -95,7 +84,7 @@ public abstract class TsundereBase implements Language {
 
 	@Override
 	public Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
-		setChanged(true);
+		registerModification();
 		recentRecommendations++;
 		return getOptionalCommentOnRecommendationResponse(recentRecommendations);
 	}
@@ -369,7 +358,7 @@ public abstract class TsundereBase implements Language {
 	public String invalidChoice(String invalid, String choices) {
 		if (choices.contains("[nomod]")) {
 			// recommendation parameter was off
-			setChanged(true);
+			registerModification();
 			/*
 			 * we'll give three fake recommendations and then one proper error
 			 * message. non-randomness required for unit test.

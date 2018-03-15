@@ -13,7 +13,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * @author Tomoka Rin leoyao321@gmail.com https://osu.ppy.sh/u/125308
  */
-public class ChineseTraditional implements Language {
+public class ChineseTraditional extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -153,16 +154,6 @@ public class ChineseTraditional implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "無效的Acc數值。: \"" + acc + "\"";
 	}
@@ -184,12 +175,13 @@ public class ChineseTraditional implements Language {
 				+ "更多資訊請輸入 !help 來幫助你。";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "Osu!伺服器目前連線緩慢，所以我跟你一樣什麼事都不能做...你可以試著...";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"泡杯咖啡看看最近有什麼新聞打發時間。",
 				"去小睡一下再回來!",
 				"來看看現在有誰在實況吧! [http://www.twitch.tv/directory/game/Osu! streaming]",

@@ -143,16 +143,6 @@ public class Hebrew implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "\"" + acc + "\" :אחוזי דיוק שגויים";
 	}

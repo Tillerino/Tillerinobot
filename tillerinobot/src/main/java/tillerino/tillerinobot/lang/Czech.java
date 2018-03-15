@@ -19,7 +19,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Polarni tom.rivnac@gmail.com https://github.com/Polarni https://osu.ppy.sh/u/Polarni
  */
-public class Czech implements Language {
+public class Czech extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
   static final Random rnd = new Random();
 
 	@Override
@@ -157,16 +158,6 @@ public class Czech implements Language {
 	public String notRanked() {
 		return "Vypadá to že beatmapa není hodnocená.";
 	}
-	
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
 
 	@Override
 	public String invalidAccuracy(String acc) {
@@ -214,12 +205,13 @@ public class Czech implements Language {
 		return "Syntaxe pro nastavení parametru je !set option (nastavení) value (hodnota). Zkus !help pokud potřebuješ další ukazatele.";
 	}
 	
-  StringShuffler doSomething = new StringShuffler(rnd);
+  StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
   
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "V tuto chvíli jsou osu! servery super pomalé, takže pro tuto chvíli nemůžu nic pro tebe udělat. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Řekni... Kdy jsi naposledy mluvil(a) se svojí babičkou?",
 				"Co říkáš na úklid tvého pokoje a pak se zkusit zeptat znova?",
 				"Vsadím se že by jsi se moc rád(a) běžel(a) projít. Ty víš... venku?",

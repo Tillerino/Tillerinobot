@@ -13,7 +13,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * @author Deardrops lness@qq.com https://github.com/Deardrops https://osu.ppy.sh/u/1735252
  */
-public class ChineseSimple implements Language {
+public class ChineseSimple extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -153,16 +154,6 @@ public class ChineseSimple implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "无效的Acc数值： \"" + acc + "\"";
 	}
@@ -208,12 +199,13 @@ public class ChineseSimple implements Language {
 		return "请输入 !set option 数值 来设置变量。输入 !help 可以获得更多帮助。";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "老板家的小霸王又被人拖走了，所以什么都做不了的说。 ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"说点什么好呢...你最后一次和奶奶说话是什么时候？",
 				"你要不要打扫一下房间再回来看看？",
 				"我想你现在应该去外面走走，去外面见见朋友。",

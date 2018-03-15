@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
+import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 

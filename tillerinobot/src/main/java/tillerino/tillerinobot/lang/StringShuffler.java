@@ -1,5 +1,6 @@
 package tillerino.tillerinobot.lang;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
@@ -13,7 +14,8 @@ import java.util.Random;
  * saving the seed for shuffling the array and shuffling it every time a String
  * is requested instead of shuffling it once.
  */
-public class StringShuffler {
+public class StringShuffler implements Serializable {
+	private static final long serialVersionUID = 1L;
 	/*
 	 * 8 bytes;
 	 */

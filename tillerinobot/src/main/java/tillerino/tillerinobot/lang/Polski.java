@@ -148,16 +148,6 @@ public class Polski implements Language {
 	public String notRanked() {
 		return "Wygląda na to, że ta mapa nie jest rankingowa.";
 	}
-	
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
 
 	@Override
 	public String invalidAccuracy(String acc) {

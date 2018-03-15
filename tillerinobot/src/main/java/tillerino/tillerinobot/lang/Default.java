@@ -19,7 +19,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
  */
-public class Default implements Language {
+public class Default extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -159,16 +160,6 @@ public class Default implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Invalid accuracy: \"" + acc + "\"";
 	}
@@ -214,12 +205,13 @@ public class Default implements Language {
 		return "The syntax to set a parameter is !set option value. Try !help if you need more pointers.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "The osu! servers are super slow right now, so there's nothing I can do for you at this moment. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Say... When was the last time you talked to your grandmother?",
 				"How about you clean your room and then ask again?",
 				"I bet you'd love to take a walk right now. You know... outside?",

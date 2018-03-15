@@ -13,7 +13,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * Dutch language implementation by https://osu.ppy.sh/u/PudiPudi and https://github.com/notadecent and https://osu.ppy.sh/u/2756335
  */
-public class Nederlands implements Language {
+public class Nederlands extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -151,16 +152,6 @@ public class Nederlands implements Language {
 	}
 	
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Ongeldige accuracy: \"" + acc + "\"";
 	}
@@ -181,12 +172,13 @@ public class Nederlands implements Language {
 		return "De syntax om een parameter in te stellen is '!set optie waarde'. Typ !help als je meer aanwijzingen nodig hebt.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "De osu! servers zijn nu heel erg traag, dus ik kan op dit moment niets voor je doen. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Zeg... Wanneer heb je voor het laatst met je oma gesproken?",
 				"Wat dacht je ervan om je kamer eens op te ruimen en dan nog eens te proberen?",
 				"Ik weet zeker dat je vast erg zin hebt in een wandeling. Jeweetwel... daarbuiten?",

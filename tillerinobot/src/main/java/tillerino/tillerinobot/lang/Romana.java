@@ -19,7 +19,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Dddsasul ffrrtt223@gmail.com https://github.com/Dddsasul https://osu.ppy.sh/u/6579055
  */
-public class Romana implements Language {
+public class Romana extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -159,16 +160,6 @@ public class Romana implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Acuratețe incalidă: \"" + acc + "\"";
 	}
@@ -214,12 +205,13 @@ public class Romana implements Language {
 		return "Pentru a seta un parametru folosește !set opțiune valoare. Încearcă !help dacă ai nevoie de mai multe indicații.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "Serverele osu! se mișcă foarte greu, nu te pot ajuta momentan =[. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Fi sincer... Când a fost ultima oară când ai vorbit cu bunica ta?",
 				"Ce-ar fi să-ți cureți camera și sa întrebi după?",
 				"Pun pariu că ți-ar placea să te plimbi puțin. Ști tu... afară?",

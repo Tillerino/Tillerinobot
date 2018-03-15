@@ -13,8 +13,9 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * Italian Language implementation. Thanks go to
  * https://osu.ppy.sh/u/marcostudios and https://osu.ppy.sh/u/Howl for this.
  */
-public class Italiano implements Language {
-        static final Random rnd = new Random();
+public class Italiano extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
+	static final Random rnd = new Random();
 		
 	@Override
 	public String unknownBeatmap() {
@@ -157,16 +158,6 @@ public class Italiano implements Language {
 	}
  
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
- 
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
- 
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Accuracy invalida: \"" + acc + "\"";
 	}
@@ -187,12 +178,13 @@ public class Italiano implements Language {
 		return "La sintassi per impostare un parametro è !set opzione valore. Usa !help se ti servono più indicazioni.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "I server di osu! sono super lenti per ora, quindi non c'è nulla che posso fare al momento. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Dimmi... Quand'è stata l'ultima volta che hai parlato a tua nonna?",
 				"Che ne dici di pulire la tua stanza e poi chiedermelo di nuovo?",
 				"Scommetto che vuoi fare una passeggiata ora. Sai... fuori?",

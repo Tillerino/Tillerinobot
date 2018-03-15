@@ -10,7 +10,8 @@ import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 
-public class Portuguese implements Language {
+public class Portuguese extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -148,16 +149,6 @@ public class Portuguese implements Language {
 	}
 	
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Precisão inválida: \"" + acc + "\"";
 	}
@@ -178,12 +169,13 @@ public class Portuguese implements Language {
 		return "A sintaxe para definir um parâmetro é !set valor. Tente !help se você precisa de mais ajuda";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "O servidor do osu! está muito lento, não há nada que posso fazer no momento.";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Então... Quando foi a última vez que você falou com a sua avó?",
 				"Que tal você ir limpar seu quarto e depois tentar de novo?",
 				"Aposto que você adoraria ir caminhar agora. Sabe... lá fora?",

@@ -36,6 +36,7 @@ import tillerino.tillerinobot.data.BotUserData;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.*;
+import tillerino.tillerinobot.util.IsMutable;
 
 /**
  * Manager for serializing and caching user data. Since user data can be
@@ -56,48 +57,6 @@ public class UserDataManager implements TidyObject {
 	 * @author Tillerino
 	 */
 	public static class UserData {
-		public enum LanguageIdentifier {
-			Default(Default.class),
-			English(Default.class),
-			Tsundere(TsundereEnglish.class),
-			TsundereGerman(TsundereGerman.class),
-			Italiano(Italiano.class),
-			Français(Francais.class),
-			Polski(Polski.class),
-			Nederlands(Nederlands.class),
-			עברית(Hebrew.class),
-			Farsi(Farsi.class),
-			Português_BR(Portuguese.class),
-			Deutsch(Deutsch.class),
-			Čeština(Czech.class),
-			Magyar(Hungarian.class),
-			한국어(Korean.class),
-			Dansk(Dansk.class),
-			Türkçe(Turkish.class),
-			日本語(Japanese.class),
-			Español(Spanish.class),
-			Ελληνικά(Greek.class),
-			Русский(Russian.class),
-			Lietuvių(Lithuanian.class),
-			Português_PT(PortuguesePortugal.class),
-			Svenska(Svenska.class),
-			Romana(Romana.class),
-			繁體中文(ChineseTraditional.class),
-			български(Bulgarian.class),
-			Norsk(Norwegian.class),
-			Indonesian(Indonesian.class),
-			简体中文(ChineseSimple.class),
-			Català(Catalan.class),
-			Slovenščina(Slovenian.class),
-			; // please end identifier entries with a comma and leave this semicolon here
-			
-			public final Class<? extends Language> cls;
-
-			private LanguageIdentifier(Class<? extends Language> cls) {
-				this.cls = cls;
-			}
-		}
-		
 		@Data
 		public static class BeatmapWithMods {
 			public BeatmapWithMods(@BeatmapId int beatmap,
@@ -123,13 +82,13 @@ public class UserDataManager implements TidyObject {
 		public void setChanged(boolean changed) {
 			this.changed = changed;
 			
-			if(!changed) {
-				getLanguage().setChanged(changed);
+			if(!changed && (getLanguage() instanceof IsMutable)) {
+				((IsMutable) getLanguage()).clearModified();
 			}
 		}
 		
 		public boolean isChanged() {
-			return changed || getLanguage().isChanged();
+			return changed || (getLanguage() instanceof IsMutable) && ((IsMutable) getLanguage()).isModified();
 		}
 		
 		@Getter

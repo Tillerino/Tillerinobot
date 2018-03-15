@@ -14,7 +14,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * @author Sibchil https://osu.ppy.sh/u/3988045 https://github.com/sibchil
  * @author Zarkinox arichtermohr@gmail.com https://osu.ppy.sh/u/2743036 https://github.com/zarkinox
  */
-public class Spanish implements Language {
+public class Spanish extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -152,16 +153,6 @@ public class Spanish implements Language {
 	public String notRanked() {
 		return "Parece que este mapa no está rankeado.";
 	}
-	
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
 
 	@Override
 	public String invalidAccuracy(String acc) {
@@ -184,12 +175,13 @@ public class Spanish implements Language {
 		return "La sintaxis para establecer un parámetro es !set opción valor. Prueba !help si necesitas más indicaciones.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "Los servidores de osu! están muy lentos ahora mismo, por lo que no puedo ayudarte con nada en estos momentos. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Dime, ¿cuándo fue la última vez que hablaste con tu abuela?",
 				"¿Qué te parece si ordenas un poco tu habitación y luego me preguntas otra vez?",
 				"Apuesto a que te encantaría dar un paseo, ya sabes... fuera de casa y eso.",

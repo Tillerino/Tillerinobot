@@ -152,16 +152,6 @@ public class Dansk implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Ugyldig accuracy: \"" + acc + "\"";
 	}

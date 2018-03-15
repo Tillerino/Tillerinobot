@@ -238,20 +238,6 @@ public interface Language {
 	default Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
 		return new NoResponse();
 	}
-	
-	/**
-	 * @return true if the object has been changed since the last time that
-	 *         {@link #setChanged(boolean)} was called with false.
-	 */
-	public boolean isChanged();
-	
-	/**
-	 * Bot tells the Language object that it was saved.
-	 * 
-	 * @param changed
-	 *            false, if the object was saved.
-	 */
-	public void setChanged(boolean changed);
 
 	/**
 	 * The given accuracy is invalid.

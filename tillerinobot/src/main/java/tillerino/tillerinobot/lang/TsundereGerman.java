@@ -15,6 +15,8 @@ import tillerino.tillerinobot.diff.PercentageEstimates;
 import javax.annotation.Nonnull;
 
 public class TsundereGerman extends TsundereBase {
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected String getInactiveShortGreeting(String username, long inactiveTime) {
 		return welcomeUserShortShuffler.get(
@@ -48,7 +50,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String unknownBeatmap() {
-		setChanged(true);
+		registerModification();
 
 		return unknownBeatmapShuffler.get(
 			"Bist du dumm? Niemand würde diese Map spielen!",
@@ -72,7 +74,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String noInformationForModsShort() {
-		setChanged(true);
+		registerModification();
 
 		return noInformationForModsShortShuffler.get(
 			"Diese Mods? Denkste!",
@@ -84,7 +86,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String noInformationForMods() {
-		setChanged(true);
+		registerModification();
 
 		return noInformationForModsShuffler.get(
 			"Was!? Du kannst nicht wirklich glauben dass ich die Antwort dazu kenne!",
@@ -110,7 +112,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String tryWithMods() {
-		setChanged(true);
+		registerModification();
 
 		return tryWithModsShuffler.get(
 			"So ein Trottel wie du hätte gar nicht daran gedacht, das hier mit Mods zu spielen. Ein Dankeschön wäre angebracht.",								
@@ -121,7 +123,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		setChanged(true);
+		registerModification();
 
 		String modnames = Mods.toShortNamesContinuous(mods);
 		return tryWithModsListShuffler.get(
@@ -265,7 +267,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		setChanged(true);
+		registerModification();
 
 		return invalidAccuracyShuffler.get(
 			"\"Die erste Regel ist, dass du dich nicht selbst betrügen sollst - und du bist die einfachste Person zum Betrügen.\"",
@@ -280,7 +282,7 @@ public class TsundereGerman extends TsundereBase {
 
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		setChanged(true);
+		registerModification();
 
 		return new Message(optionalCommentOnLanguageShuffler.get(
 			"[https://osu.ppy.sh/u/3135278 MrMorkat] hat mir dabei geholfen Deutsch zu lernen. Aber welche Art von Idiot will einen Tsundere Roboter auf Deutsch!? Das ist ernsthaft die dümmste Idee, die ich je gehört habe!",
