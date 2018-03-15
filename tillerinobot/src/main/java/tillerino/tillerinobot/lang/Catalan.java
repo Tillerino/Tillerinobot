@@ -19,7 +19,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Underforest https://osu.ppy.sh/u/6753180
  */
-public class Catalan implements Language {
+public class Catalan extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -159,16 +160,6 @@ public class Catalan implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Precisió invàlida: \"" + acc + "\"";
 	}
@@ -189,12 +180,13 @@ public class Catalan implements Language {
 		return "La sintaxi per a establir un paràmetre és !set opció valor. Prova !help si necessites més indicacions.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "Els servidors de osu! estan molt lents ara mateix, pel que no puc ajudar-te amb res a hores d'ara. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"I digues-me... quan va ser l'última vegada que vas parlar amb teva àvia?",
 				"Què tal si ordenes una mica teva habitació i després em preguntes novament?",
 				"Aposto a que et encantaria fer una passejada, ja saps ... fora?",

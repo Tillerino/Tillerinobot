@@ -78,6 +78,8 @@ import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.osutrack.UpdateResult;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
@@ -110,16 +112,15 @@ public class IRCBot extends CoreHooks {
 	public static final String MDC_DURATION = "duration";
 	public static final String MCD_OSU_API_RATE_BLOCKED_TIME = "osuApiRateBlockedTime";
 	
-	final BotBackend backend;
-	final private boolean silent;
-	final RecommendationsManager manager;
-	final BotInfo botInfo;
-	final UserDataManager userDataManager;
-	final List<CommandHandler> commandHandlers = new ArrayList<>();
-	final ThreadLocalAutoCommittingEntityManager em;
-	final EntityManagerFactory emf;
-	final IrcNameResolver resolver;
-	final OsutrackDownloader osutrackDownloader;
+	private final BotBackend backend;
+	private final boolean silent;
+	private final BotInfo botInfo;
+	private final UserDataManager userDataManager;
+	private final List<CommandHandler> commandHandlers = new ArrayList<>();
+	private final ThreadLocalAutoCommittingEntityManager em;
+	private final EntityManagerFactory emf;
+	private final IrcNameResolver resolver;
+	private final OsutrackDownloader osutrackDownloader;
 	private final RateLimiter rateLimiter;
 	
 	@Inject
@@ -130,7 +131,6 @@ public class IRCBot extends CoreHooks {
 			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
 			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter) {
 		this.backend = backend;
-		this.manager = manager;
 		this.botInfo = botInfo;
 		this.userDataManager = userDataManager;
 		this.pinger = pinger;
@@ -143,7 +143,7 @@ public class IRCBot extends CoreHooks {
 		this.rateLimiter = rateLimiter;
 		
 		commandHandlers.add(new ResetHandler(manager));
-		commandHandlers.add(new OptionsHandler(manager));
+		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
 		commandHandlers.add(new AccHandler(backend));
 		commandHandlers.add(new WithHandler(backend));
 		commandHandlers.add(new RecommendHandler(manager));
@@ -353,8 +353,7 @@ public class IRCBot extends CoreHooks {
 		for (int j = 0; j < chars.length; j++) {
 			chars[j] = (char) ('A' + r.nextInt(26));
 		}
-		String string = new String(chars);
-		return string;
+		return new String(chars);
 	}
 
 	@Override
@@ -383,6 +382,7 @@ public class IRCBot extends CoreHooks {
 				try {
 					senderSemaphore.acquire();
 				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 					return false;
 				}
 				try {
@@ -417,6 +417,7 @@ public class IRCBot extends CoreHooks {
 				try {
 					senderSemaphore.acquire();
 				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 					return false;
 				}
 				try {
@@ -507,11 +508,9 @@ public class IRCBot extends CoreHooks {
 			
 			Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
 			
-			if(hugPattern.matcher(originalMessage).find()) {
-				if (apiUser != null && userData.getHearts() > 0) {
-					sendResponse(lang.hug(apiUser), user);
-					return;
-				}
+			if(hugPattern.matcher(originalMessage).find() && userData.getHearts() > 0) {
+				sendResponse(lang.hug(apiUser), user);
+				return;
 			}
 			
 			if(tryHandleAndRespond(new LinkPpaddictHandler(backend), originalMessage, apiUser, userData, user)) {
@@ -544,10 +543,8 @@ public class IRCBot extends CoreHooks {
 
 	private void checkVersionInfo(final IRCBotUser user) throws SQLException, UserException {
 		int userVersion = backend.getLastVisitedVersion(user.getNick());
-		if(userVersion < currentVersion) {
-			if(versionMessage == null || user.message(versionMessage, false)) {
-				backend.setLastVisitedVersion(user.getNick(), currentVersion);
-			}
+		if (userVersion < CURRENT_VERSION && (VERSION_MESSAGE == null || user.message(VERSION_MESSAGE, false))) {
+			backend.setLastVisitedVersion(user.getNick(), CURRENT_VERSION);
 		}
 	}
 	
@@ -606,8 +603,8 @@ public class IRCBot extends CoreHooks {
 		pinger.handleUnknownEvent(event);
 	}
 
-	static final int currentVersion = 12;
-	static final String versionMessage = "Quick update: You might have heard of a sweet tool called [https://ameobea.me/osutrack/ osu!track] made by [https://osu.ppy.sh/u/Ameo Ameo]."
+	static final int CURRENT_VERSION = 12;
+	static final String VERSION_MESSAGE = "Quick update: You might have heard of a sweet tool called [https://ameobea.me/osutrack/ osu!track] made by [https://osu.ppy.sh/u/Ameo Ameo]."
 			+ " Starting now, I can query it for you. Give it a go! Just type !u."
 			+ " For more info check out the [https://github.com/Tillerino/Tillerinobot/wiki/osu!track wiki].";
 
@@ -622,64 +619,64 @@ public class IRCBot extends CoreHooks {
 		}
 
 		IRCBotUser user = fromIRC(event.getUser(), event);
-		welcomeIfDonator(user);
-	}
-	
-	void welcomeIfDonator(IRCBotUser user) {
 		try {
-			Integer userid;
-			try {
-				userid = resolver.resolveIRCName(user.getNick());
-			} catch (IOException e) {
-				if (isTimeout(e)) {
-					log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
-					return;
-				}
-				throw e;
-			}
-			
-			if(userid == null)
-				return;
-			
-			OsuApiUser apiUser;
-			try {
-				apiUser = backend.getUser(userid, 0);
-			} catch (IOException e) {
-				if (isTimeout(e)) {
-					log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
-					return;
-				}
-				throw e;
-			}
-			
-			if(apiUser == null)
-				return;
-			
-			if(backend.getDonator(apiUser) > 0) {
-				// this is a donator, let's welcome them!
-				UserData data = userDataManager.getData(userid);
-				
-				if (!data.isShowWelcomeMessage())
-					return;
-
-				long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
-				
-				Response welcome = data.getLanguage().welcomeUser(apiUser,
-						inactiveTime);
-				sendResponse(welcome, user);
-
-				if (data.isOsuTrackWelcomeEnabled()) {
-					UpdateResult update = osutrackDownloader.getUpdate(user.getNick());
-					Response updateResponse = OsuTrackHandler.updateResultToResponse(update);
-					sendResponse(updateResponse, user);
-				}
-				
-				checkVersionInfo(user);
-			}
+			welcomeIfDonator(user);
 		} catch (InterruptedException e) {
-			// no problem
+			Thread.currentThread().interrupt();
 		} catch (Exception e) {
 			log.error("error welcoming potential donator", e);
+		}
+	}
+	
+	void welcomeIfDonator(IRCBotUser user) throws SQLException, InterruptedException, IOException, UserException {
+		Integer userid;
+		try {
+			userid = resolver.resolveIRCName(user.getNick());
+		} catch (IOException e) {
+			if (isTimeout(e)) {
+				log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
+				return;
+			}
+			throw e;
+		}
+		
+		if(userid == null)
+			return;
+		
+		OsuApiUser apiUser;
+		try {
+			apiUser = backend.getUser(userid, 0);
+		} catch (IOException e) {
+			if (isTimeout(e)) {
+				log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
+				return;
+			}
+			throw e;
+		}
+		
+		if(apiUser == null)
+			return;
+		
+		if(backend.getDonator(apiUser) > 0) {
+			// this is a donator, let's welcome them!
+			UserData data = userDataManager.getData(userid);
+			
+			if (!data.isShowWelcomeMessage())
+				return;
+
+			long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
+			
+			Response welcome = data.getLanguage().welcomeUser(apiUser,
+					inactiveTime);
+			sendResponse(welcome, user);
+
+			if (data.isOsuTrackWelcomeEnabled()) {
+				UpdateResult update = osutrackDownloader.getUpdate(user.getNick());
+				Response updateResponse = OsuTrackHandler.updateResultToResponse(update);
+				sendResponse(updateResponse, user);
+			}
+			
+			checkVersionInfo(user);
 		}
 	}
 
@@ -748,7 +745,7 @@ public class IRCBot extends CoreHooks {
 		Integer userId = resolver.resolveIRCName(user.getNick());
 		
 		if(userId != null) {
-			OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000);
+			OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000L);
 			
 			if(apiUser != null) {
 				String apiUserIrcName = IrcNameResolver.getIrcUserName(apiUser);

@@ -137,6 +137,7 @@ public class BeatmapInfoService {
 
 			return info;
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			throw BotAPIServer.getInterrupted();
 		} catch (ExecutionException e) {
 			throw BotAPIServer.refreshWebApplicationException(e.getCause());

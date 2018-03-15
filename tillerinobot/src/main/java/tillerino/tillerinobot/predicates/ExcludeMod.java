@@ -5,10 +5,10 @@ import lombok.Value;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser.PredicateBuilder;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
 
 @Value
 public class ExcludeMod implements RecommendationPredicate {

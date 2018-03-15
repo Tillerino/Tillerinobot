@@ -13,7 +13,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * @author Haganenno https://osu.ppy.sh/u/4692344 https://github.com/peraz
  */
-public class Lithuanian implements Language {
+public class Lithuanian extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 	
 	@Override
@@ -151,16 +152,6 @@ public class Lithuanian implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Negalimas tikslumas: \"" + acc + "\"";
 	}
@@ -181,12 +172,13 @@ public class Lithuanian implements Language {
 		return "Komanda, kuri nustato parametrą yra !set nustatymo reikšmė. Pabandyk !help, jeigu tau reikia daugiau patarimų. ";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "osu! serveriai labai sulėtėjo ir šiuo momentu niekuo negaliu padėt. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Gal susitvarkom kambarį ir pamėginam vėliau?",
 				"Manau reiktų išeit pasivaikščiot arba pasivažinėt. Žinai... į lauką?",
 				"Esu įsitikinęs, kad turi darbų kuriuos tu turi atlikt. Davai pasidarom bent vieną dabar?",

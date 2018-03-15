@@ -19,7 +19,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Akuma Kudasai aka _BibleThump diabloxx50@gmail.com https://git.blosu.net/Diabloxx osu account is restricted
  */
-public class Norwegian implements Language {
+public class Norwegian extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -159,16 +160,6 @@ public class Norwegian implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Unkjent accuracy: \"" + acc + "\"";
 	}
@@ -214,12 +205,13 @@ public class Norwegian implements Language {
 		return "Syntaksen for å sette parameter er !set option value. Prøv !help hvis du trenger mer veiledning.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "osu! serverene er ikke så raske akkurat nå, så det er ingenting jeg kan gjøre for deg i dette øyeblikket. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"Fortell... Når sist snakket du med bestemoren din?",
 				"Hva med at du rydder rommet ditt så spør du meg igjen?",
 				"Jeg vedder på at du ville elsket å gått en tur akkuratt nå. Du vet... ut?",

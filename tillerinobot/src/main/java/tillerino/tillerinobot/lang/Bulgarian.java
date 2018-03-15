@@ -19,7 +19,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author rint0 matey_krastev2@hotmail.com https://osu.ppy.sh/u/6330087
  */
-public class Bulgarian implements Language {
+public class Bulgarian extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -159,16 +160,6 @@ public class Bulgarian implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return " Невалидна точност: \"" + acc + "\"";
 	}
@@ -214,12 +205,13 @@ public class Bulgarian implements Language {
 		return " Синтаксисът, за да приложиш параметър е !set option value. Напиши !help , ако имаш нужда от още помощ.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = " Сървърите на осу! са леко лагави в момента и не мога да ти помогна. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				" Хм... Кога за последно говори с баба си?",
 				" Защо първо не си изчистиш стаята и после да опиташ пак?",
 				" Обзалагам се, че сега кипиш от желание да се разходиш. Знаеш... навън?",

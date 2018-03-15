@@ -10,7 +10,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.recommendations.Recommendation;
 
 /**
  * <p>
@@ -238,20 +238,6 @@ public interface Language {
 	default Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
 		return new NoResponse();
 	}
-	
-	/**
-	 * @return true if the object has been changed since the last time that
-	 *         {@link #setChanged(boolean)} was called with false.
-	 */
-	public boolean isChanged();
-	
-	/**
-	 * Bot tells the Language object that it was saved.
-	 * 
-	 * @param changed
-	 *            false, if the object was saved.
-	 */
-	public void setChanged(boolean changed);
 
 	/**
 	 * The given accuracy is invalid.

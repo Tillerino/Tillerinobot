@@ -31,17 +31,13 @@ public class RepositoryModule extends AbstractModule {
 	@Singleton
 	public JpaRepositoryFactory getRepoFactory(EntityManagerFactory emf,
 			ThreadLocalAutoCommittingEntityManager em) {
+		em.setThreadLocalEntityManager(emf.createEntityManager());
 		try {
-			em.setThreadLocalEntityManager(emf.createEntityManager());
-			try {
-				JpaRepositoryFactory factory = new JpaRepositoryFactory(em);
-				createRepositories(factory);
-				return factory;
-			} finally {
-				em.close();
-			}
-		} catch (Exception e) {
-			throw e;
+			JpaRepositoryFactory factory = new JpaRepositoryFactory(em);
+			createRepositories(factory);
+			return factory;
+		} finally {
+			em.close();
 		}
 	}
 

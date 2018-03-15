@@ -1,6 +1,7 @@
-package tillerino.tillerinobot;
+package tillerino.tillerinobot.recommendations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -11,9 +12,14 @@ import org.junit.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-import tillerino.tillerinobot.RecommendationsManager.Sampler.Settings;
+import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.TestBackend;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.recommendations.RecommendationRequest;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	TestBackend backend = new TestBackend(false);
@@ -31,31 +37,31 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	
 	@Before
 	public void createRecommendationsManager() {
-		manager = new RecommendationsManager(backend, recommendationsRepo, em);
+		manager = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
 	}
 
 	@Test
 	public void testPredicateParser() throws Exception {
-		Settings samplerSettings = manager.parseSamplerSettings(user, "gamma AR=9", new Default());
+		RecommendationRequest samplerSettings = manager.parseSamplerSettings(user, "gamma AR=9", new Default());
 
-		assertEquals(1, samplerSettings.predicates.size());
+		assertEquals(1, samplerSettings.getPredicates().size());
 
 		// Test "nc" alias for nightcore
 		// Gives double-time recommendations
 		samplerSettings = manager.parseSamplerSettings(user, "nc", new Default());
 
-		assertTrue(Mods.DoubleTime.is(samplerSettings.requestedMods));
+		assertTrue(Mods.DoubleTime.is(samplerSettings.getRequestedMods()));
 	}
 
 	@Test
 	public void testContinuousMods() throws Exception {
-		Settings samplerSettings = manager.parseSamplerSettings(user, "hdhr", new Default());
+		RecommendationRequest samplerSettings = manager.parseSamplerSettings(user, "hdhr", new Default());
 
-		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock), samplerSettings.requestedMods);
+		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock), samplerSettings.getRequestedMods());
 
 		samplerSettings = manager.parseSamplerSettings(user, "hdhr dt", new Default());
 
-		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime), samplerSettings.requestedMods);
+		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime), samplerSettings.getRequestedMods());
 	}
 
 	@Test(expected = UserException.class)
@@ -94,7 +100,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testHiding() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em);
+		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em, new RecommendationRequestParser(backend));
 
 		// save a recommendation and reload it
 		recMan.saveGivenRecommendation(1954, 2, 0);

@@ -22,7 +22,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 
-public class AbstractDatabaseTest {
+public abstract class AbstractDatabaseTest {
 	public static class CreateInMemoryDatabaseModule extends RepositoryModule {
 		@Provides
 		public EntityManagerFactory newEntityManagerFactory() {

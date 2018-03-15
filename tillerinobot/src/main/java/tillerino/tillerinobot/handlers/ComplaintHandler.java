@@ -15,9 +15,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.RecommendationsManager;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.recommendations.Recommendation;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.UserException;
 
 @Slf4j

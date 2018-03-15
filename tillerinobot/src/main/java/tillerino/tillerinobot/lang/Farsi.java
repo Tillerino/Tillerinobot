@@ -147,16 +147,6 @@ public class Farsi implements Language {
 	}
 	
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Accuracy-ro eshtebaa type nakardi? \"" + acc + "\" yani chi?";
 	}

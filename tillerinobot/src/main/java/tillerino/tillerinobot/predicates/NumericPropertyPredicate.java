@@ -1,10 +1,9 @@
 package tillerino.tillerinobot.predicates;
 
 import lombok.Value;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
 
 @Value
 public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
@@ -29,11 +28,7 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 		if(value > max) {
 			return false;
 		}
-		if(value >= max && !includeMax) {
-			return false;
-		}
-		
-		return true;
+		return value < max || includeMax;
 	}
 
 	@Override

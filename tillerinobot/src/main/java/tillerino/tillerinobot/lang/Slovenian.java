@@ -19,7 +19,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * 
  * @author Anze Jensterle hello@craftbyte.net https://github.com/CraftByte https://osu.ppy.sh/u/CraftByte
  */
-public class Slovenian implements Language {
+public class Slovenian extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -159,16 +160,6 @@ public class Slovenian implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Neveljavna natančnost: \"" + acc + "\"";
 	}
@@ -214,12 +205,13 @@ public class Slovenian implements Language {
 		return "Sintaksa za nastavitev parametra je !set nastavitev vrednost. Poskusi !help za več informacij.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "osu! strežniki so trenutno super počasni, zato trenutno ne morem narediti nič. ";
-		return message + doSomething.get(
+		return message + apiTimeoutShuffler.get(
 				"torej... Kdaj si nazadnje poklical babico?",
 				"Kaj pa če pospraviš sobo in potem poskusiva še enkrat?",
 				"Stavim da bi ti bil všeč en sprehod. Saj veš... zunaj?",

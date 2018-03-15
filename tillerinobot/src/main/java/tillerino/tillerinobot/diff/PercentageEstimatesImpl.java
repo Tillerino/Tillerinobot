@@ -25,7 +25,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 		AccuracyDistribution dist = AccuracyDistribution.get(getBeatmap().getObjectCount(), 0, acc);
 
 		CStandardScore score = new CStandardScore((int) getBeatmap().DifficultyAttribute(getMods(), CBeatmap.MaxCombo),
-				dist.get_300(), dist.get_100(), dist.get_50(), dist.getMiss(), getMods());
+				dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(), getMods());
 
 		return score.getPP(getBeatmap());
 	}
@@ -34,7 +34,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 	public double getPP(double acc, int combo, int misses) {
 		AccuracyDistribution dist = AccuracyDistribution.get(getBeatmap().getObjectCount(), misses, acc);
 
-		CStandardScore score = new CStandardScore(combo, dist.get_300(), dist.get_100(), dist.get_50(), dist.getMiss(),
+		CStandardScore score = new CStandardScore(combo, dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(),
 				getMods());
 
 		return score.getPP(getBeatmap());

@@ -54,18 +54,19 @@ public class AccHandler implements CommandHandler {
 
 		message = message.substring(3).trim().replace(',', '.');
 		Matcher extendedMatcher = extended.matcher(message);
+		Matcher superExtendedMatcher = superExtended.matcher(message);
 		if(extendedMatcher.matches()) {
 			double acc = parseAcc(extendedMatcher.group(1), lang);
 			int combo = parseInt(extendedMatcher.group(2), lang);
 			int misses = parseInt(extendedMatcher.group(3), lang);
 			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
-		} else if((extendedMatcher = superExtended.matcher(message)).matches()) {
+		} else if (superExtendedMatcher.matches()) {
 			// we're now in superExtended matching, aka drop % and add x100 and x50
-			int x100 = parseInt(extendedMatcher.group(1), lang);
-			String group2 = extendedMatcher.group(2);
+			int x100 = parseInt(superExtendedMatcher.group(1), lang);
+			String group2 = superExtendedMatcher.group(2);
 			int x50 = group2 == null ? 0 : parseInt(group2, lang);
-			int combo = parseInt(extendedMatcher.group(3), lang);
-			int misses = parseInt(extendedMatcher.group(4), lang);
+			int combo = parseInt(superExtendedMatcher.group(3), lang);
+			int misses = parseInt(superExtendedMatcher.group(4), lang);
 			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), x100, x50, combo, misses));
 		} else {
 			if(message.endsWith("%")) {

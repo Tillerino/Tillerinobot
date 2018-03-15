@@ -76,7 +76,7 @@ public class Hebrew implements Language {
 	@Override
 	public String malformattedMods(String mods) {
 		return "!with HDHR !with DTEZ :חבר אותם ללא רווחים או תווים מיוחדים. לדוגמה ,DT HR HD HT EZ NC FL SO NF משהו במודים האלה לא נראה נכון. החיבורים האפשריים הם";
-	};
+	}
 
 	@Override
 	public String noLastSongInfo() {
@@ -140,16 +140,6 @@ public class Hebrew implements Language {
 	@Override
 	public String notRanked() {
 		return ".נראה כי המפה אינה מדורגת";
-	}
-
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
 	}
 
 	@Override

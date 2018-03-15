@@ -31,13 +31,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import lombok.Getter;
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.CBeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.Model;
 
 /**
  * <p>

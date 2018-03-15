@@ -13,7 +13,8 @@ import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * @author https://osu.ppy.sh/u/3258429 SnickarN https://github.com/SnickarN-
  */
-public class Svenska implements Language {
+public class Svenska extends AbstractMutableLanguage {
+	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
 	@Override
@@ -151,16 +152,6 @@ public class Svenska implements Language {
 	public String notRanked() {
 		return "Ser ut som att den mappen inte är rankad.";
 	}
-	
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
 
 	@Override
 	public String invalidAccuracy(String acc) {
@@ -183,12 +174,13 @@ public class Svenska implements Language {
 		return "Syntaxen för att ställa en parameter är !set. Testa !help om du behöver mer hjälp.";
 	}
 	
-	StringShuffler doSomething = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
 	
 	@Override
 	public String apiTimeoutException() {
+		registerModification();
 		final String message = "osu! servrarna är jätte sakta just nu, så jag kan inte göra något för dig just nu. ";
-        return message + doSomething.get(
+        return message + apiTimeoutShuffler.get(
 				"Så... När var senaste gången du pratade med din mormor eller farmor?",
 				"Vad sägs som att du städar ditt rum och frågar mig igen efter det?",
 				"Jag slår vad om att du skulle älska att gå en runda. Du vet... utomhus?",

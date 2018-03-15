@@ -49,18 +49,8 @@ public class BeatmapMeta {
 		if(formLink) {
 			beatmapName = String.format("[http://osu.ppy.sh/b/%d %s]", getBeatmap().getBeatmapId(), beatmapName);
 		}
-		
-		PercentageEstimates percentageEstimates = getEstimates();
-		long mods = percentageEstimates.getMods();
-		if (percentageEstimates.getMods() != 0) {
-			StringBuilder modsString = new StringBuilder();
-			for (Mods mod : Mods.getMods(percentageEstimates.getMods())) {
-				if (mod.isEffective()) {
-					modsString.append(mod.getShortName());
-				}
-			}
-			beatmapName += " " + modsString;
-		}
+
+		beatmapName += formModsSuffix();
 
 		String estimateMessage = "";
 		Integer future = getPersonalPP();
@@ -70,16 +60,16 @@ public class BeatmapMeta {
 			estimateMessage += "future you: " + future + "pp | ";
 		}
 
-        estimateMessage += ppMessageBuilder.buildMessage(percentageEstimates);
+        estimateMessage += ppMessageBuilder.buildMessage(getEstimates());
 
-        if (percentageEstimates.isShaky()) {
+        if (getEstimates().isShaky()) {
             estimateMessage += " (rough estimates)";
         }
 
-        estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(mods));
+        estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(getMods()));
 
 		Double starDiff = null;
-		if (mods == 0) {
+		if (getMods() == 0) {
 			starDiff = beatmap.getStarDifficulty();
 		} else {
 			starDiff = estimates.getStarDiff();
@@ -88,9 +78,9 @@ public class BeatmapMeta {
 			estimateMessage += " ★ " + format.format(starDiff);
 		}
 
-		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(mods));
-		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(mods));
-		estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(mods));
+		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(getMods()));
+		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(getMods()));
+		estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(getMods()));
 		
 		if (estimates.isOppaiOnly()) {
 			estimateMessage += " (";
@@ -119,7 +109,7 @@ public class BeatmapMeta {
 	}
 	
 	public BeatmapWithMods getBeatmapWithMods() {
-		return new BeatmapWithMods(beatmap.getBeatmapId(), estimates.getMods());
+		return new BeatmapWithMods(beatmap.getBeatmapId(), getMods());
 	}
 
 	double getPpForAcc(double acc) {
@@ -205,4 +195,18 @@ public class BeatmapMeta {
                     noDecimalsFormat.format(estimates.getPP(x100, x50, combo, misses)) + "pp";
         }
     }
+
+	String formModsSuffix() {
+		PercentageEstimates percentageEstimates = getEstimates();
+		if (percentageEstimates.getMods() == 0) {
+			return "";
+		}
+		StringBuilder modsString = new StringBuilder();
+		for (Mods mod : Mods.getMods(percentageEstimates.getMods())) {
+			if (mod.isEffective()) {
+				modsString.append(mod.getShortName());
+			}
+		}
+		return " " + modsString;
+	}
 }

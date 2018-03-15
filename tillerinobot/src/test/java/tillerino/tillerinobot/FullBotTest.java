@@ -79,7 +79,7 @@ public class FullBotTest {
 						public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
 							log.debug("user{} received private message from {}: {}", botNumber, event.getUser().getNick(),
 									event.getMessage());
-							if (event.getMessage().contains(IRCBot.versionMessage)) {
+							if (event.getMessage().contains(IRCBot.VERSION_MESSAGE)) {
 								return;
 							}
 							if (event.getMessage().contains("Beatmap")) {

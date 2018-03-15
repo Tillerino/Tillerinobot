@@ -28,6 +28,8 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
  * This file violates all Java coding standards to be as easily comparable to
  * the original as possible.
  */
+// suppress all found Sonar warnings, since we are trying to copy C# code
+@SuppressWarnings({ "squid:S00116", "squid:S00117", "squid:ClassVariableVisibilityCheck", "squid:S00100" })
 public class CStandardScore {
 	private final int _maxCombo;
 	private final int _amount300;

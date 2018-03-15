@@ -19,10 +19,10 @@ import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.Model;
 
 public interface BotBackend {
 	@TypeQualifier(applicableTo = String.class)
@@ -36,8 +36,6 @@ public interface BotBackend {
 	 * @param mods
 	 *            mods for {@link PercentageEstimates}. These might be ignored
 	 *            if they can't be satisfied
-	 * @param lang
-	 *            TODO
 	 * @return null if not found
 	 * @throws SQLException
 	 * @throws IOException

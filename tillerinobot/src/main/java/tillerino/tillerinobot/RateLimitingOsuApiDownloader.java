@@ -20,6 +20,7 @@ public class RateLimitingOsuApiDownloader extends Downloader {
 		try {
 			limiter.limitRate();
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			throw new ServiceUnavailableException();
 		}
 		return super.get(command, parameters);

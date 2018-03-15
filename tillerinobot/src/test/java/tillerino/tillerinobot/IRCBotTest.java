@@ -44,9 +44,11 @@ import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.CommandHandler.AsyncTask;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.Model;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
@@ -68,14 +70,14 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		when(user.message(anyString(), anyBoolean())).thenReturn(true);
 		
 		bot.processPrivateMessage(user, "!recommend");
-		verify(user).message(IRCBot.versionMessage, false);
-		verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.currentVersion));
+		verify(user).message(IRCBot.VERSION_MESSAGE, false);
+		verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.CURRENT_VERSION));
 		
 		user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("user");
 		
 		bot.processPrivateMessage(user, "!recommend");
-		verify(user, never()).message(IRCBot.versionMessage, false);
+		verify(user, never()).message(IRCBot.VERSION_MESSAGE, false);
 	}
 	
 	@Test
@@ -83,7 +85,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		IRCBot bot = getTestBot(backend);
 		
 		backend.hintUser("user", false, 100, 1000);
-		doReturn(IRCBot.currentVersion).when(backend).getLastVisitedVersion(anyString());
+		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
 
 		IRCBotUser user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("user");
@@ -141,15 +143,12 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	}
 	
 	IRCBot getTestBot(BotBackend backend) {
-		RecommendationsManager recMan;
-		if (backend == this.backend) {
-			recMan = this.recommendationsManager;
-		} else {
-			recMan = spy(new RecommendationsManager(backend,
-					recommendationsRepo, em));
+		if (backend != this.backend) {
+			this.recommendationsManager = spy(new RecommendationsManager(backend,
+					recommendationsRepo, em, new RecommendationRequestParser(backend)));
 		}
 
-		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
+		IRCBot ircBot = new IRCBot(backend, this.recommendationsManager, new BotInfo(),
 				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
 				emf, resolver, new TestOsutrackDownloader(), exec, new RateLimiter());
 		return ircBot;
@@ -161,7 +160,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 		
-		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em));
+		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend)));
 	}
 	
 	@After
@@ -220,7 +219,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		Integer id = resolver.resolveIRCName("user");
 
 		verify(recommendationsManager).forgetRecommendations(id);
-		verify(bot.manager).forgetRecommendations(id);
 	}
 
 	IRCBotUser mockBotUser(String name) {

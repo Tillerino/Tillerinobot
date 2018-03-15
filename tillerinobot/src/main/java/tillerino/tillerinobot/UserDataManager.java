@@ -1,6 +1,7 @@
 package tillerino.tillerinobot;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -10,8 +11,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,15 +18,6 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
-
-import tillerino.tillerinobot.data.BotUserData;
-import tillerino.tillerinobot.data.repos.BotUserDataRepository;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.lang.*;
-import tillerino.tillerinobot.mbeans.AbstractMBeanRegistration;
-import tillerino.tillerinobot.mbeans.CacheMXBean;
-import tillerino.tillerinobot.mbeans.CacheMXBeanImpl;
-import tillerino.tillerinobot.mbeans.UserDataManagerMXBean;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -43,6 +33,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import tillerino.tillerinobot.data.BotUserData;
+import tillerino.tillerinobot.data.repos.BotUserDataRepository;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.lang.*;
+import tillerino.tillerinobot.util.IsMutable;
 
 /**
  * Manager for serializing and caching user data. Since user data can be
@@ -54,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Singleton
-public class UserDataManager extends AbstractMBeanRegistration implements UserDataManagerMXBean, TidyObject {
+public class UserDataManager implements TidyObject {
 	/**
 	 * Bot-specific user data. It is only saved when changed and responsible for
 	 * determining if it has been changed. Manual getters and setters must be
@@ -62,51 +57,13 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 	 * 
 	 * @author Tillerino
 	 */
-	public static class UserData {
-		public enum LanguageIdentifier {
-			Default(Default.class),
-			English(Default.class),
-			Tsundere(TsundereEnglish.class),
-			TsundereGerman(TsundereGerman.class),
-			Italiano(Italiano.class),
-			Français(Francais.class),
-			Polski(Polski.class),
-			Nederlands(Nederlands.class),
-			עברית(Hebrew.class),
-			Farsi(Farsi.class),
-			Português_BR(Portuguese.class),
-			Deutsch(Deutsch.class),
-			Čeština(Czech.class),
-			Magyar(Hungarian.class),
-			한국어(Korean.class),
-			Dansk(Dansk.class),
-			Türkçe(Turkish.class),
-			日本語(Japanese.class),
-			Español(Spanish.class),
-			Ελληνικά(Greek.class),
-			Русский(Russian.class),
-			Lietuvių(Lithuanian.class),
-			Português_PT(PortuguesePortugal.class),
-			Svenska(Svenska.class),
-			Romana(Romana.class),
-			繁體中文(ChineseTraditional.class),
-			български(Bulgarian.class),
-			Norsk(Norwegian.class),
-			Indonesian(Indonesian.class),
-			简体中文(ChineseSimple.class),
-			Català(Catalan.class),
-			Slovenščina(Slovenian.class),
-			; // please end identifier entries with a comma and leave this semicolon here
-			
-			public final Class<? extends Language> cls;
+	public static class UserData implements Serializable {
+		private static final long serialVersionUID = 1L;
 
-			private LanguageIdentifier(Class<? extends Language> cls) {
-				this.cls = cls;
-			}
-		}
-		
 		@Data
-		public static class BeatmapWithMods {
+		public static class BeatmapWithMods implements Serializable {
+			private static final long serialVersionUID = 1L;
+
 			public BeatmapWithMods(@BeatmapId int beatmap,
 					@BitwiseMods long mods) {
 				super();
@@ -130,13 +87,13 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		public void setChanged(boolean changed) {
 			this.changed = changed;
 			
-			if(!changed) {
-				getLanguage().setChanged(changed);
+			if(!changed && (getLanguage() instanceof IsMutable)) {
+				((IsMutable) getLanguage()).clearModified();
 			}
 		}
 		
 		public boolean isChanged() {
-			return changed || getLanguage().isChanged();
+			return changed || (getLanguage() instanceof IsMutable) && ((IsMutable) getLanguage()).isModified();
 		}
 		
 		@Getter
@@ -205,6 +162,8 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		 * accessed from outside of UserDataManager. This field should be kept
 		 * at the end because it may get large.
 		 */
+		@SuppressWarnings("squid:S1948")
+		@SuppressFBWarnings("SE_BAD_FIELD")
 		JsonObject serializedLanguage;
 
 		transient BotBackend backend;
@@ -258,13 +217,6 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 		hook.add();
 	}
 
-	@Override
-	public ObjectName preRegister(MBeanServer server, ObjectName objectName)
-			throws Exception {
-		server.registerMBean(cacheMXBean, null);
-		return super.preRegister(server, objectName);
-	}
-
 	public UserData getData(int userid) throws SQLException {
 		try {
 			return cache.get(userid);
@@ -297,13 +249,6 @@ public class UserDataManager extends AbstractMBeanRegistration implements UserDa
 					return UserDataManager.this.load(key);
 				}
 			});
-	
-	CacheMXBean cacheMXBean = new CacheMXBeanImpl(cache, getClass(), "userDataCache");
-
-	@Override
-	public CacheMXBean fetchCache() {
-		return cacheMXBean;
-	}
 	
 	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
 			.create();
