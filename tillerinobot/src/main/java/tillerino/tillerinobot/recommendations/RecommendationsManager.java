@@ -1,6 +1,4 @@
-package tillerino.tillerinobot;
-
-import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
+package tillerino.tillerinobot.recommendations;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -9,9 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -20,7 +15,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
@@ -33,15 +27,15 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import lombok.RequiredArgsConstructor;
+import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
-import tillerino.tillerinobot.recommendations.RecommendationRequest;
-import tillerino.tillerinobot.recommendations.RecommendationRequest.RecommendationRequestBuilder;
 
 /**
  * Communicates with the backend and creates recommendations samplers as well as caching information.
@@ -51,145 +45,29 @@ import tillerino.tillerinobot.recommendations.RecommendationRequest.Recommendati
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RecommendationsManager {
-	/**
-	 * Recommendation as returned by the backend. Needs to be enriched before being displayed.
-	 * 
-	 * @author Tillerino
-	 */
-	public interface BareRecommendation {
-		@BeatmapId
-		int getBeatmapId();
-		
-		/**
-		 * mods for this recommendation
-		 * @return 0 for no mods, -1 for unknown mods, any other long for mods according to {@link Mods}
-		 */
-		@BitwiseMods
-		long getMods();
-		
-		long[] getCauses();
-		
-		/**
-		 * returns a guess at how much pp the player could achieve for this recommendation
-		 * @return null if no personal pp were calculated
-		 */
-		Integer getPersonalPP();
-		
-		/**
-		 * @return this is not normed, so the sum of all probabilities can be greater than 1 and this must be accounted for!
-		 */
-		double getProbability();
-	}
-	
-	/**
-	 * Enriched Recommendation.
-	 * 
-	 * @author Tillerino
-	 */
-	@RequiredArgsConstructor
-	public static class Recommendation {
-		public final BeatmapMeta beatmap;
-		
-		public final BareRecommendation bareRecommendation;
-	}
-	
-	/**
-	 * The type of recommendation model that the player has chosen.
-	 * 
-	 * @author Tillerino
-	 */
-	public enum Model {
-		ALPHA,
-		BETA,
-		GAMMA
-	}
-	
-	/**
-	 * Thrown when a loaded beatmap has neither aproved status 1 or 2.
-	 * 
-	 *	// TODO find out about "qualified" = 3
-	 * 
-	 * @author Tillerino
-	 */
-	public static class NotRankedException extends UserException {
-		private static final long serialVersionUID = 1L;
-
-		public NotRankedException(String message) {
-			super(message);
-		}
-	}
-	
-	/**
-	 * Distribution for recommendations. Changes upon sampling.
-	 * 
-	 * @author Tillerino
-	 */
-	public static class Sampler {
-		final SortedMap<Double, BareRecommendation> distribution = new TreeMap<>();
-		double sum = 0;
-		final Random random = new Random();
-		final RecommendationRequest settings;
-		public Sampler(Collection<BareRecommendation> recommendations, RecommendationRequest settings) {
-			for (BareRecommendation bareRecommendation : recommendations) {
-				sum += bareRecommendation.getProbability();
-				distribution.put(sum, bareRecommendation);
-			}
-			this.settings = settings;
-		}
-		public boolean isEmpty() {
-			return distribution.isEmpty();
-		}
-		public synchronized BareRecommendation sample() {
-			double x = random.nextDouble() * sum;
-			
-			SortedMap<Double, BareRecommendation> rest = distribution.tailMap(x);
-			if(rest.size() == 0) {
-				// this means that there was some extreme numerical instability.
-				// this is practically not possible. at least not *maximum stack
-				// size* times in a row.
-				return sample();
-			}
-			
-			sum = rest.firstKey();
-			
-			BareRecommendation sample = rest.remove(sum);
-			
-			sum -= sample.getProbability();
-			
-			Collection<BareRecommendation> refill = new ArrayList<>();
-			
-			while(!rest.isEmpty()) {
-				refill.add(rest.remove(rest.firstKey()));
-			}
-			
-			for(BareRecommendation bareRecommendation : refill) {
-				sum += bareRecommendation.getProbability();
-				distribution.put(sum, bareRecommendation);
-			}
-			
-			return sample;
-		}
-	}
-	
 	private final BotBackend backend;
 	
 	private final GivenRecommendationRepository recommendationsRepo;
 	
 	private final ThreadLocalAutoCommittingEntityManager em;
 
-	PredicateParser parser = new PredicateParser();
+	private final RecommendationRequestParser parser;
 
-	private final Cache<Integer, Recommendation> lastRecommendation = CacheBuilder
-			.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).recordStats().build();
+	private final Cache<Integer, Recommendation> lastRecommendation = CacheBuilder.newBuilder()
+			.expireAfterWrite(1, TimeUnit.HOURS)
+			.build();
 
-	private final LoadingCache<Integer, List<GivenRecommendation>> givenRecomendations = CacheBuilder
-			.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).recordStats()
+	private final LoadingCache<Integer, List<GivenRecommendation>> givenRecomendations = CacheBuilder.newBuilder()
+			.expireAfterAccess(1, TimeUnit.HOURS)
 			.build(CacheLoader.from(this::doLoadGivenRecommendations));
 	
 	/**
 	 * These take long to calculate, so we want to keep them for a bit, but they also take a lot of space. 100 should be a good balance.
 	 */
-	public Cache<Integer, Sampler> samplers = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).maximumSize(100).build();
+	private final Cache<Integer, Sampler<BareRecommendation, RecommendationRequest>> samplers = CacheBuilder.newBuilder()
+			.expireAfterWrite(1, TimeUnit.HOURS)
+			.maximumSize(100)
+			.build();
 
 	@CheckForNull
 	public Recommendation getLastRecommendation(Integer userid) {
@@ -217,7 +95,7 @@ public class RecommendationsManager {
 		 * load sampler
 		 */
 
-		Sampler sampler = samplers.getIfPresent(userid);
+		Sampler<BareRecommendation, RecommendationRequest> sampler = samplers.getIfPresent(userid);
 
 		if (sampler == null || message != null) {
 			/*
@@ -226,7 +104,7 @@ public class RecommendationsManager {
 
 			RecommendationRequest settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
 
-			if (sampler == null || !sampler.settings.equals(settings)) {
+			if (sampler == null || !sampler.getSettings().equals(settings)) {
 				List<Integer> exclude = loadGivenRecommendations(userid)
 						.stream().map(GivenRecommendation::getBeatmapid)
 						.collect(Collectors.toList());
@@ -238,7 +116,7 @@ public class RecommendationsManager {
 				// memory
 				recommendations = getTopRecommendations(recommendations, settings.getPredicates());
 
-				sampler = new Sampler(recommendations, settings);
+				sampler = new Sampler<>(recommendations, settings, BareRecommendation::getProbability);
 
 				samplers.put(userid, sampler);
 			}
@@ -295,87 +173,7 @@ public class RecommendationsManager {
 
 	public RecommendationRequest parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message,
 			Language lang) throws UserException, SQLException, IOException {
-		String[] remaining = message.split(" ");
-		
-		RecommendationRequestBuilder settingsBuilder = RecommendationRequest.builder();
-		
-		settingsBuilder.model(Model.GAMMA);
-
-		for (int i = 0; i < remaining.length; i++) {
-			String param = remaining[i];
-			String lowerCase = param.toLowerCase();
-			if(lowerCase.length() == 0)
-				continue;
-			if(getLevenshteinDistance(lowerCase, "nomod") <= 2) {
-				settingsBuilder.nomod(true);
-				continue;
-			}
-			if(getLevenshteinDistance(lowerCase, "relax") <= 2) {
-				settingsBuilder.model(Model.ALPHA);
-				continue;
-			}
-			if(getLevenshteinDistance(lowerCase, "beta") <= 1) {
-				settingsBuilder.model(Model.BETA);
-				continue;
-			}
-			if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
-				settingsBuilder.model(Model.GAMMA);
-				continue;
-			}
-			if(settingsBuilder.getModel() == Model.GAMMA && (lowerCase.equals("dt") || lowerCase.equals("nc"))) {
-				settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), Mods.DoubleTime));
-				continue;
-			}
-			if(settingsBuilder.getModel() == Model.GAMMA &&  lowerCase.equals("hr")) {
-				settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), Mods.HardRock));
-				continue;
-			}
-			if(settingsBuilder.getModel() == Model.GAMMA &&  lowerCase.equals("hd")) {
-				settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), Mods.Hidden));
-				continue;
-			}
-			if (settingsBuilder.getModel() == Model.GAMMA) {
-				Long mods = Mods.fromShortNamesContinuous(lowerCase);
-				if (mods != null) {
-					mods = Mods.fixNC(mods);
-					if (mods == (mods & Mods.getMask(Mods.DoubleTime, Mods.HardRock, Mods.Hidden))) {
-						for (Mods mod : Mods.getMods(mods)) {
-							settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), mod));
-						}
-						continue;
-					}
-				}
-			}
-			if (backend.getDonator(apiUser) > 0) {
-				RecommendationPredicate predicate = parser.tryParse(param, lang);
-				if (predicate != null) {
-					for (RecommendationPredicate existingPredicate : settingsBuilder.getPredicates()) {
-						if (existingPredicate.contradicts(predicate)) {
-							throw new UserException(lang.invalidChoice(
-									existingPredicate.getOriginalArgument() + " with "
-											+ predicate.getOriginalArgument(),
-									"either " + existingPredicate.getOriginalArgument() + " or "
-											+ predicate.getOriginalArgument()));
-						}
-					}
-					settingsBuilder.predicate(predicate);
-					continue;
-				}
-			}
-			throw new UserException(lang.invalidChoice(param,
-					"[nomod] [relax|beta|gamma] [dt] [hr] [hd]"));
-		}
-
-		RecommendationRequest request = settingsBuilder.build();
-		/*
-		 * verify the arguments
-		 */
-		
-		if(request.isNomod() && request.getRequestedMods() != 0) {
-			throw new UserException(lang.mixedNomodAndMods());
-		}
-		
-		return request;
+		return parser.parseSamplerSettings(apiUser, message, lang);
 	}
 
 	/**

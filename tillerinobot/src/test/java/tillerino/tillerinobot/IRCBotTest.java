@@ -44,9 +44,11 @@ import org.tillerino.osuApiModel.types.UserId;
 
 import tillerino.tillerinobot.CommandHandler.AsyncTask;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.Model;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 public class IRCBotTest extends AbstractDatabaseTest {
@@ -142,7 +144,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	IRCBot getTestBot(BotBackend backend) {
 		if (backend != this.backend) {
 			this.recommendationsManager = spy(new RecommendationsManager(backend,
-					recommendationsRepo, em));
+					recommendationsRepo, em, new RecommendationRequestParser(backend)));
 		}
 
 		IRCBot ircBot = new IRCBot(backend, this.recommendationsManager, new BotInfo(),
@@ -157,7 +159,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 		
-		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em));
+		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend)));
 	}
 	
 	@After

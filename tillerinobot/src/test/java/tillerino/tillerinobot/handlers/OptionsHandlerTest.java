@@ -11,11 +11,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 
 public class OptionsHandlerTest {
@@ -71,7 +72,7 @@ public class OptionsHandlerTest {
 
     @Test
     public void testDefaultSettings() throws Exception {
-      OptionsHandler handler = new OptionsHandler(new RecommendationsManager(mock(BotBackend.class), null, null));
+      OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
 
       handler.handle("set default hd hr", null, userData);
 
@@ -89,7 +90,7 @@ public class OptionsHandlerTest {
 
     @Test(expected = UserException.class)
     public void testInvalidDefaultSettings() throws Exception {
-      OptionsHandler handler = new OptionsHandler(new RecommendationsManager(mock(BotBackend.class), null, null));
+      OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
 
       handler.handle("set default invalid", null, userData);
     }

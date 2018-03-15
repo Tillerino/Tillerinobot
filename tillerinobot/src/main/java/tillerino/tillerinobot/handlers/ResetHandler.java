@@ -8,9 +8,9 @@ import javax.inject.Inject;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class ResetHandler implements CommandHandler {
 	RecommendationsManager backend;

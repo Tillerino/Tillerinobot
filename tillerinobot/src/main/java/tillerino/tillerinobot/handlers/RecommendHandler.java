@@ -13,13 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot;
-import tillerino.tillerinobot.RecommendationsManager;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.recommendations.Recommendation;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Slf4j
 public class RecommendHandler extends CommandHandler.WithShorthand {

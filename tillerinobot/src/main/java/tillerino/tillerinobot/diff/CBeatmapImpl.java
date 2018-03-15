@@ -38,7 +38,7 @@ public class CBeatmapImpl implements CBeatmap {
 		case CBeatmap.MaxCombo:
 			return beatmap.getMaxCombo();
 		default:
-			throw new RuntimeException("" + kind);
+			throw new UnsupportedOperationException("" + kind);
 		}
 	}
 

@@ -1,4 +1,4 @@
-package tillerino.tillerinobot;
+package tillerino.tillerinobot.recommendations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -12,9 +12,14 @@ import org.junit.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.TestBackend;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.RecommendationRequest;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	TestBackend backend = new TestBackend(false);
@@ -32,7 +37,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	
 	@Before
 	public void createRecommendationsManager() {
-		manager = new RecommendationsManager(backend, recommendationsRepo, em);
+		manager = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
 	}
 
 	@Test
@@ -95,7 +100,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testHiding() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em);
+		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em, new RecommendationRequestParser(backend));
 
 		// save a recommendation and reload it
 		recMan.saveGivenRecommendation(1954, 2, 0);

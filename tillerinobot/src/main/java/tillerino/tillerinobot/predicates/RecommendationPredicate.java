@@ -2,7 +2,7 @@ package tillerino.tillerinobot.predicates;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
 
 public interface RecommendationPredicate {
 	boolean test(BareRecommendation r, OsuApiBeatmap beatmap);

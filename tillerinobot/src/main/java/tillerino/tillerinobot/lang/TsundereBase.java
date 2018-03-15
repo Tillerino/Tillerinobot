@@ -6,7 +6,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.recommendations.Recommendation;
 
 import javax.annotation.Nonnull;
 

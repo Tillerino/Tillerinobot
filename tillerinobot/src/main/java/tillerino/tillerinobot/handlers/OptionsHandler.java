@@ -15,15 +15,15 @@ import org.tillerino.osuApiModel.OsuApiUser;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class OptionsHandler implements CommandHandler {
-	final RecommendationsManager manager;
+	final RecommendationRequestParser requestParser;
 
 	@Override
 	public Response handle(String command, OsuApiUser apiUser,
@@ -90,7 +90,7 @@ public class OptionsHandler implements CommandHandler {
 				if (value.isEmpty()) {
 					userData.setDefaultRecommendationOptions(null);
 				} else {
-					manager.parseSamplerSettings(apiUser, value, userData.getLanguage());
+					requestParser.parseSamplerSettings(apiUser, value, userData.getLanguage());
 					userData.setDefaultRecommendationOptions(value);
 				}
 			} else {

@@ -19,10 +19,10 @@ import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.Model;
 
 public interface BotBackend {
 	@TypeQualifier(applicableTo = String.class)

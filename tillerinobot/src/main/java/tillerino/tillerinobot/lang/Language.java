@@ -10,7 +10,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
+import tillerino.tillerinobot.recommendations.Recommendation;
 
 /**
  * <p>
