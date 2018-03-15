@@ -39,8 +39,8 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Singleton
 public class UserDataServiceImpl extends RemoteServiceServlet implements UserDataService {

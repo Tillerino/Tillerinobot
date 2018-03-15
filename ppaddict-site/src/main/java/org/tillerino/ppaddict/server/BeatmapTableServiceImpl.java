@@ -36,9 +36,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.RecommendationsManager;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.PercentageEstimates;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 /**
  * The server-side implementation of the RPC service.
