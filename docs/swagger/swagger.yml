@@ -253,7 +253,7 @@ securityDefinitions:
     description: 'An API key query parameter. To get an API key, contact the team.'
   api_key_header:
     type: apiKey
-    name: k
+    name: api-key
     in: header
     description: 'An API key header. To get an API key, contact the team.'
 responses:
