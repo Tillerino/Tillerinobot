@@ -8,7 +8,7 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import lombok.Getter;
 import lombok.Value;
-import lombok.experimental.Builder;
+import lombok.Builder;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
 
 @Value
