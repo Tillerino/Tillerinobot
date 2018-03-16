@@ -113,9 +113,9 @@ public class FullBotTest {
 		}
 	}
 
-	private static final int USERS = 10;
+	private static final int USERS = 100;
 
-	private static final int RECOMMENDATIONS_PER_USER = 5;
+	private static final int RECOMMENDATIONS_PER_USER = 20;
 
 	@Rule
 	public final EmbeddedIrcServerRule server = new EmbeddedIrcServerRule();
@@ -207,10 +207,13 @@ public class FullBotTest {
 		};
 		for (int i = 0; i < 100; i++) {
 			try {
+				log.info("Waiting for recommendation count to reach {}.", USERS * RECOMMENDATIONS_PER_USER);
 				await().atMost(Duration.TEN_SECONDS).until(allRecommendationsReceived);
 			} catch (ConditionTimeoutException e) {
 				log.info("Some clients got concurrent messages. Let's give 'em a push.");
-				clients.stream().filter(client -> client.lastReceivedRecommendation < System.currentTimeMillis() - 1000)
+				clients.stream()
+						.filter(client -> client.receivedRecommendations < RECOMMENDATIONS_PER_USER)
+						.filter(client -> client.lastReceivedRecommendation < System.currentTimeMillis() - 1000)
 						.forEach(Client::r);
 				continue;
 			}
