@@ -1,4 +1,4 @@
-package tillerino.tillerinobot;
+package tillerino.tillerinobot.testutil;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +20,7 @@ import lombok.experimental.Delegate;
  * This is an {@link ExecutorService} implementation which executes all tasks on
  * a separate thread, but waits for completion of the task.
  */
-public class SynchronousExecutorService extends ExternalResource implements ExecutorService {
+public class SynchronousExecutorServiceRule extends ExternalResource implements ExecutorService {
 	@Delegate(types = ExecutorService.class)
 	private ExecutorService exec;
 
