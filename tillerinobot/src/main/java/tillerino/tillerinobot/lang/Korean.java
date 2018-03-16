@@ -152,16 +152,6 @@ public class Korean implements Language {
 	}
 
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "가능하지 않은 정확도입니다.: \"" + acc + "\"";
 	}
@@ -195,10 +185,5 @@ public class Korean implements Language {
 	@Override
 	public String isSetId() {
 		return new Default().isSetId();
-	}
-	
-	@Override
-	public String getPatience() {
-		return new Default().getPatience();
 	}
 }

@@ -1,4 +1,7 @@
 package tillerino.tillerinobot;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyCollectionOf;
@@ -22,9 +25,13 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.persistence.EntityManager;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.MockitoAnnotations;
@@ -32,15 +39,24 @@ import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.osuApiModel.types.OsuName;
+import org.tillerino.osuApiModel.types.UserId;
 
+import tillerino.tillerinobot.CommandHandler.AsyncTask;
 import tillerino.tillerinobot.IRCBot.IRCBotUser;
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.Model;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.Model;
+import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
+import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
 public class IRCBotTest extends AbstractDatabaseTest {
 	UserDataManager userDataManager;
+
+	@Rule
+	public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
 	
 	@Test
 	public void testVersionMessage() throws IOException, SQLException, UserException {
@@ -54,14 +70,14 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		when(user.message(anyString(), anyBoolean())).thenReturn(true);
 		
 		bot.processPrivateMessage(user, "!recommend");
-		verify(user).message(IRCBot.versionMessage, false);
-		verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.currentVersion));
+		verify(user).message(IRCBot.VERSION_MESSAGE, false);
+		verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.CURRENT_VERSION));
 		
 		user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("user");
 		
 		bot.processPrivateMessage(user, "!recommend");
-		verify(user, never()).message(IRCBot.versionMessage, false);
+		verify(user, never()).message(IRCBot.VERSION_MESSAGE, false);
 	}
 	
 	@Test
@@ -69,7 +85,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		IRCBot bot = getTestBot(backend);
 		
 		backend.hintUser("user", false, 100, 1000);
-		doReturn(IRCBot.currentVersion).when(backend).getLastVisitedVersion(anyString());
+		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
 
 		IRCBotUser user = mock(IRCBotUser.class);
 		when(user.getNick()).thenReturn("user");
@@ -127,17 +143,14 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	}
 	
 	IRCBot getTestBot(BotBackend backend) {
-		RecommendationsManager recMan;
-		if (backend == this.backend) {
-			recMan = this.recommendationsManager;
-		} else {
-			recMan = spy(new RecommendationsManager(backend,
-					recommendationsRepo, em));
+		if (backend != this.backend) {
+			this.recommendationsManager = spy(new RecommendationsManager(backend,
+					recommendationsRepo, em, new RecommendationRequestParser(backend)));
 		}
 
-		IRCBot ircBot = new IRCBot(backend, recMan, new BotInfo(),
+		IRCBot ircBot = new IRCBot(backend, this.recommendationsManager, new BotInfo(),
 				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
-				emf, resolver, new TestOsutrackDownloader(), new SynchronousExecutorService(), new RateLimiter());
+				emf, resolver, new TestOsutrackDownloader(), exec, new RateLimiter());
 		return ircBot;
 	}
 	
@@ -147,7 +160,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 		
-		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em));
+		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend)));
 	}
 	
 	@After
@@ -206,7 +219,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		Integer id = resolver.resolveIRCName("user");
 
 		verify(recommendationsManager).forgetRecommendations(id);
-		verify(bot.manager).forgetRecommendations(id);
 	}
 
 	IRCBotUser mockBotUser(String name) {
@@ -312,5 +324,48 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		bot.processPrivateMessage(botUser, "!u");
 		verify(botUser, times(1)).message(eq("Rank: -3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track]."), anyBoolean());
 		verify(botUser, times(1)).message(eq("2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.06pp; [https://osu.ppy.sh/b/693195 #89]: 331.89pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."), anyBoolean());
+	}
+
+	@Test
+	public void testAsyncTask() throws Exception {
+		IRCBot bot = new IRCBot(null, null, null, null, null, false, em, emf, null, null, exec, null);
+
+		EntityManager targetEntityManager = em.getTargetEntityManager();
+
+		AtomicBoolean executed = new AtomicBoolean();
+		bot.sendResponse((AsyncTask) () -> {
+			assertNotSame(targetEntityManager, em.getTargetEntityManager());
+			executed.set(true);
+		}, null);
+		assertTrue(executed.get());
+	}
+
+	@Test
+	public void testAutomaticNameChangeRemapping() throws Exception {
+		// override test backend because we need more control
+		BotBackend backend = mock(BotBackend.class);
+		resolver = new IrcNameResolver(userNameMappingRepo, backend);
+		IRCBot bot = getTestBot(backend);
+
+		when(backend.downloadUser("user1_old")).thenReturn(user(1, "user1 old"));
+		when(backend.getUser(eq(1), anyLong())).thenReturn(user(1, "user1 old"));
+		assertEquals(1, (int) bot.getUserOrThrow(mockBotUser("user1_old")).getUserId());
+
+		// meanwhile, user 1 changed her name
+		when(backend.downloadUser("user1_new")).thenReturn(user(1, "user1 new"));
+		when(backend.getUser(eq(1), anyLong())).thenReturn(user(1, "user1 new"));
+		// and user 2 hijacked her old name
+		when(backend.downloadUser("user1_old")).thenReturn(user(2, "user1 old"));
+		when(backend.getUser(eq(2), anyLong())).thenReturn(user(2, "user1 new"));
+
+		assertEquals(2, (int) bot.getUserOrThrow(mockBotUser("user1_old")).getUserId());
+		assertEquals(1, (int) bot.getUserOrThrow(mockBotUser("user1_new")).getUserId());
+	}
+
+	OsuApiUser user(@UserId int id, @OsuName String name) {
+		OsuApiUser user = new OsuApiUser();
+		user.setUserId(id);
+		user.setUserName(name);
+		return user;
 	}
 }

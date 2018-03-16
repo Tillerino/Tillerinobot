@@ -77,7 +77,7 @@ public class NumericPredicateBuilder<T extends NumericBeatmapProperty>
 		double min = relation == Relation.EQ || relation == Relation.GEQ || relation == Relation.G ? d
 				: Double.NEGATIVE_INFINITY;
 
-		return new NumericPropertyPredicate<T>(argument, property,
+		return new NumericPropertyPredicate<>(argument, property,
 				min, relation != Relation.G,
 				max, relation != Relation.L);
 	}

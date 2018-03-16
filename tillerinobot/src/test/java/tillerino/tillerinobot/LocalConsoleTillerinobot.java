@@ -6,7 +6,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.lang.management.ManagementFactory;
 import java.net.Socket;
 import java.net.URI;
 import java.util.Scanner;
@@ -18,6 +17,7 @@ import java.util.stream.Stream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.UriBuilder;
 
 import org.eclipse.jetty.server.Server;
@@ -37,12 +37,8 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.output.OutputIRC;
 import org.pircbotx.output.OutputUser;
-
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.rest.BeatmapResource;
-import tillerino.tillerinobot.rest.BeatmapsService;
+import org.tillerino.ppaddict.rest.AuthenticationService;
+import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -51,6 +47,11 @@ import com.google.inject.Provides;
 import com.google.inject.name.Names;
 
 import lombok.extern.slf4j.Slf4j;
+import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.rest.BeatmapResource;
+import tillerino.tillerinobot.rest.BeatmapsService;
 
 /**
  * The purpose of this class and its main function is to completely mock backend
@@ -86,6 +87,12 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				true);
 		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
 				.toInstance(Executors.newSingleThreadExecutor(r -> { Thread thread = new Thread(r); thread.setDaemon(true); return thread; }));
+		bind(AuthenticationService.class).toInstance(key -> {
+			if (key.equals("testKey")) {
+				return new Authorization(false);
+			}
+			throw new NotFoundException();
+		});
 	}
 
 	@Provides
@@ -292,15 +299,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	 */
 	public static void main(String[] args) throws Exception {
 		Injector injector = Guice.createInjector(new LocalConsoleTillerinobot());
-
-		ManagementFactory.getPlatformMBeanServer().registerMBean(
-				injector.getInstance(RecommendationsManager.class), null);
-
-		ManagementFactory.getPlatformMBeanServer().registerMBean(
-				injector.getInstance(UserDataManager.class), null);
-
-		ManagementFactory.getPlatformMBeanServer().registerMBean(
-				injector.getInstance(Pinger.MXBean.class), null);
 
 		URI baseUri = UriBuilder.fromUri("http://localhost/")
 				.port(Integer.parseInt(Stream.of(args).findAny().orElse("0"))).build();

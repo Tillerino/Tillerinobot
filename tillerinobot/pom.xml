@@ -4,6 +4,11 @@
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot</artifactId>
 	<version>0.11.0</version>
+
+	<properties>
+		<jacoco.version>0.8.0</jacoco.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -13,6 +18,12 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -95,13 +106,39 @@
 					</apiSources>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- Run with goal org.pitest:pitest-maven:mutationCoverage. Since the 
+					mutation tests take quite long, they're not currently enabled in CI. -->
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.3.2</version>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.tillerino</groupId>
 			<artifactId>osu-api-connector</artifactId>
-			<version>0.11.0</version>
+			<version>0.12.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pircbotx</groupId>
@@ -126,7 +163,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.14.8</version>
+			<version>1.16.20</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -178,7 +215,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -224,46 +261,27 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.9.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tillerino.twirc</groupId>
+			<artifactId>twirc-server</artifactId>
+			<version>0.0.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<version>3.1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.github.francesco149</groupId>
 			<artifactId>koohii</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.12</version>
 		</dependency>
 	</dependencies>
-
-	<profiles>
-		<profile>
-			<id>linux-windows</id>
-			<activation>
-				<file>
-					<exists>${java.home}/../lib/tools.jar</exists>
-				</file>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>sun.jdk</groupId>
-					<artifactId>jconsole</artifactId>
-					<version>jdk</version>
-					<scope>system</scope>
-					<systemPath>${java.home}/../lib/jconsole.jar</systemPath>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>os-x</id>
-			<activation>
-				<file>
-					<exists>${java.home}/bundle/Classes/classes.jar</exists>
-				</file>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>sun.jdk</groupId>
-					<artifactId>jconsole</artifactId>
-					<version>jdk</version>
-					<scope>system</scope>
-					<systemPath>${java.home}/bundle/Classes/jconsole.jar</systemPath>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 </project>

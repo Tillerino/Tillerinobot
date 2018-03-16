@@ -99,7 +99,6 @@ public class NPHandler implements CommandHandler {
 				mods |= Mods.getMask(mod);
 		}
 
-		BeatmapWithMods pair = new BeatmapWithMods(beatmapid, mods);
-		return pair;
+		return new BeatmapWithMods(beatmapid, mods);
 	}
 }

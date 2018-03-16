@@ -149,16 +149,6 @@ public class Deutsch implements Language {
 	}
 	
 	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
-
-	@Override
 	public String invalidAccuracy(String acc) {
 		return "Ungültige Genauigkeit: \"" + acc + "\"";
 	}
@@ -192,10 +182,5 @@ public class Deutsch implements Language {
 	@Override
 	public String isSetId() {
 		return "Das bezieht sich auf ein Set von Beatmaps statt auf eine einzelne Beatmap.";
-	}
-	
-	@Override
-	public String getPatience() {
-		return "Gib mir einen Moment...";
 	}
 }

@@ -3,6 +3,12 @@ jdk:
   - oraclejdk8
 sudo: required
 dist: trusty
+addons:
+  sonarcloud:
+    organization: "tillerino-github"
+    token:
+      secure: "U7IZ4JYpiL9PuxEHeDCA09TkFmgPT93+lGg4fwm9fRna+O+we8lH++aMc7Ca/hwnHdDc2PJtasuMJ1yVje8iBJzJn6AF7eyx+48oa+LhYPUD98ccaLrCODoS4QIoPMRJMkTdJ+Z/lGcf8U/XgMnBYBrEohwOi6KD9K4TnddzRBw="
+
 before_install:
   - git clone https://github.com/Tillerino/oppai.git
   - cd oppai
@@ -14,8 +20,12 @@ before_install:
 install: true
 
 script:
-  - mvn verify -Dmaven.javadoc.skip=true -B -V
+  - mvn verify -Dmaven.javadoc.skip=true -B -V sonar:sonar
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
   
 cache:
   directories:
     - $HOME/.m2/repository
+    - '$HOME/.sonar/cache'

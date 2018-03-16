@@ -1,27 +1,27 @@
 package tillerino.tillerinobot.rest;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Optional;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
-import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.rest.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
-import tillerino.tillerinobot.BotBackend;
 
 @KeyRequired
 @Priority(Priorities.AUTHENTICATION)
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AuthenticationFilter implements ContainerRequestFilter {
-	private final BotBackend backend;
+	private final AuthenticationService authentication;
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -29,11 +29,12 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 				.flatMap(l -> l.stream().findFirst()).orElse(requestContext.getHeaderString("k"));
 
 		try {
-			if (apiKey == null || !backend.verifyGeneralKey(apiKey)) {
-				throw new WebApplicationException("Please provide an API key", 401);
+			if (apiKey == null) {
+				throw new NotFoundException();
 			}
-		} catch (SQLException e) {
-			throw new InternalServerErrorException(e);
+			authentication.findKey(apiKey);
+		} catch (NotFoundException e) {
+			throw new WebApplicationException("Unknown API key", Status.UNAUTHORIZED);
 		}
 		MDC.put("apiKey", apiKey);
 	}

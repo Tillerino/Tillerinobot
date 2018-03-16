@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.UserDataManager.UserData.LanguageIdentifier;
+import tillerino.tillerinobot.lang.LanguageIdentifier;
 
 public class CommandHandlerTest {
 	UserData userData = new UserData();

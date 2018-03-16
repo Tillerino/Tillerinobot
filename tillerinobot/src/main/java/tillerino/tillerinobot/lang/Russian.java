@@ -150,16 +150,6 @@ public class Russian implements Language {
 	public String notRanked() {
 		return "Похоже, что эта карта еще не ранкнута.";
 	}
-	
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
 
 	@Override
 	public String invalidAccuracy(String acc) {
@@ -195,10 +185,5 @@ public class Russian implements Language {
 	@Override
 	public String isSetId() {
 		return "Эта ссылка указывает на набор карт, а не одну конкретную.";
-	}
-	
-	@Override
-	public String getPatience() {
-		return "Одну секундочку....";
 	}
 }

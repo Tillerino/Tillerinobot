@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
 
 public class NumericPropertyPredicateTest {
 	@Test

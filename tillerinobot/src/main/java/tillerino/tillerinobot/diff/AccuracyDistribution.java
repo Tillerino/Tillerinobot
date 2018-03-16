@@ -9,9 +9,9 @@ import org.tillerino.osuApiModel.OsuApiScore;
 
 @Value
 public class AccuracyDistribution {
-	final int _300;
-	final int _100;
-	final int _50;
+	final int x300;
+	final int x100;
+	final int x50;
 	final int miss;
 	
 	public static AccuracyDistribution get(int allObjects, int misses, double acc) {
@@ -51,11 +51,11 @@ public class AccuracyDistribution {
 		}
 	}
 	
-	public static Pair<Integer, Double> getBest100s(int allObjects, int _300s, int misses, double acc) {
+	public static Pair<Integer, Double> getBest100s(int allObjects, int x300, int misses, double acc) {
 		return bisect(
 				0,
-				allObjects - _300s - misses,
-				x -> OsuApiScore.getAccuracy(_300s, x, allObjects - _300s - x
+				allObjects - x300 - misses,
+				x -> OsuApiScore.getAccuracy(x300, x, allObjects - x300 - x
 						- misses, misses), acc);
 	}
 	

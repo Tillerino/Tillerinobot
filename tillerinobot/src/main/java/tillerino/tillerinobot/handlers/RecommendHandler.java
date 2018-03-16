@@ -13,13 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IRCBot;
-import tillerino.tillerinobot.RecommendationsManager;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.recommendations.Recommendation;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Slf4j
 public class RecommendHandler extends CommandHandler.WithShorthand {
@@ -64,14 +64,15 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 		}
 
 		return new Success(beatmap.formInfoMessage(true, addition,
-				userData.getHearts(), null, null, null)).thenRun(
-				() -> {
+						userData.getHearts(), null, null, null))
+				.thenRun(() -> 
 					userData.setLastSongInfo(new BeatmapWithMods(beatmap
-							.getBeatmap().getBeatmapId(), beatmap.getMods()));
+							.getBeatmap().getBeatmapId(), beatmap.getMods())))
+				.thenRunAsync(() -> 
 					manager.saveGivenRecommendation(apiUser.getUserId(),
 							beatmap.getBeatmap().getBeatmapId(),
-							recommendation.bareRecommendation.getMods());
-				}).then(lang.optionalCommentOnRecommendation(apiUser, recommendation));
+							recommendation.bareRecommendation.getMods())).
+				then(lang.optionalCommentOnRecommendation(apiUser, recommendation));
 	}
 
 }

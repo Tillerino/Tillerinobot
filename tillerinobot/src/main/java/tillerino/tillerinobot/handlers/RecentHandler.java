@@ -23,7 +23,7 @@ public class RecentHandler implements CommandHandler {
 	@Override
 	public Response handle(String command, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException, InterruptedException {
-		if (!command.toLowerCase().equals("now")) {
+		if (!command.equalsIgnoreCase("now")) {
 			return null;
 		}
 		

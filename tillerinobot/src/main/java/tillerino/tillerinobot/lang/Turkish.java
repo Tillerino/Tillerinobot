@@ -150,16 +150,6 @@ public class Turkish implements Language {
 	public String notRanked() {
 		return "Görünüşe göre bu beatmap ranked değil.";
 	}
-	
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
 
 	@Override
 	public String invalidAccuracy(String acc) {
@@ -195,10 +185,5 @@ public class Turkish implements Language {
 	@Override
 	public String isSetId() {
 		return new Default().isSetId();
-	}
-	
-	@Override
-	public String getPatience() {
-		return new Default().getPatience();
 	}
 }

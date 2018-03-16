@@ -150,16 +150,6 @@ public class PortuguesePortugal implements Language {
 	public String notRanked() {
 		return "Parece que este mapa não está ranqueado.";
 	}
-	
-	@Override
-	public boolean isChanged() {
-		return false;
-	}
-
-	@Override
-	public void setChanged(boolean changed) {
-		
-	}
 
 	@Override
 	public String invalidAccuracy(String acc) {
@@ -195,10 +185,5 @@ public class PortuguesePortugal implements Language {
 	@Override
 	public String isSetId() {
 		return new Default().isSetId();
-	}
-	
-	@Override
-	public String getPatience() {
-		return new Default().getPatience();
 	}
 }

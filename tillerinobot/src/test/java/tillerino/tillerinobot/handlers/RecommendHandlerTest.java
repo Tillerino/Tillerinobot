@@ -10,12 +10,12 @@ import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.RecommendationsManager;
-import tillerino.tillerinobot.RecommendationsManager.BareRecommendation;
-import tillerino.tillerinobot.RecommendationsManager.Recommendation;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.Recommendation;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class RecommendHandlerTest {
 	@Test
