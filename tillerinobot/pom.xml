@@ -125,6 +125,13 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<!-- Run with goal org.pitest:pitest-maven:mutationCoverage. Since the 
+					mutation tests take quite long, they're not currently enabled in CI. -->
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.3.2</version>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
