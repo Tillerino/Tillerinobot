@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.rules.ExternalResource;
 
-import jersey.repackaged.com.google.common.util.concurrent.UncheckedExecutionException;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import lombok.Getter;
 import lombok.experimental.Delegate;
 

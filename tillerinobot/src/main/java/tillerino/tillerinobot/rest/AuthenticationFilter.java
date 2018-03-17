@@ -26,7 +26,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 		String apiKey = Optional.ofNullable(requestContext.getUriInfo().getQueryParameters().get("k"))
-				.flatMap(l -> l.stream().findFirst()).orElse(requestContext.getHeaderString("k"));
+				.flatMap(l -> l.stream().findFirst()).orElse(requestContext.getHeaderString("api-key"));
 
 		try {
 			if (apiKey == null) {
