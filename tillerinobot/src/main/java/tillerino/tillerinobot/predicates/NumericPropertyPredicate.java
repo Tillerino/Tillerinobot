@@ -57,7 +57,7 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 
 	@Override
 	public Optional<String> findNonPredicateContradiction(RecommendationRequest request) {
-		return Optional.empty();
+		return property.findNonPredicateContradiction(request, this);
 	}
 
 }

@@ -17,6 +17,8 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.predicates.ExcludeMod;
+import tillerino.tillerinobot.predicates.NumericPropertyPredicate;
+import tillerino.tillerinobot.predicates.StarDiff;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RecommendationRequestParserTest {
@@ -36,5 +38,13 @@ public class RecommendationRequestParserTest {
 		assertThat(parse("dt")).hasFieldOrPropertyWithValue("requestedMods", 64L);
 		assertThat(parse("-dt").getPredicates()).containsExactly(new ExcludeMod(Mods.DoubleTime));
 		assertThatThrownBy(() -> parse("dt -dt")).isInstanceOfAny(UserException.class).hasMessageContaining("DT -DT");
+	}
+
+	@Test
+	public void testModVsStar() throws Exception {
+		when(backend.getDonator(any())).thenReturn(1);
+		assertThat(parse("dt")).hasFieldOrPropertyWithValue("requestedMods", 64L);
+		assertThat(parse("STAR=5").getPredicates()).containsExactly(new NumericPropertyPredicate<>("STAR=5", new StarDiff(), 5, true, 5, true));
+		assertThatThrownBy(() -> parse("dt STAR=5")).isInstanceOfAny(UserException.class).hasMessageContaining("DT STAR");
 	}
 }
