@@ -69,6 +69,7 @@ paths:
           $ref: '#/responses/upstream'
       security:
         - api_key: []
+        - api_key_header: []
   /botinfo:
     get:
       tags:
@@ -100,6 +101,7 @@ paths:
           format: int32
       security:
         - api_key: []
+        - api_key_header: []
       responses:
         '200':
           schema:
@@ -129,6 +131,7 @@ paths:
           description: successful operation
       security:
         - api_key: []
+        - api_key_header: []
   '/beatmaps/byHash/{hash}/file':
     get:
       tags:
@@ -150,6 +153,7 @@ paths:
             type: string
       security:
         - api_key: []
+        - api_key_header: []
     put:
       tags:
         - public
@@ -172,6 +176,7 @@ paths:
           description: The supplied beatmap file did not have the required hash value
       security:
         - api_key: []
+        - api_key_header: []
   '/beatmaps/byId/{id}':
     get:
       tags:
@@ -192,6 +197,7 @@ paths:
           description: successful operation
       security:
         - api_key: []
+        - api_key_header: []
   '/beatmaps/byId/{id}/file':
     get:
       tags:
@@ -214,6 +220,7 @@ paths:
             type: string
       security:
         - api_key: []
+        - api_key_header: []
     put:
       tags:
         - public
@@ -237,12 +244,18 @@ paths:
           description: The supplied beatmap file did not have the required hash value
       security:
         - api_key: []
+        - api_key_header: []
 securityDefinitions:
   api_key:
     type: apiKey
     name: k
     in: query
-    description: 'An API key. Currently, you need to ask for it.'
+    description: 'An API key query parameter. To get an API key, contact the team.'
+  api_key_header:
+    type: apiKey
+    name: api-key
+    in: header
+    description: 'An API key header. To get an API key, contact the team.'
 responses:
   unauthorized:
     description: No or API key presented or key not authorized for this operation.

@@ -2,11 +2,7 @@ package tillerino.tillerinobot.rest;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.pircbotx.PircBotX;
 
@@ -14,8 +10,7 @@ import lombok.Data;
 import tillerino.tillerinobot.BotRunner;
 
 @Singleton
-@Path("/botinfo")
-public class BotInfoService {
+public class BotInfoService implements BotStatus {
 	private final BotRunner bot;
 
 	@Inject
@@ -39,8 +34,7 @@ public class BotInfoService {
 
 	private final BotInfo botInfo;
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Override
 	public BotInfo botinfo() {
 		PircBotX pircBot = bot.getBot();
 		if (pircBot != null) {
@@ -55,10 +49,7 @@ public class BotInfoService {
 	 * The following are endpoints for automated health checks, so they don't return anything
 	 * valuable other than a 200 or 404.
 	 */
-
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/isReceiving")
+	@Override
 	public boolean isReceiving() {
 		if (botInfo.getLastReceivedMessage() < System.currentTimeMillis() - 10000) {
 			throw new NotFoundException();
@@ -66,9 +57,7 @@ public class BotInfoService {
 		return true;
 	}
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/isSending")
+	@Override
 	public boolean isSending() {
 		if (botInfo.getLastSentMessage() < System.currentTimeMillis() - 60000) {
 			throw new NotFoundException();
@@ -76,9 +65,7 @@ public class BotInfoService {
 		return true;
 	}
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/isRecommending")
+	@Override
 	public boolean isRecommending() {
 		if (botInfo.getLastRecommendation() < System.currentTimeMillis() - 60000) {
 			throw new NotFoundException();

@@ -23,13 +23,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.tillerino.osuApiModel.types.BeatmapId;
@@ -45,15 +41,14 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
 @Singleton
-@Path("/beatmapinfo")
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BeatmapInfoService {
+public class BeatmapInfoService implements BeatmapDifficulties {
 	private final BotBackend backend;
 	private final ThreadLocalAutoCommittingEntityManager em;
 	private final EntityManagerFactory emf;
@@ -107,10 +102,8 @@ public class BeatmapInfoService {
 		Double starDiff;
 	}
 	
-	@KeyRequired
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public BeatmapInfo getBeatmapInfo(@QueryParam("beatmapid") @BeatmapId int beatmapid, @QueryParam("mods") @BitwiseMods long mods, @QueryParam("acc") List<Double> requestedAccs, @QueryParam("wait") @DefaultValue("1000") long wait) throws Throwable {
+	@Override
+	public BeatmapInfo getBeatmapInfo(@BeatmapId int beatmapid, @BitwiseMods long mods, List<Double> requestedAccs, long wait) throws Throwable {
 		mods = fixNC(getMask(getEffectiveMods(getMods(mods))));
 
 		BeatmapMeta beatmapMeta;
