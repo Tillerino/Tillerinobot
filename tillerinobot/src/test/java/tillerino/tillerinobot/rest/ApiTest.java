@@ -1,4 +1,4 @@
-package tillerino.tillerinobot;
+package tillerino.tillerinobot.rest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertTrue;
@@ -21,13 +21,9 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
-import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -40,11 +36,10 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-import tillerino.tillerinobot.rest.BeatmapDifficulties;
-import tillerino.tillerinobot.rest.BeatmapsService;
-import tillerino.tillerinobot.rest.BotApiDefinition;
+import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.BotRunner;
+import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
-import tillerino.tillerinobot.rest.BotStatus;
 
 /**
  * Tests the Tillerinobot API on a live HTTP server including authentication.
@@ -58,7 +53,8 @@ public class ApiTest {
 			bind(BotBackend.class).toInstance(new TestBackend(false));
 			bind(BotRunner.class).toInstance(mock(BotRunner.class));
 			bind(BeatmapsService.class).toInstance(mock(BeatmapsService.class));
-			bind(AuthenticationService.class).toInstance(authenticationService);
+			// since the authentication service is not mocked yet, we inject a proxy
+			bind(AuthenticationService.class).toInstance(key -> authenticationService.findKey(key));
 		}
 	}
 
@@ -96,10 +92,13 @@ public class ApiTest {
 		}
 	}
 
+	private final Injector injector = Guice.createInjector(new ApiTestModule());
+
 	/**
 	 * Jetty server
 	 */
-	private Server server;
+	@Rule
+	public JettyServerResource server = new JettyServerResource(injector.getInstance(BotApiDefinition.class), "localhost", 0);
 
 	@Mock
 	private AuthenticationService authenticationService;
@@ -107,7 +106,7 @@ public class ApiTest {
 	/**
 	 * API-internal object
 	 */
-	private BotInfo botInfo;
+	private BotInfo botInfo = injector.getInstance(BotInfo.class);
 	
 	/**
 	 * Endpoint which goes through the started HTTP API
@@ -123,25 +122,11 @@ public class ApiTest {
 
 	@Before
 	public void startServer() throws Exception {
-		Injector injector = Guice.createInjector(new ApiTestModule());
-		botInfo = injector.getInstance(BotInfo.class);
-
-		// start server
-		BotApiDefinition serverConfig = injector.getInstance(BotApiDefinition.class);
-		server = JettyHttpContainerFactory.createServer(new URI("http://localhost:0"),
-				ResourceConfig.forApplication(serverConfig));
-		int port = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
-
 		// build clients
 		Client client = ClientBuilder.newBuilder().register(clientRequestFilter).build();
-		WebTarget target = client.target("http://localhost:" + port);
+		WebTarget target = client.target("http://localhost:" + server.getPort());
 		botStatus = WebResourceFactory.newResource(BotStatus.class, target);
 		beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
-	}
-
-	@After
-	public void stopServer() throws Exception {
-		server.stop();
 	}
 
 	@Test
