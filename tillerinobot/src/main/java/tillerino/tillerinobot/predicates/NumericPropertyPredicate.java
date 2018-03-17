@@ -2,6 +2,9 @@ package tillerino.tillerinobot.predicates;
 
 import lombok.Value;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.RecommendationRequest;
+
+import java.util.Optional;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
@@ -50,6 +53,11 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 		}
 
 		return false;
+	}
+
+	@Override
+	public Optional<String> findNonPredicateContradiction(RecommendationRequest request) {
+		return Optional.empty();
 	}
 
 }

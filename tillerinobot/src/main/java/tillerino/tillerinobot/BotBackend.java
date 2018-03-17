@@ -71,6 +71,11 @@ public interface BotBackend {
 	
 	public long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
 
+	/**
+	 * Checks if a user is a donator/patron.
+	 *
+	 * @return a positive value if the user is a donator/patron.
+	 */
 	public int getDonator(@Nonnull OsuApiUser user) throws SQLException, IOException;
 	
 	/**

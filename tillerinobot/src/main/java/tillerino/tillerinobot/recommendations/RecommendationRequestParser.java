@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -21,10 +22,19 @@ import tillerino.tillerinobot.recommendations.RecommendationRequest.Recommendati
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RecommendationRequestParser {
+	private static final String STANDARD_SYNTAX = "[nomod] [relax|beta|gamma] [dt] [hr] [hd]";
+
 	private final BotBackend backend;
 	
 	PredicateParser parser = new PredicateParser();
 
+	/**
+	 * Parses a recommendation request string.
+	 *
+	 * @param message
+	 *          the string after the trigger word, e.g. "!r " has been removed.
+	 * @return a validated request
+	 */
 	public RecommendationRequest parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message,
 			Language lang) throws UserException, SQLException, IOException {
 		String[] remaining = message.split(" ");
@@ -40,8 +50,7 @@ public class RecommendationRequestParser {
 			if (!parseEngines(param, settingsBuilder)
 					&& !parseMods(param, settingsBuilder)
 					&& !parsePredicates(param, settingsBuilder, apiUser, lang)) {
-				throw new UserException(lang.invalidChoice(param,
-						"[nomod] [relax|beta|gamma] [dt] [hr] [hd]"));
+				throw new UserException(lang.invalidChoice(param, STANDARD_SYNTAX));
 			}
 		}
 
@@ -53,7 +62,14 @@ public class RecommendationRequestParser {
 		if(request.isNomod() && request.getRequestedMods() != 0) {
 			throw new UserException(lang.mixedNomodAndMods());
 		}
-		
+
+		for (RecommendationPredicate predicate : request.getPredicates()) {
+			Optional<String> contradiction = predicate.findNonPredicateContradiction(request);
+			if (contradiction.isPresent()) {
+				throw new UserException(lang.invalidChoice(contradiction.get(), STANDARD_SYNTAX));
+			}
+		}
+
 		return request;
 	}
 

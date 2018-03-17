@@ -2,6 +2,8 @@ package tillerino.tillerinobot.predicates;
 
 import lombok.Value;
 
+import java.util.Optional;
+
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
@@ -9,6 +11,7 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser.PredicateBuilder;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
+import tillerino.tillerinobot.recommendations.RecommendationRequest;
 
 @Value
 public class ExcludeMod implements RecommendationPredicate {
@@ -46,5 +49,13 @@ public class ExcludeMod implements RecommendationPredicate {
 			}
 		}
 
+	}
+
+	@Override
+	public Optional<String> findNonPredicateContradiction(RecommendationRequest request) {
+		if (mod.is(request.getRequestedMods())) {
+			return Optional.of(String.format("%s -%s", mod.getShortName(), mod.getShortName()));
+		}
+		return Optional.empty();
 	}
 }

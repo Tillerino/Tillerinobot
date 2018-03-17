@@ -144,6 +144,7 @@ public class TestBackend implements BotBackend {
 		return new BeatmapMeta(beatmap, null, estimates);
 	}
 
+	@Override
 	public OsuApiBeatmap getBeatmap(int beatmapid) {
 		Random rand = new Random(beatmapid);
 		OsuApiBeatmap beatmap = database.beatmaps.get(beatmapid);
@@ -264,14 +265,14 @@ public class TestBackend implements BotBackend {
 		for (int i : setIds.keySet()) {
 			for(long m : mods) {
 				BeatmapMeta meta = loadBeatmap(i, m, null);
-				if(Math.abs(1 - ((PercentageEstimates) meta.getEstimates()).getPP(.98) / equivalent) < .15) {
+				if(Math.abs(1 - meta.getEstimates().getPP(.98) / equivalent) < .15) {
 					maps.add(meta);
 				}
 			}
 		}
 		Collection<BareRecommendation> recommendations = new ArrayList<>();
 		for (final BeatmapMeta meta : maps) {
-			final PercentageEstimates est = (PercentageEstimates) meta.getEstimates();
+			final PercentageEstimates est = meta.getEstimates();
 			recommendations.add(new BareRecommendation() {
 				@Override
 				public double getProbability() {
