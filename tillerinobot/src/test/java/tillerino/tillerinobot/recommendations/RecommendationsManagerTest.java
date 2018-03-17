@@ -71,15 +71,15 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	
 	@Test
 	public void testSaveRecommendations() throws Exception {
-		manager.saveGivenRecommendation(15, 16, 64);
+		manager.saveGivenRecommendation(1015, 16, 64);
 		
-		List<GivenRecommendation> saved = manager.loadGivenRecommendations(15);
+		List<GivenRecommendation> saved = manager.loadGivenRecommendations(1015);
 		
 		assertEquals(1, saved.size());
 		
 		GivenRecommendation rec = saved.get(0);
 
-		assertEquals(15, rec.getUserid());
+		assertEquals(1015, rec.getUserid());
 		assertEquals(16, rec.getBeatmapid());
 		assertEquals(64, rec.getMods());
 	}
