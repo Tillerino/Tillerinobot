@@ -16,7 +16,6 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 
 import lombok.RequiredArgsConstructor;
-import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.IrcNameResolver;
 
 @Singleton
@@ -37,7 +36,7 @@ public class UserByIdService {
                 return user;
             }
         } catch (IOException e) {
-            throw BotAPIServer.getBadGateway(null);
+            throw RestUtils.getBadGateway(null);
         }
     }
 }

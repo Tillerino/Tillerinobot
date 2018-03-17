@@ -22,9 +22,7 @@ import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -38,7 +36,6 @@ import com.google.common.cache.LoadingCache;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotAPIServer;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -82,7 +79,7 @@ public class BeatmapInfoService implements BeatmapDifficulties {
 								
 								return beatmap;
 							} catch (IOException e) {
-								throw BotAPIServer.getBadGateway(null);
+								throw RestUtils.getBadGateway(null);
 							} catch (UserException e) {
 								throw new NotFoundException(e.getMessage());
 							} finally {
@@ -131,9 +128,9 @@ public class BeatmapInfoService implements BeatmapDifficulties {
 			return info;
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw BotAPIServer.getInterrupted();
+			throw RestUtils.getInterrupted();
 		} catch (ExecutionException e) {
-			throw BotAPIServer.refreshWebApplicationException(e.getCause());
+			throw RestUtils.refreshWebApplicationException(e.getCause());
 		} catch (TimeoutException e) {
 			throw new WebApplicationException("The request is being processed. Please try again in a few moments.", Status.ACCEPTED);
 		}
