@@ -52,6 +52,7 @@ import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
+import tillerino.tillerinobot.rest.BotApiDefinition;
 
 /**
  * The purpose of this class and its main function is to completely mock backend
@@ -303,7 +304,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		URI baseUri = UriBuilder.fromUri("http://localhost/")
 				.port(Integer.parseInt(Stream.of(args).findAny().orElse("0"))).build();
 		Server apiServer = JettyHttpContainerFactory.createServer(baseUri, 
-				ResourceConfig.forApplication(injector.getInstance(BotAPIServer.class)));
+				ResourceConfig.forApplication(injector.getInstance(BotApiDefinition.class)));
 		((QueuedThreadPool) apiServer.getThreadPool()).setMaxThreads(32);
 		apiServer.start();
 

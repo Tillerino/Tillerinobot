@@ -42,6 +42,7 @@ import com.google.inject.Injector;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.rest.BeatmapDifficulties;
 import tillerino.tillerinobot.rest.BeatmapsService;
+import tillerino.tillerinobot.rest.BotApiDefinition;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.rest.BotStatus;
 
@@ -126,7 +127,7 @@ public class ApiTest {
 		botInfo = injector.getInstance(BotInfo.class);
 
 		// start server
-		BotAPIServer serverConfig = injector.getInstance(BotAPIServer.class);
+		BotApiDefinition serverConfig = injector.getInstance(BotApiDefinition.class);
 		server = JettyHttpContainerFactory.createServer(new URI("http://localhost:0"),
 				ResourceConfig.forApplication(serverConfig));
 		int port = ((ServerConnector) server.getConnectors()[0]).getLocalPort();

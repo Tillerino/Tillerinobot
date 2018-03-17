@@ -16,6 +16,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
+import tillerino.tillerinobot.rest.BotApiDefinition;
+
 public class LocalAPIServer extends AbstractModule {
 	@Override
 	protected void configure() {
@@ -31,7 +33,7 @@ public class LocalAPIServer extends AbstractModule {
 		Injector injector = Guice.createInjector(new LocalAPIServer());
 		
 		URI baseUri = UriBuilder.fromUri("http://localhost/").port(1666).build();
-		ResourceConfig config = ResourceConfig.forApplication(injector.getInstance(BotAPIServer.class));
+		ResourceConfig config = ResourceConfig.forApplication(injector.getInstance(BotApiDefinition.class));
 		Server server = JettyHttpContainerFactory.createServer(baseUri, config);
 		((QueuedThreadPool) server.getThreadPool()).setMaxThreads(32);
 		

@@ -1,4 +1,4 @@
-package tillerino.tillerinobot;
+package tillerino.tillerinobot.rest;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -8,23 +8,15 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Application;
 
 import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
-import tillerino.tillerinobot.rest.AuthenticationFilter;
-import tillerino.tillerinobot.rest.BeatmapInfoService;
-import tillerino.tillerinobot.rest.BeatmapsService;
-import tillerino.tillerinobot.rest.BotInfoService;
-import tillerino.tillerinobot.rest.DelegatingBeatmapsService;
-import tillerino.tillerinobot.rest.PrintMessageExceptionMapper;
-import tillerino.tillerinobot.rest.ApiLoggingFeature;
-import tillerino.tillerinobot.rest.UserByIdService;
 
 /**
  * @author Tillerino
  */
-public class BotAPIServer extends Application {
+public class BotApiDefinition extends Application {
 	Set<Object> resourceInstances = new HashSet<>();
 
 	@Inject
-	public BotAPIServer(BotInfoService botInfo, BeatmapInfoService beatmapInfo,
+	public BotApiDefinition(BotInfoService botInfo, BeatmapInfoService beatmapInfo,
 			UserByIdService userById, EntityManagerProxyFeature proxyFeature, BeatmapsService beatmaps,
 			AuthenticationFilter authentication, ApiLoggingFeature logging) {
 		super();
