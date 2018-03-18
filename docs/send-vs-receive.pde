@@ -8,30 +8,30 @@ abstract class Drawable {
 }
 class Received extends Drawable {
 	int lane;
-	int hue = random(0, 255);
+	int hue;
 	boolean purge() {
 		return age > width / 2;
 	}
 	void draw() {
+		colorMode(HSB, 255)
 		c = color(hue, 192, 255)
-		colorMode(HSB)
 		fill(c);
 		rect(width / 2 - age, lane, 5, 5);
-		colorMode(RGB);
+		colorMode(RGB, 255);
 	}
 }
 class Sent extends Drawable {
 	int lane;
-	int hue = random(0, 255);
+	int hue;
 	boolean purge() {
 		return age > width / 2;
 	}
 	void draw() {
+		colorMode(HSB, 255)
 		c = color(hue, 192, 255)
-		colorMode(HSB)
 		fill(c);
 		rect(width / 2 + age, lane, 5, 5);
-		colorMode(RGB);
+		colorMode(RGB, 255);
 	}
 }
 void setup()
@@ -54,10 +54,12 @@ void draw()
 		if (elem.received) {
 			drawable = new Received();
 			drawable.lane = (elem.received.user % height + height) % height;
+			drawable.hue = (elem.received.user / 255 % height + height) % height;
 		}
 		if (elem.sent) {
 			drawable = new Sent();
 			drawable.lane = (elem.sent.user % height + height) % height;
+			drawable.hue = (elem.sent.user / 255 % height + height) % height;
 		}
 		liveobjects.add(drawable);
 		console.log(drawable);
