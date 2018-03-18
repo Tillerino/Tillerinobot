@@ -19,13 +19,19 @@
 body, table td, input, .gwt-Button, button {
 	font-size: 16px;
 	font-family: Cabin, "Gill Sans", Calibri, "DejaVu Sans", sans-serif;
+	color: #555;
+}
+
+body {
+	background-color: #000;
 }
 </style>
 <title>Tillerinobot</title>
 </head>
 <body>
-	<canvas data-processing-sources="send-vs-receive.pde"></canvas>
-	<p>Dots moving to the left are received messages, dots moving to
+	<canvas data-processing-sources="send-vs-receive.pde"
+		style="padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block;"></canvas>
+	<p style="text-align: center;">Dots moving to the left are received messages, dots moving to
 		the right are sent messages. One user will be in the same vertical
 		position and keep the same color until you reload. Two users might
 		share a vertical position or color.</p>

@@ -10,11 +10,11 @@ class Received extends Drawable {
 	int lane;
 	int hue;
 	boolean purge() {
-		return age > width / 2;
+		return age > width / 2 + 5;
 	}
 	void draw() {
 		colorMode(HSB, 255)
-		c = color(hue, 192, 255)
+		c = color(hue, 192, 255 - age / (width / 2) * 192)
 		fill(c);
 		rect(width / 2 - age, lane, 5, 5);
 		colorMode(RGB, 255);
@@ -28,7 +28,7 @@ class Sent extends Drawable {
 	}
 	void draw() {
 		colorMode(HSB, 255)
-		c = color(hue, 192, 255)
+		c = color(hue, 192, 255 - age / (width / 2) * 192)
 		fill(c);
 		rect(width / 2 + age, lane, 5, 5);
 		colorMode(RGB, 255);
@@ -36,7 +36,7 @@ class Sent extends Drawable {
 }
 void setup()
 {
-	size(640, 240);
+	size(window.innerWidth * 0.9, window.innerHeight * 0.8);
 	background(0);
 	fill(255);
 	PFont
