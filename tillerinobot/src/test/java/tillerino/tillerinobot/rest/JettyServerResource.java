@@ -31,7 +31,6 @@ public class JettyServerResource extends ExternalResource {
 		server = JettyHttpContainerFactory.createServer(new URI("http", null, host, port, null, null, null),
 				ResourceConfig.forApplication(app));
 		actualPort = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
-		server.start();
 	}
 
 	@Override

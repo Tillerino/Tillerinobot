@@ -53,6 +53,8 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
+import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
  * The purpose of this class and its main function is to completely mock backend
@@ -308,8 +310,13 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		((QueuedThreadPool) apiServer.getThreadPool()).setMaxThreads(32);
 		apiServer.start();
 
+		JettyWebsocketServerResource websocketServer = new JettyWebsocketServerResource("localhost", 0);
+		websocketServer.start();
+		websocketServer.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
+
 		injector.getInstance(BotRunner.class).run();
 		
 		apiServer.stop();
+		websocketServer.stop();
 	}
 }

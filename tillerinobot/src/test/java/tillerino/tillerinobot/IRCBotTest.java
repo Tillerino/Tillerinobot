@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
@@ -51,6 +52,7 @@ import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 public class IRCBotTest extends AbstractDatabaseTest {
 	UserDataManager userDataManager;
@@ -150,7 +152,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		IRCBot ircBot = new IRCBot(backend, this.recommendationsManager, new BotInfo(),
 				userDataManager = new UserDataManager(backend, emf, em, userDataRepository), mock(Pinger.class), false, em,
-				emf, resolver, new TestOsutrackDownloader(), exec, new RateLimiter());
+				emf, resolver, new TestOsutrackDownloader(), exec, new RateLimiter(), liveActivity);
 		return ircBot;
 	}
 	
@@ -176,6 +178,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	IrcNameResolver resolver;
 	
 	RecommendationsManager recommendationsManager;
+
+	@Mock
+	LiveActivityEndpoint liveActivity;
 	
 	@Test
 	public void testHugs() throws Exception {
@@ -328,7 +333,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testAsyncTask() throws Exception {
-		IRCBot bot = new IRCBot(null, null, null, null, null, false, em, emf, null, null, exec, null);
+		IRCBot bot = new IRCBot(null, null, null, null, null, false, em, emf, null, null, exec, null, liveActivity);
 
 		EntityManager targetEntityManager = em.getTargetEntityManager();
 
@@ -360,6 +365,13 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		assertEquals(2, (int) bot.getUserOrThrow(mockBotUser("user1_old")).getUserId());
 		assertEquals(1, (int) bot.getUserOrThrow(mockBotUser("user1_new")).getUserId());
+	}
+
+	@Test
+	public void testLiveActivity() throws Exception {
+		IRCBot bot = getTestBot(backend);
+		bot.processPrivateMessage(mockBotUser("user"), "whatever");
+		verify(liveActivity).propagateReceivedMessage("user");
 	}
 
 	OsuApiUser user(@UserId int id, @OsuName String name) {

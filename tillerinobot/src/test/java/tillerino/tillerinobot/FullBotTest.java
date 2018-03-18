@@ -44,6 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
+import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
  * This test starts an embedded IRC server, mocks a backend and requests
@@ -124,6 +126,9 @@ public class FullBotTest {
 	public final ExecutorServiceRule exec = new ExecutorServiceRule(
 			() -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>()));
 
+	@Rule
+	public final JettyWebsocketServerResource websocket = new JettyWebsocketServerResource("localhost", 0);
+
 	private final AtomicInteger recommendationCount = new AtomicInteger();
 
 	private BotRunner botRunner;
@@ -169,6 +174,9 @@ public class FullBotTest {
 	@Before
 	public void startBot() throws Exception {
 		Injector injector = Guice.createInjector(new FullBotConfiguration());
+
+		websocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
+
 		BotInfo botInfo = injector.getInstance(BotInfo.class);
 		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
 		botRunner = injector.getInstance(BotRunner.class);

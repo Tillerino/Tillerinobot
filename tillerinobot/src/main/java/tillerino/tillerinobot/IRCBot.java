@@ -81,6 +81,7 @@ import tillerino.tillerinobot.osutrack.UpdateResult;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
@@ -122,6 +123,7 @@ public class IRCBot extends CoreHooks {
 	private final IrcNameResolver resolver;
 	private final OsutrackDownloader osutrackDownloader;
 	private final RateLimiter rateLimiter;
+	private final LiveActivityEndpoint liveActivity;
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
@@ -129,7 +131,8 @@ public class IRCBot extends CoreHooks {
 			Pinger pinger, @Named("tillerinobot.ignore") boolean silent,
 			ThreadLocalAutoCommittingEntityManager em,
 			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
-			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter) {
+			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter,
+			LiveActivityEndpoint liveActivity) {
 		this.backend = backend;
 		this.botInfo = botInfo;
 		this.userDataManager = userDataManager;
@@ -141,6 +144,7 @@ public class IRCBot extends CoreHooks {
 		this.osutrackDownloader = osutrackDownloader;
 		this.exec = exec;
 		this.rateLimiter = rateLimiter;
+		this.liveActivity = liveActivity;
 		
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
@@ -261,6 +265,7 @@ public class IRCBot extends CoreHooks {
 		MDC.put(MDC_STATE, "action");
 		log.debug("action: " + message);
 		botInfo.setLastReceivedMessage(System.currentTimeMillis());
+		liveActivity.propagateReceivedMessage(user.getNick());
 		
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
@@ -389,6 +394,7 @@ public class IRCBot extends CoreHooks {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().message(msg);
+					liveActivity.propagateSentMessage(getNick());
 					MDC.put(MDC_STATE, "sent");
 					if (success) {
 						MDC.put(MDC_DURATION, System.currentTimeMillis() - event.getTimestamp() + "");
@@ -424,6 +430,7 @@ public class IRCBot extends CoreHooks {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().action(msg);
+					liveActivity.propagateSentMessage(getNick());
 					MDC.put(MDC_STATE, "sent");
 					log.debug("sent action: " + msg);
 					return true;
@@ -490,6 +497,7 @@ public class IRCBot extends CoreHooks {
 		MDC.put(MDC_STATE, "msg");
 		log.debug("received: " + originalMessage);
 		botInfo.setLastReceivedMessage(System.currentTimeMillis());
+		liveActivity.propagateReceivedMessage(user.getNick());
 
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {

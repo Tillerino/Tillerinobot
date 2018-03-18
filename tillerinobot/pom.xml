@@ -180,6 +180,12 @@
 			<version>1.2</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- libraries -->
 		<dependency>
 			<groupId>com.github.tillerino</groupId>
@@ -269,6 +275,13 @@
 			<groupId>org.glassfish.jersey.ext</groupId>
 			<artifactId>jersey-proxy-client</artifactId>
 			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>javax-websocket-server-impl</artifactId>
+			<!-- this version matches jersey -->
+			<version>9.2.14.v20151106</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
