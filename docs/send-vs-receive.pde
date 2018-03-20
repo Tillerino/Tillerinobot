@@ -55,6 +55,7 @@ class Sent extends Drawable {
 	// class marker
 	boolean sent = true;
 
+	long eventId;
 	int lane;
 	boolean purge() {
 		return ageToDist(age - 1000) > width / 2;
@@ -175,6 +176,36 @@ class Ping extends Drawable {
 		return height - 10 - logScale * height / 9; // 1s = 1/3rd of window height
 	}
 }
+class Match extends Drawable {
+	// class marker
+	boolean match = true;
+
+	Received receiveEvent;
+
+	Sent sentEvent;
+
+	int lane;
+
+	int lineLane;
+
+	int drawnFrames = 0;
+
+	boolean purge() {
+		return age > 3000;
+	}
+
+	void draw() {
+		strokeWeight(2);
+		colorMode(HSB, 255);
+		if (Math.floor(drawnFrames++ / 2) % 2 == 1 && age < 600) {
+			return;
+		}
+		stroke(color(v1(), v2(), v3(), (1 - Math.max(0, age - 1000) / 2000) * 192));
+		line(width / 2 - ageToDist(receiveEvent.age), lane, width / 2 - ageToDist(receiveEvent.age), lineLane);
+		line(width / 2 + ageToDist(sentEvent.age), lane, width / 2 + ageToDist(sentEvent.age), lineLane);
+		line(width / 2 - ageToDist(receiveEvent.age) + 1, lineLane, width / 2 + ageToDist(sentEvent.age) - 1, lineLane);
+	}
+}
 void setup()
 {
 	size(window.innerWidth, window.innerHeight);
@@ -195,11 +226,28 @@ void draw()
 			drawable.lane = (elem.received.user % height + height) % height;
 			drawable.hue = (elem.received.user / 255 % 255 + 255) % 255;
 			drawable.eventId = elem.received.eventId;
+			/*
+			 * look for matching sent object
+			 */
+			for (var i = 0; i < liveobjects.size(); i++) {
+				var obj = liveobjects.get(i);
+				if (obj.sent && obj.eventId == drawable.eventId) {
+					Match match = new Match();
+					match.receiveEvent = drawable;
+					match.sentEvent = obj;
+					match.receivedTime = elem.receivedTime;
+					match.hue = drawable.hue;
+					match.lane = drawable.lane;
+					avoidCollisionForMatch(match);
+					liveobjects.add(match);
+				}
+			}
 		}
 		if (elem.sent) {
 			drawable = new Sent();
 			drawable.lane = (elem.sent.user % height + height) % height;
 			drawable.hue = (elem.sent.user / 255 % 255 + 255) % 255;
+			drawable.eventId = elem.sent.eventId;
 			if (elem.sent.ping) {
 				var ping = new Ping();
 				ping.lane = drawable.lane;
@@ -213,9 +261,24 @@ void draw()
 				console.log(ping);
 				liveobjects.add(ping);
 			}
+			/*
+			 * look for matching received object
+			 */
+			for (var i = 0; i < liveobjects.size(); i++) {
+				var obj = liveobjects.get(i);
+				if (obj.received && obj.eventId == drawable.eventId) {
+					Match match = new Match();
+					match.receiveEvent = obj;
+					match.sentEvent = drawable;
+					match.receivedTime = elem.receivedTime;
+					match.hue = drawable.hue;
+					match.lane = drawable.lane;
+					avoidCollisionForMatch(match);
+					liveobjects.add(match);
+				}
+			}
 		}
 		if (elem.messageDetails) {
-			console.log(elem.messageDetails);
 			drawable = new MessageDetails();
 			drawable.message = elem.messageDetails.message;
 			drawable.textWidth = textWidth(drawable.message);
@@ -245,7 +308,6 @@ void draw()
 		}
 		drawable.receivedTime = elem.receivedTime;
 		Blip blip = drawable.toBlip();
-		console.log(blip);
 		if (blip) {
 			liveobjects.add(blip);
 		}
@@ -272,6 +334,10 @@ void draw()
 
 void drawQueue(ArrayList queue, boolean backward) {
 	var now = Date.now();
+	/*
+	 * adjusted all ages in a first pass to make sure that inter-object drawing
+	 * is correct
+	 */
 	for (int i = 0; i < queue.size(); i++) {
 		Drawable obj = queue.get(i);
 		long clockAge = now - obj.receivedTime;
@@ -306,9 +372,9 @@ Number ageToDist(clockAge)
 
 void drawTail(lane, age, v1, v2, v3, sign)
 {
-	Number opacity = 30;
-	for (var time = age - 32; time >= Math.max(0, age - 1000); time -= 32) {
-		opacity --;
+	Number opacity = 60;
+	for (var time = age - 64; time >= Math.max(0, age - 1000); time -= 64) {
+		opacity -= 4;
 		stroke(v1, v2, v3, opacity);
 		point(ageToDist(time) * sign + width / 2, lane);
 	}
@@ -316,4 +382,17 @@ void drawTail(lane, age, v1, v2, v3, sign)
 void growLine(x1, y1, x2, y2, progress) {
 	progress = Math.max(0, Math.min(progress, 1));
 	line(x1, y1, x1 + (x2 - x1) * progress, y1 + (y2 - y1) * progress);
+}
+void avoidCollisionForMatch(Match match) {
+	match.lineLane = match.lane - 6;
+	for (var i = 0; i < liveobjects.size(); i++) {
+		var obj = liveobjects.get(i);
+		if (!obj.match) {
+			continue;
+		}
+		if (Math.abs(match.lineLane - obj.lineLane) < 6) {
+			match.lineLane = obj.lineLane - 6;
+			i = -1;
+		}
+	}
 }
