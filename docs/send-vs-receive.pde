@@ -1,7 +1,9 @@
 ArrayList liveobjects = new ArrayList();
+ArrayList texts = new ArrayList();
 ArrayList pings = new ArrayList();
 Ping previousPing = null;
-
+// the age at which you hit the screen edge
+float maxAge = (Math.E - 1) * 30000;
 abstract class Drawable {
 	int age = 0;
 
@@ -26,6 +28,10 @@ abstract class Drawable {
 	}
 }
 class Received extends Drawable {
+	// class marker
+	boolean received = true;
+
+	long eventId;
 	int lane;
 	boolean purge() {
 		return ageToDist(age - 1000) > width / 2;
@@ -46,6 +52,9 @@ class Received extends Drawable {
 	}
 }
 class Sent extends Drawable {
+	// class marker
+	boolean sent = true;
+
 	int lane;
 	boolean purge() {
 		return ageToDist(age - 1000) > width / 2;
@@ -65,7 +74,40 @@ class Sent extends Drawable {
 		return blip;
 	}
 }
+class MessageDetails extends Drawable {
+	// class marker
+	boolean messageDetails = true;
+
+	Received reference;
+	int y;
+	String message;
+	float textWidth;
+	boolean purge() {
+		return ageToDist(age) - textWidth - 3 > width / 2;
+	}
+	void draw() {
+		if (!showMessageText) {
+			return;
+		}
+		colorMode(HSB, 255);
+		var opacity = (age < 1000 ? age / 1000 : Math.max(0.25, (1 - ageToDist(age - 1000) / (width / 2)))) * 192;
+		fill(0, opacity / 2);
+		noStroke();
+		rect(width / 2 - ageToDist(reference.age) + 3, y - 5, textWidth, 10)
+		strokeWeight(2);
+		stroke(reference.v1(), reference.v2(), reference.v3(), opacity / 2);
+		growLine(width / 2 -  ageToDist(reference.age), reference.lane, width / 2 - ageToDist(reference.age), y, age / 1000);
+		fill(reference.v1(), reference.v2(), reference.v3(), opacity);
+		text(message, width / 2 - ageToDist(reference.age) + 3, y);
+	}
+	Blip toBlip() {
+		return null;
+	}
+}
 class Blip extends Drawable {
+	// class marker
+	boolean blip = true;
+
 	int lane;
 	int maxAge = 2000;
 	boolean purge() {
@@ -80,6 +122,9 @@ class Blip extends Drawable {
 	}
 }
 class Ping extends Drawable {
+	// class marker
+	boolean ping = true;
+
 	int lane;
 
 	int receivedTime;
@@ -114,8 +159,6 @@ class Ping extends Drawable {
 		stroke(192, opacity(1000));
 		point(ageToDist(age) + width / 2, y());
 		fill(192, opacity(1000));
-		textAlign(LEFT, CENTER);
-		textSize(10);
 		text(ping + "ms", ageToDist(age) + width / 2 + 5, earlierPing == null || earlierPing.ping < ping ? y() - 10 : y() + 10);
 	}
 
@@ -138,17 +181,20 @@ void setup()
 	background(0);
 	smooth();
 	frameRate(60);
+	textAlign(LEFT, CENTER);
+	textSize(10);
 }
 
 void draw()
 {
 	while (queue.length > 0) {
-		var elem = queue.pop();
+		var elem = queue.shift();
 		Drawable drawable;
 		if (elem.received) {
 			drawable = new Received();
 			drawable.lane = (elem.received.user % height + height) % height;
 			drawable.hue = (elem.received.user / 255 % 255 + 255) % 255;
+			drawable.eventId = elem.received.eventId;
 		}
 		if (elem.sent) {
 			drawable = new Sent();
@@ -168,6 +214,32 @@ void draw()
 				liveobjects.add(ping);
 			}
 		}
+		if (elem.messageDetails) {
+			console.log(elem.messageDetails);
+			drawable = new MessageDetails();
+			drawable.message = elem.messageDetails.message;
+			drawable.textWidth = textWidth(drawable.message);
+			for (var i = 0; i < liveobjects.size(); i++) {
+				if (liveobjects.get(i).received && liveobjects.get(i).eventId == elem.messageDetails.eventId) {
+					drawable.reference = liveobjects.get(i);
+					break;
+				}
+			}
+			if (drawable.reference == null) {
+				continue;
+			}
+			drawable.y = drawable.reference.lane + 8;
+			// collision detection
+			for (var i = 0; i < texts.size(); i++) {
+				MessageDetails other = texts.get(i);
+				if (drawable.y >= other.y + 10 || drawable.y + 10 <= other.y || - ageToDist(maxAge + other.age) + other.textWidth <= - ageToDist(maxAge) - 5 /* five for the little line */) {
+					continue;
+				}
+				// move down, start over
+				drawable.y = other.y + 10;
+				i = -1;
+			}
+		}
 		if (drawable == null) {
 			continue;
 		}
@@ -177,26 +249,52 @@ void draw()
 		if (blip) {
 			liveobjects.add(blip);
 		}
-		liveobjects.add(drawable);
+		if (drawable.messageDetails) {
+			texts.add(drawable);
+		} else {
+			liveobjects.add(drawable);
+		}
 		console.log(drawable);
 	}
+	// black out the before we draw the texts
 	colorMode(RGB);
 	fill(0);
 	noStroke();
-	rect(0, 0, width, height);
+	rect(0, 0, width / 2, height);
+	drawQueue(texts, true);
+	// after we've drawn the texts we black out the right half
+	colorMode(RGB);
+	fill(0);
+	noStroke();
+	rect(width / 2, 0, width, height);
+	drawQueue(liveobjects, false);
+}
+
+void drawQueue(ArrayList queue, boolean backward) {
 	var now = Date.now();
-	for (int i = 0; i < liveobjects.size(); i++) {
-		Drawable obj = liveobjects.get(i);
+	for (int i = 0; i < queue.size(); i++) {
+		Drawable obj = queue.get(i);
 		long clockAge = now - obj.receivedTime;
 		obj.age = clockAge;
 	}
-	for (int i = 0; i < liveobjects.size(); i++) {
-		Drawable obj = liveobjects.get(i);
-		if (obj.purge()) {
-			liveobjects.remove(i);
-			i--;
-		} else {
-			obj.draw();
+	if (backward) {
+		for (int i = queue.size() - 1; i >= 0; i--) {
+			Drawable obj = queue.get(i);
+			if (obj.purge()) {
+				queue.remove(i);
+			} else {
+				obj.draw();
+			}
+		}
+	} else {
+		for (int i = 0; i < queue.size(); i++) {
+			Drawable obj = queue.get(i);
+			if (obj.purge()) {
+				queue.remove(i);
+				i--;
+			} else {
+				obj.draw();
+			}
 		}
 	}
 }

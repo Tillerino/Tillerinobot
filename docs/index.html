@@ -14,18 +14,14 @@
 		queue.push(payload);
 	}
 	var queue = [];
+	var showMessageText = false;
 
-	function showHelp() {
-		d3.select("#help")
-			.transition()
-			.style("opacity", "0.8");
+	function show(id) {
+		d3.select(id).transition().style("opacity", "0.8");
 	}
 
-	function hideHelp(duration) {
-		d3.select("#help")
-			.transition()
-			.duration(duration)
-			.style("opacity", "0.1");
+	function hide(id, duration) {
+		d3.select(id).transition().duration(duration).style("opacity", "0.1");
 	}
 </script>
 <style>
@@ -44,13 +40,20 @@ body {
 </style>
 <title>Tillerinobot</title>
 </head>
-<body onload="hideHelp(5000)">
+<body onload="hide('#help', 5000); hide('#controls', 5000)">
 	<canvas data-processing-sources="send-vs-receive.pde"
 		style="padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block;"></canvas>
+	<div id="controls"
+		style="position: absolute; margin: 0px; padding: 0px; padding-right: 15px; bottom: 0px; right: 0px; background-color: black; opacity: 0.5; color: #999; width: 40%; text-align: right;"
+		onmouseout="hide('#controls', 500)" onmouseover="show('#controls')">
+		<p>
+			<input type="checkbox" onchange="showMessageText = this.checked;">Show
+			message texts
+		</p>
+	</div>
 	<div id="help"
-		style="position: absolute; margin: 0px; padding: 0px; padding-left: 10px; bottom: 0px; background-color: black; opacity: 0.5; color: #999; width: 40%;"
-		onmouseout="hideHelp(1000)"
-		onmouseover="showHelp()">
+		style="position: absolute; margin: 0px; padding: 0px; padding-left: 15px; bottom: 0px; background-color: black; opacity: 0.5; color: #999; width: 40%;"
+		onmouseout="hide('#help', 500)" onmouseover="show('#help')">
 		<p>Dots moving to the left are received messages, dots moving to
 			the right are sent messages. One user will be in the same vertical
 			position and keep the same color until you reload. Two users might
