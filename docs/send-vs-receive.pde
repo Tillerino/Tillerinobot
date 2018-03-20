@@ -168,6 +168,9 @@ void draw()
 				liveobjects.add(ping);
 			}
 		}
+		if (drawable == null) {
+			continue;
+		}
 		drawable.receivedTime = elem.receivedTime;
 		Blip blip = drawable.toBlip();
 		console.log(blip);
