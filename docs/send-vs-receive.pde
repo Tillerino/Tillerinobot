@@ -1,4 +1,7 @@
 ArrayList liveobjects = new ArrayList();
+ArrayList pings = new ArrayList();
+Ping previousPing = null;
+
 abstract class Drawable {
 	int age = 0;
 
@@ -33,7 +36,6 @@ class Received extends Drawable {
 		drawTail(lane, age, v1(), v2(), v3(), -1);
 		stroke(color(v1(), v2(), v3()));
 		point(width / 2 - ageToDist(age), lane);
-		colorMode(RGB, 255);
 	}
 	Blip toBlip() {
 		Blip blip = new Blip();
@@ -54,7 +56,6 @@ class Sent extends Drawable {
 		drawTail(lane, age, v1(), v2(), v3(), 1);
 		stroke(color(v1(), v2(), v3()));
 		point(width / 2 + ageToDist(age), lane);
-		colorMode(RGB, 255);
 	}
 	Blip toBlip() {
 		Blip blip = new Blip();
@@ -76,12 +77,64 @@ class Blip extends Drawable {
 		stroke(color(v1(), v2(), v3(), (1 - age / maxAge) * 128));
 		fill(color(v1(), v2(), v3(), Math.pow(1 - age / 2000, 2) * 64))
 		ellipse(width / 2, lane, ageToDist(age) * 4, ageToDist(age) * 4);
+	}
+}
+class Ping extends Drawable {
+	int lane;
+
+	int receivedTime;
+
+	int ping;
+
+	Ping earlierPing;
+
+	Ping newerPing;
+
+	boolean purge() {
+		return newerPing != null && ageToDist(newerPing.age) > width / 2;
+	}
+
+	void draw() {
 		colorMode(RGB, 255);
+		if (newerPing != null) {
+			strokeWeight(4);
+			stroke(160, newerPing.opacity(0));
+			if (newerPing.age > 1000) {
+				// to draw this line exactly as fast as the first line, we need to adjust by the quotient of the distances
+				var speed = Math.abs(newerPing.y() - newerPing.lane) / dist(ageToDist(newerPing.age), newerPing.y(), ageToDist(age), y());
+				// but never decrease the speed
+				speed = Math.max(speed, 1);
+				growLine(ageToDist(newerPing.age) + width / 2, newerPing.y(), ageToDist(age) + width / 2, y(), (newerPing.age - 1000) / 1000 * speed);
+			}
+		}
+		stroke(96, opacity(0));
+		strokeWeight(2);
+		growLine(ageToDist(age) + width / 2, lane, ageToDist(age) + width / 2, y(), age / 1000);
+		strokeWeight(8);
+		stroke(192, opacity(1000));
+		point(ageToDist(age) + width / 2, y());
+		fill(192, opacity(1000));
+		textAlign(LEFT, CENTER);
+		textSize(10);
+		text(ping + "ms", ageToDist(age) + width / 2 + 5, earlierPing == null || earlierPing.ping < ping ? y() - 10 : y() + 10);
+	}
+
+	Number y() {
+		return pingToY(ping);
+	}
+
+	Number opacity(int delay) {
+		return 128 * Math.pow(Math.min(Math.max(age - delay, 0), 2000) / 2000, 2);
+	}
+
+	Number pingToY(int ping) {
+		var logScale = Math.max(0, Math.log10(ping) - 1); // 10ms = 0, 1s = 3
+		return height - 10 - logScale * height / 9; // 1s = 1/3rd of window height
 	}
 }
 void setup()
 {
-	size(window.innerWidth * 0.9, window.innerHeight * 0.8);
+	size(window.innerWidth, window.innerHeight);
 	background(0);
 	smooth();
 	frameRate(60);
@@ -101,6 +154,19 @@ void draw()
 			drawable = new Sent();
 			drawable.lane = (elem.sent.user % height + height) % height;
 			drawable.hue = (elem.sent.user / 255 % 255 + 255) % 255;
+			if (elem.sent.ping) {
+				var ping = new Ping();
+				ping.lane = drawable.lane;
+				ping.receivedTime = elem.receivedTime;
+				ping.ping = elem.sent.ping;
+				if (previousPing != null) {
+					previousPing.newerPing = ping;
+					ping.earlierPing = previousPing;
+				}
+				previousPing = ping;
+				console.log(ping);
+				liveobjects.add(ping);
+			}
 		}
 		drawable.receivedTime = elem.receivedTime;
 		Blip blip = drawable.toBlip();
@@ -111,6 +177,7 @@ void draw()
 		liveobjects.add(drawable);
 		console.log(drawable);
 	}
+	colorMode(RGB);
 	fill(0);
 	noStroke();
 	rect(0, 0, width, height);
@@ -118,12 +185,15 @@ void draw()
 	for (int i = 0; i < liveobjects.size(); i++) {
 		Drawable obj = liveobjects.get(i);
 		long clockAge = now - obj.receivedTime;
+		obj.age = clockAge;
+	}
+	for (int i = 0; i < liveobjects.size(); i++) {
+		Drawable obj = liveobjects.get(i);
 		if (obj.purge()) {
 			liveobjects.remove(i);
 			i--;
 		} else {
 			obj.draw();
-			obj.age = clockAge;
 		}
 	}
 }
@@ -141,4 +211,8 @@ void drawTail(lane, age, v1, v2, v3, sign)
 		stroke(v1, v2, v3, opacity);
 		point(ageToDist(time) * sign + width / 2, lane);
 	}
+}
+void growLine(x1, y1, x2, y2, progress) {
+	progress = Math.max(0, Math.min(progress, 1));
+	line(x1, y1, x1 + (x2 - x1) * progress, y1 + (y2 - y1) * progress);
 }

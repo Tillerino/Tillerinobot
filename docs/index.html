@@ -3,6 +3,7 @@
 <head>
 <meta charset="ISO-8859-1">
 <script src="processing.min.js"></script>
+<script src="d3.min.js"></script>
 <script type="text/javascript">
 	var ws = new WebSocket("ws://api.tillerino.org/live/v0");
 	ws.onmessage = function(event) {
@@ -12,7 +13,20 @@
 		payload.receivedTime = Date.now();
 		queue.push(payload);
 	}
-	var queue = []
+	var queue = [];
+
+	function showHelp() {
+		d3.select("#help")
+			.transition()
+			.style("opacity", "0.8");
+	}
+
+	function hideHelp(duration) {
+		d3.select("#help")
+			.transition()
+			.duration(duration)
+			.style("opacity", "0.1");
+	}
 </script>
 <style>
 @import url(//fonts.googleapis.com/css?family=Cabin:semibold);
@@ -20,21 +34,30 @@
 body, table td, input, .gwt-Button, button {
 	font-size: 16px;
 	font-family: Cabin, "Gill Sans", Calibri, "DejaVu Sans", sans-serif;
-	color: #555;
 }
 
 body {
 	background-color: #000;
+	margin: 0px;
+	padding: 0px;
 }
 </style>
 <title>Tillerinobot</title>
 </head>
-<body>
+<body onload="hideHelp(5000)">
 	<canvas data-processing-sources="send-vs-receive.pde"
 		style="padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block;"></canvas>
-	<p style="text-align: center;">Dots moving to the left are received messages, dots moving to
-		the right are sent messages. One user will be in the same vertical
-		position and keep the same color until you reload. Two users might
-		share a vertical position or color.</p>
+	<div id="help"
+		style="position: absolute; margin: 0px; padding: 0px; padding-left: 10px; bottom: 0px; background-color: black; opacity: 0.5; color: #999; width: 40%;"
+		onmouseout="hideHelp(1000)"
+		onmouseover="showHelp()">
+		<p>Dots moving to the left are received messages, dots moving to
+			the right are sent messages. One user will be in the same vertical
+			position and keep the same color until you reload. Two users might
+			share a vertical position or color.</p>
+		<p>The plot on the bottom right shows the ping to the server.
+			Vertical lines connect the values to the events which they were
+			measured for.</p>
+	</div>
 </body>
 </html>
