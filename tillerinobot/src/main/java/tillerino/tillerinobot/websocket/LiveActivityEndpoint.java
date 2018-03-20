@@ -4,8 +4,9 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Singleton;
 import javax.websocket.CloseReason;
@@ -18,7 +19,15 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.MDC;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import lombok.Builder;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotBackend.IRCName;
 
@@ -31,8 +40,32 @@ import tillerino.tillerinobot.BotBackend.IRCName;
 @Singleton
 @ServerEndpoint("/live/v0")
 public class LiveActivityEndpoint extends Endpoint {
-	private static final String RECEIVED = "{\n\t\"received\": {\n\t\t\"user\": %d\n\t}\n}";
-	private static final String SENT = "{\n\t\"sent\": {\n\t\t\"user\": %d\n\t}\n}";
+	@Value
+	public static class Received {
+		int user;
+	}
+
+	@Value
+	public static class Sent {
+		int user;
+		Integer ping;
+	}
+
+	@Value
+	@Builder
+	public static class Message {
+		Received received;
+		Sent sent;;
+	}
+
+	final ObjectMapper mapper = new ObjectMapper();
+	final ObjectWriter writer;
+	{
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.setSerializationInclusion(Include.NON_NULL);
+		writer = mapper.writerFor(Message.class);
+	}
+
 	private final Set<Session> sessions = new HashSet<>();
 
 	@Override
@@ -55,10 +88,10 @@ public class LiveActivityEndpoint extends Endpoint {
 		sessions.remove(session);
 	}
 
-	private synchronized void forEachSession(Consumer<Session> action) {
+	private synchronized void sendToEachSession(Function<Session, Message> action) {
 		for (Session session : sessions) {
 			try {
-				action.accept(session);
+				session.getAsyncRemote().sendText(writer.writeValueAsString(action.apply(session)));
 			} catch (Exception e) {
 				log.error("Error sending on Websocket", e);
 			}
@@ -66,13 +99,12 @@ public class LiveActivityEndpoint extends Endpoint {
 	}
 
 	public void propagateReceivedMessage(@IRCName String ircUserName) {
-		forEachSession(session -> session.getAsyncRemote()
-				.sendText(String.format(RECEIVED, anonymizeHashCode(ircUserName, session))));
+		sendToEachSession(session -> Message.builder().received(new Received(anonymizeHashCode(ircUserName, session))).build());
 	}
 
 	public void propagateSentMessage(@IRCName String ircUserName) {
-		forEachSession(session -> session.getAsyncRemote()
-				.sendText(String.format(SENT, anonymizeHashCode(ircUserName, session))));
+		Integer ping = Optional.ofNullable(MDC.get("ping")).map(Integer::valueOf).orElse(null);
+		sendToEachSession(session -> Message.builder().sent(new Sent(anonymizeHashCode(ircUserName, session), ping)).build());
 	}
 
 	/**
