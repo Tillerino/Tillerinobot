@@ -5,7 +5,7 @@
 <script src="processing.min.js"></script>
 <script src="d3.min.js"></script>
 <script type="text/javascript">
-	var ws = new WebSocket("ws://api.tillerino.org/live/v0");
+	var ws = new WebSocket("wss://api.tillerino.org:444/live/v0");
 	ws.onmessage = function(event) {
 		var message = event.data;
 		console.log(message);
