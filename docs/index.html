@@ -9,6 +9,7 @@
 		var message = event.data;
 		console.log(message);
 		var payload = JSON.parse(message);
+		payload.receivedTime = Date.now();
 		queue.push(payload);
 	}
 	var queue = []
