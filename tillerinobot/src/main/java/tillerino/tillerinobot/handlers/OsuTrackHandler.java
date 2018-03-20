@@ -26,7 +26,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
     }
 
     @Override
-    public Response handleArgument(String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+    public Response handleArgument(String originalCommand, String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
         MDC.put(IRCBot.MDC_HANDLER, "u");
 
         String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();

@@ -371,7 +371,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	public void testLiveActivity() throws Exception {
 		IRCBot bot = getTestBot(backend);
 		bot.processPrivateMessage(mockBotUser("user"), "whatever");
-		verify(liveActivity).propagateReceivedMessage("user");
+		verify(liveActivity).propagateReceivedMessage("user", null);
 	}
 
 	OsuApiUser user(@UserId int id, @OsuName String name) {

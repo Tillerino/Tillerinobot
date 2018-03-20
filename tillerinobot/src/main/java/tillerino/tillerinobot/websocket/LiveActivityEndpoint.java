@@ -42,20 +42,29 @@ import tillerino.tillerinobot.BotBackend.IRCName;
 public class LiveActivityEndpoint extends Endpoint {
 	@Value
 	public static class Received {
+		Long eventId;
 		int user;
 	}
 
 	@Value
 	public static class Sent {
+		Long eventId;
 		int user;
 		Integer ping;
+	}
+
+	@Value
+	public static class MessageDetails {
+		Long eventId;
+		String message;
 	}
 
 	@Value
 	@Builder
 	public static class Message {
 		Received received;
-		Sent sent;;
+		Sent sent;
+		MessageDetails messageDetails;
 	}
 
 	final ObjectMapper mapper = new ObjectMapper();
@@ -98,13 +107,17 @@ public class LiveActivityEndpoint extends Endpoint {
 		}
 	}
 
-	public void propagateReceivedMessage(@IRCName String ircUserName) {
-		sendToEachSession(session -> Message.builder().received(new Received(anonymizeHashCode(ircUserName, session))).build());
+	public void propagateReceivedMessage(@IRCName String ircUserName, Long eventId) {
+		sendToEachSession(session -> Message.builder().received(new Received(eventId, anonymizeHashCode(ircUserName, session))).build());
 	}
 
-	public void propagateSentMessage(@IRCName String ircUserName) {
+	public void propagateSentMessage(@IRCName String ircUserName, Long eventId) {
 		Integer ping = Optional.ofNullable(MDC.get("ping")).map(Integer::valueOf).orElse(null);
-		sendToEachSession(session -> Message.builder().sent(new Sent(anonymizeHashCode(ircUserName, session), ping)).build());
+		sendToEachSession(session -> Message.builder().sent(new Sent(eventId, anonymizeHashCode(ircUserName, session), ping)).build());
+	}
+
+	public void propagateMessageDetails(Long eventId, String text) {
+		sendToEachSession(session -> Message.builder().messageDetails(new MessageDetails(eventId, text)).build());
 	}
 
 	/**

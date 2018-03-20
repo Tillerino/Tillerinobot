@@ -12,6 +12,7 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 public class TsundereTest {
 
@@ -23,7 +24,7 @@ public class TsundereTest {
 		// mock backend and create RecommendationsManager and RecommendHandler based on mocked backend
 		BotBackend backend = mock(BotBackend.class);
 		RecommendHandler handler = new RecommendHandler(
-				new RecommendationsManager(backend, null, null, new RecommendationRequestParser(backend)));
+				new RecommendationsManager(backend, null, null, new RecommendationRequestParser(backend)), mock(LiveActivityEndpoint.class));
 
 		// mock a user data object and make it return the tsundere object that we're spying on
 		UserData userData = mock(UserData.class);

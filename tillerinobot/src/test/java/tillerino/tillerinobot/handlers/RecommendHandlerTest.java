@@ -16,6 +16,7 @@ import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Recommendation;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 public class RecommendHandlerTest {
 	@Test
@@ -29,7 +30,7 @@ public class RecommendHandlerTest {
 		when(userData.getLanguage()).thenReturn(new Default());
 
 		when(userData.getDefaultRecommendationOptions()).thenReturn("dt");
-		new RecommendHandler(manager).handle("r", null, userData);
+		new RecommendHandler(manager, mock(LiveActivityEndpoint.class)).handle("r", null, userData);
 		verify(manager).getRecommendation(any(), eq("dt"), any());
 	}
 }

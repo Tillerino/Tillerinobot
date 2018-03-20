@@ -3,6 +3,7 @@ package tillerino.tillerinobot.handlers;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.slf4j.MDC;
@@ -20,33 +21,49 @@ import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.Recommendation;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @Slf4j
 public class RecommendHandler extends CommandHandler.WithShorthand {
 	public static final String MDC_FLAG = "r";
 
-	RecommendationsManager manager;
+	private final RecommendationsManager manager;
+	private final LiveActivityEndpoint liveActivity;
 
 	@Inject
-	public RecommendHandler(RecommendationsManager manager) {
+	public RecommendHandler(RecommendationsManager manager, LiveActivityEndpoint liveActivity) {
 		super("recommend");
 		this.manager = manager;
+		this.liveActivity = liveActivity;
 	}
 
 	@Override
-	public Response handleArgument(String remaining, OsuApiUser apiUser,
-								   UserData userData) throws UserException,
-			IOException, SQLException, InterruptedException {
+	public Response handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
+			throws UserException, IOException, SQLException, InterruptedException {
 		MDC.put(IRCBot.MDC_HANDLER, MDC_FLAG);
 
 		Language lang = userData.getLanguage();
 
-		if (remaining.isEmpty() && userData.getDefaultRecommendationOptions() != null) {
+		if (remaining.isEmpty()) {
 			remaining = userData.getDefaultRecommendationOptions();
+		}
+		if (remaining == null) {
+			remaining = "";
+		}
+
+		{
+			/*
+			 * First we check if the command is proper and then broadcast it. The point of
+			 * checking if it is correct is to make sure that nothing else is contained in
+			 * the message making the message anonymous as can be.
+			 */
+			manager.parseSamplerSettings(apiUser, remaining, lang);
+			liveActivity.propagateMessageDetails(IRCBot.getEventId(), "!" + originalCommand);
 		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,
 				remaining, lang);
+		
 		BeatmapMeta beatmap = recommendation.beatmap;
 
 		if (beatmap == null) {

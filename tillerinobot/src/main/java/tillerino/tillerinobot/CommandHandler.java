@@ -275,22 +275,22 @@ public interface CommandHandler {
 				IOException, SQLException, InterruptedException {
 			String lowerCase = originalCommand.toLowerCase();
 			if (lowerCase.equals(alias)) {
-				return handleArgument("", apiUser, userData);
+				return handleArgument(originalCommand, "", apiUser, userData);
 			}
 			if (getLevenshteinDistance(lowerCase, command) <= 2) {
-				return handleArgument("", apiUser, userData);
+				return handleArgument(originalCommand, "", apiUser, userData);
 			}
 			if (lowerCase.startsWith(aliasWithSpace)) {
-				return handleArgument(originalCommand.substring(2), apiUser, userData);
+				return handleArgument(originalCommand, originalCommand.substring(2), apiUser, userData);
 			}
 			int pos = lowerCase.indexOf(' ');
 			if (pos > 0 && getLevenshteinDistance(lowerCase.substring(0, pos), command) <= 2) {
-				return handleArgument(originalCommand.substring(pos + 1), apiUser, userData);
+				return handleArgument(originalCommand, originalCommand.substring(pos + 1), apiUser, userData);
 			}
 			return null;
 		}
 
-		public abstract Response handleArgument(String remaining, OsuApiUser apiUser, UserData userData)
+		public abstract Response handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
 				throws UserException, IOException, SQLException, InterruptedException;
 	}
 }

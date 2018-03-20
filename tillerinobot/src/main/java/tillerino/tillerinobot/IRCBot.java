@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -86,6 +87,8 @@ import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 @Slf4j
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class IRCBot extends CoreHooks {
+	private static final String MDC_EVENT = "event";
+
 	interface IRCBotUser {
 		/**
 		 * @return the user's IRC nick, not their actual user name.
@@ -150,7 +153,7 @@ public class IRCBot extends CoreHooks {
 		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
 		commandHandlers.add(new AccHandler(backend));
 		commandHandlers.add(new WithHandler(backend));
-		commandHandlers.add(new RecommendHandler(manager));
+		commandHandlers.add(new RecommendHandler(manager, liveActivity));
 		commandHandlers.add(new RecentHandler(backend));
 		commandHandlers.add(new DebugHandler(backend, resolver));
 		commandHandlers.add(new HelpHandler());
@@ -265,7 +268,7 @@ public class IRCBot extends CoreHooks {
 		MDC.put(MDC_STATE, "action");
 		log.debug("action: " + message);
 		botInfo.setLastReceivedMessage(System.currentTimeMillis());
-		liveActivity.propagateReceivedMessage(user.getNick());
+		liveActivity.propagateReceivedMessage(user.getNick(), getEventId());
 		
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
@@ -287,6 +290,14 @@ public class IRCBot extends CoreHooks {
 		} finally {
 			semaphore.release();
 		}
+	}
+
+	public static @CheckForNull Long getEventId() {
+		String asString = MDC.get(MDC_EVENT);
+		if (asString == null) {
+			return null;
+		}
+		return Long.parseLong(asString);
 	}
 
 	private void handleException(IRCBotUser user, Throwable e, Language lang) {
@@ -394,7 +405,7 @@ public class IRCBot extends CoreHooks {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().message(msg);
-					liveActivity.propagateSentMessage(getNick());
+					liveActivity.propagateSentMessage(getNick(), getEventId());
 					MDC.put(MDC_STATE, "sent");
 					if (success) {
 						MDC.put(MDC_DURATION, System.currentTimeMillis() - event.getTimestamp() + "");
@@ -430,7 +441,7 @@ public class IRCBot extends CoreHooks {
 					pinger.ping((CloseableBot) user.getBot());
 					
 					user.send().action(msg);
-					liveActivity.propagateSentMessage(getNick());
+					liveActivity.propagateSentMessage(getNick(), getEventId());
 					MDC.put(MDC_STATE, "sent");
 					log.debug("sent action: " + msg);
 					return true;
@@ -497,7 +508,7 @@ public class IRCBot extends CoreHooks {
 		MDC.put(MDC_STATE, "msg");
 		log.debug("received: " + originalMessage);
 		botInfo.setLastReceivedMessage(System.currentTimeMillis());
-		liveActivity.propagateReceivedMessage(user.getNick());
+		liveActivity.propagateReceivedMessage(user.getNick(), getEventId());
 
 		TimingSemaphore semaphore = perUserLock.getUnchecked(user.getNick());
 		if(!semaphore.tryAcquire()) {
@@ -566,7 +577,7 @@ public class IRCBot extends CoreHooks {
 	@Override
 	public void onEvent(Event event) throws Exception {
 		botInfo.setLastInteraction(System.currentTimeMillis());
-		MDC.put("event", "" + lastSerial.incrementAndGet());
+		MDC.put(MDC_EVENT, "" + lastSerial.incrementAndGet());
 		em.setThreadLocalEntityManager(emf.createEntityManager());
 		try {
 			rateLimiter.setThreadPriority(RateLimiter.EVENT);
