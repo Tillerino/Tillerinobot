@@ -28,10 +28,10 @@ public class WithHandler implements CommandHandler {
 	private final LiveActivityEndpoint live;
 
 	@Override
-	public Response handle(String message, OsuApiUser apiUser,
+	public Response handle(String originalMessage, OsuApiUser apiUser,
 			UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
-		if (!message.toLowerCase().startsWith("with")) {
+		if (!originalMessage.toLowerCase().startsWith("with")) {
 			return null;
 		}
 
@@ -43,7 +43,7 @@ public class WithHandler implements CommandHandler {
 		if(lastSongInfo == null) {
 			throw new UserException(lang.noLastSongInfo());
 		}
-		message = message.substring(4).trim();
+		String message = originalMessage.substring(4).trim();
 		
 		Long mods = Mods.fromShortNamesContinuous(message);
 		if (mods == null || mods == 0) {
@@ -57,7 +57,7 @@ public class WithHandler implements CommandHandler {
 			throw new UserException(lang.noInformationForMods());
 		}
 		
-		live.propagateMessageDetails(IRCBot.getEventId(), "!" + message);
+		live.propagateMessageDetails(IRCBot.getEventId(), "!" + originalMessage);
 
 		return new Message(beatmap.formInfoMessage(false, null,
 				userData.getHearts(), null, null, null)).thenRun(
