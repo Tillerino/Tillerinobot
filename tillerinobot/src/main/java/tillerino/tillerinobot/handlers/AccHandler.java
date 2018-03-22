@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
@@ -19,15 +20,13 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AccHandler implements CommandHandler {
-	BotBackend backend;
-	
-	@Inject
-	public AccHandler(BotBackend backend) {
-		super();
-		this.backend = backend;
-	}
+	private final BotBackend backend;
+
+	private final LiveActivityEndpoint live;
 
 	static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 	static Pattern superExtended = Pattern.compile("(\\d+)x100\\s+(?:(\\d+)x50\\s+)?(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
@@ -51,6 +50,8 @@ public class AccHandler implements CommandHandler {
 		if (beatmap == null) {
 			throw new RareUserException(lang.excuseForError());
 		}
+
+		live.propagateMessageDetails(IRCBot.getEventId(), "!" + message);
 
 		message = message.substring(3).trim().replace(',', '.');
 		Matcher extendedMatcher = extended.matcher(message);

@@ -21,8 +21,11 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NPHandler implements CommandHandler {
 	static final Pattern npPattern = Pattern
 			.compile("(?:is listening to|is watching|is playing|is editing) \\[https?://osu.ppy.sh/(?<idtype>b|s)/(?<id>\\d+).*\\](?<mods>(?: "
@@ -31,13 +34,9 @@ public class NPHandler implements CommandHandler {
 					+ "|\\+HardRock|\\+SuddenDeath|\\+Perfect|\\+DoubleTime|\\+Nightcore|\\+Hidden|\\+Flashlight"
 					+ "|~Relax~|~AutoPilot~|-SpunOut|\\|Autoplay\\|" + "))*)");
 
-	BotBackend backend;
+	private final BotBackend backend;
 
-	@Inject
-	public NPHandler(BotBackend backend) {
-		super();
-		this.backend = backend;
-	}
+	private final LiveActivityEndpoint live;
 
 	@Override
 	public Response handle(String message, OsuApiUser apiUser, UserData userData) throws UserException, IOException, SQLException, InterruptedException {
@@ -49,6 +48,8 @@ public class NPHandler implements CommandHandler {
 
 		if (pair == null)
 			return null;
+		
+		live.propagateMessageDetails(IRCBot.getEventId(), "/np");
 
 		BeatmapMeta beatmap = backend.loadBeatmap(pair.getBeatmap(),
 				pair.getMods(), lang);

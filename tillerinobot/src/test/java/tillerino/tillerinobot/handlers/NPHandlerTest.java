@@ -8,6 +8,7 @@ import org.junit.Test;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 
 public class NPHandlerTest {
@@ -22,7 +23,7 @@ public class NPHandlerTest {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(new Default());
 		try {
-			new NPHandler(null).handle("is editing [https://osu.ppy.sh/s/123 title]", null, userData);
+			new NPHandler(null, mock(LiveActivityEndpoint.class)).handle("is editing [https://osu.ppy.sh/s/123 title]", null, userData);
 			fail();
 		} catch(UserException e) {
 			assertEquals(new Default().isSetId(), e.getMessage());

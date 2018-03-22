@@ -9,6 +9,7 @@ import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
@@ -18,15 +19,13 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WithHandler implements CommandHandler {
-	BotBackend backend;
+	private final BotBackend backend;
 
-	@Inject
-	public WithHandler(BotBackend backend) {
-		super();
-		this.backend = backend;
-	}
+	private final LiveActivityEndpoint live;
 
 	@Override
 	public Response handle(String message, OsuApiUser apiUser,
@@ -58,6 +57,8 @@ public class WithHandler implements CommandHandler {
 			throw new UserException(lang.noInformationForMods());
 		}
 		
+		live.propagateMessageDetails(IRCBot.getEventId(), "!" + message);
+
 		return new Message(beatmap.formInfoMessage(false, null,
 				userData.getHearts(), null, null, null)).thenRun(
 				() -> userData.setLastSongInfo(new BeatmapWithMods(beatmap

@@ -25,6 +25,7 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 
 public class AccHandlerTest {
@@ -46,7 +47,7 @@ public class AccHandlerTest {
 		beatmap.setMaxCombo(100);
 		when(backend.loadBeatmap(anyInt(), anyLong(), any(Language.class)))
 				.thenReturn(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)));
-		AccHandler accHandler = new AccHandler(backend);
+		AccHandler accHandler = new AccHandler(backend, mock(LiveActivityEndpoint.class));
 		
 		UserData userData = mock(UserData.class);
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
@@ -62,7 +63,7 @@ public class AccHandlerTest {
 		BotBackend backend = mock(BotBackend.class);
 		when(backend.loadBeatmap(anyInt(), anyLong(), any())).thenReturn(new BeatmapMeta(null, null, null));
 		try {
-			new AccHandler(backend).handle("acc 99 80000000000000000000x 1m", null, userData);
+			new AccHandler(backend, mock(LiveActivityEndpoint.class)).handle("acc 99 80000000000000000000x 1m", null, userData);
 			fail();
 		} catch (Exception e) {
 			assertThat(e.getMessage(), new Contains("800000000000"));

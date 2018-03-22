@@ -151,8 +151,8 @@ public class IRCBot extends CoreHooks {
 		
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
-		commandHandlers.add(new AccHandler(backend));
-		commandHandlers.add(new WithHandler(backend));
+		commandHandlers.add(new AccHandler(backend, liveActivity));
+		commandHandlers.add(new WithHandler(backend, liveActivity));
 		commandHandlers.add(new RecommendHandler(manager, liveActivity));
 		commandHandlers.add(new RecentHandler(backend));
 		commandHandlers.add(new DebugHandler(backend, resolver));
@@ -284,7 +284,7 @@ public class IRCBot extends CoreHooks {
 			
 			checkVersionInfo(user);
 
-			sendResponse(new NPHandler(backend).handle(message, apiUser, userData), user);
+			sendResponse(new NPHandler(backend, liveActivity).handle(message, apiUser, userData), user);
 		} catch (RuntimeException | Error | UserException | IOException | SQLException | InterruptedException e) {
 			handleException(user, e, lang);
 		} finally {
