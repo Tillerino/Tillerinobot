@@ -4,14 +4,49 @@
 <meta charset="ISO-8859-1">
 <script src="processing.min.js"></script>
 <script src="d3.min.js"></script>
+<script src="reconnecting-websocket.min.js"></script>
 <script type="text/javascript">
-	var ws = new WebSocket("wss://api.tillerino.org:444/live/v0");
+	/* prepare notifications */
+
+	if (Notification.permission !== "denied" && Notification.permission !== "granted") {
+		Notification.requestPermission(function(permission) {
+			if (permission === "granted") {
+				var notification = new Notification("Tillerinobot", { body: "Notifications enabled." });
+			}
+		});
+	}
+
+	var ws = new ReconnectingWebSocket("wss://api.tillerino.org:444/live/v0");
+	var wasEverConnected = false;
 	ws.onmessage = function(event) {
 		var message = event.data;
 		console.log(message);
 		var payload = JSON.parse(message);
 		payload.receivedTime = Date.now();
 		queue.push(payload);
+	};
+	ws.onclose = function(event) {
+		if (wasEverConnected) {
+			console.log("connection lost");
+			if (Notification.permission === "granted") {
+				new Notification("Tillerinobot", {
+					body: "Connection lost.",
+					icon: "img/notification_disconnected.png"
+				});
+			}
+		}
+	}
+	ws.onopen = function(event) {
+		if (wasEverConnected) {
+			console.log("connection restored");
+			if (Notification.permission === "granted") {
+				new Notification("Tillerinobot", {
+					body: "Connected to Tillerinobot.",
+					icon: "img/notification_reconnected.png"
+				});
+			}
+		}
+		wasEverConnected = true;
 	}
 	var queue = [];
 	var showMessageText = false;
