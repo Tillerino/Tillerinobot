@@ -136,6 +136,8 @@ class Ping extends Drawable {
 
 	Ping newerPing;
 
+	Sent sentEvent;
+
 	boolean purge() {
 		return newerPing != null && ageToDist(newerPing.age) > width / 2;
 	}
@@ -201,9 +203,13 @@ class Match extends Drawable {
 			return;
 		}
 		stroke(color(v1(), v2(), v3(), (1 - Math.max(0, age - 1000) / 2000) * 192));
-		line(width / 2 - ageToDist(receiveEvent.age), lane, width / 2 - ageToDist(receiveEvent.age), lineLane);
-		line(width / 2 + ageToDist(sentEvent.age), lane, width / 2 + ageToDist(sentEvent.age), lineLane);
-		line(width / 2 - ageToDist(receiveEvent.age) + 1, lineLane, width / 2 + ageToDist(sentEvent.age) - 1, lineLane);
+		noFill();
+		beginShape();
+		vertex(width / 2 - ageToDist(receiveEvent.age), lane);
+		vertex(width / 2 - ageToDist(receiveEvent.age), lineLane);
+		vertex(width / 2 + ageToDist(sentEvent.age), lineLane);
+		vertex(width / 2 + ageToDist(sentEvent.age), lane);
+		endShape();
 	}
 }
 void setup()
@@ -252,8 +258,13 @@ void draw()
 				var ping = new Ping();
 				ping.lane = drawable.lane;
 				ping.receivedTime = elem.receivedTime;
+				ping.sentEvent = drawable;
 				ping.ping = elem.sent.ping;
 				if (previousPing != null) {
+					if (previousPing.sentEvent.eventId == drawable.eventId) {
+						// more than one sent message logged this ping
+						continue;
+					}
 					previousPing.newerPing = ping;
 					ping.earlierPing = previousPing;
 				}
@@ -389,6 +400,10 @@ void avoidCollisionForMatch(Match match) {
 		var obj = liveobjects.get(i);
 		if (!obj.match) {
 			continue;
+		}
+		if (obj.receiveEvent == match.receiveEvent) {
+			match.lineLane = obj.lineLane;
+			return;
 		}
 		if (Math.abs(match.lineLane - obj.lineLane) < 6) {
 			match.lineLane = obj.lineLane - 6;
