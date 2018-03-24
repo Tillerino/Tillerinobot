@@ -1,0 +1,10 @@
+*/target
+*/.project
+*/.settings
+*/.classpath
+*/.factorypath
+tillerinobot/tillerinobot-db.json
+
+# IntelliJ IDEA
+*/.idea
+*/*.iml

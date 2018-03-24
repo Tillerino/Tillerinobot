@@ -1,9 +1,0 @@
-/target
-/.project
-/.settings
-/.classpath
-/tillerinobot-db.json
-
-# IntelliJ IDEA
-/.idea
-/*.iml
