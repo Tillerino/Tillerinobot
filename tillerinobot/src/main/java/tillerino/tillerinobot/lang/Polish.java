@@ -11,7 +11,7 @@ import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
- * French language implementation.
+ * Polish language implementation.
  * Pawwit https://osu.ppy.sh/u/2070907 & LilSilv https://github.com/LilSilv https://osu.ppy.sh/users/8488688
  */
 public class Default extends AbstractMutableLanguage {
