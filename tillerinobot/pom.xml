@@ -244,7 +244,7 @@
 		<dependency>
 			<groupId>com.github.francesco149</groupId>
 			<artifactId>koohii</artifactId>
-			<version>1.0.12</version>
+			<version>1.0.15</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -316,7 +316,7 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.9.1</version>
+			<version>3.11.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

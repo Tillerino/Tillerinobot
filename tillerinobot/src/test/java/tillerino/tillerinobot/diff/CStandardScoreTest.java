@@ -109,6 +109,6 @@ public class CStandardScoreTest {
 				apiBeatmap.getApproachRate(mods), 3.870850244939327,
 				2.8966311118954815, apiBeatmap.getMaxCombo());
 		CStandardScore standardScore = new CStandardScore(score);
-		assertEquals(614.43, standardScore.getPP(beatmap), 1E-2);
+		assertEquals(579, standardScore.getPP(beatmap), 0.5);
 	}
 }

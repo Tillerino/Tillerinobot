@@ -17,7 +17,7 @@ public final class MathHelper {
 		return x;
 	}
 
-	static double clamp(double x, double min, double max) {
+	static double Clamp(double x, double min, double max) {
 		return max(min, min(max, x));
 	}
 }

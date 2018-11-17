@@ -622,10 +622,9 @@ public class IRCBot extends CoreHooks {
 		pinger.handleUnknownEvent(event);
 	}
 
-	static final int CURRENT_VERSION = 12;
-	static final String VERSION_MESSAGE = "Quick update: You might have heard of a sweet tool called [https://ameobea.me/osutrack/ osu!track] made by [https://osu.ppy.sh/u/Ameo Ameo]."
-			+ " Starting now, I can query it for you. Give it a go! Just type !u."
-			+ " For more info check out the [https://github.com/Tillerino/Tillerinobot/wiki/osu!track wiki].";
+	static final int CURRENT_VERSION = 13;
+	static final String VERSION_MESSAGE = "This is embarrasing. Looks like I didn't know about the HD nerf for a quite a while."
+			+ " Don't worry: I'm all caught up now. I'll be updating my pp records over the following days.";
 
 	long lastListTime = System.currentTimeMillis();
 	
