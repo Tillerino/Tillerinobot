@@ -14,7 +14,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * Polish language implementation.
  * Pawwit https://osu.ppy.sh/u/2070907 & LilSilv https://github.com/LilSilv https://osu.ppy.sh/users/8488688
  */
-public class Default extends AbstractMutableLanguage {
+public class Polish extends AbstractMutableLanguage {
 	private static final long serialVersionUID = 1L;
 	static final Random rnd = new Random();
 
@@ -26,7 +26,7 @@ public class Default extends AbstractMutableLanguage {
 	@Override
 	public String internalException(String marker) {
 		return "Ugh... Wygląda na to, że ludzki Tillerino uszkodził moje obwody."
-				+ "Gdyby wkrótce tego nie zauważył, mógłbyś go [https://github.com/Tillerino/Tillerinobot/wiki/Contact poinformować]? (odwołanie "
+				+ " Gdyby wkrótce tego nie zauważył, mógłbyś go [https://github.com/Tillerino/Tillerinobot/wiki/Contact poinformować]? (odwołanie "
 				+ marker + ")";
 	}
 
