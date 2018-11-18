@@ -187,7 +187,7 @@ public class Default extends AbstractMutableLanguage {
                 "Stawiam, że chętnie byś poszedł na spacerek. Wiesz... na zewnątrz",
                 "Jestem pewien, że masz kilka innych rzeczy do zrobienia. Może zrobisz je teraz?",
                 "Wyglądasz jakbyś potrzebował drzemki",
-                "Ale sprawdź tą super interesującą stronę na [https://en.wikipedia.org/wiki/Special:Random Wikipedii]!",
+                "Ale sprawdź tą super interesującą stronę na [https://pl.wikipedia.org/wiki/Special:Random Wikipedii]!",
                 "Sprawdźmy czy ktoś niezły teraz [http://www.twitch.tv/directory/game/Osu! streamuje]!",
                 "Zobacz kolejna [http://dagobah.net/flash/Cursor_Invisible.swf gra], w którą pewnie ssiesz!",
                 "Powinieneś mieć teraz wystarczająco dużo czasu na przeczytanie [https://github.com/Tillerino/Tillerinobot/wiki mojej instrukcji]",
