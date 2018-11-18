@@ -43,8 +43,7 @@ public class Facebook implements AuthenticatorService {
 
   public static class FacebookMeBody {
     String id;
-    String first_name;
-    String last_name;
+    String name;
   }
 
   @SuppressFBWarnings(value = "TQ", justification = "Producer")
@@ -62,8 +61,7 @@ public class Facebook implements AuthenticatorService {
 
     FacebookMeBody fromJson = gson.fromJson(response.getBody(), FacebookMeBody.class);
 
-    Credentials user =
-        new Credentials("facebook:" + fromJson.id, fromJson.first_name + " " + fromJson.last_name);
+    Credentials user = new Credentials("facebook:" + fromJson.id, fromJson.name);
 
     return user;
   }
