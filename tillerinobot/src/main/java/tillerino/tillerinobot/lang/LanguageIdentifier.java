@@ -9,7 +9,7 @@ public enum LanguageIdentifier {
 	TsundereGerman(TsundereGerman.class),
 	Italiano(Italiano.class),
 	Français(Francais.class),
-	Polski(Polski.class),
+	Polski(Polish.class),
 	Nederlands(Nederlands.class),
 	עברית(Hebrew.class),
 	Farsi(Farsi.class),
