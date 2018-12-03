@@ -50,7 +50,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 			return new Message("Labas, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			return new Message(apiUser.getUserName() + "...")
-				.then(new Message("Senai matytas!!"))
+				.then(new Message("...Ar čia tikrai tu?"))
 				.then(new Message("Labas. Gal kažką parekomenduoti?"));
 		} else {
 			String[] messages = {
@@ -86,12 +86,12 @@ public class Lithuanian extends AbstractMutableLanguage {
 
 	@Override
 	public String noLastSongInfo() {
-		return "Nepamenu, kad būtum klausęs info apie kažkokią dainą...";
+		return "Aha... O kokiam čia mapui?";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Pabandyk šį grajų su kokiais nors modais!";
+		return "Pabandyk šį mapą su kokiais nors modais!";
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 
 	@Override
 	public String help() {
-		return "Sveikas! Aš esu botas, kuris pagrobė Tillerino ir užgrobė jo accountą. Che che, juokauju. Bet šiaip tai tikrai naudojuosi šituo accountu."
+		return "Labas! Aš esu botas, kuris pagrobė Tillerino ir užgrobė jo accountą. Che che, juokauju. Bet šiaip tai rimtai naudojuosi šituo accountu."
 				+ " [https://twitter.com/Tillerinobot būsena ir atnaujinimai]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki komandos]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
@@ -143,7 +143,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
 				+ " Pasiūliau, viską, ką tau galiu pasiūlyt]."
-				+ " Mėgink kitus modus, nustatymus arba rašyk !reset. Jei nesi nežinai, rašyk !help.";
+				+ " Mėgink kitus modus, nustatymus arba rašyk !reset. Jei nežinai, rašyk !help.";
 	}
 
 	@Override
