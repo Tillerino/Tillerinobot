@@ -19,7 +19,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 	
 	@Override
 	public String unknownBeatmap() {
-		return "Sorry, bet tokio beatmapo nežinau. Galbūt jis yra naujas, labai sunkus, nepatvirtintas arba ne osu!standard.";
+		return "Atsiprašau, bet tokio beatmapo nežinau. Galbūt jis yra naujas, labai sunkus, nepatvirtintas arba ne osu!standard.";
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 
 	@Override
 	public String noInformationForMods() {
-		return "Sorry, bet neturiu info su šiais modais.";
+		return "Atsiprašau, bet neturiu info su šiais modais.";
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 
 	@Override
 	public String excuseForError() {
-		return "Sorry, buvau paklydęs tarp nulių ir vienetų. Gali pakartot ko norėjai?";
+		return "Atsiprašau, buvau paklydęs tarp nulių ir vienetų. Gali pakartot ko norėjai?";
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Sorry, bet " + feature + " yra prieinama tik žaidėjams, kurie yra pasiekę bent " + minRank + " vietą.";
+		return "Atsiprašau, bet " + feature + " yra prieinama tik žaidėjams, kurie yra pasiekę bent " + minRank + " vietą.";
 	}
 	
 	@Override
@@ -163,7 +163,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		return "Soriuks, bet \"" + invalid
+		return "Atsiprašau, bet \"" + invalid
 				+ "\" nesiskaito, pabandyk " + choices + "!";
 	}
 
