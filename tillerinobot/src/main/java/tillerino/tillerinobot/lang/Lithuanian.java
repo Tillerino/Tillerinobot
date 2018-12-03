@@ -25,21 +25,21 @@ public class Lithuanian extends AbstractMutableLanguage {
 	@Override
 	public String internalException(String marker) {
 		return "Velnias... mano kūrėjai susimovė."
-				+ " Jeigu jie artimiausiu metu to nepastebės ir nepataisys, gal galėtum apie [https://github.com/Tillerino/Tillerinobot/wiki/Contact tai informuoti]? (reference "
+				+ " Jeigu jie artimiausiu metu to nepastebės ir nepataisys, gal galėtum apie [https://github.com/Tillerino/Tillerinobot/wiki/Contact tai pranešti]? (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
 		return "Nesuprantu kas darosi? osu! servas kažkokias nesąmones siunčia. Ar galėtum pasakyti, ką tai reiškia? 0011101001010000."
-				+ " mano kūrėjai sako, kad čia dzin ir siūlo mėginti dar kartą."
+				+ " mano kūrėjai sako, kad čia nieko rimto ir siūlo mėginti dar kartą."
 				+ " Jei manai, kad čia bus kažkas rimčiau gali [https://github.com/Tillerino/Tillerinobot/wiki/Contact mus informuoti]?. (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "Nėra duomenų apie pateiktus modus.";
+		return "Nėra duomenų su pateiktais modais.";
 	}
 
 	@Override
@@ -47,11 +47,11 @@ public class Lithuanian extends AbstractMutableLanguage {
 		if(inactiveTime < 60 * 1000) {
 			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			return new Message("Sveikas, " + apiUser.getUserName() + ".");
+			return new Message("Labas, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			return new Message(apiUser.getUserName() + "...")
 				.then(new Message("Senai matytas!!"))
-				.then(new Message("Sveikas sugrįžęs. Gal kažką parekomenduoti?"));
+				.then(new Message("Labas. Gal kažką parekomenduoti?"));
 		} else {
 			String[] messages = {
 					"atrodo, kad tau reikia rekomendacijų.",
@@ -106,7 +106,7 @@ public class Lithuanian extends AbstractMutableLanguage {
 
 	@Override
 	public String complaint() {
-		return "Tavo nepasitenkinimas pateiktas. Tillerino peržiūrės kai prie jo prieis.";
+		return "Tavo skundas pateiktas. Tillerino peržiūrės kai prie jo prieis.";
 	}
 
 	@Override
@@ -142,8 +142,8 @@ public class Lithuanian extends AbstractMutableLanguage {
 	@Override
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
-				+ " Pasiūliau, viską, ką galiu tau pasiūlyt]."
-				+ " Mėgink kitus modus, nustatymus arba rašyk !reset. Jei nesi tikras, rašyk !help.";
+				+ " Pasiūliau, viską, ką tau galiu pasiūlyt]."
+				+ " Mėgink kitus modus, nustatymus arba rašyk !reset. Jei nesi nežinai, rašyk !help.";
 	}
 
 	@Override
