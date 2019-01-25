@@ -155,7 +155,7 @@ public class Swissgerman implements Language {
 
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("Nüt liechter als das!");
+		return new Message("De Maurice het mir Schwiizerdütsch bihbracht. :D");
 	}
 
 	@Override
