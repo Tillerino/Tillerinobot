@@ -20,7 +20,7 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Przykro mi, nie rozpoznaję tej mapy. Możliwe, że jest nowa, bardzo trudna, nierankingowa lub z innego trybu niż osu!standard";
+		return "Przykro mi, nie rozpoznaję tej mapy. Możliwe że jest nowa, bardzo trudna, nierankingowa lub z innego trybu niż osu!standard";
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public String excuseForError() {
-		return "Wybacz, widziałem piękną sekwencję zer i jedynek, przez co się trochę rozkojarzyłem. Mógłbyś powtórzyć co chciałeś?";
+		return "Wybacz, widziałem piękną sekwencję zer i jedynek, przez co trochę się rozkojarzyłem. Mógłbyś powtórzyć co chciałeś?";
 	}
 
 	@Override
