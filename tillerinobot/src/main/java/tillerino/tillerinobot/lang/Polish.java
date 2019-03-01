@@ -121,7 +121,7 @@ public class Polish extends AbstractMutableLanguage {
 	@Override
 	public String help() {
 		return "Hej! Jestem robotem, który zabił Tillerino i przejął jego konto. Żartowałem, ale często używam tego konta."
-				+ " [https://twitter.com/Tillerinobot status i aktualizacje]"
+				+ "  [https://twitter.com/Tillerinobot status i aktualizacje]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki komendy]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact kontakt]";
