@@ -20,7 +20,7 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public String unknownBeatmap() {
-		return "Przykro mi, nie rozpoznaje tej mapy. Możliwe że jest nowa, bardzo trudna, nierankingowa lub z innego trybu niż osu!standard";
+		return "Przykro mi, nie rozpoznaję tej mapy. Możliwe że jest nowa, bardzo trudna, nierankingowa lub z innego trybu niż osu!standard";
 	}
 
 	@Override
@@ -33,8 +33,8 @@ public class Polish extends AbstractMutableLanguage {
 	@Override
 	public String externalException(String marker) {
 		return "Co jest?! Odpowiedź serwera osu nie ma sensu. Możesz mi powiedzieć, co to ma znaczyć? 0011101001010000"
-				+ " Ludzki Tillerino mówi, żeby się tym nie przejmować, oraz że powinniśmy spróbować jeszcze raz."
-				+ " Jeżeli z jakiegoś powodu jesteś zanieniepokojony, możesz [https://github.com/Tillerino/Tillerinobot/wiki/Contact powiedzieć mu] o tym. (odwołanie "
+				+ " Ludzki Tillerino mówi, żeby się tym nie przejmować, i że powinniśmy spróbować jeszcze raz."
+				+ " Jeżeli z jakiegoś powodu jesteś zaniepokojony, możesz [https://github.com/Tillerino/Tillerinobot/wiki/Contact powiedzieć mu] o tym. (odwołanie "
 				+ marker + ")";
 	}
 
@@ -52,14 +52,14 @@ public class Polish extends AbstractMutableLanguage {
 		} else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			return new Message(apiUser.getUserName() + "...")
 				.then(new Message("...czy to Ty? Minęło sporo czasu!"))
-				.then(new Message("Dobrze znowu Cie widzieć. Chcesz usłyszeć kilka rekomendacji?"));
+				.then(new Message("Dobrze znowu Cię widzieć. Chcesz usłyszeć kilka rekomendacji?"));
 		} else {
 			String[] messages = {
 					"wyglądasz jakbyś chciał rekomendacji.",
-					"jak dobrze Cie widzieć! :)",
+					"jak dobrze Cię widzieć! :)",
 					"mój ulubiony człowiek. (Nie mów o tym innym człowiekom!)",
 					"jakie miłe zaskoczenie! ^.^",
-					"Miałem nadzieję, że się pojawisz. Jesteś fajniejszy niż inni ludzie, ale nie mówi im że Ci to powiedziałem! :3",
+					"Miałem nadzieję, że się pojawisz. Jesteś fajniejszy niż inni ludzie, ale nie mów im, że Ci to powiedziałem! :3",
 					"na co masz dzisiaj ochotę?",
 			};
 
@@ -74,7 +74,7 @@ public class Polish extends AbstractMutableLanguage {
 	@Override
 	public String unknownCommand(String command) {
 		return "Nieznana komenda \"" + command
-				+ "\". Napisz !help jeśli potrzebujesz pomocy";
+				+ "\". Napisz !help jeśli potrzebujesz pomocy!";
 	}
 
 	@Override
@@ -89,22 +89,22 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public String noLastSongInfo() {
-		return "Nie pamiętam, żebyś pytał się ostatnio o jakąś mape...";
+		return "Nie pamiętam, żebyś pytał się ostatnio o jakąś mapę...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Spróbuj zagrać tą mapę z modami!";
+		return "Spróbuj zagrać tę mapę z modami!";
 	}
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Spróbuj zagrać tą mapę z  " + Mods.toShortNamesContinuous(mods) + "!";
+		return "Spróbuj zagrać tę mapę z " + Mods.toShortNamesContinuous(mods) + "!";
 	}
 
 	@Override
 	public String excuseForError() {
-		return "Wybacz, widziałem piękną sekwencję zer i jedynek, przez co się trochę rozkojarzyłem. Mógłbyś powtórzyć co chciałeś?";
+		return "Wybacz, widziałem piękną sekwencję zer i jedynek, przez co trochę się rozkojarzyłem. Mógłbyś powtórzyć co chciałeś?";
 	}
 
 	@Override
@@ -120,8 +120,8 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public String help() {
-		return "Hej! Jestem robotem, który zabił Tilleriino i przejął jego konto. Żartowałem, ale często używam tego konta."
-				+ " [https://twitter.com/Tillerinobot status i aktualizacje]"
+		return "Hej! Jestem robotem, który zabił Tillerino i przejął jego konto. Żartowałem, ale często używam tego konta."
+				+ "  [https://twitter.com/Tillerinobot status i aktualizacje]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki komendy]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact kontakt]";
@@ -129,12 +129,12 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public String faq() {
-		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Często Zadawane Pytania]";
+		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ Często zadawane pytania]";
 	}
 
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Wybacz, ale w tym momencie " + feature + " jest dostępna tylko dla graczy, którzy przekroczyli pozycje  " + minRank + "w rankingu.";
+		return "Wybacz, ale w tym momencie " + feature + " jest dostępna tylko dla graczy, którzy przekroczyli pozycję " + minRank + " w rankingu.";
 	}
 
 	@Override
@@ -161,18 +161,18 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("[https://osu.ppy.sh/users/1698537 Pawwit] i [https://osu.ppy.sh/users/8488688 Lil Silv] nauczyli mnie mówić po polsku, jeśli uważasz że gdzieś się pomylili, napisz do nich na osu!");
+		return new Message("[https://osu.ppy.sh/users/1698537 Pawwit] i [https://osu.ppy.sh/users/8488688 Lil Silv] nauczyli mnie mówić po polsku. Jeśli uważasz, że gdzieś się pomylili, napisz do nich na osu!");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		return "Wybacz, nie wiem co \"" + invalid
-				+ "\" znaczy. Wypróbuj: " + choices + "!";
+		return "Wybacz, nie wiem co oznacza \"" + invalid
+				+ "\". Spróbuj: " + choices + "!";
 	}
 
 	@Override
 	public String setFormat() {
-		return "Składnia polecenia !set jest następująca !set opcja wartość. Wpisz !help jeśli potrzebujesz więcej wskazówek.";
+		return "Składnia polecenia !set jest następująca: !set opcja wartość. Wpisz !help jeśli potrzebujesz więcej wskazówek.";
 	}
 	
 	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
@@ -180,7 +180,7 @@ public class Polish extends AbstractMutableLanguage {
 	@Override
 	public String apiTimeoutException() {
 		registerModification(); 
-		final String message = "Serwery osu! obecnie działają bardzo wolno, więc na razie nie mogę nic dla Ciebie zrobić. ";
+		final String message = "Serwery osu! obecnie działają bardzo wolno, więc w tym momencie nie mogę nic dla Ciebie zrobić. ";
 		return message + apiTimeoutShuffler.get(
                 "Powiedz... Kiedy był ostatni raz, gdy rozmawiałeś ze swoją babcią?",
                 "Może posprzątasz swój pokój, a potem zapytasz jeszcze raz?",
@@ -189,23 +189,23 @@ public class Polish extends AbstractMutableLanguage {
                 "Wyglądasz jakbyś potrzebował drzemki",
                 "Ale sprawdź tą super interesującą stronę na [https://pl.wikipedia.org/wiki/Special:Random Wikipedii]!",
                 "Sprawdźmy czy ktoś niezły teraz [http://www.twitch.tv/directory/game/Osu! streamuje]!",
-                "Zobacz kolejna [http://dagobah.net/flash/Cursor_Invisible.swf gra], w którą pewnie ssiesz!",
-                "Powinieneś mieć teraz wystarczająco dużo czasu na przeczytanie [https://github.com/Tillerino/Tillerinobot/wiki mojej instrukcji]",
-                "Nie martw się, te [https://www.reddit.com/r/osugame dank memy] powinny Ci pomóc zabić czas",
-                "Jeśli się nudzisz, wypróbuj [http://gabrielecirulli.github.io/2048/ 2048]",
+                "Zobacz, kolejna [http://dagobah.net/flash/Cursor_Invisible.swf gra], w którą pewnie ssiesz!",
+                "Powinieneś mieć teraz wystarczająco dużo czasu na przeczytanie [https://github.com/Tillerino/Tillerinobot/wiki mojej instrukcji].",
+                "Nie martw się, te [https://www.reddit.com/r/osugame dank memy] powinny Ci pomóc zabić czas.",
+                "Jeśli się nudzisz, wypróbuj [http://gabrielecirulli.github.io/2048/ 2048]!",
                 "Zabawne pytanie: Jeśli twój dysk twardy by się teraz zepsuł, ile twoich osobistych danych przepadłoby na zawsze?",
-                "Więc... Próbowałeś kiedyś [https://www.google.pl/search?q=bring%20sally%20up%20push%20up%20challenge wyzwania sally up push up]",
-                "Możesz iść gdzieś indziej albo możemy gapić się na siebie nawzajem. W ciszy."
+                "Więc... Próbowałeś kiedyś [https://www.google.pl/search?q=bring%20sally%20up%20push%20up%20challenge wyzwania sally up push up]?",
+                "Możesz iść robić coś innego, lub możemy gapić się na siebie nawzajem. W ciszy."
 				);
 	}
 
 	@Override
 	public String noRecentPlays() {
-		return "Nie widziałem, żebyś ostatnio grał";
+		return "Nie widziałem, żebyś ostatnio grał.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return "To odwołuje się do zestawu map, a nie do jednej mapy";
+		return "To odwołuje się do zestawu map, a nie do jednej mapy.";
 	}
 }
