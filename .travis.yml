@@ -14,8 +14,12 @@ before_install:
 # we're not installing anything
 install: true
 
-script:
-  - mvn verify -Dmaven.javadoc.skip=true -B -V sonar:sonar
+script: >-
+  if [ "${SONAR_SCANNER_HOME}" != "" ]; then
+    mvn verify -Dmaven.javadoc.skip=true -B -V sonar:sonar
+  else
+    mvn verify -Dmaven.javadoc.skip=true -B -V
+  fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
