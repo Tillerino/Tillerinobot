@@ -17,35 +17,35 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * messages are required, I'll use the English version in all translations and
  * notify the authors.
  * 
- * @author Polarni tom.rivnac@gmail.com https://github.com/Polarni https://osu.ppy.sh/u/Polarni
+ * @author Polarni majojo992@gmail.com https://github.com/BramboraSK https://osu.ppy.sh/u/BramboraSK
  */
-public class Czech extends AbstractMutableLanguage {
+public class Slovak extends AbstractMutableLanguage {
 	private static final long serialVersionUID = 1L;
   static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
-		return "Omlouvám se, ale beatmapa není k dispozici. Možná je moc nová, těžká, nehodnocená nebo nepatří do osu! standard.";
+		return "Prepáč, ale mapa nie je k dispozícií. Možno je moc nová, ťažká, nehodnotená alebo nepatrí do osu standard.";
 	}
 
 	@Override
 	public String internalException(String marker) {
-		return "Uff... Vypadá to že lidský Tillerino zvoral mojí instalaci."
-				+ " Pokud si toho brzy nevšimne, mohl(a) by jsi [https://github.com/Tillerino/Tillerinobot/wiki/Contact ho upozornit]? (reference "
+		return "Uhh... Vyzerá to tak, že ľudský Tillerino pokazil moju inštaláciu."
+				+ " Pokiaľ si to čoskoro nevšimne, mohol/mohla by si [https://github.com/Tillerino/Tillerinobot/wiki/Contact ho upozorniť]? (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String externalException(String marker) {
-		return "Co se děje? Dostávám nesmyly z osu! serveru. Můžeš mi říct, co to znamená? 0011101001010000"
-				+ " Lidský Tillerino říká že se nejedná o nic o co by jsme se museli starat a měli bychom to zkusit znovu."
-				+ " Pokud se z nějakého důvodu obáváš, můžeš [https://github.com/Tillerino/Tillerinobot/wiki/Contact mu to říct]. (reference "
+		return "Čo sa to deje? Dostávam blbosti z osu! serveru. Povieš mi, čo to znamená? 0011101001010000"
+				+ " Ľudský Tillerino hovorí, že sa nejedná o nič, o čo by sme mali starať a mali by sme to skúsiť znovu."
+				+ " Pokiaľ sa z nejakého dôvodu strašne obávaš, môžeš [https://github.com/Tillerino/Tillerinobot/wiki/Contact mu to povedať]. (reference "
 				+ marker + ")";
 	}
 
 	@Override
 	public String noInformationForModsShort() {
-		return "žádné data pro požadované mody";
+		return "žiadne dáta pre požadované módy";
 	}
 
 	@Override
@@ -53,19 +53,19 @@ public class Czech extends AbstractMutableLanguage {
 		if(inactiveTime < 60 * 1000) {
 			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
-			return new Message("Vítej zpět, " + apiUser.getUserName() + ".");
+			return new Message("Vitaj späť, " + apiUser.getUserName() + ".");
 		} else if(inactiveTime > 7l * 24 * 60 * 60 * 1000) {
 			return new Message(apiUser.getUserName() + "...")
-				.then(new Message("...jsi to ty? Už je to nějaká doba!"))
-				.then(new Message("To je dobře, že jsi zpátky. Mohu tě zaujmout doporučením?"));
+				.then(new Message("...si to ty? Tak dlho som ťa nevidel!"))
+				.then(new Message("To je super, že si späť. Nechcel by si nejaké odporúčanie?"));
 		} else {
 			String[] messages = {
-					"vypadáš jako že chceš doporučení.",
-					"rád tě vidím! :)",
-					"můj oblíbený člověk. (Neříkej to ostatním lidem!)",
-					"to je příjemné překvapení! ^.^",
-					"Doufal jsem že se ukážeš. Ostatní lidi jsou lamy, ale neříkej jim to! :3",
-					"Jak se máš?",
+					"vyzeráš, že chceš nejaké doporučenie.",
+					"rád ťa vidím! :)",
+					"môj obľubený človek. (Nehovor to ostatným ľuďom!)",
+					"aké príjemné prekvapenie! ^.^",
+					"dúfal som, že sa ukážeš. Ostatní ľudia sú lamy, ale nehovor im to! :3",
+					"ako sa máš?",
 			};
 			
 			Random random = new Random();
@@ -78,56 +78,56 @@ public class Czech extends AbstractMutableLanguage {
 
 	@Override
 	public String unknownCommand(String command) {
-		return "neznámý příkaz \"" + command
-				+ "\". Zadej !help pokud potřebuješ pomoc!";
+		return "neznámý príkaz \"" + command
+				+ "\". Napíš !help pokiaľ potrebuješ pomoc!";
 	}
 
 	@Override
 	public String noInformationForMods() {
-		return "Omlouvám se, ale v tuto chvíli nemohu poskytnout informace pro tyto mody.";
+		return "Prepáč, momentálne ti nedokážem poskytnúť informácie o týchto módoch.";
 	}
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Tyto mody nevypadají dobře. Mody můžou být různé kombinace DT HR HD HT EZ NC FL SO NF. Zkombinuj je bez mezer a speciálních znaků. Například: !with HDHR, !with DTEZ";
+		return "Tieto módy nie sú správne. Módy môžú byť rôzne kombinácie DT HR HD HT EZ NC FL SO NF. Skombinuj ich bez medzier a špeciálnych znakov. Napríklad: !with HDHR, !with DTEZ";
 	}
 
 	@Override
 	public String noLastSongInfo() {
-		return "Nepamatuji si že můžeš dostat informace o jakékoliv písničce...";
+		return "Nepamätám si, že by som ti dával informácie o nejakej pesničke...";
 	}
 
 	@Override
 	public String tryWithMods() {
-		return "Zkus tuto mapu s některými mody!";
+		return "Skús túto mapu s nejakými módmi!";
 	}
 
 	@Override
 	public String tryWithMods(List<Mods> mods) {
-		return "Zkus tuto mapu s " + Mods.toShortNamesContinuous(mods);
+		return "Skús túto mapu s " + Mods.toShortNamesContinuous(mods);
 	}
   
 	@Override
 	public String excuseForError() {
-		return "Omlouvám se, byla tam krásná posloupnost jedniček a nul a nechal jsem se rozptýlit. Ješte jednou prosím.";
+		return "Prepáč, ale bola tam taká pekná postupnosť jedničiek a núl. Ešte raz, prosím.";
 	}
 
 	@Override
 	public String complaint() {
-		return "Tvoje stížnost byla podána. Tillerino se na ní podívá hned jak bude moct.";
+		return "Tvoja sťažnosť bola odoslaná. Tillerino sa na ňu pozrie čo najskôr.";
 	}
 
 	@Override
 	public Response hug(OsuApiUser apiUser) {
-		return new Message("Pojď sem, ty!")
-			.then(new Action("objetí " + apiUser.getUserName()));
+		return new Message("Poď sem, ty!")
+			.then(new Action("objíma " + apiUser.getUserName()));
 	}
 
 	@Override
 	public String help() {
-		return "Ahoj! Já jsem robot který zabil Tillerino a převzal jeho účet. Dělám si srandu, ale hodně používám jeho účet."
-				+ " [https://twitter.com/Tillerinobot status a aktualizace]"
-				+ " - [https://github.com/Tillerino/Tillerinobot/wiki příkazy]"
+		return "Ahoj! Ja som robot, ktorý zabil Tillerina a prevzal jeho účet. Robím si srandu, ale veľmi často používam jeho účet."
+				+ " [https://twitter.com/Tillerinobot status a aktualizácie]"
+				+ " - [https://github.com/Tillerino/Tillerinobot/wiki príkazy]"
 				+ " - [http://ppaddict.tillerino.org/ ppaddict]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact kontakt]";
 	}
@@ -139,29 +139,29 @@ public class Czech extends AbstractMutableLanguage {
 	
 	@Override
 	public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
-		return "Je mi líto, v tuto chvíli " + feature + " je jen přístup pro hráče, kteří překonali rank " + minRank + ".";
+		return "Je mi ľúto, ale v tejto chvíli " + feature + " je sprístupnená len pre hráčov, ktorí prekonali rank " + minRank + ".";
 	}
 	
 	@Override
 	public String mixedNomodAndMods() {
-		return "Co myslíš tím bez modu s modama?";
+		return "Čo myslíš tým, že si zmiešal bez módu s módmi?";
 	}
 	
 	@Override
 	public String outOfRecommendations() {
 		return "[https://github.com/Tillerino/Tillerinobot/wiki/FAQ#the-bot-says-its-out-of-recommendations-what-do"
-				+ " Doporučil jsem vše, co mě napadlo]."
-				+ " Zkus ostatní možnosti doporučení nebo použij !reset. Pokud si nejsi jistý(á) koukni na !help.";
+				+ " Doporučil som ti všetko, čo mi prišlo na um]."
+				+ " Skús ostatné možnosti doporučenia, alebo použi !reset. Pokiaľ si si neistý(á), pozri sa na !help.";
 	}
 
 	@Override
 	public String notRanked() {
-		return "Vypadá to že beatmapa není hodnocená.";
+		return "Vyzerá to tak, že táto mapa nie je hodnotená.";
 	}
 
 	@Override
 	public String invalidAccuracy(String acc) {
-		return "Neplatná přesnost: \"" + acc + "\"";
+		return "Neplatná presnosť: \"" + acc + "\"";
 	}
 
 	@Override
@@ -191,18 +191,18 @@ public class Czech extends AbstractMutableLanguage {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		return new Message("[https://osu.ppy.sh/u/Polarni Polarni] mi pomohl naučit se česky.");
+		return new Message("[https://osu.ppy.sh/u/BramboraSK BramboraSK] mi pomohol naučiť sa slovensky.");
 	}
 
 	@Override
 	public String invalidChoice(String invalid, String choices) {
-		return "Omlouvám se, ale \"" + invalid
-				+ "\" se nepočítá. Zkus tyto: " + choices + "!";
+		return "Prepáč, ale \"" + invalid
+				+ "\" sa nepočítá. Skús tieto: " + choices + "!";
 	}
 
 	@Override
 	public String setFormat() {
-		return "Syntaxe pro nastavení parametru je !set option (nastavení) value (hodnota). Zkus !help pokud potřebuješ další ukazatele.";
+		return "Parameter nastavíš pomocou !set option (nastavenie) value (hodnota). Skús !help pokiaľ potrebuješ dalšie ukazovatele.";
 	}
 	
   StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
@@ -210,32 +210,32 @@ public class Czech extends AbstractMutableLanguage {
 	@Override
 	public String apiTimeoutException() {
 		registerModification();
-		final String message = "V tuto chvíli jsou osu! servery super pomalé, takže pro tuto chvíli nemůžu nic pro tebe udělat. ";
+		final String message = "V tejto chvíli sú osu! servery super pomalé, takže momentálne ti nemôžem pomôcť. ";
 		return message + apiTimeoutShuffler.get(
-				"Řekni... Kdy jsi naposledy mluvil(a) se svojí babičkou?",
-				"Co říkáš na úklid tvého pokoje a pak se zkusit zeptat znova?",
-				"Vsadím se že by jsi se moc rád(a) běžel(a) projít. Ty víš... venku?",
-				"Já jen vím že máš spoust jiných věcí na dělání. Co třeba jít je udělat?",
-				"Stejně vypadáš jako kdyby jsi si potřeboval(a) zdřímnout.",
-				"Ale podívej se na tuhle zajímavou stránku na [https://en.wikipedia.org/wiki/Special:Random wikipedii]!",
-				"Pojďme zjistit jestli je někdo dobrý ve [http://www.twitch.tv/directory/game/Osu! streamování]!",
-				"Podívej, tady je jiná [http://dagobah.net/flash/Cursor_Invisible.swf hra] ve který jsi pravděpodobně špatný(á)!",
-				"Tohle by ti mělo dát dostatek času na prostudování [https://github.com/Tillerino/Tillerinobot/wiki mého návodu].",
-				"Neboj se, tady jsou [https://www.reddit.com/r/osugame dank meme] které by měly zabít nějaký tvůj čas.",
-				"Zatím co se nudíš, vyzkoušej [http://gabrielecirulli.github.io/2048/ 2048]!",
-				"Zábavná otázka: Pokud se teď tvůj pevný disk rozbije, kolik tvých osobních údajů může být navždy ztraceno?",
-				"Takže... Už jsi někdy zkoušel(a) [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge Bring Sally Up - klikovací výzvu]?",
-				"Můžeš jít dělat něco jinýho nebo můžem jít civět ostatním do očí. Tiše."
+				"Povedz... Kedy si naposledy hovoril(a) so svojou babičkou?",
+				"Čo hovoríš na to, že si upraceš izbu a potom sa spýtaš znovu?",
+				"Vsadím sa, že by si sa veľmi rád/rada išiel/išla prejsť. Ty vieš... von?",
+				"Viem, že máš ešte veľa vecí, ktoré musíš urobiť. Necheš si ich teraz urobiť?",
+				"Aj tak vyzeráš, že by si si mal(a) zdriemnuť.",
+				"Ale pozri sa na túto zaujímavú stránku na [https://en.wikipedia.org/wiki/Special:Random wikipédií]!",
+				"Poďme zistiť, či niekto dobrý momentálne [http://www.twitch.tv/directory/game/Osu! streamuje]!",
+				"Pozri, tu je ďalšia [http://dagobah.net/flash/Cursor_Invisible.swf hra], v ktorej jsi pravdepodobne zlý(á)!",
+				"Toto by ti malo dať dostatok času na preštudovanie [https://github.com/Tillerino/Tillerinobot/wiki môjho návodu].",
+				"Neboj sa, tieto [https://www.reddit.com/r/osugame dank memes] by ti mali pomôcť zabiť nejaký ten čas.",
+				"Zatiaľ čo sa nudíš, vyskúšaj [http://gabrielecirulli.github.io/2048/ 2048]!",
+				"Zábavná otázka: Pokiaľ by sa ti teraz pokazil harddrive, koľko tvojich osobných údajov môže byť navždy stratených?",
+				"Takže... Už si niekdy skúsil(a) [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge Bring Sally Up - klikovaciu výzvu]?",
+				"Môžeš ísť robiť niečo iné, alebo si môžeme navzájom civieť do očí. Potichu."
 				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return "Neviděl jsem tě v poslední době hrát.";
+		return "V poslednej dobe som ťa nevidel hrať.";
 	}
 	
 	@Override
 	public String isSetId() {
-		return "Tohle odkazuje na balíček beatmap a ne na určitou beatmapu.";
+		return "Toto odkazuje na balíčok pesničiek, nie na určitú pesničku.";
 	}
 }
