@@ -17,7 +17,7 @@ import tillerino.tillerinobot.CommandHandler.Response;
  * messages are required, I'll use the English version in all translations and
  * notify the authors.
  * 
- * @author Polarni majojo992@gmail.com https://github.com/BramboraSK https://osu.ppy.sh/u/BramboraSK
+ * @author BramboraSK majojo992@gmail.com https://github.com/BramboraSK https://osu.ppy.sh/u/BramboraSK
  */
 public class Slovak extends AbstractMutableLanguage {
 	private static final long serialVersionUID = 1L;
