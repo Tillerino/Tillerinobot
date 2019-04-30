@@ -37,7 +37,7 @@ public class Slovak extends AbstractMutableLanguage {
 
 	@Override
 	public String externalException(String marker) {
-		return "Čo sa to deje? Dostávam blbosti z osu! serveru. Povieš mi, čo to znamená? 0011101001010000"
+		return "Čo sa to deje? Z osu! serveru pri prichádzajú nejaké kraviny..."
 				+ " Ľudský Tillerino hovorí, že sa nejedná o nič, o čo by sme mali starať a mali by sme to skúsiť znovu."
 				+ " Pokiaľ sa z nejakého dôvodu strašne obávaš, môžeš [https://github.com/Tillerino/Tillerinobot/wiki/Contact mu to povedať]. (reference "
 				+ marker + ")";
@@ -212,6 +212,8 @@ public class Slovak extends AbstractMutableLanguage {
 		registerModification();
 		final String message = "V tejto chvíli sú osu! servery super pomalé, takže momentálne ti nemôžem pomôcť. ";
 		return message + apiTimeoutShuffler.get(
+			        "No čo, používaš tablet, alebo myš? :3",
+			        "Kedže tak rád tapuješ, aké switche používaš?",
 				"Povedz... Kedy si naposledy hovoril(a) so svojou babičkou?",
 				"Čo hovoríš na to, že si upraceš izbu a potom sa spýtaš znovu?",
 				"Vsadím sa, že by si sa veľmi rád/rada išiel/išla prejsť. Ty vieš... von?",
