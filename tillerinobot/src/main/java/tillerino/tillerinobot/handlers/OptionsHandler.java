@@ -5,7 +5,9 @@ import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
@@ -120,21 +122,31 @@ public class OptionsHandler implements CommandHandler {
 	public static @Nonnull <E extends Enum<E>> E find(@Nonnull E[] haystack, @Nonnull String needle) {
 		needle = needle.toLowerCase();
 		
-		E found = null;
+		List<E> found = new ArrayList<>();
+		int bestDistance = Integer.MAX_VALUE;
 		
 		for (int i = 0; i < haystack.length; i++) {
-			if(getLevenshteinDistance(haystack[i].toString().toLowerCase(), needle) <= 1) {
-				if(found != null) {
-					throw new IllegalArgumentException();
-				}
-				found = haystack[i];
+			int distance = getLevenshteinDistance(haystack[i].toString().toLowerCase(), needle);
+			if (distance > 1) {
+				continue;
+			}
+			if(distance < bestDistance) {
+				bestDistance = distance;
+				found.clear();
+				found.add(haystack[i]);
+			} else if (distance == bestDistance) {
+				found.add(haystack[i]);
 			}
 		}
 		
-		if(found == null) {
+		if(found.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
-		
-		return found;
+
+		if(found.size() > 1) {
+			throw new IllegalArgumentException(String.format("%s all match %s", found, needle));
+		}
+
+		return found.get(0);
 	}
 }

@@ -1,5 +1,6 @@
 package tillerino.tillerinobot.handlers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -16,7 +17,6 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
-import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 
 public class OptionsHandlerTest {
@@ -93,5 +93,13 @@ public class OptionsHandlerTest {
       OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
 
       handler.handle("set default invalid", null, userData);
+    }
+
+    @Test
+    public void allLanguageNamesNeedToBeParsable() throws Exception {
+      for (LanguageIdentifier language : LanguageIdentifier.values()) {
+        assertThat(OptionsHandler.find(LanguageIdentifier.values(), language.toString()))
+          .isNotNull();
+      }
     }
 }
