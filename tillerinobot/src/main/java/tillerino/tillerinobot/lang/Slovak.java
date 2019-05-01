@@ -191,7 +191,7 @@ public class Slovak extends AbstractMutableLanguage {
 		 * P.S. you can put a link to your profile into the line like this:
 		 * [https://osu.ppy.sh/u/2070907 Tillerino]
 		 */
-		return new Message("[https://osu.ppy.sh/u/BramboraSK BramboraSK] mi pomohol naučiť sa slovensky.");
+		return new Message("[https://osu.ppy.sh/u/8543258 BramboraSK] mi pomohol naučiť sa slovensky.");
 	}
 
 	@Override
