@@ -47,7 +47,6 @@ public class LocalGameChatEventQueue extends LoopingRunnable implements GameChat
 	@Override
 	protected void loop() throws InterruptedException {
 		GameChatEvent event = queue.take();
-		botInfo.setEventQueueSize(size());
 		coreExecutorService.submit(() -> {
 			try (MdcAttributes mdc = event.getMeta().getMdc().apply()) {
 				coreHandler.onEvent(event);
@@ -55,6 +54,7 @@ public class LocalGameChatEventQueue extends LoopingRunnable implements GameChat
 				log.error("Uncaught exception in core event handler", e);
 			}
 		});
+		botInfo.setEventQueueSize(size());
 	}
 
 	@Override

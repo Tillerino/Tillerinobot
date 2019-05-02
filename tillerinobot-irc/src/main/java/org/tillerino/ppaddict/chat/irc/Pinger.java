@@ -30,8 +30,6 @@ public class Pinger {
 
 	final Clock clock;
 
-	long lastquit = 0l;
-
 	final AtomicInteger pingCalls = new AtomicInteger();
 
 	void ping(CloseableBot bot) throws IOException, InterruptedException {
