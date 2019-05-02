@@ -8,9 +8,6 @@ addons:
     token:
       secure: "U7IZ4JYpiL9PuxEHeDCA09TkFmgPT93+lGg4fwm9fRna+O+we8lH++aMc7Ca/hwnHdDc2PJtasuMJ1yVje8iBJzJn6AF7eyx+48oa+LhYPUD98ccaLrCODoS4QIoPMRJMkTdJ+Z/lGcf8U/XgMnBYBrEohwOi6KD9K4TnddzRBw="
 
-before_install:
-  - cd tillerinobot
-
 # we're not installing anything
 install: true
 

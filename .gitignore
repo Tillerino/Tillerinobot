@@ -8,3 +8,6 @@ tillerinobot/tillerinobot-db.json
 # IntelliJ IDEA
 */.idea
 */*.iml
+/.settings/
+/target/
+/.project
