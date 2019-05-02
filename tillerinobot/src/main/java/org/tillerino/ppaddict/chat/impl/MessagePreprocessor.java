@@ -3,6 +3,7 @@ package org.tillerino.ppaddict.chat.impl;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
@@ -26,6 +27,7 @@ import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
  * question. Non-interactive events like joins are passed right through to the
  * message queue.
  */
+@Singleton
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessagePreprocessor implements GameChatEventConsumer {

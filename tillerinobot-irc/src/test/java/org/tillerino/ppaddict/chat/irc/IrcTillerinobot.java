@@ -5,20 +5,16 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 
-import org.tillerino.ppaddict.chat.irc.BotRunnerImpl;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
-import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotRunner;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-import tillerino.tillerinobot.data.util.RepositoryModule;
 
 /**
  * Will connect to an actual IRC server with completely fake data. Use system
@@ -31,7 +27,6 @@ public class IrcTillerinobot extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(BotRunner.class).to(BotRunnerImpl.class);
-		install(new RepositoryModule());
 		install(new CreateInMemoryDatabaseModule());
 		install(new TillerinobotConfigurationModule());
 

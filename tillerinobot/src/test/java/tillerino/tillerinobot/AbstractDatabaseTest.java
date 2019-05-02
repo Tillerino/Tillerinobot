@@ -41,7 +41,7 @@ public abstract class AbstractDatabaseTest {
 
 		@Override
 		protected void configure() {
-			
+			install(new RepositoryModule());
 		}
 	}
 	protected static Injector injector;
@@ -57,12 +57,7 @@ public abstract class AbstractDatabaseTest {
 	
 	@BeforeClass
 	public static void injectAll() {
-		injector = Guice.createInjector(new CreateInMemoryDatabaseModule() {
-			@Override
-			protected void configure() {
-				install(new RepositoryModule());
-			}
-		});
+		injector = Guice.createInjector(new CreateInMemoryDatabaseModule());
 
 		emf = injector.getInstance(EntityManagerFactory.class);
 		

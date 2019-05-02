@@ -155,7 +155,6 @@ public class FullBotTest {
 		@Override
 		protected void configure() {
 			install(new CreateInMemoryDatabaseModule());
-			install(new RepositoryModule());
 			install(new TillerinobotConfigurationModule());
 			install(new InMemoryQueuesModule());
 

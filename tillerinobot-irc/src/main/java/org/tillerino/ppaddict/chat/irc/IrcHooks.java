@@ -18,7 +18,6 @@ import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
 import org.slf4j.MDC;
-import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
@@ -36,10 +35,13 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
+/**
+ * Feeds the {@link MessagePreprocessor} from an IRC client.
+ */
 @SuppressWarnings("rawtypes")
 @Slf4j
 public class IrcHooks extends CoreHooks {
-	private final GameChatEventConsumer downStream;
+	private final MessagePreprocessor downStream;
 	private final BotInfo botInfo;
 	private final IrcWriter queue;
 	private final boolean silent;

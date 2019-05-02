@@ -66,7 +66,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	protected void configure() {
 		install(new CreateInMemoryDatabaseModule());
 		install(new TillerinobotConfigurationModule());
-		install(new RepositoryModule());
 		install(new InMemoryQueuesModule());
 		
 		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore"))

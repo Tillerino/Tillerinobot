@@ -19,6 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
+/**
+ * Implements {@link GameChatResponseQueue} with a simple local, in-memory
+ * version. If {@link #run()} is executed, the queue feeds the queued responses
+ * synchronously downstream.
+ */
 @Slf4j
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

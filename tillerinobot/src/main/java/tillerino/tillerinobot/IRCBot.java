@@ -5,7 +5,6 @@ import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -32,6 +31,7 @@ import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.chat.impl.Bouncer;
+import org.tillerino.ppaddict.util.LoggingUtils;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
@@ -196,18 +196,9 @@ public class IRCBot implements GameChatEventConsumer {
 	}
 
 	public static String logException(Throwable e, Logger logger) {
-		String string = getRandomString(6);
+		String string = LoggingUtils.getRandomString(6);
 		logger.error(string + ": fucked up", e);
 		return string;
-	}
-
-	public static String getRandomString(int length) {
-		Random r = new Random();
-		char[] chars = new char[length];
-		for (int j = 0; j < chars.length; j++) {
-			chars[j] = (char) ('A' + r.nextInt(26));
-		}
-		return new String(chars);
 	}
 
 	/**
@@ -455,7 +446,7 @@ public class IRCBot implements GameChatEventConsumer {
 			}
 		}
 		
-		String string = IRCBot.getRandomString(8);
+		String string = LoggingUtils.getRandomString(8);
 		log.error("bot user not resolvable " + string + " name: " + nick);
 		
 		// message not in language-files, since we cant possible know language atm

@@ -13,10 +13,10 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.util.LoggingUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
@@ -45,7 +45,7 @@ public class Pinger {
 
 		synchronized (this) {
 			pingLatch = new CountDownLatch(1);
-			pingMessage = IRCBot.getRandomString(16);
+			pingMessage = LoggingUtils.getRandomString(16);
 		}
 
 		log.debug("PING {}", pingMessage);
