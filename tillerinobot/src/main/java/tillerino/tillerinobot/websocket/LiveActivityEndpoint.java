@@ -48,7 +48,7 @@ public class LiveActivityEndpoint extends Endpoint {
 
 	@Value
 	public static class Sent {
-		Long eventId;
+		long eventId;
 		int user;
 		Integer ping;
 	}
@@ -111,7 +111,7 @@ public class LiveActivityEndpoint extends Endpoint {
 		sendToEachSession(session -> Message.builder().received(new Received(eventId, anonymizeHashCode(ircUserName, session))).build());
 	}
 
-	public void propagateSentMessage(@IRCName String ircUserName, Long eventId) {
+	public void propagateSentMessage(@IRCName String ircUserName, long eventId) {
 		Integer ping = Optional.ofNullable(MDC.get("ping")).map(Integer::valueOf).orElse(null);
 		sendToEachSession(session -> Message.builder().sent(new Sent(eventId, anonymizeHashCode(ircUserName, session), ping)).build());
 	}
