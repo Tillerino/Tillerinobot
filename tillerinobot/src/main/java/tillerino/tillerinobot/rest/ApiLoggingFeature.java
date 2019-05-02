@@ -14,10 +14,10 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.RateLimiter;
 
 /**
@@ -58,7 +58,7 @@ public class ApiLoggingFeature implements Feature {
 		@Override
 		public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 			rateLimiter.clearThreadPriority();
-			MDC.put(IRCBot.MCD_OSU_API_RATE_BLOCKED_TIME, String.valueOf(rateLimiter.blockedTime()));
+			MDC.put(MdcUtils.MCD_OSU_API_RATE_BLOCKED_TIME, String.valueOf(rateLimiter.blockedTime()));
 			MDC.put("apiStatus", String.valueOf(responseContext.getStatus()));
 			log.debug("API call finished");
 			MDC.clear();

@@ -36,6 +36,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.data.util.RepositoryModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotRunner;
 import tillerino.tillerinobot.TestBackend;
@@ -50,6 +51,7 @@ public class ApiTest {
 		@Override
 		protected void configure() {
 			install(new CreateInMemoryDatabaseModule());
+			install(new RepositoryModule());
 			bind(BotBackend.class).toInstance(new TestBackend(false));
 			bind(BotRunner.class).toInstance(mock(BotRunner.class));
 			bind(BeatmapsService.class).toInstance(mock(BeatmapsService.class));

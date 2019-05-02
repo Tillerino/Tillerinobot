@@ -1,12 +1,14 @@
-package tillerino.tillerinobot;
+package org.tillerino.ppaddict.chat.irc;
 
 import static java.util.stream.Collectors.toList;
 import static org.awaitility.Awaitility.await;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -32,8 +34,13 @@ import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
+import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
+import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
+import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
+import org.tillerino.ppaddict.util.Clock;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -42,6 +49,12 @@ import com.google.inject.name.Names;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.BotRunner;
+import tillerino.tillerinobot.IRCBot;
+import tillerino.tillerinobot.TestBackend;
+import tillerino.tillerinobot.TillerinobotConfigurationModule;
+import tillerino.tillerinobot.data.util.RepositoryModule;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
@@ -127,19 +140,24 @@ public class FullBotTest {
 			() -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>()));
 
 	@Rule
+	public final ExecutorServiceRule coreWorkerPool = new ExecutorServiceRule(() -> Executors.newFixedThreadPool(4));
+
+	@Rule
 	public final JettyWebsocketServerResource websocket = new JettyWebsocketServerResource("localhost", 0);
 
 	private final AtomicInteger recommendationCount = new AtomicInteger();
 
 	private BotRunner botRunner;
 
-	private Future<?> botRunnerFuture;
+	private final List<Future> started = new ArrayList<>();
 
 	class FullBotConfiguration extends AbstractModule {
 		@Override
 		protected void configure() {
 			install(new CreateInMemoryDatabaseModule());
+			install(new RepositoryModule());
 			install(new TillerinobotConfigurationModule());
+			install(new InMemoryQueuesModule());
 
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance("localhost");
 			bind(Integer.class).annotatedWith(Names.named("tillerinobot.irc.port")).toInstance(server.getPort());
@@ -150,8 +168,11 @@ public class FullBotTest {
 			bind(BotRunner.class).to(BotRunnerImpl.class);
 			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore")).toInstance(false);
 			bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
+			bind(GameChatWriter.class).to(IrcWriter.class);
+			bind(Clock.class).toInstance(Clock.system());
 			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
 			bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance")).toInstance(exec);
+			bind(ExecutorService.class).annotatedWith(Names.named("core")).toInstance(coreWorkerPool);
 			bind(AuthenticationService.class).toInstance(key -> {
 				if (key.equals("testKey")) {
 					return new Authorization(false);
@@ -180,7 +201,9 @@ public class FullBotTest {
 		BotInfo botInfo = injector.getInstance(BotInfo.class);
 		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
 		botRunner = injector.getInstance(BotRunner.class);
-		botRunnerFuture = exec.submit(botRunner);
+		started.add(exec.submit(botRunner));
+		started.add(exec.submit(injector.getInstance(LocalGameChatEventQueue.class)));
+		started.add(exec.submit(injector.getInstance(LocalGameChatResponseQueue.class)));
 		for (int botNumber = 0; botNumber < USERS; botNumber++) {
 			backend.hintUser("user" + botNumber, false, 12, 1000);
 		}
@@ -189,8 +212,8 @@ public class FullBotTest {
 
 	@After
 	public void stopBot() {
-		botRunnerFuture.cancel(true);
-		botRunner.getBot().sendIRC().quitServer();
+		started.forEach(fut -> fut.cancel(true));
+		botRunner.disconnectSoftly();
 	}
 
 	@Test

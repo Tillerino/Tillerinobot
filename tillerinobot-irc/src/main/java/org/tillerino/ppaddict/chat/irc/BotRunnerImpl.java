@@ -1,40 +1,42 @@
-package tillerino.tillerinobot;
+package org.tillerino.ppaddict.chat.irc;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
-import org.pircbotx.InputParser;
-import org.pircbotx.User;
-import org.pircbotx.UserChannelDao;
 import org.pircbotx.Configuration.BotFactory;
 import org.pircbotx.Configuration.Builder;
+import org.pircbotx.InputParser;
+import org.pircbotx.PircBotX;
+import org.pircbotx.User;
+import org.pircbotx.UserChannelDao;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.snapshot.UserChannelDaoSnapshot;
 import org.pircbotx.snapshot.UserSnapshot;
-import org.pircbotx.PircBotX;
 
-import com.google.common.collect.Lists;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
+import tillerino.tillerinobot.BotRunner;
+import tillerino.tillerinobot.TidyObject;
 
 @Slf4j
 @Singleton
 public class BotRunnerImpl implements BotRunner, TidyObject {
-	static final int DEFAULT_MESSAGE_DELAY = 250;
-	static int MESSAGE_DELAY = DEFAULT_MESSAGE_DELAY;
+	public static final int DEFAULT_MESSAGE_DELAY = 250;
+	@SuppressFBWarnings(value = "MS", justification = "We're modifying this in tests")
+	public static int MESSAGE_DELAY = DEFAULT_MESSAGE_DELAY;
 
 	public static class CloseableBot extends PircBotX {
 		public CloseableBot(Configuration<? extends PircBotX> configuration) {
@@ -130,34 +132,24 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 	
 	static class CustomThreadedListenerManager extends ThreadedListenerManager<PircBotX> {
 		public CustomThreadedListenerManager() {
-			super();
+			/*
+			 * run with a single thread which will only do some light
+			 * preprocessing and then push everything into a queue.
+			 * This thread is allowed to time out.
+			 */
+			super(new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>()));
 		}
 
-		public CustomThreadedListenerManager(ExecutorService pool) {
-			super(pool);
-		}
-		
 		@Override
 		public void shutdown(PircBotX bot) {
-			List<ManagedFutureTask> remainingTasks;
-			synchronized (runningListeners) {
-				remainingTasks = Lists.newArrayList(runningListeners.get(bot));
-			}
-
-			for (ManagedFutureTask curFuture : remainingTasks) {
-				try {
-					curFuture.cancel(true);
-				} catch (Exception e) {
-					log.error("exception cancelling future", e);
-				}
-			}
+			pool.shutdownNow();
 		}
 	}
 	
 	volatile CloseableBot bot = null;
 
 	@Inject
-	public BotRunnerImpl(Provider<IRCBot> tillerinoBot,
+	public BotRunnerImpl(IrcHooks tillerinoBot,
 			@Named("tillerinobot.irc.server") String server,
 			@Named("tillerinobot.irc.port") int port,
 			@Named("tillerinobot.irc.nickname") String nickname,
@@ -166,7 +158,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 			@Named("tillerinobot.git.commit.id.abbrev") String commit,
 			@Named("tillerinobot.git.commit.message.short") String commitMessage) {
 		super();
-		this.tillerinoBot = tillerinoBot;
+		this.listener = tillerinoBot;
 		this.server = server.split(",");
 		this.port = port;
 		this.nickname = nickname;
@@ -176,7 +168,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 		this.commitMessage = commitMessage;
 	}
 
-	private final Provider<IRCBot> tillerinoBot;
+	private final IrcHooks listener;
 
 	private final String[] server;
 	private final int port;
@@ -186,23 +178,14 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 	private final String commit;
 	private final String commitMessage;
 
-	@Override
-	@CheckForNull
-	public CloseableBot getBot() {
-		return bot;
-	}
-
 	private volatile boolean reconnect = true;
 	private int reconnectTimeout = 10000;
 
-	IRCBot listener;
-	
 	@Override
 	public void run() {
 		log.info("Starting Tillerinobot {}: {}", commit, commitMessage);
 		for (int i = 0; reconnect; i++) {
 			try {
-				listener = tillerinoBot.get();
 				try {
 					final CustomThreadedListenerManager listenerManager = new CustomThreadedListenerManager();
 					listenerManager.addListener(listener);
@@ -229,7 +212,6 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 					}
 				} finally {
 					bot = null;
-					listener = null;
 				}
 			} catch (Exception e) {
 				log.error("exception running IRC bot", e);
@@ -262,6 +244,20 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 					log.error("error closing socket", e);
 				}
 			}
+		}
+	}
+
+	@Override
+	public boolean isConnected() {
+		CloseableBot bot = this.bot;
+		return bot != null && bot.isConnected();
+	}
+
+	@Override
+	public void disconnectSoftly() {
+		CloseableBot bot = this.bot;
+		if (bot != null) {
+			bot.sendIRC().quitServer();
 		}
 	}
 }

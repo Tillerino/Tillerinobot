@@ -13,6 +13,7 @@ public class TillerinobotConfigurationModule extends AbstractModule {
 	protected void configure() {
 		loadProperties("/tillerinobot.git.properties", binder());
 		loadProperties("/tillerinobot.properties", binder());
+		Names.bindProperties(binder(), System.getProperties());
 	}
 
 	public static void loadProperties(String path, Binder binder) {

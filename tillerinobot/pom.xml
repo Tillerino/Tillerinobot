@@ -185,11 +185,6 @@
 			<version>0.12.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.pircbotx</groupId>
-			<artifactId>pircbotx</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<!-- This overwrites pircbotx' version -->
@@ -272,12 +267,6 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.tillerino.twirc</groupId>
-			<artifactId>twirc-server</artifactId>
-			<version>0.0.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

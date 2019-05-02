@@ -4,8 +4,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.NotFoundException;
 
-import org.pircbotx.PircBotX;
-
 import lombok.Data;
 import tillerino.tillerinobot.BotRunner;
 
@@ -30,18 +28,15 @@ public class BotInfoService implements BotStatus {
 		private long lastReceivedMessage;
 		private long lastSentMessage;
 		private long lastRecommendation;
+		private long responseQueueSize;
+		private long eventQueueSize;
 	}
 
 	private final BotInfo botInfo;
 
 	@Override
 	public BotInfo botinfo() {
-		PircBotX pircBot = bot.getBot();
-		if (pircBot != null) {
-			botInfo.setConnected(pircBot.isConnected());
-		} else {
-			botInfo.setConnected(false);
-		}
+		botInfo.setConnected(bot.isConnected());
 		return botInfo;
 	}
 

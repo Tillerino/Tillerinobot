@@ -1,4 +1,4 @@
-package tillerino.tillerinobot;
+package org.tillerino.ppaddict.chat.irc;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -7,16 +7,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
+import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
+@Singleton
 public class Pinger {
 	volatile String pingMessage = null;
 	volatile CountDownLatch pingLatch = null;
@@ -33,9 +36,6 @@ public class Pinger {
 
 	final AtomicInteger pingCalls = new AtomicInteger();
 
-	/*
-	 * this method is synchronized through the sender semaphore
-	 */
 	void ping(CloseableBot bot) throws IOException, InterruptedException {
 		if (pingCalls.incrementAndGet() % 10 != 0) {
 			return;
@@ -67,7 +67,7 @@ public class Pinger {
 		MDC.put("ping", ping + "");
 	}
 
-	void handleUnknownEvent(@SuppressWarnings("rawtypes") UnknownEvent event) {
+	public void handleUnknownEvent(@SuppressWarnings("rawtypes") UnknownEvent event) {
 		synchronized(this) {
 			if (pingMessage == null)
 				return;

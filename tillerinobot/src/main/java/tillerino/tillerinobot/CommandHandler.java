@@ -1,23 +1,24 @@
 package tillerino.tillerinobot;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.Value;
-
 import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.Value;
 import tillerino.tillerinobot.UserDataManager.UserData;
-
-import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 public interface CommandHandler {
 	/**
@@ -27,14 +28,14 @@ public interface CommandHandler {
 		/**
 		 * Adds another response to the current one.
 		 */
-		default Response then(Response nextResponse) {
-			ResponseList list = new ResponseList();
+		default Response then(@CheckForNull Response nextResponse) {
+			if (nextResponse instanceof NoResponse || nextResponse == null) {
+				return this;
+			}
 			if (this instanceof NoResponse) {
 				return nextResponse;
 			}
-			if (nextResponse instanceof NoResponse) {
-				return this;
-			}
+			ResponseList list = new ResponseList();
 			if (this instanceof ResponseList) {
 				list.responses.addAll(((ResponseList) this).responses);
 			} else {
@@ -48,15 +49,12 @@ public interface CommandHandler {
 			return list;
 		}
 
-		/**
-		 * Executes a task after this response
-		 */
-		default Response thenRun(Task task) {
-			return then(task);
+		static NoResponse none() {
+			return new NoResponse();
 		}
 
-		default Response thenRunAsync(AsyncTask task) {
-			return then(task);
+		default boolean isNone() {
+			return this instanceof NoResponse;
 		}
 	}
 
@@ -100,16 +98,13 @@ public interface CommandHandler {
 
 	@EqualsAndHashCode
 	@ToString
+	@SuppressFBWarnings(value = "RCN", justification = "Generated code")
 	public static final class ResponseList implements Response {
 		List<Response> responses = new ArrayList<>();
-	}
 
-	interface Task extends Response {
-		void run();
-	}
-
-	interface AsyncTask extends Response {
-		void run();
+		public List<Response> getResponses() {
+			return Collections.unmodifiableList(responses);
+		}
 	}
 
 	/**
