@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.chat.impl;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
@@ -15,6 +16,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -33,10 +35,11 @@ import lombok.experimental.Wither;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class Bouncer {
-	@ToString
-	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@RequiredArgsConstructor(access = AccessLevel.PACKAGE) // visible for testing
 	@Getter
-	public final class SemaphorePayload {
+	@ToString
+	@EqualsAndHashCode
+	public static final class SemaphorePayload {
 		private final long eventId;
 
 		private final long enteredTime;
@@ -92,12 +95,24 @@ public class Bouncer {
 		return perUserLock.getUnchecked(ircNick);
 	}
 
+	/**
+	 * Updates the current payload.
+	 *
+	 * @param ircNick the nick name to upload the payload for
+	 * @param eventId the event ID. If the current payload has a different event ID, no change will be applied.
+	 * @param mapper change to the underlying object. May return null to remove the payload.
+	 * @return true if the payload after method call was returned by the mapper.
+	 */
 	public boolean updateIfPresent(String ircNick, long eventId, UnaryOperator<SemaphorePayload> mapper) {
-		AtomicReference<SemaphorePayload> newObject = new AtomicReference<>();
-		return getSemaphore(ircNick).updateAndGet(payload -> {
-			SemaphorePayload changed = Optional.ofNullable(payload).filter(p -> p.eventId == eventId).map(mapper).orElse(null);
-			newObject.set(changed);
-			return changed;
-		}) == newObject.get();
+		AtomicBoolean changed = new AtomicBoolean();
+		getSemaphore(ircNick).updateAndGet(payload -> {
+			changed.set(false);
+			if (payload == null || payload.eventId != eventId) {
+				return payload;
+			}
+			changed.set(true);
+			return mapper.apply(payload);
+		});
+		return changed.get();
 	}
 }
