@@ -42,7 +42,7 @@ import tillerino.tillerinobot.BotBackend.IRCName;
 public class LiveActivityEndpoint extends Endpoint {
 	@Value
 	public static class Received {
-		Long eventId;
+		long eventId;
 		int user;
 	}
 
@@ -107,7 +107,7 @@ public class LiveActivityEndpoint extends Endpoint {
 		}
 	}
 
-	public void propagateReceivedMessage(@IRCName String ircUserName, Long eventId) {
+	public void propagateReceivedMessage(@IRCName String ircUserName, long eventId) {
 		sendToEachSession(session -> Message.builder().received(new Received(eventId, anonymizeHashCode(ircUserName, session))).build());
 	}
 

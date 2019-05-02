@@ -11,6 +11,7 @@ import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
+import org.tillerino.ppaddict.util.Clock;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,13 @@ import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
+/**
+ * Here we do anything that we can do right after we receive the message and
+ * eventually put the message into the event queue. One important job is to ask
+ * the {@link Bouncer} if we aren't already processing a message for the user in
+ * question. Non-interactive events like joins are passed right through to the
+ * message queue.
+ */
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessagePreprocessor implements GameChatEventConsumer {
@@ -28,6 +36,8 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 	private final Bouncer bouncer;
 
 	private final GameChatResponseQueue responses;
+
+	private final Clock clock;
 
 	@Override
 	public void onEvent(GameChatEvent event) throws InterruptedException {
@@ -50,21 +60,18 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 	private Response handleSemaphoreInUse(GameChatEvent event) {
 		return bouncer.get(event.getNick()).map(feedback -> {
 			String purpose = "Concurrent " + event.getClass().getSimpleName();
-			double processing = (System.currentTimeMillis() - feedback.getEnteredTime()) / 1000d;
+			double processing = (clock.currentTimeMillis() - feedback.getEnteredTime()) / 1000d;
 			Thread thread = feedback.getWorkingThread();
 
-			if(processing > 5) {
+			if (processing > 5) {
 				if (thread != null) {
 					StackTraceElement[] stackTrace = thread.getStackTrace();
-					stackTrace = Stream.of(stackTrace)
-							.filter(elem -> elem.getClassName().contains("tillerino"))
-							.toArray(StackTraceElement[]::new);
+					stackTrace = Stream.of(stackTrace).filter(elem -> elem.getClassName().contains("tillerino")).toArray(StackTraceElement[]::new);
 					Throwable t = new Throwable("Processing thread's stack trace");
 					t.setStackTrace(stackTrace);
 					log.warn(purpose + " - request has been processing for " + processing, t);
 				} else {
-					log.warn("{} - request has been processing for {}. Currently in queue. Event queue size: {} Response queue size: {}",
-							purpose, processing, queue.size(), responses.size());
+					log.warn("{} - request has been processing for {}. Currently in queue. Event queue size: {} Response queue size: {}", purpose, processing, queue.size(), responses.size());
 				}
 				if (!feedback.isWarningSent() && thread != null && setWarningSent(event, feedback)) {
 					return new Message("Just a second...");
@@ -73,7 +80,7 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 				log.debug(purpose);
 			}
 			// only send if thread is not null, i.e. message is not in queue
-			if(feedback.getAttemptsSinceEntered() >= 3 && !feedback.isWarningSent() && thread != null && setWarningSent(event, feedback)) {
+			if (feedback.getAttemptsSinceEntered() >= 3 && !feedback.isWarningSent() && thread != null && setWarningSent(event, feedback)) {
 				return new Message("[http://i.imgur.com/Ykfua8r.png ...]");
 			}
 
