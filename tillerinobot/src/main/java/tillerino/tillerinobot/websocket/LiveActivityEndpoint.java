@@ -12,8 +12,8 @@ import javax.inject.Singleton;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
-import javax.websocket.MessageHandler.Whole;
 import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -26,7 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotBackend.IRCName;
@@ -75,20 +77,20 @@ public class LiveActivityEndpoint extends Endpoint {
 		writer = mapper.writerFor(Message.class);
 	}
 
+	@Getter(AccessLevel.PACKAGE) // for unit tests
 	private final Set<Session> sessions = new HashSet<>();
 
 	@Override
 	@OnOpen
 	public synchronized void onOpen(Session session, EndpointConfig config) {
 		sessions.add(session);
-		session.addMessageHandler(new Whole<String>() {
-			@Override
-			public void onMessage(String message) {
-				if (message.equalsIgnoreCase("ping")) {
-					session.getAsyncRemote().sendText("PONG");
-				}
-			}
-		});
+	}
+
+	@OnMessage
+	public void onMessage(String message, Session session) {
+		if (message.equalsIgnoreCase("ping")) {
+			session.getAsyncRemote().sendText("PONG");
+		}
 	}
 
 	@Override
@@ -116,7 +118,7 @@ public class LiveActivityEndpoint extends Endpoint {
 		sendToEachSession(session -> Message.builder().sent(new Sent(eventId, anonymizeHashCode(ircUserName, session), ping)).build());
 	}
 
-	public void propagateMessageDetails(Long eventId, String text) {
+	public void propagateMessageDetails(long eventId, String text) {
 		sendToEachSession(session -> Message.builder().messageDetails(new MessageDetails(eventId, text)).build());
 	}
 
