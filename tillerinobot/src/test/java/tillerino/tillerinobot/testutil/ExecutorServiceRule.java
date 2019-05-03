@@ -1,6 +1,7 @@
 package tillerino.tillerinobot.testutil;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 import org.awaitility.Awaitility;
@@ -30,5 +31,9 @@ public class ExecutorServiceRule extends ExternalResource implements ExecutorSer
 		exec.shutdown();
 		Awaitility.await("Executor service shut down").until(exec::isTerminated);
 		super.after();
+	}
+
+	public static ExecutorServiceRule singleThread(String name) {
+		return new ExecutorServiceRule(() -> Executors.newSingleThreadExecutor(r -> new Thread(r, name)));
 	}
 }
