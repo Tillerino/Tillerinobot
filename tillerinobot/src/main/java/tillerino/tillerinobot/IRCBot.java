@@ -39,7 +39,6 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;

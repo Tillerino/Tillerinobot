@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,7 +53,6 @@ import tillerino.tillerinobot.BotRunner;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
-import tillerino.tillerinobot.data.util.RepositoryModule;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
@@ -140,7 +138,7 @@ public class FullBotTest {
 			() -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>()));
 
 	@Rule
-	public final ExecutorServiceRule coreWorkerPool = new ExecutorServiceRule(() -> Executors.newFixedThreadPool(4));
+	public final ExecutorServiceRule coreWorkerPool = ExecutorServiceRule.fixedThreadPool("core", 4);
 
 	@Rule
 	public final JettyWebsocketServerResource websocket = new JettyWebsocketServerResource("localhost", 0);

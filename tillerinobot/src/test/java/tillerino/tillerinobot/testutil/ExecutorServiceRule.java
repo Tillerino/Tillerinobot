@@ -36,4 +36,8 @@ public class ExecutorServiceRule extends ExternalResource implements ExecutorSer
 	public static ExecutorServiceRule singleThread(String name) {
 		return new ExecutorServiceRule(() -> Executors.newSingleThreadExecutor(r -> new Thread(r, name)));
 	}
+
+	public static ExecutorServiceRule fixedThreadPool(String name, int nThreads) {
+		return new ExecutorServiceRule(() -> Executors.newFixedThreadPool(nThreads, r -> new Thread(r, name)));
+	}
 }
