@@ -25,6 +25,7 @@ import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.snapshot.UserChannelDaoSnapshot;
 import org.pircbotx.snapshot.UserSnapshot;
+import org.tillerino.ppaddict.util.TillerinobotGitProperties;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
@@ -155,8 +156,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 			@Named("tillerinobot.irc.nickname") String nickname,
 			@Named("tillerinobot.irc.password") String password,
 			@Named("tillerinobot.irc.autojoin") String autojoinChannel,
-			@Named("tillerinobot.git.commit.id.abbrev") String commit,
-			@Named("tillerinobot.git.commit.message.short") String commitMessage) {
+			TillerinobotGitProperties gitProperties) {
 		super();
 		this.listener = tillerinoBot;
 		this.server = server.split(",");
@@ -164,8 +164,7 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 		this.nickname = nickname;
 		this.password = password;
 		this.autojoinChannel = autojoinChannel;
-		this.commit = commit;
-		this.commitMessage = commitMessage;
+		this.gitProperties = gitProperties;
 	}
 
 	private final IrcHooks listener;
@@ -175,15 +174,14 @@ public class BotRunnerImpl implements BotRunner, TidyObject {
 	private final String nickname;
 	private final String password;
 	private final String autojoinChannel;
-	private final String commit;
-	private final String commitMessage;
+	private TillerinobotGitProperties gitProperties;
 
 	private volatile boolean reconnect = true;
 	private int reconnectTimeout = 10000;
 
 	@Override
 	public void run() {
-		log.info("Starting Tillerinobot {}: {}", commit, commitMessage);
+		log.info("Starting Tillerinobot {}: {}", gitProperties.getCommit(), gitProperties.getCommitMessage());
 		for (int i = 0; reconnect; i++) {
 			try {
 				try {
