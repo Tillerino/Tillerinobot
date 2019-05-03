@@ -1,6 +1,7 @@
 package tillerino.tillerinobot.websocket;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.awaitility.Awaitility;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -100,7 +102,7 @@ public class LiveActivityEndpointTest {
 
 	@Test
 	public void testPropagateMessageReceived() throws Exception {
-		verify(client, timeout(1000)).connect(any());
+		waitForConnectionEstablished();
 		liveActivity.propagateReceivedMessage("user", 15);
 		verify(client, timeout(1000)).message("{\n" + 
 				"  \"received\" : {\n" + 
@@ -112,7 +114,7 @@ public class LiveActivityEndpointTest {
 
 	@Test
 	public void testPropagateMessageSent() throws Exception {
-		verify(client, timeout(1000)).connect(any());
+		waitForConnectionEstablished();
 		liveActivity.propagateSentMessage("user", 15);
 		verify(client, timeout(1000)).message("{\n" + 
 				"  \"sent\" : {\n" + 
@@ -124,7 +126,7 @@ public class LiveActivityEndpointTest {
 
 	@Test
 	public void testpropagateMessageDetails() throws Exception {
-		verify(client, timeout(1000)).connect(any());
+		waitForConnectionEstablished();
 		liveActivity.propagateMessageDetails(15, "!r");
 		verify(client, timeout(1000)).message("{\n" + 
 				"  \"messageDetails\" : {\n" + 
@@ -136,5 +138,10 @@ public class LiveActivityEndpointTest {
 
 	private Session session() throws Exception {
 		return session.get(1, TimeUnit.SECONDS);
+	}
+
+	private void waitForConnectionEstablished() {
+		verify(client, timeout(1000)).connect(any());
+		await().until(() -> !liveActivity.getSessions().isEmpty());
 	}
 }
