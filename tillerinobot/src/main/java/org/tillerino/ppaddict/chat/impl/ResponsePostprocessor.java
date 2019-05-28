@@ -50,8 +50,8 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		} catch (IOException e) {
 			log.warn("Error while sending chat message", e);
 		}
-		if (!bouncer.exit(event.getNick(), event.getEventId())) {
-			log.warn("Responded to stale event");
+		if (event.isInteractive() && !bouncer.exit(event.getNick(), event.getEventId())) {
+			log.warn("Responded to stale event {} {}", event.getNick(), event.getEventId());
 		}
 	}
 

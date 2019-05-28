@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.PrivateMessage;
+import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
@@ -101,6 +102,14 @@ public class ResponsePostprocessorTest {
 			responsePostprocessor.onResponse(new Success("xyz"), event);
 			verify(botInfo).setLastRecommendation(159);
 		}
+	}
+
+	@Test
+	public void testNoBouncerForNonInteractiveEvents() throws Exception {
+		Sighted event = new Sighted(1, "nick", 2);
+		responsePostprocessor.onResponse(new Success("hai"), event);
+		verify(writer).message("hai", event);
+		verifyZeroInteractions(bouncer);
 	}
 
 	@Test
