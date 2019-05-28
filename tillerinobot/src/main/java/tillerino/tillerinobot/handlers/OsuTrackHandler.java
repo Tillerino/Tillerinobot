@@ -2,8 +2,9 @@ package tillerino.tillerinobot.handlers;
 
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.util.MdcUtils;
+
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
@@ -27,7 +28,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
 
     @Override
     public Response handleArgument(String originalCommand, String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
-        MDC.put(IRCBot.MDC_HANDLER, "u");
+        MDC.put(MdcUtils.MDC_HANDLER, "u");
 
         String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();
         UpdateResult update = osutrackDownloader.getUpdate(username);

@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -41,7 +40,7 @@ public class NPHandler implements CommandHandler {
 
 	@Override
 	public Response handle(String message, OsuApiUser apiUser, UserData userData) throws UserException, IOException, SQLException, InterruptedException {
-		MDC.put(IRCBot.MDC_HANDLER, "np");
+		MDC.put(MdcUtils.MDC_HANDLER, "np");
 		
 		Language lang = userData.getLanguage();
 

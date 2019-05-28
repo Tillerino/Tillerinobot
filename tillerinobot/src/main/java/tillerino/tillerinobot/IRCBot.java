@@ -71,9 +71,6 @@ import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
  */
 @Slf4j
 public class IRCBot implements GameChatEventConsumer {
-	public static final String MDC_HANDLER = "handler";
-	public static final String MDC_STATE = "state";
-
 	private final BotBackend backend;
 	private final UserDataManager userDataManager;
 	private final List<CommandHandler> commandHandlers = new ArrayList<>();
@@ -118,8 +115,6 @@ public class IRCBot implements GameChatEventConsumer {
 	}
 
 	private Response processPrivateAction(PrivateAction action) throws InterruptedException {
-		MDC.put(MDC_STATE, "action");
-
 		Language lang = new Default();
 		Response versionInfo = Response.none();
 		try {
@@ -212,8 +207,6 @@ public class IRCBot implements GameChatEventConsumer {
 	}
 
 	private Response processPrivateMessage(final PrivateMessage message) throws InterruptedException {
-		MDC.put(MDC_STATE, "msg");
-
 		Language lang = new Default();
 		Response prelimResponse = Response.none();
 		try {
@@ -248,7 +241,7 @@ public class IRCBot implements GameChatEventConsumer {
 				if ((response = handler.handle(originalMessage, apiUser, userData)) != null) {
 					break;
 				}
-				MDC.remove(MDC_HANDLER);
+				MDC.remove(MdcUtils.MDC_HANDLER);
 			}
 			if (response == null) {
 				throw new UserException(lang.unknownCommand(originalMessage));

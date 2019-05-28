@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -40,7 +39,7 @@ public class AccHandler implements CommandHandler {
 			return null;
 		}
 		
-		MDC.put(IRCBot.MDC_HANDLER, "acc");
+		MDC.put(MdcUtils.MDC_HANDLER, "acc");
 		
 		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 		Language lang = userData.getLanguage();

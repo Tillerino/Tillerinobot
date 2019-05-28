@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -36,7 +35,7 @@ public class WithHandler implements CommandHandler {
 			return null;
 		}
 
-		MDC.put(IRCBot.MDC_HANDLER, "with");
+		MDC.put(MdcUtils.MDC_HANDLER, "with");
 		
 		Language lang = userData.getLanguage();
 		

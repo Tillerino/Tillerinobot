@@ -21,7 +21,6 @@ import tillerino.tillerinobot.CommandHandler.Message;
 import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.CommandHandler.ResponseList;
 import tillerino.tillerinobot.CommandHandler.Success;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
@@ -73,7 +72,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 			writer.action(msg, result);
 
 			liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
-			try (MdcAttributes mdc = MdcUtils.with(IRCBot.MDC_STATE, "sent")) {
+			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
 				log.debug("sent action: " + msg);
 			}
 		} else {
@@ -84,12 +83,12 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	private void message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
 		writer.message(msg, result);
 		liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
-		try (MdcAttributes mdc = MdcUtils.with(IRCBot.MDC_STATE, "sent")) {
+		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
 			if (success) {
 				mdc.add(MdcUtils.MDC_DURATION, clock.currentTimeMillis() - result.getTimestamp());
 				mdc.add(MdcUtils.MDC_SUCCESS, true);
 				mdc.add(MdcUtils.MCD_OSU_API_RATE_BLOCKED_TIME, result.getMeta().getRateLimiterBlockedTime());
-				if (Objects.equals(MDC.get(IRCBot.MDC_HANDLER), RecommendHandler.MDC_FLAG)) {
+				if (Objects.equals(MDC.get(MdcUtils.MDC_HANDLER), RecommendHandler.MDC_FLAG)) {
 					botInfo.setLastRecommendation(clock.currentTimeMillis());
 				}
 			}

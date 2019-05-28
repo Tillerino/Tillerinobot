@@ -14,7 +14,6 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -41,7 +40,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 	@Override
 	public Response handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException, InterruptedException {
-		MDC.put(IRCBot.MDC_HANDLER, MDC_FLAG);
+		MDC.put(MdcUtils.MDC_HANDLER, MDC_FLAG);
 
 		Language lang = userData.getLanguage();
 

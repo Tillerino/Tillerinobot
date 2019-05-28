@@ -132,4 +132,6 @@ public class MdcUtils {
 	public static final String MDC_DURATION = "duration";
 	public static final String MCD_OSU_API_RATE_BLOCKED_TIME = "osuApiRateBlockedTime";
 	public static final String MDC_SUCCESS = "success";
+	public static final String MDC_HANDLER = "handler";
+	public static final String MDC_STATE = "state";
 }

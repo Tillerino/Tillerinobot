@@ -13,6 +13,8 @@ import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.util.MdcUtils;
+import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,10 +49,14 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 			liveActivity.propagateReceivedMessage(event.getNick(), event.getEventId());
 		}
 		if (event instanceof PrivateAction) {
-			log.debug("action: " + ((PrivateAction) event).getAction());
+			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "action")) {
+				log.debug("action: " + ((PrivateAction) event).getAction());
+			}
 		}
 		if (event instanceof PrivateMessage) {
-			log.debug("received: " + ((PrivateMessage) event).getMessage());
+			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "msg")) {
+				log.debug("received: " + ((PrivateMessage) event).getMessage());
+			}
 		}
 		if (event.isInteractive() && !bouncer.tryEnter(event.getNick(), event.getEventId())) {
 			responses.onResponse(handleSemaphoreInUse(event), event);
