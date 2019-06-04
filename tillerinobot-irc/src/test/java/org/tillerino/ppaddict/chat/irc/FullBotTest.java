@@ -46,6 +46,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
@@ -149,7 +150,12 @@ public class FullBotTest {
 
 	private final List<Future> started = new ArrayList<>();
 
-	class FullBotConfiguration extends AbstractModule {
+	@RequiredArgsConstructor
+	static class FullBotConfiguration extends AbstractModule {
+		private final int port;
+		private final ExecutorService maintenanceWorkerPool;
+		private final ExecutorService coreWorkerPool;
+
 		@Override
 		protected void configure() {
 			install(new CreateInMemoryDatabaseModule());
@@ -157,7 +163,7 @@ public class FullBotTest {
 			install(new InMemoryQueuesModule());
 
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance("localhost");
-			bind(Integer.class).annotatedWith(Names.named("tillerinobot.irc.port")).toInstance(server.getPort());
+			bind(Integer.class).annotatedWith(Names.named("tillerinobot.irc.port")).toInstance(port);
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.nickname")).toInstance("tillerinobot");
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.password")).toInstance("");
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.autojoin")).toInstance("#osu");
@@ -168,7 +174,7 @@ public class FullBotTest {
 			bind(GameChatWriter.class).to(IrcWriter.class);
 			bind(Clock.class).toInstance(Clock.system());
 			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
-			bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance")).toInstance(exec);
+			bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance")).toInstance(maintenanceWorkerPool);
 			bind(ExecutorService.class).annotatedWith(Names.named("core")).toInstance(coreWorkerPool);
 			bind(AuthenticationService.class).toInstance(key -> {
 				if (key.equals("testKey")) {
@@ -191,7 +197,7 @@ public class FullBotTest {
 
 	@Before
 	public void startBot() throws Exception {
-		Injector injector = Guice.createInjector(new FullBotConfiguration());
+		Injector injector = Guice.createInjector(new FullBotConfiguration(server.getPort(), exec, coreWorkerPool));
 
 		websocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
 

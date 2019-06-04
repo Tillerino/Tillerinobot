@@ -1,5 +1,7 @@
 package org.tillerino.ppaddict.util;
 
+import org.slf4j.MDC;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -12,6 +14,7 @@ public abstract class LoopingRunnable implements Runnable {
 	public final void run() {
 		for (;;) {
 			try {
+				MDC.clear();
 				loop();
 			} catch (InterruptedException e) {
 				log.info("Interrupted. Stopping loop.");
@@ -24,7 +27,7 @@ public abstract class LoopingRunnable implements Runnable {
 	/**
 	 * Is repeatedly called from {@link #run()} until an
 	 * {@link InterruptedException} is thrown. All other exceptions are not
-	 * caught.
+	 * caught. This method is always called with an empty {@link MDC}.
 	 *
 	 * @throws InterruptedException to end the loop gracefully.
 	 */

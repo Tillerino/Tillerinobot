@@ -1,6 +1,7 @@
 package org.tillerino.ppaddict.chat.irc;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.ExecutorService;
 
@@ -19,7 +20,6 @@ import org.pircbotx.output.OutputUser;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 
-import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.RateLimiter;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;

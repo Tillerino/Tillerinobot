@@ -121,7 +121,7 @@ public class IrcHooks extends CoreHooks {
 			User user = null;
 			if (event instanceof GenericUserEvent<?>) {
 				user = ((GenericUserEvent) event).getUser();
-				mdc.add("user", user.getNick());
+				mdc.add(MdcUtils.MDC_USER, user.getNick());
 			}
 
 			super.onEvent(event);

@@ -14,6 +14,7 @@ import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.LoggingUtils;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,12 +53,12 @@ public class Pinger {
 		Utils.sendRawLineToServer(bot, "PING " + pingMessage);
 
 		if(!pingLatch.await(10, TimeUnit.SECONDS)) {
-			MDC.put("ping", 10000 + "");
+			MDC.put(MdcUtils.MDC_PING, 10000 + "");
 			throw new IOException("ping timed out");
 		}
 
 		long ping = clock.currentTimeMillis() - time;
-		MDC.put("ping", ping + "");
+		MDC.put(MdcUtils.MDC_PING, ping + "");
 	}
 
 	public void handleUnknownEvent(@SuppressWarnings("rawtypes") UnknownEvent event) {

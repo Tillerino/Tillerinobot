@@ -20,17 +20,26 @@ public class ExecutorServiceRule extends ExternalResource implements ExecutorSer
 
 	private final Supplier<ExecutorService> supplier;
 
+	private boolean interruptOnShutdown = false;
+
 	@Override
 	protected void before() throws Throwable {
-		super.before();
 		exec = supplier.get();
 	}
 
 	@Override
 	protected void after() {
-		exec.shutdown();
+		if (interruptOnShutdown) {
+			exec.shutdownNow();
+		} else {
+			exec.shutdown();
+		}
 		Awaitility.await("Executor service shut down").until(exec::isTerminated);
-		super.after();
+	}
+
+	public ExecutorServiceRule interruptOnShutdown() {
+		interruptOnShutdown = true;
+		return this;
 	}
 
 	public static ExecutorServiceRule singleThread(String name) {
@@ -39,5 +48,9 @@ public class ExecutorServiceRule extends ExternalResource implements ExecutorSer
 
 	public static ExecutorServiceRule fixedThreadPool(String name, int nThreads) {
 		return new ExecutorServiceRule(() -> Executors.newFixedThreadPool(nThreads, r -> new Thread(r, name)));
+	}
+
+	public static ExecutorServiceRule cachedThreadPool(String name) {
+		return new ExecutorServiceRule(() -> Executors.newCachedThreadPool(r -> new Thread(r, name)));
 	}
 }

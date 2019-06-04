@@ -1,7 +1,11 @@
 package tillerino.tillerinobot;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.Scanner;
@@ -44,7 +48,6 @@ import com.google.inject.name.Names;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-import tillerino.tillerinobot.data.util.RepositoryModule;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
@@ -68,13 +71,11 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		install(new TillerinobotConfigurationModule());
 		install(new InMemoryQueuesModule());
 		
-		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore"))
-				.toInstance(false);
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
-		bind(Clock.class).toInstance(Clock.system());
+		bind(Clock.class).toInstance(createClock());
 		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
 				.toInstance(Executors.newSingleThreadExecutor(threadFactory("maintenance")));
 		bind(ExecutorService.class).annotatedWith(Names.named("core"))
@@ -85,6 +86,10 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 			}
 			throw new NotFoundException();
 		});
+	}
+
+	protected Clock createClock() {
+		return Clock.system();
 	}
 
 	static ThreadFactory threadFactory(String name) {

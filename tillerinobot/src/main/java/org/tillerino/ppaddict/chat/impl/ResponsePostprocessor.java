@@ -74,6 +74,8 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 			liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
 				log.debug("sent action: " + msg);
+			} finally {
+				MDC.remove(MdcUtils.MDC_PING);
 			}
 		} else {
 			throw new NotImplementedException("Unknown response type: " + response.getClass());
@@ -94,6 +96,8 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 			}
 			log.debug("sent: " + msg);
 			botInfo.setLastSentMessage(clock.currentTimeMillis());
+		} finally {
+			MDC.remove(MdcUtils.MDC_PING);
 		}
 	}
 }

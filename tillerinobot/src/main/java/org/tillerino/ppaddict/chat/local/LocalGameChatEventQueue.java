@@ -21,7 +21,7 @@ import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Singleton
 @Slf4j
-public class LocalGameChatEventQueue extends LoopingRunnable implements GameChatEventQueue, Runnable {
+public class LocalGameChatEventQueue extends LoopingRunnable implements GameChatEventQueue {
 	private final BlockingQueue<GameChatEvent> queue = new LinkedBlockingQueue<>();
 
 	private final IRCBot coreHandler;

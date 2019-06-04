@@ -114,8 +114,6 @@ public class MdcUtils {
 		return new MdcAttributes(key, val);
 	}
 
-	public static final String MDC_EVENT = "event";
-
 	/**
 	 * I didn't want to rewrite the signature of
 	 * {@link CommandHandler#handle(String, org.tillerino.osuApiModel.OsuApiUser, tillerino.tillerinobot.UserDataManager.UserData)},
@@ -129,9 +127,12 @@ public class MdcUtils {
 		return OptionalLong.of(Long.parseLong(asString));
 	}
 
+	public static final String MDC_EVENT = "event";
 	public static final String MDC_DURATION = "duration";
 	public static final String MCD_OSU_API_RATE_BLOCKED_TIME = "osuApiRateBlockedTime";
 	public static final String MDC_SUCCESS = "success";
 	public static final String MDC_HANDLER = "handler";
 	public static final String MDC_STATE = "state";
+	public static final String MDC_USER = "user";
+	public static final String MDC_PING = "ping";
 }

@@ -45,24 +45,29 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 
 	@Override
 	public void onEvent(GameChatEvent event) throws InterruptedException {
-		if (event instanceof PrivateMessage || event instanceof PrivateAction) {
-			liveActivity.propagateReceivedMessage(event.getNick(), event.getEventId());
-		}
-		if (event instanceof PrivateAction) {
-			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "action")) {
-				log.debug("action: " + ((PrivateAction) event).getAction());
+		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, event.getEventId())) {
+			mdc.add(MdcUtils.MDC_USER, event.getNick());
+			// these fields are also set by the IRC connector, but we'll make sure here
+
+			if (event instanceof PrivateMessage || event instanceof PrivateAction) {
+				liveActivity.propagateReceivedMessage(event.getNick(), event.getEventId());
 			}
-		}
-		if (event instanceof PrivateMessage) {
-			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "msg")) {
-				log.debug("received: " + ((PrivateMessage) event).getMessage());
+			if (event instanceof PrivateAction) {
+				try (MdcAttributes mdc2 = MdcUtils.with(MdcUtils.MDC_STATE, "action")) {
+					log.debug("action: " + ((PrivateAction) event).getAction());
+				}
 			}
+			if (event instanceof PrivateMessage) {
+				try (MdcAttributes mdc2 = MdcUtils.with(MdcUtils.MDC_STATE, "msg")) {
+					log.debug("received: " + ((PrivateMessage) event).getMessage());
+				}
+			}
+			if (event.isInteractive() && !bouncer.tryEnter(event.getNick(), event.getEventId())) {
+				responses.onResponse(handleSemaphoreInUse(event), event);
+				return;
+			}
+			queue.onEvent(event);
 		}
-		if (event.isInteractive() && !bouncer.tryEnter(event.getNick(), event.getEventId())) {
-			responses.onResponse(handleSemaphoreInUse(event), event);
-			return;
-		}
-		queue.onEvent(event);
 	}
 
 	private Response handleSemaphoreInUse(GameChatEvent event) {

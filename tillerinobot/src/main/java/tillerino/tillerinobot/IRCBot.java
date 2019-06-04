@@ -320,7 +320,7 @@ public class IRCBot implements GameChatEventConsumer {
 		throw new NotImplementedException("Event not implemented: " + event);
 	}
 
-	static final int CURRENT_VERSION = 13;
+	public static final int CURRENT_VERSION = 13;
 	public static final String VERSION_MESSAGE = "This is embarrasing. Looks like I didn't know about the HD nerf for a quite a while."
 			+ " Don't worry: I'm all caught up now. I'll be updating my pp records over the following days.";
 
