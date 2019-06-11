@@ -67,7 +67,7 @@ public class IrcNameResolver {
 	@CheckForNull
 	public Integer getIDByUserName(@IRCName String userName) throws IOException,
 			SQLException {
-		UserNameMapping mapping = repo.findOne(userName);
+		UserNameMapping mapping = repo.findById(userName).orElse(null);
 
 		long maxAge = 90l * 24 * 60 * 60 * 1000;
 		if (System.currentTimeMillis() < 1483747380000l /* sometime January 7th, 2017*/) {
