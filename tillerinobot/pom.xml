@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
-		<version>0.11.0</version>
+		<version>0.12.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot</artifactId>
@@ -41,22 +41,6 @@
 							test-jar
 							</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-						<phase>test</phase>
-						<configuration>
-							<maxRank>15</maxRank>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -187,7 +171,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>1.10.2.RELEASE</version>
+			<version>2.1.8.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -212,7 +196,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.9.8</version>
+			<version>2.9.9</version>
 		</dependency>
 
 		<!-- test dependencies -->
