@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
-		<version>0.11.0</version>
+		<version>0.12.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot-irc</artifactId>
