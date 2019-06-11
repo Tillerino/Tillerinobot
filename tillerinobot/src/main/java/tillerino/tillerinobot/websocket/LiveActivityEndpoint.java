@@ -22,6 +22,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.MDC;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -74,6 +76,7 @@ public class LiveActivityEndpoint extends Endpoint {
 	{
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.setSerializationInclusion(Include.NON_NULL);
+		mapper.setDefaultPrettyPrinter(new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter().withLinefeed("\n")));
 		writer = mapper.writerFor(Message.class);
 	}
 
