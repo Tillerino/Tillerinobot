@@ -12,6 +12,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 
@@ -36,6 +37,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		} catch (NotFoundException e) {
 			throw new WebApplicationException("Unknown API key", Status.UNAUTHORIZED);
 		}
-		MDC.put("apiKey", apiKey);
+		// abbreviate. never log credentials. keys are made to be unique in the first 8 characters.
+		MDC.put("apiKey", StringUtils.substring(apiKey, 0, 8));
 	}
 }

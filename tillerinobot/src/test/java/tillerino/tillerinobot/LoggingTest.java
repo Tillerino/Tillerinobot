@@ -90,15 +90,15 @@ public class LoggingTest {
 
 		assertThatOurLog().first()
 			.satisfies(received("!r"))
-			.satisfies(mdc("duration", null))
-			.satisfies(mdc("ping", null));
+			.satisfies(TestAppender.mdc("duration", null))
+			.satisfies(TestAppender.mdc("ping", null));
 
 		assertThatOurLog().element(1)
 			.satisfies(sent("[http://osu.ppy.sh/b/"))
-			.satisfies(mdc("success", "true"))
-			.satisfies(mdc("handler", "r"))
-			.satisfies(mdc("duration", "15"))
-			.satisfies(mdc("ping", "14"));
+			.satisfies(TestAppender.mdc("success", "true"))
+			.satisfies(TestAppender.mdc("handler", "r"))
+			.satisfies(TestAppender.mdc("duration", "15"))
+			.satisfies(TestAppender.mdc("ping", "14"));
 	}
 
 	@Test
@@ -109,15 +109,15 @@ public class LoggingTest {
 
 		assertThatOurLog().first()
 			.satisfies(received("!not-a-command"))
-			.satisfies(mdc("duration", null))
-			.satisfies(mdc("ping", null));
+			.satisfies(TestAppender.mdc("duration", null))
+			.satisfies(TestAppender.mdc("ping", null));
 
 		assertThatOurLog().element(1)
 			.satisfies(sent(new Default().unknownCommand("not-a-command")))
-			.satisfies(not(mdc("success", "true")))
-			.satisfies(mdc("handler", null))
-			.satisfies(mdc("duration", null))
-			.satisfies(mdc("ping", "14"));
+			.satisfies(not(TestAppender.mdc("success", "true")))
+			.satisfies(TestAppender.mdc("handler", null))
+			.satisfies(TestAppender.mdc("duration", null))
+			.satisfies(TestAppender.mdc("ping", "14"));
 	}
 
 	@Test
@@ -128,15 +128,15 @@ public class LoggingTest {
 
 		assertThatOurLog().first()
 			.satisfies(action("is listening to [http://osu.ppy.sh/b/338 title]"))
-			.satisfies(mdc("duration", null))
-			.satisfies(mdc("ping", null));
+			.satisfies(TestAppender.mdc("duration", null))
+			.satisfies(TestAppender.mdc("ping", null));
 
 		assertThatOurLog().element(1)
 			.satisfies(sent("DragonForce - Beatmap 338 [Hard]"))
-			.satisfies(mdc("success", "true"))
-			.satisfies(mdc("handler", "np"))
-			.satisfies(mdc("duration", "25"))
-			.satisfies(mdc("ping", "14"));
+			.satisfies(TestAppender.mdc("success", "true"))
+			.satisfies(TestAppender.mdc("handler", "np"))
+			.satisfies(TestAppender.mdc("duration", "25"))
+			.satisfies(TestAppender.mdc("ping", "14"));
 	}
 
 	@Test
@@ -146,12 +146,12 @@ public class LoggingTest {
 		assertThatOurLog().hasSize(3);
 
 		assertThatOurLog().element(1)
-			.satisfies(mdc("state", "sent"))
-			.satisfies(mdc("ping", "14"));
+			.satisfies(TestAppender.mdc("state", "sent"))
+			.satisfies(TestAppender.mdc("ping", "14"));
 
 		assertThatOurLog().element(2)
-			.satisfies(mdc("state", "sent"))
-			.satisfies(mdc("ping", null));
+			.satisfies(TestAppender.mdc("state", "sent"))
+			.satisfies(TestAppender.mdc("ping", null));
 	}
 
 	private void processMessage(String user, String message) throws InterruptedException, IOException {
@@ -163,8 +163,8 @@ public class LoggingTest {
 		verify(out, timeout(1000)).message(anyString(), eq(event));
 
 		assertThatOurLog()
-			.allSatisfy(mdc("event", "123"))
-			.allSatisfy(mdc("user", user));
+			.allSatisfy(TestAppender.mdc("event", "123"))
+			.allSatisfy(TestAppender.mdc("user", user));
 	}
 
 	private void processAction(String user, String action) throws InterruptedException, IOException {
@@ -176,26 +176,22 @@ public class LoggingTest {
 		verify(out, timeout(1000)).message(anyString(), eq(event));
 
 		assertThatOurLog()
-			.allSatisfy(mdc("event", "123"))
-			.allSatisfy(mdc("user", user));
-	}
-
-	private Consumer<LoggingEvent> mdc(String key, String value) {
-		return event -> assertThat(event.getMDC(key)).isEqualTo(value);
+			.allSatisfy(TestAppender.mdc("event", "123"))
+			.allSatisfy(TestAppender.mdc("user", user));
 	}
 
 	private Consumer<LoggingEvent> sent(String messageStart) {
-		return mdc("state", "sent")
+		return TestAppender.mdc("state", "sent")
 				.andThen(e -> assertThat(((String) e.getMessage())).startsWith("sent: " + messageStart));
 	}
 
 	private Consumer<LoggingEvent> received(String message) {
-		return mdc("state", "msg")
+		return TestAppender.mdc("state", "msg")
 				.andThen(event -> assertThat(event.getMessage()).isEqualTo("received: " + message));
 	}
 
 	private Consumer<LoggingEvent> action(String message) {
-		return mdc("state", "action")
+		return TestAppender.mdc("state", "action")
 				.andThen(event -> assertThat(event.getMessage()).isEqualTo("action: " + message));
 	}
 

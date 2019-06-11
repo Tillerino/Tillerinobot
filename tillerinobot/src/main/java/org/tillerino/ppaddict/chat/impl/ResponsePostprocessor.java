@@ -75,6 +75,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
 				log.debug("sent action: " + msg);
 			} finally {
+				// This is possibly set by the writer. If an exception occurs, it is cleared by the queue
 				MDC.remove(MdcUtils.MDC_PING);
 			}
 		} else {
@@ -97,6 +98,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 			log.debug("sent: " + msg);
 			botInfo.setLastSentMessage(clock.currentTimeMillis());
 		} finally {
+			// This is possibly set by the writer. If an exception occurs, it is cleared by the queue
 			MDC.remove(MdcUtils.MDC_PING);
 		}
 	}

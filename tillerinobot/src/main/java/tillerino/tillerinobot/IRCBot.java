@@ -132,7 +132,6 @@ public class IRCBot implements GameChatEventConsumer {
 
 	private Response handleException(Throwable e, Language lang) {
 		try {
-			MDC.remove(MdcUtils.MDC_SUCCESS);
 			if(e instanceof ExecutionException) {
 				e = e.getCause();
 			}
@@ -241,6 +240,8 @@ public class IRCBot implements GameChatEventConsumer {
 				if ((response = handler.handle(originalMessage, apiUser, userData)) != null) {
 					break;
 				}
+				// removes the current handler's label from the MDC since it didn't work and we don't want it
+				// around for the next one
 				MDC.remove(MdcUtils.MDC_HANDLER);
 			}
 			if (response == null) {

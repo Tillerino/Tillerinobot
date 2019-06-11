@@ -21,6 +21,8 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.spi.LoggingEvent;
+import org.assertj.core.api.ListAssert;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,6 +32,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
+import org.tillerino.ppaddict.util.TestAppender;
+import org.tillerino.ppaddict.util.TestAppender.LogRule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -40,7 +44,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotRunner;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
-
+import static org.tillerino.ppaddict.util.TestAppender.mdc;
 /**
  * Tests the Tillerinobot API on a live HTTP server including authentication.
  */
@@ -100,6 +104,9 @@ public class ApiTest {
 	@Rule
 	public JettyServerResource server = new JettyServerResource(injector.getInstance(BotApiDefinition.class), "localhost", 0);
 
+	@Rule
+	public final LogRule log = TestAppender.rule();
+
 	@Mock
 	private AuthenticationService authenticationService;
 
@@ -132,8 +139,17 @@ public class ApiTest {
 	@Test
 	public void testBotInfo() throws Exception {
 		assertThatThrownBy(() -> botStatus.isReceiving()).isInstanceOf(NotFoundException.class);
+		assertThatOurLogs().hasOnlyOneElementSatisfying(
+			mdc("apiPath", "botinfo/isReceiving")
+				.andThen(mdc("apiStatus", "404"))
+				.andThen(mdc("osuApiRateBlockedTime", "0")));
+		log.clear();
 		botInfo.setLastReceivedMessage(Long.MAX_VALUE);
 		assertTrue(botStatus.isReceiving());
+		assertThatOurLogs().hasOnlyOneElementSatisfying(
+				mdc("apiPath", "botinfo/isReceiving")
+					.andThen(mdc("apiStatus", "200"))
+					.andThen(mdc("osuApiRateBlockedTime", "0")));
 	}
 
 	@Test
@@ -150,5 +166,10 @@ public class ApiTest {
 		assertThatThrownBy(() -> beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1)).isInstanceOf(NotAuthorizedException.class);
 		clientRequestFilter.addToHeader = Pair.of("api-key", "valid-key");
 		beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1);
+	}
+
+	private ListAssert<LoggingEvent> assertThatOurLogs() {
+		return log.assertThat()
+			.filteredOn(event -> event.getLoggerName().equals(ApiLoggingFeature.class.getName()));
 	}
 }

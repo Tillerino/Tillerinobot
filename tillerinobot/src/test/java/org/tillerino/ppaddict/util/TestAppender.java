@@ -1,7 +1,10 @@
 package org.tillerino.ppaddict.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.spi.LoggingEvent;
@@ -28,6 +31,10 @@ public class TestAppender extends ConsoleAppender {
 		events.add(event);
 	}
 
+	public static Consumer<LoggingEvent> mdc(String key, String value) {
+		return event -> assertThat(event.getMDC(key)).isEqualTo(value);
+	}
+
 	public static LogRule rule() {
 		return new LogRule();
 	}
@@ -40,6 +47,10 @@ public class TestAppender extends ConsoleAppender {
 
 		@Override
 		protected void after() {
+			events.clear();
+		}
+
+		public void clear() {
 			events.clear();
 		}
 

@@ -15,6 +15,7 @@ import javax.ws.rs.core.FeatureContext;
 
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.util.MdcUtils;
+import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,10 +59,11 @@ public class ApiLoggingFeature implements Feature {
 		@Override
 		public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 			rateLimiter.clearThreadPriority();
-			MDC.put(MdcUtils.MCD_OSU_API_RATE_BLOCKED_TIME, String.valueOf(rateLimiter.blockedTime()));
-			MDC.put("apiStatus", String.valueOf(responseContext.getStatus()));
-			log.debug("API call finished");
-			MDC.clear();
+			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MCD_OSU_API_RATE_BLOCKED_TIME, rateLimiter.blockedTime())) {
+				mdc.add(MdcUtils.MDC_API_STATUS, responseContext.getStatus());
+				log.debug("API call finished");
+			}
+			MDC.clear(); // clear to remove path which is set in the pre filter
 		}
 	}
 

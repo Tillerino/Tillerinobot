@@ -135,4 +135,5 @@ public class MdcUtils {
 	public static final String MDC_STATE = "state";
 	public static final String MDC_USER = "user";
 	public static final String MDC_PING = "ping";
+	public static final String MDC_API_STATUS = "apiStatus";
 }
