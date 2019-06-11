@@ -4,19 +4,20 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.NotFoundException;
 
+import org.tillerino.ppaddict.util.Clock;
+
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BotRunner;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BotInfoService implements BotStatus {
 	private final BotRunner bot;
 
-	@Inject
-	public BotInfoService(BotRunner bot, BotInfo botInfo) {
-		super();
-		this.bot = bot;
-		this.botInfo = botInfo;
-	}
+	private final BotInfo botInfo;
+
+	private final Clock clock;
 
 	@Data
 	@Singleton
@@ -32,8 +33,6 @@ public class BotInfoService implements BotStatus {
 		private long eventQueueSize;
 	}
 
-	private final BotInfo botInfo;
-
 	@Override
 	public BotInfo botinfo() {
 		botInfo.setConnected(bot.isConnected());
@@ -46,7 +45,7 @@ public class BotInfoService implements BotStatus {
 	 */
 	@Override
 	public boolean isReceiving() {
-		if (botInfo.getLastReceivedMessage() < System.currentTimeMillis() - 10000) {
+		if (botInfo.getLastReceivedMessage() < clock.currentTimeMillis() - 10000) {
 			throw new NotFoundException();
 		}
 		return true;
@@ -54,7 +53,7 @@ public class BotInfoService implements BotStatus {
 
 	@Override
 	public boolean isSending() {
-		if (botInfo.getLastSentMessage() < System.currentTimeMillis() - 60000) {
+		if (botInfo.getLastSentMessage() < clock.currentTimeMillis() - 60000) {
 			throw new NotFoundException();
 		}
 		return true;
@@ -62,7 +61,7 @@ public class BotInfoService implements BotStatus {
 
 	@Override
 	public boolean isRecommending() {
-		if (botInfo.getLastRecommendation() < System.currentTimeMillis() - 60000) {
+		if (botInfo.getLastRecommendation() < clock.currentTimeMillis() - 60000) {
 			throw new NotFoundException();
 		}
 		return true;

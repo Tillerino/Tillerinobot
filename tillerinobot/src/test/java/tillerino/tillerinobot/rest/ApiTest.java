@@ -32,7 +32,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
+import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestAppender;
+import org.tillerino.ppaddict.util.TestClock;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 
 import com.google.inject.AbstractModule;
@@ -59,6 +61,7 @@ public class ApiTest {
 			bind(BeatmapsService.class).toInstance(mock(BeatmapsService.class));
 			// since the authentication service is not mocked yet, we inject a proxy
 			bind(AuthenticationService.class).toInstance(key -> authenticationService.findKey(key));
+			bind(Clock.class).toInstance(clock);
 		}
 	}
 
@@ -95,6 +98,8 @@ public class ApiTest {
 			}
 		}
 	}
+
+	private final TestClock clock = new TestClock();
 
 	private final Injector injector = Guice.createInjector(new ApiTestModule());
 
@@ -134,38 +139,46 @@ public class ApiTest {
 		WebTarget target = client.target("http://localhost:" + server.getPort());
 		botStatus = WebResourceFactory.newResource(BotStatus.class, target);
 		beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
+		when(authenticationService.findKey("valid-key")).thenReturn(new Authorization());
 	}
 
 	@Test
-	public void testBotInfo() throws Exception {
+	public void testIsReceiving() throws Exception {
+		clock.advanceBy(60 * 60 * 1000); // one hour
+		botInfo.setLastReceivedMessage(60 * 60 * 1000 - 11000); // eleven seconds ago
 		assertThatThrownBy(() -> botStatus.isReceiving()).isInstanceOf(NotFoundException.class);
 		assertThatOurLogs().hasOnlyOneElementSatisfying(
 			mdc("apiPath", "botinfo/isReceiving")
 				.andThen(mdc("apiStatus", "404"))
 				.andThen(mdc("osuApiRateBlockedTime", "0")));
 		log.clear();
-		botInfo.setLastReceivedMessage(Long.MAX_VALUE);
+		botInfo.setLastReceivedMessage(60 * 60 * 1000 - 10000); // ten seconds ago
 		assertTrue(botStatus.isReceiving());
 		assertThatOurLogs().hasOnlyOneElementSatisfying(
 				mdc("apiPath", "botinfo/isReceiving")
 					.andThen(mdc("apiStatus", "200"))
-					.andThen(mdc("osuApiRateBlockedTime", "0")));
+					.andThen(mdc("osuApiRateBlockedTime", "0"))
+					.andThen(mdc("apiKey", null)));
 	}
 
 	@Test
 	public void testAuthenticationByParam() throws Throwable {
-		when(authenticationService.findKey("valid-key")).thenReturn(new Authorization());
 		assertThatThrownBy(() -> beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1)).isInstanceOf(NotAuthorizedException.class);
 		clientRequestFilter.addParam = Pair.of("k", "valid-key");
 		beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1);
+		assertThatOurLogs()
+			.hasSize(2)
+			.element(1).satisfies(mdc("apiKey", "valid-ke")); // truncated
 	}
 
 	@Test
 	public void testAuthenticationByHeader() throws Throwable {
-		when(authenticationService.findKey("valid-key")).thenReturn(new Authorization());
 		assertThatThrownBy(() -> beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1)).isInstanceOf(NotAuthorizedException.class);
 		clientRequestFilter.addToHeader = Pair.of("api-key", "valid-key");
 		beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1);
+		assertThatOurLogs()
+			.hasSize(2)
+			.element(1).satisfies(mdc("apiKey", "valid-ke")); // truncated
 	}
 
 	private ListAssert<LoggingEvent> assertThatOurLogs() {
