@@ -1,5 +1,6 @@
 package tillerino.tillerinobot.data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class ActualBeatmap {
 	@Id
 	private int beatmapid;
+	@Column(length = 128 * 1024 * 1024) // arbitrary cap
 	private byte[] content;
 	private long downloaded;
 	private String hash;
