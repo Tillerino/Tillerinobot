@@ -127,13 +127,17 @@ public class MdcUtils {
 		return OptionalLong.of(Long.parseLong(asString));
 	}
 
-	public static final String MDC_EVENT = "event";
-	public static final String MDC_DURATION = "duration";
-	public static final String MCD_OSU_API_RATE_BLOCKED_TIME = "osuApiRateBlockedTime";
-	public static final String MDC_SUCCESS = "success";
-	public static final String MDC_HANDLER = "handler";
-	public static final String MDC_STATE = "state";
-	public static final String MDC_USER = "user";
-	public static final String MDC_PING = "ping";
+	public static final String MDC_API_KEY = "apiKey";
+	public static final String MDC_API_PATH = "apiPath";
 	public static final String MDC_API_STATUS = "apiStatus";
+	// beatmapid
+	public static final String MDC_DURATION = "duration";
+	public static final String MDC_EVENT = "event";
+	public static final String MDC_HANDLER = "handler";
+	public static final String MCD_OSU_API_RATE_BLOCKED_TIME = "osuApiRateBlockedTime";
+	public static final String MDC_PING = "ping";
+	public static final String MDC_STATE = "state";
+	public static final String MDC_SUCCESS = "success";
+	public static final String MDC_THREAD_PRIORITY = "threadPriority";
+	public static final String MDC_USER = "user";
 }

@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.rest.AuthenticationService;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			throw new WebApplicationException("Unknown API key", Status.UNAUTHORIZED);
 		}
 		// abbreviate. never log credentials. keys are made to be unique in the first 8 characters.
-		MDC.put("apiKey", StringUtils.substring(apiKey, 0, 8));
+		MDC.put(MdcUtils.MDC_API_KEY, StringUtils.substring(apiKey, 0, 8));
 	}
 }

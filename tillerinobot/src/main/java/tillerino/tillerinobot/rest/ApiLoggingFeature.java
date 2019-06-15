@@ -34,7 +34,7 @@ public class ApiLoggingFeature implements Feature {
 	public static class SetPath implements ContainerRequestFilter {
 		@Override
 		public void filter(ContainerRequestContext requestContext) throws IOException {
-			MDC.put("apiPath", requestContext.getUriInfo().getPath());
+			MDC.put(MdcUtils.MDC_API_PATH, requestContext.getUriInfo().getPath());
 		}
 	}
 
