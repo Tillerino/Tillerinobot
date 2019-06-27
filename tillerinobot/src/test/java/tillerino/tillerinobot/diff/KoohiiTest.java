@@ -16,8 +16,8 @@ public class KoohiiTest {
 
 	@Test
 	public void testSimple() throws Exception {
-		try (InputStream is = ClassLoader.getSystemResourceAsStream(
-				"Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu")) {
+		try (InputStream is = getClass().getResourceAsStream(
+				"/Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu")) {
 			DifficultyProperties diff = new Koohii().calculate(is, Collections.emptyList());
 			assertEquals(2.0308, diff.getSpeed(), 1E-4);
 			assertEquals(2.5894, diff.getAim(), 1E-4);
@@ -29,8 +29,8 @@ public class KoohiiTest {
 
 	@Test
 	public void testFourDimensions() throws Exception {
-		try (InputStream is = ClassLoader.getSystemResourceAsStream(
-				"xi - FREEDOM DiVE (Nakagawa-Kanon) [FOUR DIMENSIONS].osu")) {
+		try (InputStream is = getClass().getResourceAsStream(
+				"/xi - FREEDOM DiVE (Nakagawa-Kanon) [FOUR DIMENSIONS].osu")) {
 			DifficultyProperties diff = new Koohii().calculate(is, Collections.emptyList());
 			softly.assertThat(diff.getSpeed()).as("speed").isEqualTo(3.613207, offset(1E-4));
 			softly.assertThat(diff.getAim()).as("aim").isEqualTo(3.297445, offset(1E-4));
