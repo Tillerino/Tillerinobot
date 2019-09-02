@@ -106,7 +106,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
 
         return new SafeHtmlBuilder()
             .appendHtmlConstant(
-                "<a href=\"http://osu.ppy.sh/d/" + object.setid + "\">"
+                "<a href=\"http://osu.ppy.sh/beatmapsets/" + object.setid + "/download\">"
                     + "<img src=\"//b.ppy.sh/thumb/" + object.setid
                     + ".jpg\" height=\"60\" style=\"vertical-align:middle\">" + "</a>"
                     + "<a href=\"" + directUrl(object) + "\">")
