@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot-parent</artifactId>
-	<version>0.13.0</version>
+	<version>0.13.1</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -185,9 +185,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<version>1.7.7</version>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.11.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
