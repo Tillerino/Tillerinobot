@@ -16,7 +16,7 @@
 		});
 	}
 
-	var ws = new ReconnectingWebSocket("wss://api.tillerino.org:444/live/v0");
+	var ws = new ReconnectingWebSocket("wss://api.tillerino.org/live/v0");
 	var wasEverConnected = false;
 	ws.onmessage = function(event) {
 		var message = event.data;
