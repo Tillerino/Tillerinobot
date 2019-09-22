@@ -199,7 +199,7 @@ void computeSpeedValue(Beatmap beatmap)
 
 	// Combo scaling
 	double maxCombo = beatmap.DifficultyAttribute(_mods, Beatmap.MaxCombo);
-	if(maxCombo > 0)
+	if (maxCombo > 0)
 		_speedValue *= min(static_cast(pow(_maxCombo, 0.8f) / pow(maxCombo, 0.8f)), 1.0f);
 
 	// We want to give more reward for lower AR when it comes to speed and HD. This nerfs high AR and buffs lower AR.
