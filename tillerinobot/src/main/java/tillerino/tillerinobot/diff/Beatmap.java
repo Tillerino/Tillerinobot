@@ -1,11 +1,11 @@
 package tillerino.tillerinobot.diff;
 
 /**
- * This interface imitates the CBeatmap class used by {@link CStandardScore}.
+ * This interface imitates the Beatmap class used by {@link OsuScore}.
  */
 //suppress all found Sonar warnings, since we are trying to copy C# code
 @SuppressWarnings({ "squid:S00100", "squid:S1214", "squid:S00115" })
-public interface CBeatmap {
+public interface Beatmap {
 	public enum EScoreVersion {
 		ScoreV1, ScoreV2
 	}
@@ -23,7 +23,7 @@ public interface CBeatmap {
 	 * 
 	 * @return
 	 */
-	int AmountHitCircles();
+	int NumHitCircles();
 
 	default EScoreVersion ScoreVersion() {
 		// as of now, we don't care about score versions.

@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
-import tillerino.tillerinobot.diff.CBeatmapImpl;
+import tillerino.tillerinobot.diff.BeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 
@@ -26,7 +26,7 @@ public class BestmapMetaTest {
 
 	public static BeatmapMeta fakeBeatmapMeta(Integer personalPp) {
 		OsuApiBeatmap beatmap = new OsuApiBeatmap();
-		CBeatmapImpl cBeatmap = new CBeatmapImpl(beatmap, 1.45, 1, 200, 250, false, false, true);
+		BeatmapImpl cBeatmap = new BeatmapImpl(beatmap, 1.45, 1, 200, 250, false, false, true);
 		beatmap.setArtist("Artist");
 		beatmap.setTitle("Title");
 		beatmap.setVersion("Version");
