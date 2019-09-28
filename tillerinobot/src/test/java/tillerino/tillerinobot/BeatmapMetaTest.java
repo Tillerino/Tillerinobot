@@ -10,7 +10,7 @@ import tillerino.tillerinobot.diff.BeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 
-public class BestmapMetaTest {
+public class BeatmapMetaTest {
 	@Test
 	public void testFuturePpSwitch() throws Exception {
 		BeatmapMeta meta = fakeBeatmapMeta(101);

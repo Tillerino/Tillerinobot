@@ -15,7 +15,7 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import lombok.RequiredArgsConstructor;
-import tillerino.tillerinobot.BestmapMetaTest;
+import tillerino.tillerinobot.BeatmapMetaTest;
 import tillerino.tillerinobot.CommandHandler;
 
 @RequiredArgsConstructor
@@ -58,9 +58,9 @@ public class AllLanguagesTest {
 	@Test
 	public void testOptionals() throws Exception {
 		lang.optionalCommentOnLanguage(new OsuApiUser());
-		lang.optionalCommentOnNP(new OsuApiUser(), BestmapMetaTest.fakeBeatmapMeta(101));
+		lang.optionalCommentOnNP(new OsuApiUser(), BeatmapMetaTest.fakeBeatmapMeta(101));
 		// lang.optionalCommentOnRecommendation(new OsuApiUser(), recommendation)
-		lang.optionalCommentOnWith(new OsuApiUser(), BestmapMetaTest.fakeBeatmapMeta(101));
+		lang.optionalCommentOnWith(new OsuApiUser(), BeatmapMetaTest.fakeBeatmapMeta(101));
 	}
 
 	@Test
