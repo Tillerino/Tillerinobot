@@ -6,6 +6,8 @@
 This project contains the IRC frontend and a growing part of the backend for ppaddict recommendations and similar services.
 The web frontend can be found in the [ppaddict](https://github.com/Tillerino/ppaddict) project.
 
+**Just want to use the bot? Message Tillerino in-game!**
+
 Please visit the [wiki](https://github.com/Tillerino/Tillerinobot/wiki) for documentation.
 
 Join the discussion on [discord](https://discord.gg/0ww19XGd9XsiJ4LI)!
@@ -25,6 +27,6 @@ For the [osu! API](https://github.com/ppy/osu-api/wiki), I rolled my own [Java l
 
 Since it came out, [oppai](https://github.com/Francesco149/oppai) (or rather [a fork](https://github.com/Tillerino/oppai)) is being used to make beatmap difficulty calculation more stable and to calculate difficulties for unranked beatmaps.
 
-## Building/Running Tillerinobot
+## Building/Running Tillerinobot (for developing purposes)
 
-Check out [the wiki](https://github.com/Tillerino/Tillerinobot/wiki/Working-on-Tillerinobot) to find out how to build and run Tillerinobot.
+Check out [the wiki](https://github.com/Tillerino/Tillerinobot/wiki/Working-on-Tillerinobot) to find out how to build and run Tillerinobot locally for developing purposes.
