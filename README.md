@@ -27,6 +27,6 @@ For the [osu! API](https://github.com/ppy/osu-api/wiki), I rolled my own [Java l
 
 Since it came out, [oppai](https://github.com/Francesco149/oppai) (or rather [a fork](https://github.com/Tillerino/oppai)) is being used to make beatmap difficulty calculation more stable and to calculate difficulties for unranked beatmaps.
 
-## Building/Running Tillerinobot
+## Building/Running Tillerinobot (for developing purposes)
 
-Check out [the wiki](https://github.com/Tillerino/Tillerinobot/wiki/Working-on-Tillerinobot) to find out how to build and run Tillerinobot.
+Check out [the wiki](https://github.com/Tillerino/Tillerinobot/wiki/Working-on-Tillerinobot) to find out how to build and run Tillerinobot locally for developing purposes.
