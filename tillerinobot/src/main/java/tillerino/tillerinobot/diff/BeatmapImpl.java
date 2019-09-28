@@ -49,6 +49,11 @@ public class BeatmapImpl implements Beatmap {
 	}
 
 	public double getStarDiff() {
+		if (beatmap.getAimDifficulty() == aim && beatmap.getSpeedDifficulty() == speed) {
+			// we got aim and speed from the API and we're precisely matching the mods
+			// -> star difficulty is correct
+			return beatmap.getStarDifficulty();
+		}
 		return getAim() + getSpeed() + .5 * Math.abs(getAim() - getSpeed());
 	}
 }
