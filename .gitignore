@@ -11,3 +11,4 @@ tillerinobot/tillerinobot-db.json
 /.settings/
 /target/
 /.project
+**/.DS_Store

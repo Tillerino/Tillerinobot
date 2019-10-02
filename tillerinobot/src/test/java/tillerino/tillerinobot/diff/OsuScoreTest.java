@@ -9,9 +9,9 @@ import org.tillerino.osuApiModel.OsuApiScore;
 
 import lombok.Value;
 
-public class CStandardScoreTest {
+public class OsuScoreTest {
 	@Value
-	static class CBeatmapImpl implements CBeatmap {
+	static class CBeatmapImpl implements Beatmap {
 		private int amountHitCircles;
 		private double od;
 		private double ar;
@@ -22,15 +22,15 @@ public class CStandardScoreTest {
 		@Override
 		public double DifficultyAttribute(long mods, int kind) {
 			switch (kind) {
-			case CBeatmap.OD:
+			case Beatmap.OD:
 				return od;
-			case CBeatmap.AR:
+			case Beatmap.AR:
 				return ar;
-			case CBeatmap.Aim:
+			case Beatmap.Aim:
 				return aim;
-			case CBeatmap.Speed:
+			case Beatmap.Speed:
 				return speed;
-			case CBeatmap.MaxCombo:
+			case Beatmap.MaxCombo:
 				return maxMaxCombo;
 			default:
 				throw new RuntimeException("" + kind);
@@ -38,7 +38,7 @@ public class CStandardScoreTest {
 		}
 
 		@Override
-		public int AmountHitCircles() {
+		public int NumHitCircles() {
 			return amountHitCircles;
 		}
 	}
@@ -57,22 +57,22 @@ public class CStandardScoreTest {
 		apiBeatmap.setMaxCombo(2385);
 		apiBeatmap.setOverallDifficulty(8);
 		apiBeatmap.setApproachRate(9);
-		// aim and speed from oppai
+		// aim and speed from API
 		CBeatmapImpl beatmap = new CBeatmapImpl(1646,
 				apiBeatmap.getOverallDifficulty(mods),
-				apiBeatmap.getApproachRate(mods), 3.297445, 3.613207,
+				apiBeatmap.getApproachRate(mods), 3.3820393085479736, 3.7348108291625977,
 				apiBeatmap.getMaxCombo());
-		CStandardScore standardScore = new CStandardScore(score);
-		assertEquals(520.72, standardScore.getPP(beatmap), 1E-2);
+		OsuScore standardScore = new OsuScore(score);
+		assertEquals(566.696, standardScore.getPP(beatmap), 2E-3);
 	}
 
 	@Test
 	public void testFreedomDiveCookiezi() throws Exception {
-		long mods = 16l;
+		long mods = 24l;
 		OsuApiScore score = new OsuApiScore();
-		score.setMaxCombo(2384);
-		score.setCount300(1957);
-		score.setCount100(26);
+		score.setMaxCombo(2385);
+		score.setCount300(1978);
+		score.setCount100(5);
 		score.setCount50(0);
 		score.setCountMiss(0);
 		score.setMods(mods);
@@ -80,13 +80,13 @@ public class CStandardScoreTest {
 		apiBeatmap.setMaxCombo(2385);
 		apiBeatmap.setOverallDifficulty(8);
 		apiBeatmap.setApproachRate(9);
-		// aim and speed from oppai
+		// aim and speed from API
 		CBeatmapImpl beatmap = new CBeatmapImpl(1646,
 				apiBeatmap.getOverallDifficulty(mods),
-				apiBeatmap.getApproachRate(mods), 3.568212, 3.795921,
+				apiBeatmap.getApproachRate(mods), 3.6932241916656494, 3.9626119136810303,
 				apiBeatmap.getMaxCombo());
-		CStandardScore standardScore = new CStandardScore(score);
-		assertEquals(711.35, standardScore.getPP(beatmap), 1E-1);
+		OsuScore standardScore = new OsuScore(score);
+		assertEquals(894.388, standardScore.getPP(beatmap), 2E-3);
 	}
 
 	@Test
@@ -103,12 +103,12 @@ public class CStandardScoreTest {
 		apiBeatmap.setMaxCombo(404);
 		apiBeatmap.setOverallDifficulty(7.0);
 		apiBeatmap.setApproachRate(9);
-		// aim and speed tweaked
+		// aim and speed from API
 		CBeatmapImpl beatmap = new CBeatmapImpl(229,
 				apiBeatmap.getOverallDifficulty(mods),
-				apiBeatmap.getApproachRate(mods), 3.870850244939327,
-				2.8966311118954815, apiBeatmap.getMaxCombo());
-		CStandardScore standardScore = new CStandardScore(score);
-		assertEquals(579, standardScore.getPP(beatmap), 0.5);
+				apiBeatmap.getApproachRate(mods), 3.9397411346435547,
+				2.8928098678588867, apiBeatmap.getMaxCombo());
+		OsuScore standardScore = new OsuScore(score);
+		assertEquals(595.042, standardScore.getPP(beatmap), 2); // we're off pretty far here, but it's better than before
 	}
 }
