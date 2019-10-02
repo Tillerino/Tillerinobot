@@ -146,6 +146,8 @@ public class LoggingTest {
 	public void testTwoMessages() throws Exception {
 		processMessage("other-guy", "send the hug thing");
 
+		verify(out, timeout(1000)).action(anyString(), any());
+
 		assertThatOurLog().hasSize(3);
 
 		assertThatOurLog().element(1)
