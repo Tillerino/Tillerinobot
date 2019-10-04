@@ -100,7 +100,7 @@ public interface CommandHandler {
 	@ToString
 	@SuppressFBWarnings(value = "RCN", justification = "Generated code")
 	public static final class ResponseList implements Response {
-		List<Response> responses = new ArrayList<>();
+		private final List<Response> responses = new ArrayList<>();
 
 		public List<Response> getResponses() {
 			return Collections.unmodifiableList(responses);
