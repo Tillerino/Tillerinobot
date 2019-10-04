@@ -3,6 +3,7 @@ package org.tillerino.ppaddict.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -28,7 +29,9 @@ public class TestAppender extends ConsoleAppender {
 		// the test rather than the event when doing assertions on the Event.
 		event.getMDCCopy();
 		super.append(event);
-		events.add(event);
+		synchronized (events) {
+			events.add(event);
+		}
 	}
 
 	public static Consumer<LoggingEvent> mdc(String key, String value) {
@@ -55,7 +58,13 @@ public class TestAppender extends ConsoleAppender {
 		}
 
 		public ListAssert<LoggingEvent> assertThat() {
-			return Assertions.assertThat(events);
+			return Assertions.assertThat(events());
+		}
+
+		public List<LoggingEvent> events() {
+			synchronized (events) {
+				return Collections.unmodifiableList(new ArrayList<>(events));
+			}
 		}
 	}
 }

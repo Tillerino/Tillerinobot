@@ -13,10 +13,13 @@ import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LoggingEvent;
 import org.assertj.core.api.ListAssert;
+import org.awaitility.Awaitility;
+import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,7 +91,7 @@ public class LoggingTest {
 		processMessage("irc-guy", "!r");
 		assertThat(MDC.get("ping")).isNull();
 
-		assertThatOurLog().hasSize(2);
+		awaitOurLogSize(2);
 
 		assertThatOurLog().first()
 			.satisfies(received("!r"))
@@ -107,7 +110,7 @@ public class LoggingTest {
 	public void testNonHandlerMessage() throws Exception {
 		processMessage("irc-guy", "!not-a-command");
 
-		assertThatOurLog().hasSize(2);
+		awaitOurLogSize(2);
 
 		assertThatOurLog().first()
 			.satisfies(received("!not-a-command"))
@@ -127,7 +130,7 @@ public class LoggingTest {
 	public void testNp() throws Exception {
 		processAction("irc-guy", "is listening to [http://osu.ppy.sh/b/338 title]");
 
-		assertThatOurLog().hasSize(2);
+		awaitOurLogSize(2);
 
 		assertThatOurLog().first()
 			.satisfies(action("is listening to [http://osu.ppy.sh/b/338 title]"))
@@ -148,7 +151,7 @@ public class LoggingTest {
 
 		verify(out, timeout(1000)).action(anyString(), any());
 
-		assertThatOurLog().hasSize(3);
+		awaitOurLogSize(3);
 
 		assertThatOurLog().element(1)
 			.satisfies(mdc("state", "sent"))
@@ -202,9 +205,17 @@ public class LoggingTest {
 				.andThen(event -> assertThat(event.getMessage()).isEqualTo("action: " + message));
 	}
 
+	private void awaitOurLogSize(long size) {
+		Awaitility.await().until(() -> logRule.events().stream().filter(isOurEvent()).count(), new IsEqual<>(size));
+	}
+
 	private ListAssert<LoggingEvent> assertThatOurLog() {
-		return logRule.assertThat().filteredOn(event -> event.getLoggerName().startsWith("tillerino")
-				|| event.getLoggerName().startsWith("org.tillerino"));
+		return logRule.assertThat().filteredOn(isOurEvent());
+	}
+
+	private Predicate<? super LoggingEvent> isOurEvent() {
+		return event -> event.getLoggerName().startsWith("tillerino")
+				|| event.getLoggerName().startsWith("org.tillerino");
 	}
 
 	private <T> Consumer<T> not(Consumer<T> condition) {
