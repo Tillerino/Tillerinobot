@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.pircbotx.Channel;
+import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.ActionEvent;
@@ -82,6 +84,9 @@ public class IrcHooksTest {
 			return null;
 		}).when(eventHandler).onEvent(any());
 		when(user.getNick()).thenReturn("userNick");
+		Configuration<PircBotX> configuration = mock(Configuration.class);
+		when(configuration.getName()).thenReturn("bot_name");
+		when(bot.getConfiguration()).thenReturn(configuration);
 	}
 
 	@Test
@@ -140,6 +145,13 @@ public class IrcHooksTest {
 	public void testJoin() throws Exception {
 		irc.onEvent(mockEvent(JoinEvent.class));
 		verify(eventHandler).onEvent(new Joined(123_000_000, "userNick", 123));
+	}
+
+	@Test
+	public void testJoinBotItself() throws Exception {
+		doReturn("bot_name").when(user).getNick();
+		irc.onEvent(mockEvent(JoinEvent.class));
+		verifyZeroInteractions(eventHandler);
 	}
 
 	@Test

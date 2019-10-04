@@ -1,5 +1,6 @@
 package org.tillerino.ppaddict.chat.irc;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
@@ -136,6 +137,11 @@ public class IrcHooks extends CoreHooks {
 	@Override
 	public void onJoin(JoinEvent event) throws Exception {
 		if (silent) {
+			return;
+		}
+
+		if (Objects.equals(event.getBot().getConfiguration().getName(), event.getUser().getNick())) {
+			// The bot itself joined the channel. This isn't interesting to us.
 			return;
 		}
 
