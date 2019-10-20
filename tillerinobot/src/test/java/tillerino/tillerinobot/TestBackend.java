@@ -272,16 +272,16 @@ public class TestBackend implements BotBackend {
 		}
 		Collection<BareRecommendation> recommendations = new ArrayList<>();
 		for (final BeatmapMeta meta : maps) {
-			final PercentageEstimates est = meta.getEstimates();
+			double _98percentPp = meta.getEstimates().getPP(.98);
 			recommendations.add(new BareRecommendation() {
 				@Override
 				public double getProbability() {
-					return .15 - Math.abs(1 - est.getPP(.98) / equivalent);
+					return .15 - Math.abs(1 - _98percentPp / equivalent);
 				}
 				
 				@Override
 				public Integer getPersonalPP() {
-					return (int) Math.ceil((est.getPP(.98) + equivalent) / 2);
+					return (int) Math.ceil((_98percentPp + equivalent) / 2);
 				}
 				
 				@Override

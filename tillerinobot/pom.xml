@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
-		<version>0.14.0</version>
+		<version>0.15.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot</artifactId>
@@ -51,24 +51,6 @@
 						<goals>
 							<goal>integration-test</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>revision</goal>
-						</goals>
-						<phase>generate-resources</phase>
-						<configuration>
-							<generateGitPropertiesFile>true</generateGitPropertiesFile>
-							<generateGitPropertiesFilename>${project.build.outputDirectory}/tillerinobot.git.properties</generateGitPropertiesFilename>
-							<prefix>tillerinobot.git</prefix>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -169,11 +151,6 @@
 			<version>0.14.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.pircbotx</groupId>
-			<artifactId>pircbotx</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<!-- This overwrites pircbotx' version -->
@@ -256,12 +233,6 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.tillerino.twirc</groupId>
-			<artifactId>twirc-server</artifactId>
-			<version>0.0.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

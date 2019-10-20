@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData;
@@ -30,7 +31,7 @@ public class RecommendHandlerTest {
 		when(userData.getLanguage()).thenReturn(new Default());
 
 		when(userData.getDefaultRecommendationOptions()).thenReturn("dt");
-		new RecommendHandler(manager, mock(LiveActivityEndpoint.class)).handle("r", null, userData);
+		new RecommendHandler(manager, mock(LiveActivityEndpoint.class)).handle("r", mock(OsuApiUser.class), userData);
 		verify(manager).getRecommendation(any(), eq("dt"), any());
 	}
 }

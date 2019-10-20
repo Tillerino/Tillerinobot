@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 public class JettyWebsocketServerResource extends ExternalResource {
 	private final String host;
 
+	/**
+	 * May be zero. In that case, a free port is chosen.
+	 */
 	private final int port;
 
 	private int actualPort = 0;

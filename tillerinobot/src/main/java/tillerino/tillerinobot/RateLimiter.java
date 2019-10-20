@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Singleton;
 
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,13 +60,13 @@ public class RateLimiter {
 	}
 
 	public void setThreadPriority(int priority) {
-		MDC.put("threadPriority", String.valueOf(priority));
+		MDC.put(MdcUtils.MDC_THREAD_PRIORITY, String.valueOf(priority));
 		threadPriority.set(priority);
 	}
 
 	public void clearThreadPriority() {
 		threadPriority.remove();
-		MDC.remove("threadPriority");
+		MDC.remove(MdcUtils.MDC_THREAD_PRIORITY);
 	}
 
 	/**

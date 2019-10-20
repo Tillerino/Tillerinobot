@@ -8,12 +8,12 @@ import javax.inject.Inject;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -35,7 +35,7 @@ public class WithHandler implements CommandHandler {
 			return null;
 		}
 
-		MDC.put(IRCBot.MDC_HANDLER, "with");
+		MDC.put(MdcUtils.MDC_HANDLER, "with");
 		
 		Language lang = userData.getLanguage();
 		
@@ -56,13 +56,13 @@ public class WithHandler implements CommandHandler {
 		if (beatmap.getMods() == 0) {
 			throw new UserException(lang.noInformationForMods());
 		}
-		
-		live.propagateMessageDetails(IRCBot.getEventId(), "!" + originalMessage);
 
+		MdcUtils.getEventId().ifPresent(eventId -> live.propagateMessageDetails(eventId, "!" + originalMessage));
+
+		userData.setLastSongInfo(new BeatmapWithMods(beatmap
+				.getBeatmap().getBeatmapId(), beatmap.getMods()));
 		return new Message(beatmap.formInfoMessage(false, null,
-				userData.getHearts(), null, null, null)).thenRun(
-				() -> userData.setLastSongInfo(new BeatmapWithMods(beatmap
-						.getBeatmap().getBeatmapId(), beatmap.getMods())))
+				userData.getHearts(), null, null, null))
 				.then(lang.optionalCommentOnWith(apiUser, beatmap));
 	}
 

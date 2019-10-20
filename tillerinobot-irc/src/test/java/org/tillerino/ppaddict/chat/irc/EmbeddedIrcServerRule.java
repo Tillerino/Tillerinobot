@@ -1,4 +1,4 @@
-package tillerino.tillerinobot;
+package org.tillerino.ppaddict.chat.irc;
 
 import static org.junit.Assert.assertFalse;
 

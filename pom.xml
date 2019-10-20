@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot-parent</artifactId>
-	<version>0.14.0</version>
+	<version>0.15.0</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -103,6 +103,24 @@
 				<artifactId>pitest-maven</artifactId>
 				<version>1.3.2</version>
 			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<generateGitPropertiesFile>true</generateGitPropertiesFile>
+							<generateGitPropertiesFilename>${project.build.outputDirectory}/${artifactId}.git.properties</generateGitPropertiesFilename>
+							<prefix>${artifactId}.git</prefix>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -185,9 +203,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>2.11.2</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

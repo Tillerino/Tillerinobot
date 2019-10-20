@@ -9,11 +9,11 @@ import javax.inject.Inject;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
@@ -40,7 +40,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 	@Override
 	public Response handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException, InterruptedException {
-		MDC.put(IRCBot.MDC_HANDLER, MDC_FLAG);
+		MDC.put(MdcUtils.MDC_HANDLER, MDC_FLAG);
 
 		Language lang = userData.getLanguage();
 
@@ -58,7 +58,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 			 * the message making the message anonymous as can be.
 			 */
 			manager.parseSamplerSettings(apiUser, remaining, lang);
-			liveActivity.propagateMessageDetails(IRCBot.getEventId(), "!" + originalCommand);
+			MdcUtils.getEventId().ifPresent(eventId -> liveActivity.propagateMessageDetails(eventId, "!" + originalCommand));
 		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,
@@ -80,16 +80,14 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 					.getMods(recommendation.bareRecommendation.getMods()));
 		}
 
+		userData.setLastSongInfo(new BeatmapWithMods(beatmap
+				.getBeatmap().getBeatmapId(), beatmap.getMods()));
+		manager.saveGivenRecommendation(apiUser.getUserId(),
+				beatmap.getBeatmap().getBeatmapId(),
+				recommendation.bareRecommendation.getMods());
 		return new Success(beatmap.formInfoMessage(true, addition,
 						userData.getHearts(), null, null, null))
-				.thenRun(() -> 
-					userData.setLastSongInfo(new BeatmapWithMods(beatmap
-							.getBeatmap().getBeatmapId(), beatmap.getMods())))
-				.thenRunAsync(() -> 
-					manager.saveGivenRecommendation(apiUser.getUserId(),
-							beatmap.getBeatmap().getBeatmapId(),
-							recommendation.bareRecommendation.getMods())).
-				then(lang.optionalCommentOnRecommendation(apiUser, recommendation));
+				.then(lang.optionalCommentOnRecommendation(apiUser, recommendation));
 	}
 
 }

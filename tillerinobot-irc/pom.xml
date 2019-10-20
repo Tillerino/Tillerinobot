@@ -5,8 +5,91 @@
 	<parent>
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
-		<version>0.14.0</version>
+		<version>0.15.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot-irc</artifactId>
+
+	<dependencies>
+		<!-- Internal -->
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot</artifactId>
+			<version>0.15.0</version>
+		</dependency>
+
+		<!-- APIs and annotations -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Specific dependencies -->
+		<dependency>
+			<groupId>org.pircbotx</groupId>
+			<artifactId>pircbotx</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot</artifactId>
+			<version>0.15.0</version>
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-jetty-http</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-moxy</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.ext</groupId>
+			<artifactId>jersey-proxy-client</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>javax-websocket-server-impl</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tillerino.twirc</groupId>
+			<artifactId>twirc-server</artifactId>
+			<version>0.0.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

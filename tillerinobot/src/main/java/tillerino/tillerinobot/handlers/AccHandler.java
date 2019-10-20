@@ -9,16 +9,16 @@ import javax.inject.Inject;
 
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
-import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
@@ -32,14 +32,14 @@ public class AccHandler implements CommandHandler {
 	static Pattern superExtended = Pattern.compile("(\\d+)x100\\s+(?:(\\d+)x50\\s+)?(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 
 	@Override
-	public Response handle(String message, OsuApiUser apiUser,
+	public Response handle(String originalMessage, OsuApiUser apiUser,
 			UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
-		if (!message.toLowerCase().startsWith("acc")) {
+		if (!originalMessage.toLowerCase().startsWith("acc")) {
 			return null;
 		}
 		
-		MDC.put(IRCBot.MDC_HANDLER, "acc");
+		MDC.put(MdcUtils.MDC_HANDLER, "acc");
 		
 		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 		Language lang = userData.getLanguage();
@@ -51,9 +51,9 @@ public class AccHandler implements CommandHandler {
 			throw new RareUserException(lang.excuseForError());
 		}
 
-		live.propagateMessageDetails(IRCBot.getEventId(), "!" + message);
+		MdcUtils.getEventId().ifPresent(eventId -> live.propagateMessageDetails(eventId, "!" + originalMessage));
 
-		message = message.substring(3).trim().replace(',', '.');
+		String message = originalMessage.substring(3).trim().replace(',', '.');
 		Matcher extendedMatcher = extended.matcher(message);
 		Matcher superExtendedMatcher = superExtended.matcher(message);
 		if(extendedMatcher.matches()) {

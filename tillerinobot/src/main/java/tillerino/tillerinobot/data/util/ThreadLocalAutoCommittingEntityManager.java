@@ -39,7 +39,7 @@ import tillerino.tillerinobot.IRCBot;
  * a thread-local version of the repository classes, since those are only
  * created at run-time. This means that the thread-local EntityManager instance
  * needs to be set at some point. It is set in
- * {@link IRCBot#onEvent(org.pircbotx.hooks.Event)}, which covers the entire IRC
+ * {@link IRCBot#onEvent(org.tillerino.ppaddict.chat.GameChatEvent)}, which covers the entire IRC
  * frontend. For the REST API, the EntityManager is set in the
  * {@link EntityManagerProxyFeature}.
  * </p>
@@ -318,8 +318,10 @@ public class ThreadLocalAutoCommittingEntityManager implements
 		});
 	}
 
-	public void setThreadLocalEntityManager(EntityManager em) {
+	public EntityManager setThreadLocalEntityManager(EntityManager em) {
+		EntityManager old = entityManager.get();
 		entityManager.set(em);
+		return old;
 	}
 	
 	public boolean isThreadLocalEntityManagerPresent() {
@@ -369,5 +371,10 @@ public class ThreadLocalAutoCommittingEntityManager implements
 			r.run();
 			return null;
 		});
+	}
+
+	public void closeAndReplace(EntityManager em) {
+		close();
+		setThreadLocalEntityManager(em);
 	}
 }

@@ -49,10 +49,9 @@ public class RecentHandler implements CommandHandler {
 			throw new UserException(language.noInformationForMods());
 		}
 
+		userData.setLastSongInfo(estimates.getBeatmapWithMods());
 		return new Success(estimates.formInfoMessage(false, null,
-				userData.getHearts(), score.getAccuracy(), null, null))
-				.thenRun(() -> userData.setLastSongInfo(estimates
-						.getBeatmapWithMods()));
+				userData.getHearts(), score.getAccuracy(), null, null));
 	}
 
 }

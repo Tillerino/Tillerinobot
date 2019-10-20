@@ -1,16 +1,17 @@
 package tillerino.tillerinobot;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.net.Socket;
 import java.net.URI;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -26,19 +27,18 @@ import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.pircbotx.Configuration;
-import org.pircbotx.User;
-import org.pircbotx.hooks.Event;
-import org.pircbotx.hooks.events.ActionEvent;
-import org.pircbotx.hooks.events.ConnectEvent;
-import org.pircbotx.hooks.events.DisconnectEvent;
-import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
-import org.pircbotx.hooks.events.UnknownEvent;
-import org.pircbotx.output.OutputIRC;
-import org.pircbotx.output.OutputUser;
+import org.tillerino.ppaddict.chat.GameChatEvent;
+import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.Joined;
+import org.tillerino.ppaddict.chat.PrivateAction;
+import org.tillerino.ppaddict.chat.PrivateMessage;
+import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
+import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
+import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
+import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
+import org.tillerino.ppaddict.util.Clock;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -48,7 +48,6 @@ import com.google.inject.name.Names;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-import tillerino.tillerinobot.BotRunnerImpl.CloseableBot;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
@@ -65,37 +64,36 @@ import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
  */
 @Slf4j
 public class LocalConsoleTillerinobot extends AbstractModule {
-	static class PircBotX extends CloseableBot {
-		public PircBotX(
-				Configuration<? extends org.pircbotx.PircBotX> configuration) {
-			super(configuration);
-		}
-
-		@Override
-		public void sendRawLineToServer(String line) {
-			super.sendRawLineToServer(line);
-		}
-	}
 
 	@Override
 	protected void configure() {
 		install(new CreateInMemoryDatabaseModule());
 		install(new TillerinobotConfigurationModule());
+		install(new InMemoryQueuesModule());
 		
-		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore"))
-				.toInstance(false);
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
+		bind(Clock.class).toInstance(createClock());
 		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
-				.toInstance(Executors.newSingleThreadExecutor(r -> { Thread thread = new Thread(r); thread.setDaemon(true); return thread; }));
+				.toInstance(Executors.newSingleThreadExecutor(threadFactory("maintenance")));
+		bind(ExecutorService.class).annotatedWith(Names.named("core"))
+				.toInstance(Executors.newFixedThreadPool(4, threadFactory("core")));
 		bind(AuthenticationService.class).toInstance(key -> {
 			if (key.equals("testKey")) {
 				return new Authorization(false);
 			}
 			throw new NotFoundException();
 		});
+	}
+
+	protected Clock createClock() {
+		return Clock.system();
+	}
+
+	static ThreadFactory threadFactory(String name) {
+		return r -> { Thread thread = new Thread(r, name); thread.setDaemon(true); return thread; };
 	}
 
 	@Provides
@@ -113,73 +111,37 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 	@Provides
 	@Singleton
-	public BotRunner getRunner(final IRCBot bot, final BotBackend backend,
+	public GameChatWriter writer() throws Exception {
+		GameChatWriter writer = mock(GameChatWriter.class);
+		doAnswer(invocation -> {
+			System.out.println("*Tillerino " + invocation.getArguments()[0]);
+			return null;
+		}).when(writer).action(anyString(), any());
+		doAnswer(invocation -> {
+			System.out.println("Tillerino: " + invocation.getArguments()[0]);
+			return null;
+		}).when(writer).message(anyString(), any());
+		return writer;
+	}
+
+	@Provides
+	@Singleton
+	public BotRunner getRunner(MessagePreprocessor preprocessor, final BotBackend backend,
 			final IrcNameResolver resolver, EntityManagerFactory emf,
 			ThreadLocalAutoCommittingEntityManager em,
 			@Named("tillerinobot.git.commit.id.abbrev") String commit,
 			@Named("tillerinobot.git.commit.message.short") String commitMessage) throws Exception {
-		final PircBotX pircBot = mock(PircBotX.class);
-		when(pircBot.isConnected()).thenReturn(true);
-		when(pircBot.getSocket()).thenReturn(mock(Socket.class));
-
-		doAnswer(invocation -> {
-			String message = (String) invocation.getArguments()[0];
-
-			@SuppressWarnings("unchecked")
-			UnknownEvent<PircBotX> event = mock(UnknownEvent.class);
-
-			Thread.sleep((long) (Math.random() * 1000));
-
-			when(event.getLine()).thenReturn(" PONG" + message.substring(4));
-
-			bot.pinger.handleUnknownEvent(event);
-
-			return null;
-		}).when(pircBot).sendRawLineToServer(anyString());
 
 		final AtomicBoolean running = new AtomicBoolean(true);
 
-		{
-			// QUITTING
-    		OutputIRC outputIRC = mock(OutputIRC.class);
-			doAnswer(invocation -> {
-				@SuppressWarnings("unchecked")
-				DisconnectEvent<PircBotX> event = mock(DisconnectEvent.class);
-				bot.onEvent(event);
-				running.set(false);
-				return null;
-			}).when(outputIRC).quitServer();
-    		when(pircBot.sendIRC()).thenReturn(outputIRC);
-		}
-		
-		final User user = mock(User.class);
-		when(user.getBot()).thenReturn(pircBot);
-		
-		{
-			// USER MESSAGES AND ACTIONS
-    		OutputUser outputUser = mock(OutputUser.class);
-    		when(user.send()).thenReturn(outputUser);
-			doAnswer(invocation -> {
-				System.out.println("*Tillerino " + invocation.getArguments()[0]);
-				return null;
-			}).when(outputUser).action(anyString());
-    		
-			doAnswer(invocation -> {
-				System.out.println("Tillerino: " + invocation.getArguments()[0]);
-				return null;
-			}).when(outputUser).message(anyString());
-		}
 		
 		BotRunner runner = mock(BotRunner.class);
-		when(runner.getBot()).thenReturn(pircBot);
 		doAnswer(new Answer<Void>() {
+			String username;
+
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				log.info("Starting Tillerinobot {}: {}", commit, commitMessage);
-				@SuppressWarnings("unchecked")
-				ConnectEvent<PircBotX> event = mock(ConnectEvent.class);
-				when(event.getBot()).thenReturn(pircBot);
-				dispatch(event);
 
 				try (Scanner scanner = new Scanner(System.in)) {
 					for (; running.get() && userLoop(scanner);)
@@ -190,8 +152,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 			private boolean userLoop(Scanner scanner) throws Exception {
 				System.out.println("please provide your name:");
-				final String username = scanner.nextLine();
-				when(user.getNick()).thenReturn(username);
+				username = scanner.nextLine();
 
 				em.setThreadLocalEntityManager(emf.createEntityManager());
 				if (resolver.resolveIRCName(username) == null
@@ -221,12 +182,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				System.out.println("-----------------");
 
 				{
-					// JOIN EVENT
-					@SuppressWarnings("unchecked")
-					JoinEvent<PircBotX> event = mock(JoinEvent.class);
-					when(event.getBot()).thenReturn(pircBot);
-					when(event.getUser()).thenReturn(user);
-					dispatch(event);
+					dispatch(new Joined(System.currentTimeMillis(), username, System.currentTimeMillis()));
 				}
 
 				if (inputLoop(scanner)) {
@@ -241,55 +197,40 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 					String line = scanner.nextLine();
 					
 					if(line.startsWith("/np ")) {
-						@SuppressWarnings("unchecked")
-						ActionEvent<PircBotX> event = mock(ActionEvent.class);
-						when(event.getUser()).thenReturn(user);
-						when(event.getBot()).thenReturn(pircBot);
-						when(event.getTimestamp()).thenReturn(System.currentTimeMillis());
-						when(event.getMessage()).thenReturn("is listening to [http://osu.ppy.sh/b/" + line.substring(4) + " title]");
-						dispatch(event);
+						dispatch(new PrivateAction(System.currentTimeMillis(), username, System.currentTimeMillis(), "is listening to [http://osu.ppy.sh/b/" + line.substring(4) + " title]"));
 					} else if(line.startsWith("/nps ")) {
-						@SuppressWarnings("unchecked")
-						ActionEvent<PircBotX> event = mock(ActionEvent.class);
-						when(event.getUser()).thenReturn(user);
-						when(event.getBot()).thenReturn(pircBot);
-						when(event.getTimestamp()).thenReturn(System.currentTimeMillis());
-						when(event.getMessage()).thenReturn("is listening to [https://osu.ppy.sh/b/" + line.substring(5) + " title]");
-						dispatch(event);
+						dispatch(new PrivateAction(System.currentTimeMillis(), username, System.currentTimeMillis(), "is listening to [https://osu.ppy.sh/b/" + line.substring(4) + " title]"));
 					} else if(line.startsWith("/q")) {
-						pircBot.sendIRC().quitServer();
-						} else if (line.startsWith("/r")) {
-							return false;
+						runner.disconnectSoftly();
 					} else {
-						@SuppressWarnings("unchecked")
-						PrivateMessageEvent<PircBotX> event = mock(PrivateMessageEvent.class);
-						when(event.getUser()).thenReturn(user);
-						when(event.getBot()).thenReturn(pircBot);
-						when(event.getMessage()).thenReturn(line);
-						when(event.getTimestamp()).thenReturn(System.currentTimeMillis());
-						dispatch(event);
+						dispatch(new PrivateMessage(System.currentTimeMillis(), username, System.currentTimeMillis(), line));
 					}
 				}
 				return true;
 			}
-			
-			ExecutorService exec = Executors.newCachedThreadPool(r -> {
-				Thread t = new Thread(r);
-				t.setDaemon(true);
-				return t;
-			});
 
-			void dispatch(@SuppressWarnings("rawtypes") final Event e) {
+			ExecutorService exec = singleThreadExecutor("bot event loop");
+
+			void dispatch(GameChatEvent event) {
 				exec.submit(() -> {
 					try {
-						bot.onEvent(e);
+						preprocessor.onEvent(event);
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 				});
 			}
 		}).when(runner).run();
+		doAnswer(x -> {
+			running.set(false);
+			return null;
+		}).when(runner).disconnectSoftly();
+		doAnswer(x -> running.get()).when(runner).isConnected();
 		return runner;
+	}
+
+	static ExecutorService singleThreadExecutor(String name) {
+		return Executors.newSingleThreadExecutor(threadFactory(name));
 	}
 
 	/**
@@ -314,6 +255,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		websocketServer.start();
 		websocketServer.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
 
+		singleThreadExecutor("event queue").submit(injector.getInstance(LocalGameChatEventQueue.class));
+		singleThreadExecutor("response queue").submit(injector.getInstance(LocalGameChatResponseQueue.class));
 		injector.getInstance(BotRunner.class).run();
 		
 		apiServer.stop();

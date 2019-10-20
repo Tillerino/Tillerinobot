@@ -1,10 +1,12 @@
 package tillerino.tillerinobot;
 
-import javax.annotation.CheckForNull;
-
-import org.pircbotx.PircBotX;
-
 public interface BotRunner extends TidyObject, Runnable {
-	@CheckForNull
-	PircBotX getBot();
+	boolean isConnected();
+
+	/**
+	 * Disconnects from the server in a soft manner. I.e. logs out / quits
+	 * orderly. A "hard" disconnect would just close any open socket
+	 * connections.
+	 */
+	void disconnectSoftly();
 }

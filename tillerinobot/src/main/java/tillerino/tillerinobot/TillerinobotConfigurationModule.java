@@ -16,6 +16,7 @@ public class TillerinobotConfigurationModule extends AbstractModule {
 	protected void configure() {
 		loadProperties("/tillerinobot.git.properties", binder(), false);
 		loadProperties("/tillerinobot.properties", binder(), true);
+		Names.bindProperties(binder(), System.getProperties());
 		loadFromEnvironmentVariable("TILLERINOBOT_IRC_SERVER", "tillerinobot.irc.server", binder());
 		loadFromEnvironmentVariable("TILLERINOBOT_IRC_PORT", "tillerinobot.irc.port", binder());
 		loadFromEnvironmentVariable("TILLERINOBOT_IRC_NICKNAME", "tillerinobot.irc.nickname", binder());
