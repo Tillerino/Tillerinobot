@@ -71,7 +71,7 @@ public class LoggingTest {
 
 		in = injector.getInstance(MessagePreprocessor.class);
 		out = injector.getInstance(GameChatWriter.class);
-		assertTrue(new MockUtil().isMock(out));
+		assertTrue(MockUtil.isMock(out));
 		backend = (TestBackend) injector.getInstance(BotBackend.class);
 		exec.submit(injector.getInstance(LocalGameChatEventQueue.class));
 		exec.submit(injector.getInstance(LocalGameChatResponseQueue.class));

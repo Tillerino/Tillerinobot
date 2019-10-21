@@ -1,19 +1,19 @@
 package tillerino.tillerinobot.handlers;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.regex.Matcher;
 
 import org.junit.Test;
-import org.mockito.internal.matchers.Contains;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import tillerino.tillerinobot.BeatmapMeta;
@@ -51,7 +51,7 @@ public class AccHandlerTest {
 		
 		UserData userData = mock(UserData.class);
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
-		assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData)).getContent(), new Contains("800x"));
+		assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData)).getContent(), containsString("800x"));
 	}
 	
 	@Test(expected=UserException.class)
@@ -66,7 +66,7 @@ public class AccHandlerTest {
 			new AccHandler(backend, mock(LiveActivityEndpoint.class)).handle("acc 99 80000000000000000000x 1m", null, userData);
 			fail();
 		} catch (Exception e) {
-			assertThat(e.getMessage(), new Contains("800000000000"));
+			assertThat(e.getMessage(), containsString("800000000000"));
 			throw e;
 		}
 	}
