@@ -48,6 +48,7 @@ public class LocalGameChatEventQueue extends LoopingRunnable implements GameChat
 	protected void loop() throws InterruptedException {
 		GameChatEvent event = queue.take();
 		coreExecutorService.submit(() -> {
+			botInfo.setEventQueueSize(size());
 			try (MdcAttributes mdc = event.getMeta().getMdc().apply()) {
 				coreHandler.onEvent(event);
 			} catch (Throwable e) {

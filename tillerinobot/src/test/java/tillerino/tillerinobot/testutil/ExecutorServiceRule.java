@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import org.awaitility.Awaitility;
 import org.junit.rules.ExternalResource;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 
@@ -15,6 +16,7 @@ import lombok.experimental.Delegate;
  */
 @RequiredArgsConstructor
 public class ExecutorServiceRule extends ExternalResource implements ExecutorService {
+	@Getter
 	@Delegate(types = ExecutorService.class)
 	private ExecutorService exec;
 
