@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +46,7 @@ public class AccHandlerTest {
 		BotBackend backend = mock(BotBackend.class);
 		OsuApiBeatmap beatmap = new OsuApiBeatmap();
 		beatmap.setMaxCombo(100);
-		when(backend.loadBeatmap(anyInt(), anyLong(), any(Language.class)))
+		when(backend.loadBeatmap(anyInt(), anyLong(), isNull()))
 				.thenReturn(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)));
 		AccHandler accHandler = new AccHandler(backend, mock(LiveActivityEndpoint.class));
 		
