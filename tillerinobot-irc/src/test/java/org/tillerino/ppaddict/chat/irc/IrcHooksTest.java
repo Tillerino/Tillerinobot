@@ -131,28 +131,28 @@ public class IrcHooksTest {
 	public void testPrivateMessage() throws Exception {
 		irc.onEvent(mockPrivateMessage("pm"));
 		verify(botInfo).setLastReceivedMessage(123);
-		verify(eventHandler).onEvent(new PrivateMessage(123_000_000, "userNick", 123, "pm"));
+		verify(eventHandler).onEvent(new PrivateMessage(12_300, "userNick", 123, "pm"));
 
 		// check if the event ID increments
 		irc.onEvent(mockPrivateMessage("pm2"));
-		verify(eventHandler).onEvent(new PrivateMessage(123_000_001, "userNick", 123, "pm2"));
+		verify(eventHandler).onEvent(new PrivateMessage(12_301, "userNick", 123, "pm2"));
 	}
 
 	@Test
 	public void testPrivateAction() throws Exception {
 		irc.onEvent(mockPrivateAction("pa"));
 		verify(botInfo).setLastReceivedMessage(123);
-		verify(eventHandler).onEvent(new PrivateAction(123_000_000, "userNick", 123, "pa"));
+		verify(eventHandler).onEvent(new PrivateAction(12_300, "userNick", 123, "pa"));
 
 		// check if the event ID increments
 		irc.onEvent(mockPrivateAction("pa2"));
-		verify(eventHandler).onEvent(new PrivateAction(123_000_001, "userNick", 123, "pa2"));
+		verify(eventHandler).onEvent(new PrivateAction(12_301, "userNick", 123, "pa2"));
 	}
 
 	@Test
 	public void testJoin() throws Exception {
 		irc.onEvent(mockEvent(JoinEvent.class));
-		verify(eventHandler).onEvent(new Joined(123_000_000, "userNick", 123));
+		verify(eventHandler).onEvent(new Joined(12_300, "userNick", 123));
 	}
 
 	@Test
@@ -176,9 +176,9 @@ public class IrcHooksTest {
 		when(event.getParsedResponse()).thenReturn(ImmutableList.of("stuff", "nick1 @nick2 +nick3"));
 		when(event.getCode()).thenReturn(353);
 		irc.onEvent(event);
-		verify(eventHandler).onEvent(new Sighted(123_000_000, "nick1", 123));
-		verify(eventHandler).onEvent(new Sighted(123_000_001, "nick2", 123));
-		verify(eventHandler).onEvent(new Sighted(123_000_002, "nick3", 123));
+		verify(eventHandler).onEvent(new Sighted(12_300, "nick1", 123));
+		verify(eventHandler).onEvent(new Sighted(12_301, "nick2", 123));
+		verify(eventHandler).onEvent(new Sighted(12_302, "nick3", 123));
 	}
 
 	@Test
@@ -193,7 +193,7 @@ public class IrcHooksTest {
 	public void eventIdIsPutIntoMdc() throws Exception {
 		irc.onEvent(mockPrivateMessage(""));
 
-		verify(mdc).accept(ImmutableMap.of("event", "123000000", "user", "userNick"));
+		verify(mdc).accept(ImmutableMap.of("event", "12300", "user", "userNick"));
 
 		assertThat(MDC.getCopyOfContextMap()).isNullOrEmpty();
 	}

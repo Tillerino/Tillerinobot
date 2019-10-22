@@ -63,7 +63,25 @@ public class IrcHooks extends CoreHooks {
 		this.botInfo = botInfo;
 		this.queue = queue;
 		this.pinger = pinger;
-		lastSerial = new AtomicLong(clock.currentTimeMillis() * 1_000_000);
+		// We want to assign serial numbers to incoming events without repeating
+		// serial numbers and without remembering serial numbers across restarts.
+		// One possibility is to take the current time, multiply it by X and then
+		// increment it for each event. If we take the current time in milliseconds
+		// we wil not repeat a serial number as long as we stay below 1000 * X events
+		// per second on average.
+		// Now here's the tricky part:
+		// We use this serial in the JavaScript monitoring frontend.
+		// Turns out JavaScript represents _all numbers_ as 64 bit FP numbers.
+		// This means that we only have 51 significant bits which is ~15 digits.
+		// Current time in millis, e.g. 1571728442000 has 13 digits.
+		// So we can choose X = 100 and increase the digits to 15 and still be safe in JS.
+		// In this case safe = each serial number will be represented as a _different_
+		// number in JS.
+		// So here we need to stay below 100_000 events per second on average. This
+		// is a pretty safe ceiling.
+		// Although we lose a bit of head room we do all of this in base 10 for better
+		// debuggability.
+		lastSerial = new AtomicLong(clock.currentTimeMillis() * 100);
 		lastListTime = new AtomicLong(clock.currentTimeMillis());
 	}
 
