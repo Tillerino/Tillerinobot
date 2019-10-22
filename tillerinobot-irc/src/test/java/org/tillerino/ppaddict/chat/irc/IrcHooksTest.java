@@ -1,8 +1,16 @@
 package org.tillerino.ppaddict.chat.irc;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -11,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -116,7 +124,7 @@ public class IrcHooksTest {
 		verify(botInfo).setLastInteraction(123);
 		verify(botInfo).setLastReceivedMessage(123);
 		// plain (non-private) messages are not handled
-		verifyZeroInteractions(eventHandler);
+		verifyNoInteractions(eventHandler);
 	}
 
 	@Test
@@ -151,7 +159,7 @@ public class IrcHooksTest {
 	public void testJoinBotItself() throws Exception {
 		doReturn("bot_name").when(user).getNick();
 		irc.onEvent(mockEvent(JoinEvent.class));
-		verifyZeroInteractions(eventHandler);
+		verifyNoInteractions(eventHandler);
 	}
 
 	@Test
@@ -159,7 +167,7 @@ public class IrcHooksTest {
 		ActionEvent event = mockPrivateAction("pa");
 		when(event.getChannel()).thenReturn(mock(Channel.class));
 		irc.onEvent(event);
-		verifyZeroInteractions(eventHandler);
+		verifyNoInteractions(eventHandler);
 	}
 
 	@Test
@@ -176,9 +184,9 @@ public class IrcHooksTest {
 	@Test
 	public void testOtherServerResponses() throws Exception {
 		ServerResponseEvent event = mockEvent(ServerResponseEvent.class);
-		when(event.getParsedResponse()).thenReturn(ImmutableList.of("whatever"));
+		lenient().when(event.getParsedResponse()).thenReturn(ImmutableList.of("whatever"));
 		irc.onEvent(event);
-		verifyZeroInteractions(eventHandler);
+		verifyNoInteractions(eventHandler);
 	}
 
 	@Test
