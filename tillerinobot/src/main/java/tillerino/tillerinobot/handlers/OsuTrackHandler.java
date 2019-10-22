@@ -2,6 +2,7 @@ package tillerino.tillerinobot.handlers;
 
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import tillerino.tillerinobot.CommandHandler;
@@ -27,7 +28,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
     }
 
     @Override
-    public Response handleArgument(String originalCommand, String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+    public GameChatResponse handleArgument(String originalCommand, String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
         MDC.put(MdcUtils.MDC_HANDLER, "u");
 
         String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();
@@ -36,7 +37,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
         return updateResultToResponse(update);
     }
 
-    public static Response updateResultToResponse(UpdateResult update) {
+    public static GameChatResponse updateResultToResponse(UpdateResult update) {
         if (!update.isExists()) {
             return new Success(String.format("The user %s can't be found.  Try replaced spaces with underscores and try again.", update.getUsername()));
         }
@@ -51,7 +52,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
                 update.getPlayCount(),
                 update.getUsername()
         );
-        Response response = new Success(mainMessage);
+        GameChatResponse response = new Success(mainMessage);
         if (update.getNewHighscores() != null && !update.getNewHighscores().isEmpty()) {
             List<Highscore> newHighscores = update.getNewHighscores();
             StringBuilder highscoreMessageBuilder = new StringBuilder();

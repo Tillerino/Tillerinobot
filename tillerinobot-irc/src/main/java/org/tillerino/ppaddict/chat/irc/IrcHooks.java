@@ -19,11 +19,13 @@ import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.GameChatEventConsumer;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
-import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
@@ -33,8 +35,6 @@ import com.google.common.collect.ImmutableList;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.BotBackend.IRCName;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 /**
  * Feeds the {@link MessagePreprocessor} from an IRC client.
@@ -42,8 +42,8 @@ import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 @SuppressWarnings("rawtypes")
 @Slf4j
 public class IrcHooks extends CoreHooks {
-	private final MessagePreprocessor downStream;
-	private final BotInfo botInfo;
+	private final GameChatEventConsumer downStream;
+	private final GameChatMetrics botInfo;
 	private final IrcWriter queue;
 	private final boolean silent;
 	private final Pinger pinger;
@@ -52,8 +52,8 @@ public class IrcHooks extends CoreHooks {
 	private final AtomicLong lastListTime;
 
 	@Inject
-	public IrcHooks(MessagePreprocessor downStream,
-			BotInfo botInfo,
+	public IrcHooks(@Named("messagePreprocessor") GameChatEventConsumer downStream,
+			GameChatMetrics botInfo,
 			Pinger pinger,
 			@Named("tillerinobot.ignore") boolean silent,
 			IrcWriter queue,

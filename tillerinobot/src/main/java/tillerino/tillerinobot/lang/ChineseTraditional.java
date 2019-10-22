@@ -5,10 +5,10 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author Tomoka Rin leoyao321@gmail.com https://osu.ppy.sh/u/125308
@@ -43,7 +43,7 @@ public class ChineseTraditional extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+	public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
 			return new Message("哈囉!");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -112,7 +112,7 @@ public class ChineseTraditional extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response hug(OsuApiUser apiUser) {
+	public GameChatResponse hug(OsuApiUser apiUser) {
 		return new Message("可以來我這邊一下嗎?")
 			.then(new Action("抱" + apiUser.getUserName()));
 	}

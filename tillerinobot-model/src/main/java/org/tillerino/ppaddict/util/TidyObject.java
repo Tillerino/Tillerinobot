@@ -1,4 +1,4 @@
-package tillerino.tillerinobot;
+package org.tillerino.ppaddict.util;
 
 import java.lang.ref.WeakReference;
 

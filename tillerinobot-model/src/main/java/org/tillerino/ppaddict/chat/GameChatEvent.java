@@ -2,7 +2,6 @@ package org.tillerino.ppaddict.chat;
 
 import lombok.Data;
 import lombok.Getter;
-import tillerino.tillerinobot.BotBackend.IRCName;
 
 @Data
 public abstract class GameChatEvent {

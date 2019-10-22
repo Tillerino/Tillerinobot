@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 	}
 
 	@Override
-	public Response handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException, InterruptedException {
 		MDC.put(MdcUtils.MDC_HANDLER, MDC_FLAG);
 

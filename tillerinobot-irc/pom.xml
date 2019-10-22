@@ -14,7 +14,7 @@
 		<!-- Internal -->
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
-			<artifactId>tillerinobot</artifactId>
+			<artifactId>tillerinobot-model</artifactId>
 			<version>0.15.0</version>
 		</dependency>
 
@@ -38,7 +38,14 @@
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot</artifactId>
 			<version>0.15.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot</artifactId>
+			<version>0.15.0</version>
 			<classifier>tests</classifier>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>

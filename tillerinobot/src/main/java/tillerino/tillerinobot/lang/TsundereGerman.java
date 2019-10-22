@@ -4,12 +4,11 @@ import java.util.List;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.NoResponse;
-import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 import javax.annotation.Nonnull;
@@ -145,7 +144,7 @@ public class TsundereGerman extends TsundereBase {
 	
 	@Nonnull
 	@Override
-	protected Response getHugResponseForHugLevel(String username, int hugLevel) {
+	protected GameChatResponse getHugResponseForHugLevel(String username, int hugLevel) {
 		switch (hugLevel) {
 			default:
 				return new Action("Ignoriert " + username + "s Versuch einer Umarmung komplett.");
@@ -217,9 +216,9 @@ public class TsundereGerman extends TsundereBase {
 	}
 
 	@Override
-	public Response optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
+	public GameChatResponse optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
 		if (Math.random() > 0.25) {
-			return new NoResponse();
+			return GameChatResponse.none();
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20.0);
@@ -228,14 +227,14 @@ public class TsundereGerman extends TsundereBase {
 		} else if (estimates.getPP(1) / typicalPP < 0.333) {
 			return new Message("Diese Map zu spielen wird mich nicht sonderlich beeindrucken... n-n-nicht dass ich das wollen würde.");
 		}
-		return new NoResponse();
+		return GameChatResponse.none();
 	}
 	
 	@Override
-	public Response optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
+	public GameChatResponse optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
 		//The following checks are probably redundant, but they don't hurt anyone either.
 		if (Math.random() > 0.25) {
-			return new NoResponse();
+			return GameChatResponse.none();
 		}
 		PercentageEstimates estimates = meta.getEstimates();
 		double typicalPP = (apiUser.getPp() / 20);
@@ -244,11 +243,11 @@ public class TsundereGerman extends TsundereBase {
 		} else if (estimates.getPP(1) / typicalPP < 0.5) {
 			return new Message("Wenn du wie ein Baby behandelt werden willst, hättest du einfach fragen müssen... Nein, fang einfach an zu spielen.");
 		}
-		return new NoResponse();
+		return GameChatResponse.none();
 	}
 	
 	@Override
-	protected Response getOptionalCommentOnRecommendationResponse(int recentRecommendations) {
+	protected GameChatResponse getOptionalCommentOnRecommendationResponse(int recentRecommendations) {
 		switch (recentRecommendations) {
 			case 7:
 				return new Message("Ich hab viel Freizeit. Ich würde nie Maps raussuchen weil ich dich mag... r-r-rein hypothetisch.");
@@ -261,7 +260,7 @@ public class TsundereGerman extends TsundereBase {
 			case 173:
 				return new Message("Kannst mich einfach nicht allein lassen, was? Ich d-denke das ist okay. Aber wag es nicht, das jemandem zu erzählen!");
 			default:
-				return new NoResponse();
+				return GameChatResponse.none();
 		}
 	}
 
@@ -281,7 +280,7 @@ public class TsundereGerman extends TsundereBase {
 	}
 
 	@Override
-	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
 		registerModification();
 
 		return new Message(optionalCommentOnLanguageShuffler.get(

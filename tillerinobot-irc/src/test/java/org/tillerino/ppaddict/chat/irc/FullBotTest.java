@@ -33,7 +33,11 @@ import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
+import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatEventConsumer;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
@@ -50,11 +54,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.BotRunner;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
@@ -146,7 +148,7 @@ public class FullBotTest {
 
 	private final AtomicInteger recommendationCount = new AtomicInteger();
 
-	private BotRunner botRunner;
+	private GameChatClient botRunner;
 
 	private final List<Future> started = new ArrayList<>();
 
@@ -168,7 +170,8 @@ public class FullBotTest {
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.password")).toInstance("");
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.autojoin")).toInstance("#osu");
 
-			bind(BotRunner.class).to(BotRunnerImpl.class);
+			bind(GameChatEventConsumer.class).annotatedWith(Names.named("messagePreprocessor")).to(MessagePreprocessor.class);
+			bind(GameChatClient.class).to(BotRunnerImpl.class);
 			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore")).toInstance(false);
 			bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 			bind(GameChatWriter.class).to(IrcWriter.class);
@@ -201,9 +204,9 @@ public class FullBotTest {
 
 		websocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
 
-		BotInfo botInfo = injector.getInstance(BotInfo.class);
+		GameChatMetrics botInfo = injector.getInstance(GameChatMetrics.class);
 		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
-		botRunner = injector.getInstance(BotRunner.class);
+		botRunner = injector.getInstance(GameChatClient.class);
 		started.add(exec.submit(botRunner));
 		started.add(exec.submit(injector.getInstance(LocalGameChatEventQueue.class)));
 		started.add(exec.submit(injector.getInstance(LocalGameChatResponseQueue.class)));

@@ -27,6 +27,7 @@ import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.Joined;
@@ -126,7 +127,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 	@Provides
 	@Singleton
-	public BotRunner getRunner(MessagePreprocessor preprocessor, final BotBackend backend,
+	public GameChatClient getRunner(MessagePreprocessor preprocessor, final BotBackend backend,
 			final IrcNameResolver resolver, EntityManagerFactory emf,
 			ThreadLocalAutoCommittingEntityManager em,
 			@Named("tillerinobot.git.commit.id.abbrev") String commit,
@@ -135,7 +136,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		final AtomicBoolean running = new AtomicBoolean(true);
 
 		
-		BotRunner runner = mock(BotRunner.class);
+		GameChatClient runner = mock(GameChatClient.class);
 		doAnswer(new Answer<Void>() {
 			String username;
 
@@ -257,7 +258,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 		singleThreadExecutor("event queue").submit(injector.getInstance(LocalGameChatEventQueue.class));
 		singleThreadExecutor("response queue").submit(injector.getInstance(LocalGameChatResponseQueue.class));
-		injector.getInstance(BotRunner.class).run();
+		injector.getInstance(GameChatClient.class).run();
 		
 		apiServer.stop();
 		websocketServer.stop();

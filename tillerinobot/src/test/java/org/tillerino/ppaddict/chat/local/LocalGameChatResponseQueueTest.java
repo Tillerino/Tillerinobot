@@ -20,20 +20,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalGameChatResponseQueueTest {
 	@Mock
-	private BotInfo botInfo;
+	private GameChatMetrics botInfo;
 
 	@Mock
 	private ResponsePostprocessor downstream;
@@ -57,19 +57,19 @@ public class LocalGameChatResponseQueueTest {
 	public void testRegularHandoff() throws Exception {
 		queueFuture = exec.submit(queue);
 
-		queue.onResponse(Response.none(), event);
-		verify(downstream, timeout(1000)).onResponse(Response.none(), event);
+		queue.onResponse(GameChatResponse.none(), event);
+		verify(downstream, timeout(1000)).onResponse(GameChatResponse.none(), event);
 	}
 
 	@Test
 	public void testQueueSize() throws Exception {
-		queue.onResponse(Response.none(), event);
+		queue.onResponse(GameChatResponse.none(), event);
 		verify(botInfo, only()).setResponseQueueSize(1);
 		reset(botInfo);
 		assertThat(queue.size()).as("Declared queue size").isEqualTo(1);
 
 		queueFuture = exec.submit(queue);
-		verify(downstream, timeout(1000)).onResponse(Response.none(), event);
+		verify(downstream, timeout(1000)).onResponse(GameChatResponse.none(), event);
 		verify(botInfo, only()).setResponseQueueSize(0);
 		assertThat(queue.size()).as("Declared queue size").isEqualTo(0);
 	}
@@ -79,7 +79,7 @@ public class LocalGameChatResponseQueueTest {
 		queueFuture = exec.submit(queue);
 
 		doThrow(InterruptedException.class).when(downstream).onResponse(any(), any());
-		queue.onResponse(Response.none(), event);
+		queue.onResponse(GameChatResponse.none(), event);
 		await().until(() -> queueFuture.isDone());
 	}
 
@@ -89,9 +89,9 @@ public class LocalGameChatResponseQueueTest {
 
 		doThrow(RuntimeException.class).when(downstream).onResponse(new Message("throw"), event);
 		queue.onResponse(new Message("throw"), event);
-		queue.onResponse(Response.none(), event);
+		queue.onResponse(GameChatResponse.none(), event);
 		verify(downstream, timeout(1000)).onResponse(new Message("throw"), event);
-		verify(downstream, timeout(1000)).onResponse(Response.none(), event);
+		verify(downstream, timeout(1000)).onResponse(GameChatResponse.none(), event);
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class LocalGameChatResponseQueueTest {
 
 		queueFuture = exec.submit(queue);
 		try (MdcAttributes mdc = MdcUtils.with("someKey", "someVal")) {
-			queue.onResponse(Response.none(), event);
+			queue.onResponse(GameChatResponse.none(), event);
 		}
 
 		verify(downstream, timeout(1000)).onResponse(any(), any());

@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
@@ -19,7 +20,6 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
@@ -70,7 +70,7 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 		}
 	}
 
-	private Response handleSemaphoreInUse(GameChatEvent event) {
+	private GameChatResponse handleSemaphoreInUse(GameChatEvent event) {
 		return bouncer.get(event.getNick()).map(feedback -> {
 			String purpose = "Concurrent " + event.getClass().getSimpleName();
 			double processing = (clock.currentTimeMillis() - feedback.getEnteredTime()) / 1000d;
@@ -97,8 +97,8 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 				return new Message("[http://i.imgur.com/Ykfua8r.png ...]");
 			}
 
-			return Response.none();
-		}).orElseGet(Response::none);
+			return GameChatResponse.none();
+		}).orElseGet(GameChatResponse::none);
 	}
 
 	private boolean setWarningSent(GameChatEvent event, SemaphorePayload feedback) {

@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.LoggingUtils;
@@ -18,7 +19,6 @@ import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 @Slf4j
 @Singleton
@@ -27,7 +27,7 @@ public class Pinger {
 	volatile String pingMessage = null;
 	volatile CountDownLatch pingLatch = null;
 
-	final BotInfo botInfo;
+	final GameChatMetrics botInfo;
 
 	final Clock clock;
 

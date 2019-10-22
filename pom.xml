@@ -127,6 +127,7 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- APIs -->
 			<dependency>
 				<groupId>javax.ws.rs</groupId>
 				<artifactId>javax.ws.rs-api</artifactId>
@@ -141,6 +142,16 @@
 				<groupId>javax.websocket</groupId>
 				<artifactId>javax.websocket-api</artifactId>
 				<version>1.0</version>
+			</dependency>
+
+			<!-- Standard Libraries -->
+
+	
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<!-- This overwrites pircbotx' version -->
+				<version>3.3.2</version>
 			</dependency>
 
 			<!-- HTTP -->
@@ -193,6 +204,21 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
 			<scope>provided</scope>
 		</dependency>
 

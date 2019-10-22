@@ -8,8 +8,6 @@ import java.util.OptionalLong;
 
 import org.slf4j.MDC;
 
-import tillerino.tillerinobot.CommandHandler;
-
 /**
  * With the {@link MDC} we have two problems that originate from the fact that
  * the MDC is bound to a thread:

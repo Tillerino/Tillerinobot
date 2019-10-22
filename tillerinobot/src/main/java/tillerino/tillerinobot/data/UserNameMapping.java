@@ -4,11 +4,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.chat.IRCName;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import tillerino.tillerinobot.BotBackend.IRCName;
 
 @Entity(name = "usernames")
 @Data

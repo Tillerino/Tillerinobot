@@ -1,69 +1,31 @@
 package tillerino.tillerinobot;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import lombok.Value;
 import tillerino.tillerinobot.UserDataManager.UserData;
 
 public interface CommandHandler {
 	/**
-	 * Response sent to the user as the result of a command
-	 */
-	interface Response {
-		/**
-		 * Adds another response to the current one.
-		 */
-		default Response then(@CheckForNull Response nextResponse) {
-			if (nextResponse instanceof NoResponse || nextResponse == null) {
-				return this;
-			}
-			if (this instanceof NoResponse) {
-				return nextResponse;
-			}
-			ResponseList list = new ResponseList();
-			if (this instanceof ResponseList) {
-				list.responses.addAll(((ResponseList) this).responses);
-			} else {
-				list.responses.add(this);
-			}
-			if (nextResponse instanceof ResponseList) {
-				list.responses.addAll(((ResponseList) nextResponse).responses);
-			} else {
-				list.responses.add(nextResponse);
-			}
-			return list;
-		}
-
-		static NoResponse none() {
-			return new NoResponse();
-		}
-
-		default boolean isNone() {
-			return this instanceof NoResponse;
-		}
-	}
-
-	/**
 	 * A regular IRC message. This should not be used as the direct response to
 	 * a command, but for other auxiliary messages, see {@link Success}.
 	 */
 	@Value
-	public static class Message implements Response {
+	@EqualsAndHashCode(callSuper = false)
+	public static class Message extends SingletonResponse {
 		String content;
 	}
 
@@ -72,7 +34,8 @@ public interface CommandHandler {
 	 * This is the message that the command duration will be logged for.
 	 */
 	@Value
-	public static class Success implements Response {
+	@EqualsAndHashCode(callSuper = false)
+	public static class Success extends SingletonResponse {
 		String content;
 	}
 
@@ -80,30 +43,15 @@ public interface CommandHandler {
 	 * An "action" type IRC message
 	 */
 	@Value
-	public static class Action implements Response {
+	@EqualsAndHashCode(callSuper = false)
+	public static class Action extends SingletonResponse {
 		String content;
 	}
 
-	/**
-	 * Returned by the handler to clarify that the command was handled, but no
-	 * response is sent.
-	 */
-	@EqualsAndHashCode
-	public static final class NoResponse implements Response {
+	abstract static class SingletonResponse implements GameChatResponse {
 		@Override
-		public String toString() {
-			return "[No Response]";
-		}
-	}
-
-	@EqualsAndHashCode
-	@ToString
-	@SuppressFBWarnings(value = "RCN", justification = "Generated code")
-	public static final class ResponseList implements Response {
-		private final List<Response> responses = new ArrayList<>();
-
-		public List<Response> getResponses() {
-			return Collections.unmodifiableList(responses);
+		public Iterator<GameChatResponse> iterator() {
+			return Arrays.asList((GameChatResponse) this).iterator();
 		}
 	}
 
@@ -126,7 +74,7 @@ public interface CommandHandler {
 		 *             if the input is invalid
 		 */
 		@Nonnull
-		public Response handle(String command, OsuApiUser apiUser,
+		public GameChatResponse handle(String command, OsuApiUser apiUser,
 				UserData userData) throws UserException,
 				IOException, SQLException, InterruptedException;
 	}
@@ -145,7 +93,7 @@ public interface CommandHandler {
 	 *             if the input is invalid
 	 */
 	@CheckForNull
-	public Response handle(String command, OsuApiUser apiUser,
+	public GameChatResponse handle(String command, OsuApiUser apiUser,
 			UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException;
 
@@ -153,11 +101,11 @@ public interface CommandHandler {
 		CommandHandler me = this;
 		return new CommandHandler() {
 			@Override
-			public Response handle(String command, OsuApiUser apiUser,
+			public GameChatResponse handle(String command, OsuApiUser apiUser,
 					UserData userData)
 					throws UserException, IOException, SQLException,
 					InterruptedException {
-				Response response = me.handle(command, apiUser, userData);
+				GameChatResponse response = me.handle(command, apiUser, userData);
 				if (response != null) {
 					return response;
 				}
@@ -193,14 +141,14 @@ public interface CommandHandler {
 			CommandHandler underlying) {
 		return new CommandHandler() {
 			@Override
-			public Response handle(String command, OsuApiUser apiUser,
+			public GameChatResponse handle(String command, OsuApiUser apiUser,
 					UserData userData)
 					throws UserException, IOException, SQLException,
 					InterruptedException {
 				if (!StringUtils.startsWithIgnoreCase(command, start)) {
 					return null;
 				}
-				Response response = underlying.handle(command.substring(start.length()),
+				GameChatResponse response = underlying.handle(command.substring(start.length()),
 						apiUser, userData);
 				if (response != null) {
 					return response;
@@ -236,7 +184,7 @@ public interface CommandHandler {
 			AnyCommandHandler underlying) {
 		return new CommandHandler() {
 			@Override
-			public Response handle(String command, OsuApiUser apiUser,
+			public GameChatResponse handle(String command, OsuApiUser apiUser,
 					UserData userData)
 					throws UserException, IOException, SQLException,
 					InterruptedException {
@@ -266,7 +214,7 @@ public interface CommandHandler {
 		}
 
 		@Override
-		public final Response handle(String originalCommand, OsuApiUser apiUser, UserData userData) throws UserException,
+		public final GameChatResponse handle(String originalCommand, OsuApiUser apiUser, UserData userData) throws UserException,
 				IOException, SQLException, InterruptedException {
 			String lowerCase = originalCommand.toLowerCase();
 			if (lowerCase.equals(alias)) {
@@ -285,7 +233,7 @@ public interface CommandHandler {
 			return null;
 		}
 
-		public abstract Response handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
+		public abstract GameChatResponse handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
 				throws UserException, IOException, SQLException, InterruptedException;
 	}
 }

@@ -5,10 +5,10 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * TRANSLATION NOTE:
@@ -49,7 +49,7 @@ public class Norwegian extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+	public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if (inactiveTime < 60 * 1000) {
 			return new Message("beep boop");
 		} else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -118,7 +118,7 @@ public class Norwegian extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response hug(OsuApiUser apiUser) {
+	public GameChatResponse hug(OsuApiUser apiUser) {
 		return new Message("Du! Kom her!")
 			.then(new Action("klem " + apiUser.getUserName()));
 	}
@@ -165,7 +165,7 @@ public class Norwegian extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
 		/*
 		 * TRANSLATION NOTE: This line is sent to the user right after they have
 		 * chosen this Language implementation. The English version refers to

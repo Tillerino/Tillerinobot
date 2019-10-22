@@ -5,13 +5,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 
 @Path("/botinfo")
 public interface BotStatus {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	BotInfo botinfo();
+	GameChatMetrics botinfo();
 
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BotBackend;
@@ -28,7 +29,7 @@ public class DebugHandler implements CommandHandler {
 	static final String DEBUG = "debug ";
 
 	@Override
-	public Response handle(String debugCommand, OsuApiUser debugApiUser,
+	public GameChatResponse handle(String debugCommand, OsuApiUser debugApiUser,
 			UserData debugUserData) throws UserException, IOException,
 			SQLException, InterruptedException {
 		if (!debugCommand.startsWith(DEBUG)
@@ -54,7 +55,7 @@ public class DebugHandler implements CommandHandler {
 									+ " is "
 									+ backend.getUser(
 											Integer.parseInt(command), 1l))));
-			Response response = commands.handle(
+			GameChatResponse response = commands.handle(
 					debugCommand.substring(DEBUG.length()), debugApiUser,
 					debugUserData);
 			if (response != null) {

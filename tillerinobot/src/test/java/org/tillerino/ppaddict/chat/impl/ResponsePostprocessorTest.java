@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
@@ -22,15 +24,13 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.CommandHandler.Success;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResponsePostprocessorTest {
 	@Mock
-	private BotInfo botInfo;
+	private GameChatMetrics botInfo;
 
 	@Mock
 	private Bouncer bouncer;
@@ -88,7 +88,7 @@ public class ResponsePostprocessorTest {
 	@Test
 	public void testNoResponse() throws Exception {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
-		responsePostprocessor.onResponse(Response.none(), event);
+		responsePostprocessor.onResponse(GameChatResponse.none(), event);
 		verifyZeroInteractions(writer);
 		verifyZeroInteractions(liveActivity);
 		verify(bouncer, times(1)).exit("nick", 1);

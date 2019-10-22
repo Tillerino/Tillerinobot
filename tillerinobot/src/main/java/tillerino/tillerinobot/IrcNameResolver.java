@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.chat.IRCName;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -19,7 +20,6 @@ import com.google.common.cache.LoadingCache;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.data.UserNameMapping;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
 

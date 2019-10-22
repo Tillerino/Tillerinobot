@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
-import tillerino.tillerinobot.CommandHandler.NoResponse;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 
@@ -23,9 +23,9 @@ public class CommandHandlerTest {
 
 	CommandHandler handler = CommandHandler.handling(
 			"A ",
-			CommandHandler.alwaysHandling("B", (a, c, d) -> { called_b = true; return new NoResponse(); })
+			CommandHandler.alwaysHandling("B", (a, c, d) -> { called_b = true; return GameChatResponse.none(); })
 					.or(CommandHandler.alwaysHandling("C",
-							(a, c, d) -> { called_c = true; return new NoResponse(); })));
+							(a, c, d) -> { called_c = true; return GameChatResponse.none(); })));
 
 	@Test
 	public void testNestedChoices() throws Exception {

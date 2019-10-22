@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEvent;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponseConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.util.Clock;
@@ -18,11 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.CommandHandler.ResponseList;
 import tillerino.tillerinobot.CommandHandler.Success;
 import tillerino.tillerinobot.handlers.RecommendHandler;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
@@ -39,14 +38,16 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 
 	private final LiveActivityEndpoint liveActivity;
 
-	private final BotInfo botInfo;
+	private final GameChatMetrics botInfo;
 
 	private final Clock clock;
 
 	@Override
-	public void onResponse(Response response, GameChatEvent event) throws InterruptedException {
+	public void onResponse(GameChatResponse response, GameChatEvent event) throws InterruptedException {
 		try {
-			handleResponse(response, event);
+			for (GameChatResponse r : response) {
+				handleResponse(r, event);
+			}
 		} catch (IOException e) {
 			log.warn("Error while sending chat message", e);
 		}
@@ -55,15 +56,8 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		}
 	}
 
-	private void handleResponse(Response response, GameChatEvent result) throws InterruptedException, IOException {
-		if (response.isNone()) {
-			return;
-		}
-		if (response instanceof ResponseList) {
-			for (Response r : ((ResponseList) response).getResponses()) {
-				handleResponse(r, result);
-			}
-		} else if (response instanceof Message) {
+	private void handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
+		if (response instanceof Message) {
 			message(((Message) response).getContent(), false, result);
 		} else if (response instanceof Success) {
 			message(((Success) response).getContent(), true, result);

@@ -5,10 +5,10 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author https://osu.ppy.sh/u/3258429 SnickarN https://github.com/SnickarN-
@@ -43,7 +43,7 @@ public class Svenska extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+	public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
 			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
@@ -112,7 +112,7 @@ public class Svenska extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response hug(OsuApiUser apiUser) {
+	public GameChatResponse hug(OsuApiUser apiUser) {
 		return new Message("Kom hit, du!")
 			.then(new Action("kram " + apiUser.getUserName()));
 	}
@@ -159,7 +159,7 @@ public class Svenska extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
         return new Message("[https://osu.ppy.sh/u/3258429 SnickarN] och [https://osu.ppy.sh/u/8116579 Padnezz] hjälpte mig att lära mig svenska!");
 	}
 

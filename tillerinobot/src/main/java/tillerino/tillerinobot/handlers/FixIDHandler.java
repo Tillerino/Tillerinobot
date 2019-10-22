@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserException;
@@ -22,7 +23,7 @@ public class FixIDHandler implements CommandHandler {
     private final IrcNameResolver resolver;
 
 	@Override
-	public Response handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
 					throws UserException, IOException, SQLException {
 
         if (!command.toLowerCase().startsWith(COMMAND)) {

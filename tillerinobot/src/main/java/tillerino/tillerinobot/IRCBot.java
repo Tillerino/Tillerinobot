@@ -25,7 +25,9 @@ import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
+import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
@@ -37,9 +39,7 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
 
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.BotBackend.IRCName;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
@@ -114,9 +114,9 @@ public class IRCBot implements GameChatEventConsumer {
 		commandHandlers.add(new OsuTrackHandler(osutrackDownloader));
 	}
 
-	private Response processPrivateAction(PrivateAction action) throws InterruptedException {
+	private GameChatResponse processPrivateAction(PrivateAction action) throws InterruptedException {
 		Language lang = new Default();
-		Response versionInfo = Response.none();
+		GameChatResponse versionInfo = GameChatResponse.none();
 		try {
 			OsuApiUser apiUser = getUserOrThrow(action.getNick());
 			UserData userData = userDataManager.getData(apiUser.getUserId());
@@ -130,23 +130,23 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 	}
 
-	private Response handleException(Throwable e, Language lang) {
+	private GameChatResponse handleException(Throwable e, Language lang) {
 		try {
 			if(e instanceof ExecutionException) {
 				e = e.getCause();
 			}
 			if(e instanceof InterruptedException) {
-				return Response.none();
+				return GameChatResponse.none();
 			}
 			if(e instanceof UserException) {
 				if(e instanceof QuietException) {
-					return Response.none();
+					return GameChatResponse.none();
 				}
 				return new Message(e.getMessage());
 			} else {
 				if (e instanceof ServiceUnavailableException) {
 					// We're shutting down. Nothing to do here.
-					return Response.none();
+					return GameChatResponse.none();
 				} else if (isTimeout(e)) {
 					log.debug("osu api timeout");
 					return new Message(lang.apiTimeoutException());
@@ -162,7 +162,7 @@ public class IRCBot implements GameChatEventConsumer {
 			}
 		} catch (Throwable e1) {
 			log.error("holy balls", e1);
-			return Response.none();
+			return GameChatResponse.none();
 		}
 	}
 
@@ -198,16 +198,16 @@ public class IRCBot implements GameChatEventConsumer {
 	 * Queues a response and ensures that the semaphore is released if it is
 	 * held by the current thread.
 	 */
-	void sendResponse(@Nullable Response response, GameChatEvent user) throws InterruptedException {
+	void sendResponse(@Nullable GameChatResponse response, GameChatEvent user) throws InterruptedException {
 		if (response != null) {
 			user.getMeta().setRateLimiterBlockedTime(rateLimiter.blockedTime());
 			queue.onResponse(response, user);
 		}
 	}
 
-	private Response processPrivateMessage(final PrivateMessage message) throws InterruptedException {
+	private GameChatResponse processPrivateMessage(final PrivateMessage message) throws InterruptedException {
 		Language lang = new Default();
-		Response prelimResponse = Response.none();
+		GameChatResponse prelimResponse = GameChatResponse.none();
 		try {
 			prelimResponse = prelimResponse.then(new FixIDHandler(resolver).handle(message.getMessage(), null, null));
 			if (!prelimResponse.isNone()) {
@@ -229,13 +229,13 @@ public class IRCBot implements GameChatEventConsumer {
 			}
 
 			if (!message.getMessage().startsWith("!")) {
-				return Response.none();
+				return GameChatResponse.none();
 			}
 			String originalMessage = message.getMessage().substring(1).trim();
 
 			prelimResponse = checkVersionInfo(message);
 
-			Response response = null;
+			GameChatResponse response = null;
 			for (CommandHandler handler : commandHandlers) {
 				if ((response = handler.handle(originalMessage, apiUser, userData)) != null) {
 					break;
@@ -253,13 +253,13 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 	}
 
-	private Response checkVersionInfo(final GameChatEvent user) throws SQLException, UserException {
+	private GameChatResponse checkVersionInfo(final GameChatEvent user) throws SQLException, UserException {
 		int userVersion = backend.getLastVisitedVersion(user.getNick());
 		if(userVersion < CURRENT_VERSION) {
 			backend.setLastVisitedVersion(user.getNick(), CURRENT_VERSION);
 			return new Message(VERSION_MESSAGE);
 		}
-		return Response.none();
+		return GameChatResponse.none();
 	}
 
 	@Override
@@ -274,12 +274,12 @@ public class IRCBot implements GameChatEventConsumer {
 			try {
 				sendResponse(visit(event), event);
 			} catch (SQLException | IOException | UserException e) {
-				Response exceptionResponse = handleException(e, new Default());
+				GameChatResponse exceptionResponse = handleException(e, new Default());
 				if (event.isInteractive()) {
 					sendResponse(exceptionResponse, event);
 				} else {
 					// we do this just to clear the semaphore
-					sendResponse(Response.none(), event);
+					sendResponse(GameChatResponse.none(), event);
 				}
 			}
 
@@ -302,21 +302,21 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 	}
 
-	private Response visit(GameChatEvent event) throws SQLException, InterruptedException, IOException, UserException {
+	private GameChatResponse visit(GameChatEvent event) throws SQLException, InterruptedException, IOException, UserException {
 		if (event instanceof Joined) {
 			try {
 				return welcomeIfDonator(event);
 			} catch (SQLException | IOException | UserException e) {
 				handleException(e, new Default());
 				// don't return the created response, because we don't want the user to get random error messages
-				return Response.none();
+				return GameChatResponse.none();
 			}
 		} else if (event instanceof PrivateMessage) {
 			return processPrivateMessage((PrivateMessage) event);
 		} else if (event instanceof PrivateAction) {
 			return processPrivateAction((PrivateAction) event);
 		} else if (event instanceof Sighted) {
-			return Response.none();
+			return GameChatResponse.none();
 		}
 		throw new NotImplementedException("Event not implemented: " + event);
 	}
@@ -327,20 +327,20 @@ public class IRCBot implements GameChatEventConsumer {
 
 	private final ExecutorService exec;
 
-	private Response welcomeIfDonator(GameChatEvent user) throws SQLException, InterruptedException, IOException, UserException {
+	private GameChatResponse welcomeIfDonator(GameChatEvent user) throws SQLException, InterruptedException, IOException, UserException {
 		Integer userid;
 		try {
 			userid = resolver.resolveIRCName(user.getNick());
 		} catch (IOException e) {
 			if (isTimeout(e)) {
 				log.debug("timeout while resolving username {} (welcomeIfDonator)", user.getNick());
-				return Response.none();
+				return GameChatResponse.none();
 			}
 			throw e;
 		}
 		
 		if(userid == null)
-			return Response.none();
+			return GameChatResponse.none();
 		
 		OsuApiUser apiUser;
 		try {
@@ -348,25 +348,25 @@ public class IRCBot implements GameChatEventConsumer {
 		} catch (IOException e) {
 			if (isTimeout(e)) {
 				log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
-				return Response.none();
+				return GameChatResponse.none();
 			}
 			throw e;
 		}
 		
 		if(apiUser == null || backend.getDonator(apiUser) <= 0) {
-			return Response.none();
+			return GameChatResponse.none();
 		}
 
 		// this is a donator, let's welcome them!
 		UserData data = userDataManager.getData(userid);
 		
 		if (!data.isShowWelcomeMessage()) {
-			return Response.none();
+			return GameChatResponse.none();
 		}
 
 		long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
 
-		Response response = data.getLanguage().welcomeUser(apiUser,
+		GameChatResponse response = data.getLanguage().welcomeUser(apiUser,
 				inactiveTime);
 
 		if (data.isOsuTrackWelcomeEnabled()) {

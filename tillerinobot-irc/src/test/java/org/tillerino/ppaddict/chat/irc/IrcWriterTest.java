@@ -17,12 +17,12 @@ import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.UserChannelDao;
 import org.pircbotx.output.OutputUser;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 
 import tillerino.tillerinobot.RateLimiter;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,7 +43,7 @@ public class IrcWriterTest {
 	ThreadLocalAutoCommittingEntityManager em;
 
 	@Mock
-	BotInfo botInfo;
+	GameChatMetrics botInfo;
 
 	@Mock
 	RateLimiter rateLimiter;
