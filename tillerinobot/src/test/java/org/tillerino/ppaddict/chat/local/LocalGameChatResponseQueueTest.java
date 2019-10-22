@@ -87,7 +87,7 @@ public class LocalGameChatResponseQueueTest {
 	public void exceptionsDontStopTheQueue() throws Exception {
 		queueFuture = exec.submit(queue);
 
-		doThrow(Exception.class).when(downstream).onResponse(new Message("throw"), event);
+		doThrow(RuntimeException.class).when(downstream).onResponse(new Message("throw"), event);
 		queue.onResponse(new Message("throw"), event);
 		queue.onResponse(Response.none(), event);
 		verify(downstream, timeout(1000)).onResponse(new Message("throw"), event);
