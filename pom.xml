@@ -8,6 +8,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>tillerinobot-model</module>
 		<module>tillerinobot</module>
 		<module>tillerinobot-irc</module>
 	</modules>
