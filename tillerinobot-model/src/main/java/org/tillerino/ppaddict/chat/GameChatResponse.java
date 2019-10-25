@@ -68,11 +68,7 @@ public interface GameChatResponse extends Iterable<GameChatResponse> {
 	@ToString
 	@SuppressFBWarnings(value = "RCN", justification = "Generated code")
 	public static final class ResponseList implements GameChatResponse {
-		final List<GameChatResponse> responses = new ArrayList<>();
-
-		public List<GameChatResponse> getResponses() {
-			return Collections.unmodifiableList(responses);
-		}
+		private final List<GameChatResponse> responses = new ArrayList<>();
 
 		@Override
 		public Iterator<GameChatResponse> iterator() {

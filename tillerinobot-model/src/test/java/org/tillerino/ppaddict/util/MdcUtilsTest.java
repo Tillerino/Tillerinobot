@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.MDC;
@@ -15,6 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 public class MdcUtilsTest {
 	@Rule
 	public final LogRule logRule = TestAppender.rule();
+
+	@After
+	public final void tearDown() throws Exception {
+		MDC.clear();
+	}
 
 	@Test
 	public void keyIsAddedAndRemoved() throws Exception {
@@ -68,5 +74,13 @@ public class MdcUtilsTest {
 		logRule.assertThat()
 			.hasSize(1)
 			.first().satisfies(x -> assertThat(x.getMDC("foo")).isEqualTo("bar"));
+	}
+
+	@Test
+	public void eventIdCanBeRetrieved() throws Exception {
+		MDC.clear();
+		assertThat(MdcUtils.getEventId()).isEmpty();
+		MDC.put("event", "123");
+		assertThat(MdcUtils.getEventId()).isPresent().satisfies(o -> assertThat(o.getAsLong()).isEqualTo(123L));
 	}
 }
