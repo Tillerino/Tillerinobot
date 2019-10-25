@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class WithHandler implements CommandHandler {
 	private final LiveActivityEndpoint live;
 
 	@Override
-	public Response handle(String originalMessage, OsuApiUser apiUser,
+	public GameChatResponse handle(String originalMessage, OsuApiUser apiUser,
 			UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
 		if (!originalMessage.toLowerCase().startsWith("with")) {

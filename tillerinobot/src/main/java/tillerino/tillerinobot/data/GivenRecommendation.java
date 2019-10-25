@@ -5,13 +5,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
+
+import lombok.Data;
 
 @Entity(name = "givenrecommendations")
 @Data
@@ -34,17 +32,11 @@ public class GivenRecommendation {
 	private Long id;
 
 	@UserId
-	@Getter(onMethod = @__(@UserId))
-	@Setter(onParam = @__(@UserId))
 	private int userid;
 	@BeatmapId
-	@Getter(onMethod = @__(@BeatmapId))
-	@Setter(onParam = @__(@BeatmapId))
 	private int beatmapid;
 	private long date;
 	@BitwiseMods
-	@Getter(onMethod = @__(@BitwiseMods))
-	@Setter(onParam = @__(@BitwiseMods))
 	public long mods;
 
 	/**

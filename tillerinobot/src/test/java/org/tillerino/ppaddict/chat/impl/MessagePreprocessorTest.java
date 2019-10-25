@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
@@ -23,7 +24,6 @@ import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
 import org.tillerino.ppaddict.util.Clock;
 
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -93,7 +93,7 @@ public class MessagePreprocessorTest {
 		verify(bouncer).tryEnter("nick", 1);
 		verify(bouncer).get("nick");
 		verifyNoMoreInteractions(bouncer);
-		verify(responses).onResponse(Response.none(), event);
+		verify(responses).onResponse(GameChatResponse.none(), event);
 		verifyZeroInteractions(queue);
 	}
 

@@ -32,18 +32,18 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEvent;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import tillerino.tillerinobot.IRCBot;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalGameChatEventQueueTest {
 	@Mock
-	private BotInfo botInfo;
+	private GameChatMetrics botInfo;
 
 	@Mock
 	private IRCBot coreHandler;

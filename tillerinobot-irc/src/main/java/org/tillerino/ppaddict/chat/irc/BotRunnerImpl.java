@@ -25,16 +25,16 @@ import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.snapshot.UserChannelDaoSnapshot;
 import org.pircbotx.snapshot.UserSnapshot;
+import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.util.TidyObject;
 import org.tillerino.ppaddict.util.TillerinobotGitProperties;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.BotRunner;
-import tillerino.tillerinobot.TidyObject;
 
 @Slf4j
 @Singleton
-public class BotRunnerImpl implements BotRunner, TidyObject {
+public class BotRunnerImpl implements GameChatClient, TidyObject {
 	public static final int DEFAULT_MESSAGE_DELAY = 250;
 	@SuppressFBWarnings(value = "MS", justification = "We're modifying this in tests")
 	public static int MESSAGE_DELAY = DEFAULT_MESSAGE_DELAY;

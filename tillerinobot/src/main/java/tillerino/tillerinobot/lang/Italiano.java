@@ -5,10 +5,10 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 /**
  * Italian Language implementation. Thanks go to
  * https://osu.ppy.sh/u/marcostudios and https://osu.ppy.sh/u/Howl for this.
@@ -44,7 +44,7 @@ public class Italiano extends AbstractMutableLanguage {
 	}
  
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+	public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
 			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
@@ -113,7 +113,7 @@ public class Italiano extends AbstractMutableLanguage {
 	}
  
 	@Override
-	public Response hug(OsuApiUser apiUser) {
+	public GameChatResponse hug(OsuApiUser apiUser) {
 		return new Message("Ehi tu! Vieni qui!")
 			.then(new Action("abbraccia " + apiUser.getUserName()));
 	}
@@ -163,7 +163,7 @@ public class Italiano extends AbstractMutableLanguage {
 	}
  
 	@Override
-	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
 		return new Message("[https://osu.ppy.sh/u/1273955 - Marco -] e [https://osu.ppy.sh/u/2751672 Howl] mi hanno insegnato l'italiano <3");
 	}
  

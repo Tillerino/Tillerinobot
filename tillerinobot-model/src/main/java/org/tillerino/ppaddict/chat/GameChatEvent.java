@@ -1,14 +1,14 @@
 package org.tillerino.ppaddict.chat;
 
+import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
-import tillerino.tillerinobot.BotBackend.IRCName;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class GameChatEvent {
 	private final long eventId;
 
-	@Getter(onMethod = @__(@IRCName))
 	private final @IRCName String nick;
 
 	private final long timestamp;
@@ -20,13 +20,6 @@ public abstract class GameChatEvent {
 	 * of there the mutability lies.
 	 */
 	private final GameChatEventMeta meta = new GameChatEventMeta();
-
-	protected GameChatEvent(long eventId, @IRCName String ircNick, long timestamp) {
-		super();
-		this.eventId = eventId;
-		this.nick = ircNick;
-		this.timestamp = timestamp;
-	}
 
 	public abstract boolean isInteractive();
 }

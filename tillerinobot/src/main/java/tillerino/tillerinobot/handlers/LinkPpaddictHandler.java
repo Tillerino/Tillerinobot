@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
@@ -24,7 +25,7 @@ public class LinkPpaddictHandler implements CommandHandler {
 	BotBackend backend;
 	
 	@Override
-	public Response handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException {
 		if(!TOKEN_PATTERN.matcher(command).matches()) {
 			return null;

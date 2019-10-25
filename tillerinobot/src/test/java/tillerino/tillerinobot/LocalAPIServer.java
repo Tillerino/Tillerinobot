@@ -10,6 +10,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.tillerino.ppaddict.chat.GameChatClient;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -21,7 +22,7 @@ import tillerino.tillerinobot.rest.BotApiDefinition;
 public class LocalAPIServer extends AbstractModule {
 	@Override
 	protected void configure() {
-		bind(BotRunner.class).toInstance(mock(BotRunner.class));
+		bind(GameChatClient.class).toInstance(mock(GameChatClient.class));
 
 		bind(BotBackend.class).to(TestBackend.class);
 		bind(Boolean.class).annotatedWith(

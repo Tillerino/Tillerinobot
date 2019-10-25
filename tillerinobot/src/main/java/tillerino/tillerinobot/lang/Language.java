@@ -6,10 +6,9 @@ import javax.annotation.Nonnull;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.CommandHandler.NoResponse;
-import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.recommendations.Recommendation;
 
 /**
@@ -88,7 +87,7 @@ public interface Language {
 	 * @param inactiveTime
 	 *            time since the user was last seen in #osu in milliseconds
 	 */
-	Response welcomeUser(OsuApiUser apiUser, long inactiveTime);
+	GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime);
 
 	/**
 	 * The entire command that the user typed is not known.
@@ -159,7 +158,7 @@ public interface Language {
 	 *            user object for more info
 	 */
 	@Nonnull
-	Response hug(OsuApiUser apiUser);
+	GameChatResponse hug(OsuApiUser apiUser);
 
 	/**
 	 * Response to !help command.
@@ -217,8 +216,8 @@ public interface Language {
 	 * @param apiUser 
 	 * @param meta 
 	 */
-	default Response optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
-		return new NoResponse();
+	default GameChatResponse optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
+		return GameChatResponse.none();
 	}
 
 	/**
@@ -226,8 +225,8 @@ public interface Language {
 	 * @param apiUser 
 	 * @param meta 
 	 */
-	default Response optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
-		return new NoResponse();
+	default GameChatResponse optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
+		return GameChatResponse.none();
 	}
 	
 	/**
@@ -235,8 +234,8 @@ public interface Language {
 	 * @param apiUser 
 	 * @param recommendation 
 	 */
-	default Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
-		return new NoResponse();
+	default GameChatResponse optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
+		return GameChatResponse.none();
 	}
 
 	/**
@@ -251,8 +250,8 @@ public interface Language {
 	 * The user has chosen this language. Say something to acknowledge that!
 	 * @param apiUser 
 	 */
-	default Response optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new NoResponse();
+	default GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+		return GameChatResponse.none();
 	}
 
 	/**

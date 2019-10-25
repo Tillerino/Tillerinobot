@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
@@ -26,7 +27,7 @@ public class ComplaintHandler implements CommandHandler {
 	private final RecommendationsManager manager;
 	
 	@Override
-	public Response handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException,
 			InterruptedException {
 		if(getLevenshteinDistance(command.toLowerCase().substring(0, Math.min("complain".length(), command.length())), "complain") <= 2) {

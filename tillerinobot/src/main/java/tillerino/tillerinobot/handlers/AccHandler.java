@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class AccHandler implements CommandHandler {
 	static Pattern superExtended = Pattern.compile("(\\d+)x100\\s+(?:(\\d+)x50\\s+)?(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 
 	@Override
-	public Response handle(String originalMessage, OsuApiUser apiUser,
+	public GameChatResponse handle(String originalMessage, OsuApiUser apiUser,
 			UserData userData) throws UserException,
 			IOException, SQLException, InterruptedException {
 		if (!originalMessage.toLowerCase().startsWith("acc")) {

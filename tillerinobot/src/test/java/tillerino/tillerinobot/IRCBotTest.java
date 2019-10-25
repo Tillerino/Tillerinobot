@@ -23,7 +23,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,6 +37,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.GameChatEvent;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
@@ -44,8 +47,6 @@ import org.tillerino.ppaddict.chat.impl.Bouncer;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.CommandHandler.ResponseList;
 import tillerino.tillerinobot.CommandHandler.Success;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -170,7 +171,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		backend.hintUser("user", false, 100, 1000);
 		turnOffVersionMessage();
 
-		verifyResponse(bot, message("user", "no command"), Response.none());
+		verifyResponse(bot, message("user", "no command"), GameChatResponse.none());
 	}
 
 	@Test
@@ -359,7 +360,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		Sighted event = new Sighted(12, "aRareUserAppears", 15);
 		bot.onEvent(event);
-		verify(queue).onResponse(Response.none(), event);
+		verify(queue).onResponse(GameChatResponse.none(), event);
 		verify(backend, timeout(1000)).registerActivity(18);
 	}
 
@@ -378,8 +379,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		return user;
 	}
 
-	private static Response anyResponse() {
-		return new Response() {
+	private static GameChatResponse anyResponse() {
+		return new GameChatResponse() {
 			@Override
 			public boolean equals(Object arg0) {
 				return true;
@@ -389,11 +390,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			public String toString() {
 				return "Any response";
 			}
+
+			@Override
+			public Iterator<GameChatResponse> iterator() {
+				throw new NotImplementedException("nono");
+			}
 		};
 	}
 
-	private static Response singleResponse() {
-		return new Response() {
+	private static GameChatResponse singleResponse() {
+		return new GameChatResponse() {
 			@Override
 			public boolean equals(Object arg0) {
 				return arg0 != null && !(arg0 instanceof ResponseList);
@@ -403,11 +409,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			public String toString() {
 				return "Any single response";
 			}
+
+			@Override
+			public Iterator<GameChatResponse> iterator() {
+				throw new NotImplementedException("nono");
+			}
 		};
 	}
 
-	private static Response messageContaining(String s) {
-		return new Response() {
+	private static GameChatResponse messageContaining(String s) {
+		return new GameChatResponse() {
 			@Override
 			public boolean equals(Object arg0) {
 				return arg0 instanceof Message && ((Message) arg0).getContent().contains(s);
@@ -417,11 +428,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			public String toString() {
 				return "Message containing " + s;
 			}
+
+			@Override
+			public Iterator<GameChatResponse> iterator() {
+				throw new NotImplementedException("nono");
+			}
 		};
 	}
 
-	private static Response successContaining(String s) {
-		return new Response() {
+	private static GameChatResponse successContaining(String s) {
+		return new GameChatResponse() {
 			@Override
 			public boolean equals(Object arg0) {
 				return arg0 instanceof Success && ((Success) arg0).getContent().contains(s);
@@ -431,10 +447,15 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			public String toString() {
 				return "Success containing " + s;
 			}
+
+			@Override
+			public Iterator<GameChatResponse> iterator() {
+				throw new NotImplementedException("nono");
+			}
 		};
 	}
 
-	private void verifyResponse(IRCBot bot, GameChatEvent event, Response response) throws InterruptedException {
+	private void verifyResponse(IRCBot bot, GameChatEvent event, GameChatResponse response) throws InterruptedException {
 		verifyNoMoreInteractions(queue);
 		reset(queue);
 		makeQueuePrint();

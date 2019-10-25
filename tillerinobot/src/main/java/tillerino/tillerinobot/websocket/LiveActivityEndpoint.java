@@ -20,6 +20,7 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.IRCName;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
@@ -33,7 +34,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.BotBackend.IRCName;
 
 /**
  * A real-time view into Tillerinobot. All IDs are anonymized through a salted

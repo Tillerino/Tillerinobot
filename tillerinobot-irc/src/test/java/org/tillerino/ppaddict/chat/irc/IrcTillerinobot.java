@@ -5,6 +5,8 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 
+import org.tillerino.ppaddict.chat.GameChatClient;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -12,7 +14,6 @@ import com.google.inject.name.Names;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.BotRunner;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
 
@@ -26,7 +27,7 @@ public class IrcTillerinobot extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(BotRunner.class).to(BotRunnerImpl.class);
+		bind(GameChatClient.class).to(BotRunnerImpl.class);
 		install(new CreateInMemoryDatabaseModule());
 		install(new TillerinobotConfigurationModule());
 
@@ -45,6 +46,6 @@ public class IrcTillerinobot extends AbstractModule {
 	public static void main(String[] args) {
 		Injector injector = Guice.createInjector(new IrcTillerinobot());
 
-		injector.getInstance(BotRunner.class).run();
+		injector.getInstance(GameChatClient.class).run();
 	}
 }

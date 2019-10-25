@@ -5,10 +5,10 @@ import java.util.Random;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 
 /**
  * @author [HDHR] andre.pedrocv@gmail.com https://osu.ppy.sh/u/3547567 https://github.com/ThatGuy986
@@ -41,7 +41,7 @@ public class PortuguesePortugal implements Language {
 	}
 
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+	public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		if(inactiveTime < 60 * 1000) {
 			return new Message("beep boop");
 		} else if(inactiveTime < 24 * 60 * 60 * 1000) {
@@ -110,7 +110,7 @@ public class PortuguesePortugal implements Language {
 	}
 
 	@Override
-	public Response hug(OsuApiUser apiUser) {
+	public GameChatResponse hug(OsuApiUser apiUser) {
 		return new Message("anda cá!")
 			.then(new Action("abraça " + apiUser.getUserName()));
 	}
@@ -157,7 +157,7 @@ public class PortuguesePortugal implements Language {
 	}
 
 	@Override
-	public Response optionalCommentOnLanguage(OsuApiUser apiUser) {
+	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
 		return new Message("O [HDHR] ensinou-me a falar Português (de Portugal)!");
 	}
 

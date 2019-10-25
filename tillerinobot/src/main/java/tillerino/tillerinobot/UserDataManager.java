@@ -18,6 +18,8 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.util.ShutdownHook;
+import org.tillerino.ppaddict.util.TidyObject;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -29,14 +31,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.data.BotUserData;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.lang.*;
+import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.util.IsMutable;
 
 /**
@@ -61,24 +64,14 @@ public class UserDataManager implements TidyObject {
 		private static final long serialVersionUID = 1L;
 
 		@Data
+		@AllArgsConstructor
 		public static class BeatmapWithMods implements Serializable {
 			private static final long serialVersionUID = 1L;
 
-			public BeatmapWithMods(@BeatmapId int beatmap,
-					@BitwiseMods long mods) {
-				super();
-				this.beatmap = beatmap;
-				this.mods = mods;
-			}
-
 			@BeatmapId
-			@Getter(onMethod = @__(@BeatmapId))
-			@Setter(onParam = @__(@BeatmapId))
 			int beatmap;
 
 			@BitwiseMods
-			@Getter(onMethod = @__(@BitwiseMods))
-			@Setter(onParam = @__(@BitwiseMods))
 			long mods;
 		}
 

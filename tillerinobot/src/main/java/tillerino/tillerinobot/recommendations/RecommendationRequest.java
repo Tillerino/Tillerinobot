@@ -24,7 +24,7 @@ public class RecommendationRequest {
 	}
 
 	public static class RecommendationRequestBuilder {
-		@Getter(onMethod = @__(@BitwiseMods))
+		@Getter
 		@BitwiseMods
 		private long requestedMods = 0L;
 
@@ -51,7 +51,7 @@ public class RecommendationRequest {
 
 	boolean nomod;
 	Model model;
-	@Getter(onMethod = @__(@BitwiseMods))
+	@Getter
 	@BitwiseMods
 	long requestedMods;
 	List<RecommendationPredicate> predicates;

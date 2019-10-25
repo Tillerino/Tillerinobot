@@ -13,10 +13,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMetaTest;
-import tillerino.tillerinobot.CommandHandler;
 
 @RequiredArgsConstructor
 @RunWith(Parameterized.class)
@@ -82,7 +82,7 @@ public class AllLanguagesTest {
 	@Test
 	public void testHug() throws Exception {
 		for (int attempt = 0; attempt < 1000; attempt++) {
-			assertThat(lang.hug(new OsuApiUser())).isNotEqualTo(new CommandHandler.NoResponse());
+			assertThat(lang.hug(new OsuApiUser())).isNotEqualTo(GameChatResponse.none());
 		}
 	}
 

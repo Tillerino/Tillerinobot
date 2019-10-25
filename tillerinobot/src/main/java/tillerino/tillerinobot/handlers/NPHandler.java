@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,7 +40,7 @@ public class NPHandler implements CommandHandler {
 	private final LiveActivityEndpoint live;
 
 	@Override
-	public Response handle(String message, OsuApiUser apiUser, UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+	public GameChatResponse handle(String message, OsuApiUser apiUser, UserData userData) throws UserException, IOException, SQLException, InterruptedException {
 		MDC.put(MdcUtils.MDC_HANDLER, "np");
 		
 		Language lang = userData.getLanguage();

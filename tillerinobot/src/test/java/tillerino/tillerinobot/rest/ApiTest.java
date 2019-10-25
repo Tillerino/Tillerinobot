@@ -30,6 +30,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
 import org.tillerino.ppaddict.util.Clock;
@@ -43,9 +45,8 @@ import com.google.inject.Injector;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.BotRunner;
 import tillerino.tillerinobot.TestBackend;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
+
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 /**
  * Tests the Tillerinobot API on a live HTTP server including authentication.
@@ -57,7 +58,7 @@ public class ApiTest {
 		protected void configure() {
 			install(new CreateInMemoryDatabaseModule());
 			bind(BotBackend.class).toInstance(new TestBackend(false));
-			bind(BotRunner.class).toInstance(mock(BotRunner.class));
+			bind(GameChatClient.class).toInstance(mock(GameChatClient.class));
 			bind(BeatmapsService.class).toInstance(mock(BeatmapsService.class));
 			// since the authentication service is not mocked yet, we inject a proxy
 			bind(AuthenticationService.class).toInstance(key -> authenticationService.findKey(key));
@@ -118,7 +119,7 @@ public class ApiTest {
 	/**
 	 * API-internal object
 	 */
-	private BotInfo botInfo = injector.getInstance(BotInfo.class);
+	private GameChatMetrics botInfo = injector.getInstance(GameChatMetrics.class);
 	
 	/**
 	 * Endpoint which goes through the started HTTP API

@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.CommandHandler;
@@ -28,7 +29,7 @@ public class OptionsHandler implements CommandHandler {
 	final RecommendationRequestParser requestParser;
 
 	@Override
-	public Response handle(String command, OsuApiUser apiUser,
+	public GameChatResponse handle(String command, OsuApiUser apiUser,
 			UserData userData) throws UserException,
 			IOException, SQLException {
 		boolean set = false;
@@ -105,7 +106,7 @@ public class OptionsHandler implements CommandHandler {
 					"Language, Default" + (userData.getHearts() > 0 ? ", Welcome" : "")));
 		}
 
-		return new NoResponse();
+		return GameChatResponse.none();
 	}
 
 	public static boolean parseBoolean(final @Nonnull String original, Language lang) throws UserException {

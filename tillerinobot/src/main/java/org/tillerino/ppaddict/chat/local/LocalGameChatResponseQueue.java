@@ -8,6 +8,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.tillerino.ppaddict.chat.GameChatEvent;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.util.LoopingRunnable;
@@ -16,8 +18,6 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.CommandHandler.Response;
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 
 /**
  * Implements {@link GameChatResponseQueue} with a simple local, in-memory
@@ -30,12 +30,12 @@ import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
 public class LocalGameChatResponseQueue extends LoopingRunnable implements GameChatResponseQueue {
 	private final ResponsePostprocessor downstream;
 
-	private final BlockingQueue<Pair<Response, GameChatEvent>> queue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<Pair<GameChatResponse, GameChatEvent>> queue = new LinkedBlockingQueue<>();
 
-	private final BotInfo botInfo;
+	private final GameChatMetrics botInfo;
 
 	@Override
-	public void onResponse(Response response, GameChatEvent event) throws InterruptedException {
+	public void onResponse(GameChatResponse response, GameChatEvent event) throws InterruptedException {
 		event.getMeta().setMdc(MdcUtils.getSnapshot());
 		queue.put(Pair.of(response, event));
 		botInfo.setResponseQueueSize(queue.size());
@@ -43,7 +43,7 @@ public class LocalGameChatResponseQueue extends LoopingRunnable implements GameC
 
 	@Override
 	protected void loop() throws InterruptedException {
-		Pair<Response, GameChatEvent> response = queue.take();
+		Pair<GameChatResponse, GameChatEvent> response = queue.take();
 		botInfo.setResponseQueueSize(queue.size());
 		try (MdcAttributes mdc = response.getRight().getMeta().getMdc().apply()) {
 			downstream.onResponse(response.getLeft(), response.getRight());

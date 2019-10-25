@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
-		<version>0.15.0</version>
+		<version>0.16.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot-irc</artifactId>
@@ -14,8 +14,8 @@
 		<!-- Internal -->
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
-			<artifactId>tillerinobot</artifactId>
-			<version>0.15.0</version>
+			<artifactId>tillerinobot-model</artifactId>
+			<version>0.16.0</version>
 		</dependency>
 
 		<!-- APIs and annotations -->
@@ -37,8 +37,15 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot</artifactId>
-			<version>0.15.0</version>
+			<version>0.16.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot</artifactId>
+			<version>0.16.0</version>
 			<classifier>tests</classifier>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>

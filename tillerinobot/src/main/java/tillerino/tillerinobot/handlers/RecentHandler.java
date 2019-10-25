@@ -8,6 +8,7 @@ import lombok.Value;
 
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
@@ -21,7 +22,7 @@ public class RecentHandler implements CommandHandler {
 	BotBackend backend;
 
 	@Override
-	public Response handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException, InterruptedException {
 		if (!command.equalsIgnoreCase("now")) {
 			return null;

@@ -4,37 +4,23 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.NotFoundException;
 
+import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import tillerino.tillerinobot.BotRunner;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BotInfoService implements BotStatus {
-	private final BotRunner bot;
+	private final GameChatClient bot;
 
-	private final BotInfo botInfo;
+	private final GameChatMetrics botInfo;
 
 	private final Clock clock;
 
-	@Data
-	@Singleton
-	public static class BotInfo {
-		private boolean isConnected;
-		private long runningSince;
-		private long lastPingDeath;
-		private long lastInteraction;
-		private long lastReceivedMessage;
-		private long lastSentMessage;
-		private long lastRecommendation;
-		private long responseQueueSize;
-		private long eventQueueSize;
-	}
-
 	@Override
-	public BotInfo botinfo() {
+	public GameChatMetrics botinfo() {
 		botInfo.setConnected(bot.isConnected());
 		return botInfo;
 	}

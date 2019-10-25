@@ -35,26 +35,25 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
 import org.pircbotx.output.OutputRaw;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.GameChatEventQueue;
+import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
-import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.TestClock;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import tillerino.tillerinobot.rest.BotInfoService.BotInfo;
-
 @RunWith(MockitoJUnitRunner.class)
 public class IrcHooksTest {
 	@Mock
-	MessagePreprocessor eventHandler;
+	GameChatEventQueue eventHandler;
 
 	@Mock
-	BotInfo botInfo;
+	GameChatMetrics botInfo;
 
 	@Mock
 	Pinger pinger;

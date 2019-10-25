@@ -3,9 +3,9 @@ package tillerino.tillerinobot.lang;
 import java.util.Random;
 
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Response;
 import tillerino.tillerinobot.recommendations.Recommendation;
 
 import javax.annotation.Nonnull;
@@ -32,7 +32,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
 	StringShuffler unknownBeatmapShuffler = new StringShuffler(rnd);
 
 	@Override
-	public Response welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+	public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
 		String username = apiUser.getUserName();
 		String greeting;
 		//Greetings for <4 minutes, normal, and >4 days
@@ -60,7 +60,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
 
 	@Nonnull
 	@Override
-	public Response hug(OsuApiUser apiUser) {
+	public GameChatResponse hug(OsuApiUser apiUser) {
 		registerModification();
 		//Responses move from tsun to dere with more hug attempts and recommendations
 		recentHugs++;
@@ -80,16 +80,16 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
 	}
 
 	@Nonnull
-	protected abstract Response getHugResponseForHugLevel(String username, int hugLevel);
+	protected abstract GameChatResponse getHugResponseForHugLevel(String username, int hugLevel);
 
 	@Override
-	public Response optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
+	public GameChatResponse optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
 		registerModification();
 		recentRecommendations++;
 		return getOptionalCommentOnRecommendationResponse(recentRecommendations);
 	}
 
-	protected abstract Response getOptionalCommentOnRecommendationResponse(int recentRecommendations);
+	protected abstract GameChatResponse getOptionalCommentOnRecommendationResponse(int recentRecommendations);
 
 
 	String unknownRecommendationParameter() {

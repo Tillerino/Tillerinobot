@@ -1,20 +1,18 @@
 package tillerino.tillerinobot.osutrack;
 
-import com.google.gson.annotations.SerializedName;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.List;
+
 import org.tillerino.osuApiModel.types.GameMode;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
+
+import lombok.Data;
 
 @Data
 public class UpdateResult {
     private String username;
 
     @GameMode
-    @Getter(onMethod = @__(@GameMode))
-    @Setter(onParam = @__(@GameMode))
     private int mode;
 
     @SerializedName("playcount")

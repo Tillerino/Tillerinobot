@@ -2,15 +2,12 @@ package tillerino.tillerinobot;
 
 
 import java.io.IOException;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifier;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiScore;
@@ -18,6 +15,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.chat.IRCName;
 
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
@@ -25,12 +23,6 @@ import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
 
 public interface BotBackend {
-	@TypeQualifier(applicableTo = String.class)
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface IRCName {
-
-	}
-
 	/**
 	 * @param beatmapid
 	 * @param mods
