@@ -4,14 +4,12 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @NoArgsConstructor(onConstructor = @__(@Deprecated))
 public class PercentageEstimatesImpl implements PercentageEstimates {
 	private BeatmapImpl beatmap;
 
-	@Setter(onParam = @__(@BitwiseMods))
 	private @BitwiseMods long mods;
 
 	public PercentageEstimatesImpl(BeatmapImpl beatmap, @BitwiseMods long mods) {
