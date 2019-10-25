@@ -21,7 +21,6 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.spi.LoggingEvent;
 import org.assertj.core.api.ListAssert;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 import org.junit.Before;
@@ -37,6 +36,7 @@ import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestClock;
+import org.tillerino.ppaddict.util.TestAppender.LogEventWithMdc;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 
 import com.google.inject.AbstractModule;
@@ -182,7 +182,7 @@ public class ApiTest {
 			.element(1).satisfies(mdc("apiKey", "valid-ke")); // truncated
 	}
 
-	private ListAssert<LoggingEvent> assertThatOurLogs() {
+	private ListAssert<LogEventWithMdc> assertThatOurLogs() {
 		return log.assertThat()
 			.filteredOn(event -> event.getLoggerName().equals(ApiLoggingFeature.class.getName()));
 	}

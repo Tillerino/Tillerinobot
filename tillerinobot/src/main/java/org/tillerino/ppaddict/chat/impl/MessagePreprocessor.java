@@ -17,6 +17,7 @@ import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.CommandHandler.Message;
@@ -44,6 +45,7 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 	private final Clock clock;
 
 	@Override
+	@SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "For the try-with. Looks like this is a Java 13 bug in Spotbugs 3.1.11")
 	public void onEvent(GameChatEvent event) throws InterruptedException {
 		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, event.getEventId())) {
 			mdc.add(MdcUtils.MDC_USER, event.getNick());

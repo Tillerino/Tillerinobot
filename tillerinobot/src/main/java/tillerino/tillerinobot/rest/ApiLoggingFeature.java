@@ -17,6 +17,7 @@ import org.slf4j.MDC;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.RateLimiter;
@@ -57,6 +58,7 @@ public class ApiLoggingFeature implements Feature {
 		private final RateLimiter rateLimiter;
 
 		@Override
+		@SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "For the try-with. Looks like this is a Java 13 bug in Spotbugs 3.1.11")
 		public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 			rateLimiter.clearThreadPriority();
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MCD_OSU_API_RATE_BLOCKED_TIME, rateLimiter.blockedTime())) {

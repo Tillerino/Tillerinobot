@@ -3,9 +3,9 @@ package tillerino.tillerinobot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.apache.log4j.MDC;
-import org.apache.log4j.spi.LoggingEvent;
 import org.assertj.core.api.ListAssert;
 import org.awaitility.Awaitility;
 import org.hamcrest.core.IsEqual;
@@ -24,6 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.internal.util.MockUtil;
+import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
@@ -32,6 +31,7 @@ import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestAppender;
+import org.tillerino.ppaddict.util.TestAppender.LogEventWithMdc;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.util.TestClock;
 
@@ -190,30 +190,30 @@ public class LoggingTest {
 			.allSatisfy(mdc("user", user));
 	}
 
-	private Consumer<LoggingEvent> sent(String messageStart) {
+	private Consumer<LogEventWithMdc> sent(String messageStart) {
 		return mdc("state", "sent")
-				.andThen(e -> assertThat(((String) e.getMessage())).startsWith("sent: " + messageStart));
+				.andThen(e -> assertThat((e.getMessage().getFormattedMessage())).startsWith("sent: " + messageStart));
 	}
 
-	private Consumer<LoggingEvent> received(String message) {
+	private Consumer<LogEventWithMdc> received(String message) {
 		return mdc("state", "msg")
-				.andThen(event -> assertThat(event.getMessage()).isEqualTo("received: " + message));
+				.andThen(event -> assertThat(event.getMessage().getFormattedMessage()).isEqualTo("received: " + message));
 	}
 
-	private Consumer<LoggingEvent> action(String message) {
+	private Consumer<LogEventWithMdc> action(String message) {
 		return mdc("state", "action")
-				.andThen(event -> assertThat(event.getMessage()).isEqualTo("action: " + message));
+				.andThen(event -> assertThat(event.getMessage().getFormattedMessage()).isEqualTo("action: " + message));
 	}
 
 	private void awaitOurLogSize(long size) {
 		Awaitility.await().until(() -> logRule.events().stream().filter(isOurEvent()).count(), new IsEqual<>(size));
 	}
 
-	private ListAssert<LoggingEvent> assertThatOurLog() {
+	private ListAssert<LogEventWithMdc> assertThatOurLog() {
 		return logRule.assertThat().filteredOn(isOurEvent());
 	}
 
-	private Predicate<? super LoggingEvent> isOurEvent() {
+	private Predicate<? super LogEventWithMdc> isOurEvent() {
 		return event -> event.getLoggerName().startsWith("tillerino")
 				|| event.getLoggerName().startsWith("org.tillerino");
 	}

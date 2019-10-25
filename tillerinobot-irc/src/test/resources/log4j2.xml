@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG" packages="org.tillerino.ppaddict.util">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_ERR">
+			<PatternLayout
+				pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<TestAppender name="Test" />
+	</Appenders>
+	<Loggers>
+		<Root level="debug">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="Test" />
+		</Root>
+		<Logger name="org.pircbotx" level="error"/>
+		<Logger name="org.eclipse.jetty" level="info"/>
+		<Logger name="org.springframework" level="info"/>
+		<Logger name="org.hibernate" level="info"/>
+		<Logger name="org.tillerino.irc" level="info"/>
+	</Loggers>
+</Configuration>
