@@ -18,6 +18,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.util.ShutdownHook;
 import org.tillerino.ppaddict.util.TidyObject;
 
 import com.google.common.cache.CacheBuilder;
