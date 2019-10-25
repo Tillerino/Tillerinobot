@@ -33,6 +33,7 @@ public class MdcUtilsTest {
 	@Test
 	public void keyIsAddedAndRestored() throws Exception {
 		MDC.put("foo", "bar");
+		assertThat(MDC.get("foo")).isEqualTo("bar");
 		try (AutoCloseable with = MdcUtils.with("foo", "baz")) {
 			assertThat(MDC.get("foo")).isEqualTo("baz");
 		}
