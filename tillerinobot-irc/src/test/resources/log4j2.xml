@@ -16,5 +16,6 @@
 		<Logger name="org.eclipse.jetty" level="info"/>
 		<Logger name="org.springframework" level="info"/>
 		<Logger name="org.hibernate" level="info"/>
+		<Logger name="org.tillerino.irc" level="info"/>
 	</Loggers>
 </Configuration>
