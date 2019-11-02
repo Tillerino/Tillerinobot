@@ -8,5 +8,6 @@ package tillerino.tillerinobot.recommendations;
 public enum Model {
 	ALPHA,
 	BETA,
-	GAMMA
+	GAMMA,
+	GAMMA5
 }
