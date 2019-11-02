@@ -47,7 +47,7 @@ public class RecommendationRequestParser {
 			String param = remaining[i];
 			if(param.length() == 0)
 				continue;
-			if (!parseEngines(param, settingsBuilder)
+			if (!parseEngines(param, settingsBuilder, apiUser)
 					&& !parseMods(param, settingsBuilder)
 					&& !parsePredicates(param, settingsBuilder, apiUser, lang)) {
 				throw new UserException(lang.invalidChoice(param, STANDARD_SYNTAX));
@@ -73,7 +73,8 @@ public class RecommendationRequestParser {
 		return request;
 	}
 
-	private boolean parseEngines(String param, RecommendationRequestBuilder settingsBuilder) {
+	private boolean parseEngines(String param, RecommendationRequestBuilder settingsBuilder,
+			OsuApiUser user) throws SQLException, IOException {
 		String lowerCase = param.toLowerCase();
 		if(getLevenshteinDistance(lowerCase, "relax") <= 2) {
 			settingsBuilder.model(Model.ALPHA);
@@ -82,6 +83,14 @@ public class RecommendationRequestParser {
 		if(getLevenshteinDistance(lowerCase, "beta") <= 1) {
 			settingsBuilder.model(Model.BETA);
 			return true;
+		}
+		if(getLevenshteinDistance(lowerCase, "gamma5") <= 2 && lowerCase.endsWith("5")) {
+			if (backend.getDonator(user) > 0) {
+				settingsBuilder.model(Model.GAMMA5);
+				return true;
+			} else {
+				return false;
+			}
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
 			settingsBuilder.model(Model.GAMMA);

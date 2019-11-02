@@ -1,10 +1,19 @@
 package tillerino.tillerinobot.recommendations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -22,7 +31,7 @@ import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
-	TestBackend backend = new TestBackend(false);
+	TestBackend backend = spy(new TestBackend(false));
 
 	RecommendationsManager manager;
 
@@ -126,5 +135,29 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 		recMan.hideRecommendation(1954, 2, 0);
 		recs = recMan.loadVisibleRecommendations(1954);
 		assertEquals(0, recs.size());
+	}
+
+	@Test
+	public void defaultSettings() throws Exception {
+		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		assertThat(recMan.getRecommendation(user, "", new Default())).isNotNull();
+		verify(backend).loadRecommendations(user.getUserId(), Collections.emptyList(), Model.GAMMA, false, 0L);
+	}
+
+	@Test
+	public void testGamma5() throws Exception {
+		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		assertThat(recMan.getRecommendation(user, "gamma5", new Default())).isNotNull();
+		verify(backend).loadRecommendations(anyInt(), any(), eq(Model.GAMMA5), anyBoolean(), anyLong());
+	}
+
+	@Test
+	public void gamma5Restricted() throws Exception {
+		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		backend.hintUser("guy", false, 123, 123);
+		user = backend.downloadUser("guy");
+		assertThatThrownBy(() -> recMan.getRecommendation(user, "gamma5", new Default()))
+			.isInstanceOf(UserException.class)
+			.hasMessageContaining("relax|beta|gamma");
 	}
 }
