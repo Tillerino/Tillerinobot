@@ -105,7 +105,7 @@ public class RecommendationRequestParser {
 			settingsBuilder.nomod(true);
 			return true;
 		}
-		if (settingsBuilder.getModel() == Model.GAMMA) {
+		if (settingsBuilder.getModel() == Model.GAMMA || settingsBuilder.getModel() == Model.GAMMA5) {
 			Long mods = Mods.fromShortNamesContinuous(lowerCase);
 			if (mods != null) {
 				mods = Mods.fixNC(mods);

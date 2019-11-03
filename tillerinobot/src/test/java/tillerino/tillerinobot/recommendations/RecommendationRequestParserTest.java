@@ -2,14 +2,14 @@ package tillerino.tillerinobot.recommendations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
@@ -46,5 +46,13 @@ public class RecommendationRequestParserTest {
 		assertThat(parse("dt")).hasFieldOrPropertyWithValue("requestedMods", 64L);
 		assertThat(parse("STAR=5").getPredicates()).containsExactly(new NumericPropertyPredicate<>("STAR=5", new StarDiff(), 5, true, 5, true));
 		assertThatThrownBy(() -> parse("dt STAR=5")).isInstanceOfAny(UserException.class).hasMessageContaining("DT STAR");
+	}
+
+	@Test
+	public void testGamma5Dt() throws Exception {
+		when(backend.getDonator(any())).thenReturn(1);
+		assertThat(parse("gamma5 dt"))
+			.hasFieldOrPropertyWithValue("model", Model.GAMMA5)
+			.hasFieldOrPropertyWithValue("requestedMods", 64L);
 	}
 }
