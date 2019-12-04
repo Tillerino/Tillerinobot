@@ -158,7 +158,7 @@ public class Korean implements Language {
 
 	@Override
 	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin:)");
+		return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin :)");
 	}
 
 	@Override
