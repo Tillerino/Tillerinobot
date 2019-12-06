@@ -190,14 +190,14 @@ public class Korean implements Language {
 				"걱정하지 마세요, [https://www.reddit.com/r/osugame 밈들]이 시간을 다 지나게 해주니까요.",
 				"지루할때는, [http://gabrielecirulli.github.io/2048 2048]이 최고죠! ",
 				"재밌는 질문인데, 지금 하드 드라이브가 고장나면 얼마나 많은 데이터들이 영구적으로 손상될까요?",
-				"그럼.. [https://www.google.com/search?q=%EB%B8%8C%EB%A7%81%EC%85%80%EB%A6%AC%EC%97%85 브링셀리업] 해보신적 있으세요??",
+				"그럼.. [https://www.google.com/search?q=%EB%B8%8C%EB%A7%81%EC%85%80%EB%A6%AC%EC%97%85 브링셀리업] 해보신적 있으세요?",
 				"당신은 다른걸 할수도 있고, 조용히 서로 눈을 마주칠 수도 있어요."
 				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return "최근에 플레이 하신적이 없으요!";
+		return "최근에 플레이 하신적이 없으시네요!";
 	}
 	
 	@Override
