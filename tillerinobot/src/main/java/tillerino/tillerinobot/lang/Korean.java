@@ -159,7 +159,7 @@ public class Korean implements Language {
 
 	@Override
 	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin, KeepSOBP:)");
+		return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin, KeepSOBP :)");
 	}
 
 	@Override
@@ -184,20 +184,20 @@ public class Korean implements Language {
 				"저는 당신이 할일이 많다는걸 알고있어요. 그냥 지금 하시는게 어떨까요?",
 				"어쨌든 낮잠을 자야 할 것 같은데요.",
 				"한번 아주 흥미로운 [https://namu.wiki/random 위키]를 확인해보세요!",
-				"지금 [https://twitch.tv/directory/game/Osu! 트위치에서] 재밌는 방송을 하는지 확인해보세요!",
+				"지금 [https://twitch.tv/directory/game/Osu! 트위치]에서 재밌는 방송을 하는지 확인해보세요!",
 				"[http://dagobah.net/flash/Cursor_Invisible.swf 아마 당신이 잘 못하실 게임이 있다고요!]",
-				"한번 [https://github.com/Tillerino/Tillerinobot/wiki 저의 메뉴얼을] 읽어보시는게 어떤가요?.",
-				"Don't worry, these [https://www.reddit.com/r/osugame dank memes] should pass the time.",
-				"While you're bored, give [http://gabrielecirulli.github.io/2048/ 2048] a try!",
-				"Fun question: If your harddrive crashed right now, how much of your personal data would be lost forever?",
-				"So... Have you ever tried the [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
-				"You can go do something else or we can just stare into each others eyes. Silently."
+				"한번 [https://github.com/Tillerino/Tillerinobot/wiki 저의 메뉴얼]을 읽어보시는게 어떤가요?.",
+				"걱정하지 마세요, [https://www.reddit.com/r/osugame 밈들]이 시간을 다 지나게 해주니까요.",
+				"지루할때는, [http://gabrielecirulli.github.io/2048 2048]이 최고죠! ",
+				"재밌는 질문인데, 지금 하드 드라이브가 고장나면 얼마나 많은 데이터들이 영구적으로 손상될까요?",
+				"그럼.. [https://www.google.com/search?q=%EB%B8%8C%EB%A7%81%EC%85%80%EB%A6%AC%EC%97%85 브링셀리업] 해보신적 있으세요??",
+				"당신은 다른걸 할수도 있고, 조용히 서로 눈을 마주칠 수도 있어요."
 				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return "최근에 플레이 하신적이 없으셔요!";
+		return "최근에 플레이 하신적이 없으요!";
 	}
 	
 	@Override
