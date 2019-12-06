@@ -12,6 +12,7 @@ import tillerino.tillerinobot.CommandHandler.Message;
 
 /**
  * @author https://github.com/jamkevin https://osu.ppy.sh/u/jamkevin
+ * @author KeepSOBP keepsobp@naver.com https://github.com/KeepSOBP https://osu.ppy.sh/users/14709263
  */
 public class Korean implements Language {
 
@@ -158,7 +159,7 @@ public class Korean implements Language {
 
 	@Override
 	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
-		return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin:)");
+		return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin, KeepSOBP:)");
 	}
 
 	@Override
@@ -174,16 +175,33 @@ public class Korean implements Language {
 	
 	@Override
 	public String apiTimeoutException() {
-		return new Default().apiTimeoutException();
+		registerModification();
+		final String message = "지금 osu! 서버가 너무 느려서 제가 해줄수 있는건 아무것도 없어요 :(";
+		return message + apiTimeoutShuffler.get(
+				"할머니랑 마지막으로 통화하신 게 언제죠?",
+				"한번 방청소하고 오시는게 어떨까요?",
+				"지금 당장 산책하시는게 좋을것 같은데.. 밖은 아세요?",
+				"저는 당신이 할일이 많다는걸 알고있어요. 그냥 지금 하시는게 어떨까요?",
+				"어쨌든 낮잠을 자야 할 것 같은데요.",
+				"한번 아주 흥미로운 [https://namu.wiki/random 위키]를 확인해보세요!",
+				"지금 [https://twitch.tv/directory/game/Osu! 트위치에서] 재밌는 방송을 하는지 확인해보세요!",
+				"[http://dagobah.net/flash/Cursor_Invisible.swf 아마 당신이 잘 못하실 게임이 있다고요!]",
+				"한번 [https://github.com/Tillerino/Tillerinobot/wiki 저의 메뉴얼을] 읽어보시는게 어떤가요?.",
+				"Don't worry, these [https://www.reddit.com/r/osugame dank memes] should pass the time.",
+				"While you're bored, give [http://gabrielecirulli.github.io/2048/ 2048] a try!",
+				"Fun question: If your harddrive crashed right now, how much of your personal data would be lost forever?",
+				"So... Have you ever tried the [https://www.google.de/search?q=bring%20sally%20up%20push%20up%20challenge sally up push up challenge]?",
+				"You can go do something else or we can just stare into each others eyes. Silently."
+				);
 	}
 	
 	@Override
 	public String noRecentPlays() {
-		return new Default().noRecentPlays();
+		return "최근에 플레이 하신적이 없으셔요!";
 	}
 	
 	@Override
 	public String isSetId() {
-		return new Default().isSetId();
+		return "비트맵 한개가 아닌 비트맵셋을 참조합니다.";
 	}
 }
