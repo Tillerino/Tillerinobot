@@ -50,7 +50,6 @@ public class RecommendationRequestParserTest {
 
 	@Test
 	public void testGamma5Dt() throws Exception {
-		when(backend.getDonator(any())).thenReturn(1);
 		assertThat(parse("gamma5 dt"))
 			.hasFieldOrPropertyWithValue("model", Model.GAMMA5)
 			.hasFieldOrPropertyWithValue("requestedMods", 64L);
