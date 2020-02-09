@@ -85,12 +85,8 @@ public class RecommendationRequestParser {
 			return true;
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma5") <= 2 && lowerCase.endsWith("5")) {
-			if (backend.getDonator(user) > 0) {
-				settingsBuilder.model(Model.GAMMA5);
-				return true;
-			} else {
-				return false;
-			}
+			settingsBuilder.model(Model.GAMMA5);
+			return true;
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
 			settingsBuilder.model(Model.GAMMA);
@@ -105,7 +101,7 @@ public class RecommendationRequestParser {
 			settingsBuilder.nomod(true);
 			return true;
 		}
-		if (settingsBuilder.getModel() == Model.GAMMA || settingsBuilder.getModel() == Model.GAMMA5) {
+		if (settingsBuilder.getModel().isModsCapable()) {
 			Long mods = Mods.fromShortNamesContinuous(lowerCase);
 			if (mods != null) {
 				mods = Mods.fixNC(mods);
