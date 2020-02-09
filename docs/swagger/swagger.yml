@@ -2,8 +2,9 @@ swagger: '2.0'
 info:
   description: >-
     This is the API of ppaddict, the engine behind Tillerinobot, the osu! bot
-    known simply as Tillerino. Keys are currently handed out individually.
-    Please contact the developer for a key.
+    known simply as Tillerino.
+    
+    You can get a key in the settings of [ppaddict](https://ppaddict.tillerino.org).
   version: '0.1'
   title: ppaddict API
   contact:
