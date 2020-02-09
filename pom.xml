@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>tillerinobot-parent</artifactId>
-	<version>0.17.0</version>
+	<version>0.18.0</version>
 	<packaging>pom</packaging>
 
 	<modules>

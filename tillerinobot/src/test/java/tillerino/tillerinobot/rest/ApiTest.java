@@ -3,7 +3,7 @@ package tillerino.tillerinobot.rest;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -27,12 +27,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.rest.AuthenticationService;
-import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestClock;
@@ -45,9 +43,8 @@ import com.google.inject.Injector;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.LocalConsoleTillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.TestBackend;
-
-import static org.tillerino.ppaddict.util.TestAppender.mdc;
 /**
  * Tests the Tillerinobot API on a live HTTP server including authentication.
  */
@@ -60,8 +57,7 @@ public class ApiTest {
 			bind(BotBackend.class).toInstance(new TestBackend(false));
 			bind(GameChatClient.class).toInstance(mock(GameChatClient.class));
 			bind(BeatmapsService.class).toInstance(mock(BeatmapsService.class));
-			// since the authentication service is not mocked yet, we inject a proxy
-			bind(AuthenticationService.class).toInstance(key -> authenticationService.findKey(key));
+			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 			bind(Clock.class).toInstance(clock);
 		}
 	}
@@ -113,9 +109,6 @@ public class ApiTest {
 	@Rule
 	public final LogRule log = TestAppender.rule();
 
-	@Mock
-	private AuthenticationService authenticationService;
-
 	/**
 	 * API-internal object
 	 */
@@ -140,7 +133,6 @@ public class ApiTest {
 		WebTarget target = client.target("http://localhost:" + server.getPort());
 		botStatus = WebResourceFactory.newResource(BotStatus.class, target);
 		beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
-		when(authenticationService.findKey("valid-key")).thenReturn(new Authorization());
 	}
 
 	@Test

@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import javax.inject.Singleton;
-import javax.ws.rs.NotFoundException;
 
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
@@ -42,7 +41,6 @@ import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
-import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
 import org.tillerino.ppaddict.util.Clock;
 
 import com.google.inject.AbstractModule;
@@ -55,6 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IRCBot;
+import tillerino.tillerinobot.LocalConsoleTillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
@@ -179,12 +178,7 @@ public class FullBotTest {
 			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
 			bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance")).toInstance(maintenanceWorkerPool);
 			bind(ExecutorService.class).annotatedWith(Names.named("core")).toInstance(coreWorkerPool);
-			bind(AuthenticationService.class).toInstance(key -> {
-				if (key.equals("testKey")) {
-					return new Authorization(false);
-				}
-				throw new NotFoundException();
-			});
+			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 		}
 	}
 

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
-		<version>0.17.0</version>
+		<version>0.18.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot</artifactId>
@@ -106,7 +106,7 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
-			<version>0.17.0</version>
+			<version>0.18.0</version>
 		</dependency>
 
 		<!-- APIs and annotations -->
@@ -193,7 +193,7 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
-			<version>0.17.0</version>
+			<version>0.18.0</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>

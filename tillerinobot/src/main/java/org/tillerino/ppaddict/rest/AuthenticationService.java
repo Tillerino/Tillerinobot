@@ -1,5 +1,6 @@
 package org.tillerino.ppaddict.rest;
 
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
@@ -32,4 +33,13 @@ public interface AuthenticationService {
 	@Path("/{key}")
 	@Produces(MediaType.APPLICATION_JSON)
 	Authorization findKey(@PathParam("key") String key) throws NotFoundException;
+
+	/**
+	 * Creates a new API key for an osu user.
+	 *
+	 * @param adminKey admin key of the application. This key must be authorized for key creation.
+	 * @param osuUserId id of the user to create an API key for. Any existing key is revoked.
+	 * @return the new API key
+	 */
+	String createKey(String adminKey, int osuUserId) throws NotFoundException, ForbiddenException;
 }
