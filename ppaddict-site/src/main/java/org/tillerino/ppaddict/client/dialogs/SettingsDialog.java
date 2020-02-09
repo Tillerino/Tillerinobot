@@ -3,6 +3,7 @@ package org.tillerino.ppaddict.client.dialogs;
 import org.tillerino.ppaddict.client.HelpElements;
 import org.tillerino.ppaddict.client.HelpElements.E;
 import org.tillerino.ppaddict.client.UserBox;
+import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
 import org.tillerino.ppaddict.client.services.UserDataService;
 import org.tillerino.ppaddict.client.services.UserDataServiceAsync;
 import org.tillerino.ppaddict.shared.ClientUserData;
@@ -161,6 +162,27 @@ public class SettingsDialog extends AbstractSettingsDialog {
       linkOsuAccountDialog.addAutoHidePartner(helpButton);
     }
     linkOsuAccountDialog.center();
+  }
+
+  @UiHandler("createApiKey")
+  void onClickCreateApiKey(ClickEvent event) {
+    if (!userData.isOsuName) {
+      DialogUtil.displayMessageBox("Link to osu! account first");
+      return;
+    }
+    new ConfirmDialog("This will revoke any existing API key. Are you sure?", new Runnable() {
+      @Override
+      public void run() {
+        service.createApiKey(new AbstractAsyncCallback<String>() {
+          @Override
+          public void process(String result) {
+            String message = "Your new API key is:\n\n" + result + ""
+                    + "\n\nMake sure you save it - you won't be able to access it again.";
+            DialogUtil.displayMessageBox(message);
+          }
+        });
+      }
+    }).center();
   }
 
   @Override

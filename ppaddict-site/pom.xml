@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwt-version>2.6.0</gwt-version>
-		<tillerinobot.version>0.17.0</tillerinobot.version>
+		<tillerinobot.version>0.18.0</tillerinobot.version>
 	</properties>
 
 	<prerequisites>

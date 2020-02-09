@@ -26,6 +26,8 @@ public class PpaddictTestModule extends ServletModule {
     bind(String.class).annotatedWith(Names.named("ppaddict.auth.returnURL")).toInstance(
         "http://localhost:8080" + AuthArriveService.PATH);
 
+    bind(String.class).annotatedWith(Names.named("ppaddict.apiauth.key")).toInstance("ppaddict-app-key");
+
     bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend"))
         .toInstance(true);
 

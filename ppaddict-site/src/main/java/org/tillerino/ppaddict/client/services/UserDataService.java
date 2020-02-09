@@ -22,4 +22,6 @@ public interface UserDataService extends RemoteService {
   String getLinkString() throws PpaddictException;
 
   void saveComment(int beatmapid, String mods, String comment) throws PpaddictException;
+
+  String createApiKey() throws PpaddictException;
 }

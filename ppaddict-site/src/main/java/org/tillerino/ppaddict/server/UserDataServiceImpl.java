@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.client.AbstractBeatmapTable;
 import org.tillerino.ppaddict.client.services.UserDataService;
+import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.server.auth.AuthLeaveService;
 import org.tillerino.ppaddict.server.auth.AuthLogoutService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
@@ -67,6 +69,13 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
   @Inject
   RecommendationsManager recommendationsManager;
+
+  @Inject
+  AuthenticationService apiAuthenticationService;
+
+  @Inject
+  @Named("ppaddict.apiauth.key")
+  String apiAuthKey;
 
   public static final String CREDENTIALS_SESSION_KEY = "ppaddict.auth.credentials";
   public static final String CREDENTIALS_COOKIE_KEY = "ppaddict.auth.cookie";
@@ -379,5 +388,11 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       throw new PpaddictException.NotLinked();
     }
     return persistentUserData;
+  }
+
+  @Override
+  public String createApiKey() throws PpaddictException {
+    int osuUserId = getServerUserData(getCredentialsOrThrow()).getLinkedOsuIdOrThrow();
+    return apiAuthenticationService.createKey(apiAuthKey, osuUserId);
   }
 }

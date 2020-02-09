@@ -22,4 +22,6 @@ public interface UserDataServiceAsync {
 
   void getLinkString(AsyncCallback<String> callback);
 
+  void createApiKey(AsyncCallback<String> callback);
+
 }
