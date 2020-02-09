@@ -152,12 +152,11 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	public void gamma5Restricted() throws Exception {
+	public void gamma5NotRestricted() throws Exception {
 		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
 		backend.hintUser("guy", false, 123, 123);
 		user = backend.downloadUser("guy");
-		assertThatThrownBy(() -> recMan.getRecommendation(user, "gamma5", new Default()))
-			.isInstanceOf(UserException.class)
-			.hasMessageContaining("relax|beta|gamma");
+		assertThat(recMan.getRecommendation(user, "gamma5", new Default()))
+			.isNotNull();
 	}
 }
