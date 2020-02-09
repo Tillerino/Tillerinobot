@@ -250,12 +250,18 @@ securityDefinitions:
     type: apiKey
     name: k
     in: query
-    description: 'An API key query parameter. To get an API key, contact the team.'
+    description: >-
+      An API key query parameter. If possible, use the header instead.
+      
+      You can get a key in the settings of [ppaddict](https://ppaddict.tillerino.org).
   api_key_header:
     type: apiKey
     name: api-key
     in: header
-    description: 'An API key header. To get an API key, contact the team.'
+    description: >-
+      An API key header.
+      
+      You can get a key in the settings of [ppaddict](https://ppaddict.tillerino.org).
 responses:
   unauthorized:
     description: No or API key presented or key not authorized for this operation.
