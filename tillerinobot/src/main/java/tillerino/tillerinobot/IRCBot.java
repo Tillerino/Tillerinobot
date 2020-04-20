@@ -32,7 +32,6 @@ import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
-import org.tillerino.ppaddict.chat.impl.Bouncer;
 import org.tillerino.ppaddict.util.LoggingUtils;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
@@ -81,7 +80,6 @@ public class IRCBot implements GameChatEventConsumer {
 	private final RateLimiter rateLimiter;
 	private final GameChatResponseQueue queue;
 	private final NPHandler npHandler;
-	private final Bouncer bouncer;
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
@@ -89,7 +87,7 @@ public class IRCBot implements GameChatEventConsumer {
 			EntityManagerFactory emf, IrcNameResolver resolver,
 			OsutrackDownloader osutrackDownloader,
 			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter, LiveActivityEndpoint liveActivity,
-			GameChatResponseQueue queue, Bouncer bouncer) {
+			GameChatResponseQueue queue) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;
 		this.em = em;
@@ -100,7 +98,6 @@ public class IRCBot implements GameChatEventConsumer {
 		this.rateLimiter = rateLimiter;
 		this.queue = queue;
 		this.npHandler = new NPHandler(backend, liveActivity);
-		this.bouncer = bouncer;
 
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
@@ -264,7 +261,6 @@ public class IRCBot implements GameChatEventConsumer {
 
 	@Override
 	public void onEvent(GameChatEvent event) {
-		bouncer.setThread(event.getNick(), event.getEventId());
 		EntityManager oldEm = em.setThreadLocalEntityManager(emf.createEntityManager());
 		try {
 			rateLimiter.setThreadPriority(event.isInteractive() ? RateLimiter.REQUEST : RateLimiter.EVENT);
@@ -293,7 +289,6 @@ public class IRCBot implements GameChatEventConsumer {
 			Thread.currentThread().interrupt();
 			return;
 		} finally {
-			bouncer.clearThread(event.getNick(), event.getEventId());
 			em.closeAndReplace(oldEm);
 			rateLimiter.clearThreadPriority();
 			// clear blocked time so it isn't carried over to the next request under any circumstances

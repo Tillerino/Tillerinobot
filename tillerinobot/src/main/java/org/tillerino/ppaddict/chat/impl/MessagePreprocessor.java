@@ -76,26 +76,17 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 		return bouncer.get(event.getNick()).map(feedback -> {
 			String purpose = "Concurrent " + event.getClass().getSimpleName();
 			double processing = (clock.currentTimeMillis() - feedback.getEnteredTime()) / 1000d;
-			Thread thread = feedback.getWorkingThread();
 
 			if (processing > 5) {
-				if (thread != null) {
-					StackTraceElement[] stackTrace = thread.getStackTrace();
-					stackTrace = Stream.of(stackTrace).filter(elem -> elem.getClassName().contains("tillerino")).toArray(StackTraceElement[]::new);
-					Throwable t = new Throwable("Processing thread's stack trace");
-					t.setStackTrace(stackTrace);
-					log.warn(purpose + " - request has been processing for " + processing, t);
-				} else {
-					log.warn("{} - request has been processing for {}. Currently in queue. Event queue size: {} Response queue size: {}", purpose, processing, queue.size(), responses.size());
-				}
-				if (!feedback.isWarningSent() && thread != null && setWarningSent(event, feedback)) {
+				log.warn("{} - request has been processing for {}. Currently in queue. Event queue size: {} Response queue size: {}", purpose, processing, queue.size(), responses.size());
+				if (!feedback.isWarningSent() && setWarningSent(event, feedback)) {
 					return new Message("Just a second...");
 				}
 			} else {
 				log.debug(purpose);
 			}
 			// only send if thread is not null, i.e. message is not in queue
-			if (feedback.getAttemptsSinceEntered() >= 3 && !feedback.isWarningSent() && thread != null && setWarningSent(event, feedback)) {
+			if (feedback.getAttemptsSinceEntered() >= 3 && !feedback.isWarningSent() && setWarningSent(event, feedback)) {
 				return new Message("[http://i.imgur.com/Ykfua8r.png ...]");
 			}
 

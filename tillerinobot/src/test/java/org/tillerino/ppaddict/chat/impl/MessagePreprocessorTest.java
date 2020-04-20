@@ -88,7 +88,7 @@ public class MessagePreprocessorTest {
 	public void bouncerDenies() throws Exception {
 		// bouncer returns false by default
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "lo");
-		when(bouncer.get("nick")).thenReturn(Optional.of(new SemaphorePayload(0, 0, null, 0, false)));
+		when(bouncer.get("nick")).thenReturn(Optional.of(new SemaphorePayload(0, 0, 0, false)));
 		preprocessor.onEvent(event);
 		verify(bouncer).tryEnter("nick", 1);
 		verify(bouncer).get("nick");
@@ -103,7 +103,7 @@ public class MessagePreprocessorTest {
 		// fewer than three attempts within five seconds, so we get the chill response
 		when(clock.currentTimeMillis()).thenReturn(5001L);
 		PrivateMessage event = new PrivateMessage(1, "nick", 5001, "lo");
-		when(bouncer.get("nick")).thenReturn(Optional.of(new SemaphorePayload(0, 0, new Thread(), 0, false)));
+		when(bouncer.get("nick")).thenReturn(Optional.of(new SemaphorePayload(0, 0, 0, false)));
 		when(bouncer.updateIfPresent(eq("nick"), eq(0L), any())).thenReturn(true);
 		preprocessor.onEvent(event);
 		verify(bouncer).tryEnter("nick", 1);
@@ -111,7 +111,8 @@ public class MessagePreprocessorTest {
 		verify(bouncer).updateIfPresent(eq("nick"), eq(0L), any());
 		verifyNoMoreInteractions(bouncer);
 		verify(responses).onResponse(new CommandHandler.Message("Just a second..."), event);
-		verifyZeroInteractions(queue);
+		verify(queue).size();
+		verifyNoMoreInteractions(queue);
 	}
 
 	@Test
@@ -120,7 +121,7 @@ public class MessagePreprocessorTest {
 		// three attempts within less than five seconds, so we get clicky meme
 		when(clock.currentTimeMillis()).thenReturn(2001L);
 		PrivateMessage event = new PrivateMessage(1, "nick", 2001, "lo");
-		when(bouncer.get("nick")).thenReturn(Optional.of(new SemaphorePayload(0, 0, new Thread(), 3, false)));
+		when(bouncer.get("nick")).thenReturn(Optional.of(new SemaphorePayload(0, 0, 3, false)));
 		when(bouncer.updateIfPresent(eq("nick"), eq(0L), any())).thenReturn(true);
 		preprocessor.onEvent(event);
 		verify(bouncer).tryEnter("nick", 1);

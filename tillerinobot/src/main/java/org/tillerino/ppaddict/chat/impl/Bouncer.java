@@ -45,9 +45,6 @@ public class Bouncer {
 		private final long enteredTime;
 
 		@Wither(AccessLevel.PRIVATE)
-		private final Thread workingThread;
-
-		@Wither(AccessLevel.PRIVATE)
 		private final int attemptsSinceEntered;
 
 		@Wither
@@ -65,7 +62,7 @@ public class Bouncer {
 			if (payload != null) {
 				return payload.withAttemptsSinceEntered(payload.attemptsSinceEntered + 1);
 			}
-			SemaphorePayload changed = new SemaphorePayload(eventId, clock.currentTimeMillis(), null, 0, false);
+			SemaphorePayload changed = new SemaphorePayload(eventId, clock.currentTimeMillis(), 0, false);
 			newObject.set(changed);
 			return changed;
 		}) == newObject.get();
@@ -73,18 +70,6 @@ public class Bouncer {
 
 	public boolean exit(String ircNick, long eventId) {
 		return updateIfPresent(ircNick, eventId, x -> null);
-	}
-
-	public boolean setThread(String ircNick, long eventId) {
-		return updateIfPresent(ircNick, eventId, payload -> payload.withWorkingThread(Thread.currentThread()));
-	}
-
-	public boolean clearThread(String ircNick, long eventId) {
-		return updateIfPresent(ircNick, eventId, payload -> payload.withWorkingThread(null));
-	}
-
-	public Optional<Thread> getThread(String ircNick) {
-		return Optional.ofNullable(perUserLock.getUnchecked(ircNick).get()).map(p -> p.workingThread);
 	}
 
 	public Optional<SemaphorePayload> get(String ircNick) {

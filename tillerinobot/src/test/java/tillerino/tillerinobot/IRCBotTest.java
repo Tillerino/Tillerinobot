@@ -43,7 +43,6 @@ import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
-import org.tillerino.ppaddict.chat.impl.Bouncer;
 
 import tillerino.tillerinobot.CommandHandler.Action;
 import tillerino.tillerinobot.CommandHandler.Message;
@@ -129,7 +128,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		IRCBot ircBot = new IRCBot(backend, recMan, userDataManager = new UserDataManager(backend, emf, em, userDataRepository),
 				em, emf, resolver, new TestOsutrackDownloader(),
-				exec, rateLimiter, liveActivity, queue, mock(Bouncer.class)) {{
+				exec, rateLimiter, liveActivity, queue) {{
 		}};
 		return ircBot;
 	}

@@ -16,7 +16,7 @@ public class BouncerTest {
 	@Test
 	public void testEnter() throws Exception {
 		assertTrue(bouncer.tryEnter("nick", 1));
-		assertThat(bouncer.get("nick")).contains(new SemaphorePayload(1, 0, null, 0, false));
+		assertThat(bouncer.get("nick")).contains(new SemaphorePayload(1, 0, 0, false));
 	}
 
 	@Test
@@ -40,13 +40,4 @@ public class BouncerTest {
 		assertFalse(bouncer.exit("it's a me", 2));
 	}
 
-	@Test
-	public void testThreadSetting() throws Exception {
-		bouncer.tryEnter("nick", 1);
-		bouncer.setThread("nick", 1);
-		assertThat(bouncer.getThread("nick")).contains(Thread.currentThread());
-		assertFalse(bouncer.setThread("nick", 2));
-		bouncer.clearThread("nick", 1);
-		assertThat(bouncer.getThread("nick")).isEmpty();
-	}
 }
