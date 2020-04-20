@@ -23,10 +23,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.internal.util.MockUtil;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
-import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.util.Clock;
@@ -37,6 +37,8 @@ import org.tillerino.ppaddict.util.TestClock;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
@@ -53,7 +55,7 @@ public class LoggingTest {
 
 	public TestClock clock = new TestClock();
 
-	private MessagePreprocessor in;
+	private GameChatEventConsumer in;
 
 	private GameChatWriter out;
 
@@ -69,7 +71,7 @@ public class LoggingTest {
 			}
 		});
 
-		in = injector.getInstance(MessagePreprocessor.class);
+		in = injector.getInstance(Key.get(GameChatEventConsumer.class, Names.named("messagePreprocessor")));
 		out = injector.getInstance(GameChatWriter.class);
 		assertTrue(MockUtil.isMock(out));
 		backend = (TestBackend) injector.getInstance(BotBackend.class);

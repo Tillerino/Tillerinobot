@@ -31,11 +31,12 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatEvent;
+import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
-import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
+import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
@@ -86,7 +87,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		install(new CreateInMemoryDatabaseModule());
 		install(new TillerinobotConfigurationModule());
 		install(new InMemoryQueuesModule());
-		
+		install(new ProcessorsModule());
+
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
@@ -137,8 +139,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 	@Provides
 	@Singleton
-	public GameChatClient getRunner(MessagePreprocessor preprocessor, final BotBackend backend,
-			final IrcNameResolver resolver, EntityManagerFactory emf,
+	public GameChatClient getRunner(@Named("messagePreprocessor") GameChatEventConsumer preprocessor,
+			final BotBackend backend, final IrcNameResolver resolver, EntityManagerFactory emf,
 			ThreadLocalAutoCommittingEntityManager em,
 			@Named("tillerinobot.git.commit.id.abbrev") String commit,
 			@Named("tillerinobot.git.commit.message.short") String commitMessage) throws Exception {

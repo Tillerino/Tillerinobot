@@ -2,7 +2,7 @@ package org.tillerino.ppaddict.chat.local;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.only;
@@ -18,16 +18,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.GameChatResponseConsumer;
 import org.tillerino.ppaddict.chat.PrivateMessage;
-import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -36,7 +36,7 @@ public class LocalGameChatResponseQueueTest {
 	private GameChatMetrics botInfo;
 
 	@Mock
-	private ResponsePostprocessor downstream;
+	private GameChatResponseConsumer downstream;
 
 	@InjectMocks
 	private LocalGameChatResponseQueue queue;

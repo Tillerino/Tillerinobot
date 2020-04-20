@@ -4,14 +4,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponseConsumer;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
-import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.util.LoopingRunnable;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LocalGameChatResponseQueue extends LoopingRunnable implements GameChatResponseQueue {
-	private final ResponsePostprocessor downstream;
+	private final @Named("responsePostprocessor") GameChatResponseConsumer downstream;
 
 	private final BlockingQueue<Pair<GameChatResponse, GameChatEvent>> queue = new LinkedBlockingQueue<>();
 

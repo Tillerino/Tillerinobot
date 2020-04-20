@@ -33,10 +33,9 @@ import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.tillerino.ppaddict.chat.GameChatClient;
-import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatWriter;
-import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
+import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
@@ -162,6 +161,7 @@ public class FullBotTest {
 			install(new CreateInMemoryDatabaseModule());
 			install(new TillerinobotConfigurationModule());
 			install(new InMemoryQueuesModule());
+			install(new ProcessorsModule());
 
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance("localhost");
 			bind(Integer.class).annotatedWith(Names.named("tillerinobot.irc.port")).toInstance(port);
@@ -169,7 +169,6 @@ public class FullBotTest {
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.password")).toInstance("");
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.autojoin")).toInstance("#osu");
 
-			bind(GameChatEventConsumer.class).annotatedWith(Names.named("messagePreprocessor")).to(MessagePreprocessor.class);
 			bind(GameChatClient.class).to(BotRunnerImpl.class);
 			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore")).toInstance(false);
 			bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
