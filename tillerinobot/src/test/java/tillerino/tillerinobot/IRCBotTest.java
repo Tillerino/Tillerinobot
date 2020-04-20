@@ -44,9 +44,9 @@ import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 
-import tillerino.tillerinobot.CommandHandler.Action;
-import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Success;
+import org.tillerino.ppaddict.chat.GameChatResponse.Action;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
@@ -140,7 +140,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		backend.hintUser("user", false, 0, 0);
 		backend.setLastVisitedVersion("user", 0);
 		
-		verifyResponse(bot, message("user", "!recommend"), new CommandHandler.Message(IRCBot.VERSION_MESSAGE).then(singleResponse()));
+		verifyResponse(bot, message("user", "!recommend"), new Message(IRCBot.VERSION_MESSAGE).then(singleResponse()));
 		verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.CURRENT_VERSION));
 
 		verifyResponse(bot, message("user", "!recommend"), singleResponse());

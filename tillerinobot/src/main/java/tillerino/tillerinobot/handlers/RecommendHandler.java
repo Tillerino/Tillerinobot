@@ -10,6 +10,7 @@ import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.extern.slf4j.Slf4j;

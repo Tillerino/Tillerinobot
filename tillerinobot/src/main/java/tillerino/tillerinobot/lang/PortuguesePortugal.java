@@ -7,8 +7,8 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
-import tillerino.tillerinobot.CommandHandler.Action;
-import tillerino.tillerinobot.CommandHandler.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Action;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
 /**
  * @author [HDHR] andre.pedrocv@gmail.com https://osu.ppy.sh/u/3547567 https://github.com/ThatGuy986

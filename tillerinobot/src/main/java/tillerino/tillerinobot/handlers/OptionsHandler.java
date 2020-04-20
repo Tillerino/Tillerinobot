@@ -15,6 +15,7 @@ import javax.inject.Inject;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.CommandHandler;

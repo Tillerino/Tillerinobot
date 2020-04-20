@@ -9,8 +9,8 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class ResetHandler implements CommandHandler {

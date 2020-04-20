@@ -27,7 +27,7 @@ import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
-import tillerino.tillerinobot.CommandHandler.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 
 @RunWith(MockitoJUnitRunner.class)

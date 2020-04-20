@@ -5,17 +5,17 @@ import java.sql.SQLException;
 
 import javax.inject.Inject;
 
-import lombok.RequiredArgsConstructor;
-
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import tillerino.tillerinobot.UserException;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FixIDHandler implements CommandHandler {

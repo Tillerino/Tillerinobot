@@ -1,7 +1,5 @@
 package org.tillerino.ppaddict.chat.impl;
 
-import java.util.stream.Stream;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -20,7 +18,7 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.CommandHandler.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**

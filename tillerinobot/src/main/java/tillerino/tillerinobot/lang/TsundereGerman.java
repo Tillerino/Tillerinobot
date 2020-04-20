@@ -7,8 +7,8 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.CommandHandler.Action;
-import tillerino.tillerinobot.CommandHandler.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Action;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 import javax.annotation.Nonnull;

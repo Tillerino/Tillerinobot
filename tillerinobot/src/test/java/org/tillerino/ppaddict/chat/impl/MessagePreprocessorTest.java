@@ -1,7 +1,7 @@
 package org.tillerino.ppaddict.chat.impl;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
@@ -23,7 +24,6 @@ import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
 import org.tillerino.ppaddict.util.Clock;
 
-import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -110,7 +110,7 @@ public class MessagePreprocessorTest {
 		verify(bouncer).get("nick");
 		verify(bouncer).updateIfPresent(eq("nick"), eq(0L), any());
 		verifyNoMoreInteractions(bouncer);
-		verify(responses).onResponse(new CommandHandler.Message("Just a second..."), event);
+		verify(responses).onResponse(new Message("Just a second..."), event);
 		verify(queue).size();
 		verifyNoMoreInteractions(queue);
 	}
@@ -128,7 +128,7 @@ public class MessagePreprocessorTest {
 		verify(bouncer).get("nick");
 		verify(bouncer).updateIfPresent(eq("nick"), eq(0L), any());
 		verifyNoMoreInteractions(bouncer);
-		verify(responses).onResponse(new CommandHandler.Message("[http://i.imgur.com/Ykfua8r.png ...]"), event);
+		verify(responses).onResponse(new Message("[http://i.imgur.com/Ykfua8r.png ...]"), event);
 		verifyZeroInteractions(queue);
 	}
 }

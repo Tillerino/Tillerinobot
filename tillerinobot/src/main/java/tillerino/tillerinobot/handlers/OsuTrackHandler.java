@@ -1,22 +1,25 @@
 package tillerino.tillerinobot.handlers;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.osutrack.Highscore;
+import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.osutrack.UpdateResult;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Locale;
 
 public class OsuTrackHandler extends CommandHandler.WithShorthand {
     private final OsutrackDownloader osutrackDownloader;

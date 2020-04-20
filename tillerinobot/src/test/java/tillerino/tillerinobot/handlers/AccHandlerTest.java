@@ -19,13 +19,12 @@ import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.CommandHandler.Success;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
-import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 

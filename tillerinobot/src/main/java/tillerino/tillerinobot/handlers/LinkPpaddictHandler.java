@@ -6,12 +6,12 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import lombok.AllArgsConstructor;
-import lombok.Value;
-
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 
+import lombok.AllArgsConstructor;
+import lombok.Value;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;

@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import lombok.Value;
-
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 
+import lombok.Value;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;

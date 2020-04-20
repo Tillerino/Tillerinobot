@@ -1,6 +1,7 @@
 package org.tillerino.ppaddict.chat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -10,11 +11,41 @@ import javax.annotation.CheckForNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.Value;
 
 /**
  * Response sent to the user as the result of a command
  */
 public interface GameChatResponse extends Iterable<GameChatResponse> {
+	/**
+	 * A regular IRC message. This should not be used as the direct response to
+	 * a command, but for other auxiliary messages, see {@link Success}.
+	 */
+	@Value
+	@EqualsAndHashCode(callSuper = false)
+	public static class Message extends GameChatResponse.SingletonResponse {
+		String content;
+	}
+
+	/**
+	 * A regular IRC message, which will be logged as a successfully executed command.
+	 * This is the message that the command duration will be logged for.
+	 */
+	@Value
+	@EqualsAndHashCode(callSuper = false)
+	public static class Success extends GameChatResponse.SingletonResponse {
+		String content;
+	}
+
+	/**
+	 * An "action" type IRC message
+	 */
+	@Value
+	@EqualsAndHashCode(callSuper = false)
+	public static class Action extends GameChatResponse.SingletonResponse {
+		String content;
+	}
+
 	/**
 	 * Adds another response to the current one.
 	 */
@@ -73,6 +104,13 @@ public interface GameChatResponse extends Iterable<GameChatResponse> {
 		@Override
 		public Iterator<GameChatResponse> iterator() {
 			return responses.iterator();
+		}
+	}
+
+	abstract class SingletonResponse implements GameChatResponse {
+		@Override
+		public Iterator<GameChatResponse> iterator() {
+			return Arrays.asList((GameChatResponse) this).iterator();
 		}
 	}
 }

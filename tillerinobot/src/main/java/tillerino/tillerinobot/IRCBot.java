@@ -38,7 +38,7 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
 
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.CommandHandler.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;

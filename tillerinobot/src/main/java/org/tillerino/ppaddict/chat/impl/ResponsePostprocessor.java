@@ -18,9 +18,9 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.CommandHandler.Action;
-import tillerino.tillerinobot.CommandHandler.Message;
-import tillerino.tillerinobot.CommandHandler.Success;
+import org.tillerino.ppaddict.chat.GameChatResponse.Action;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 

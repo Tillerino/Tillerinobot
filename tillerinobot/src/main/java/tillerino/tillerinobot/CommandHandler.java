@@ -4,8 +4,6 @@ import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Iterator;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -14,47 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
-import lombok.EqualsAndHashCode;
-import lombok.Value;
 import tillerino.tillerinobot.UserDataManager.UserData;
 
 public interface CommandHandler {
-	/**
-	 * A regular IRC message. This should not be used as the direct response to
-	 * a command, but for other auxiliary messages, see {@link Success}.
-	 */
-	@Value
-	@EqualsAndHashCode(callSuper = false)
-	public static class Message extends SingletonResponse {
-		String content;
-	}
-
-	/**
-	 * A regular IRC message, which will be logged as a successfully executed command.
-	 * This is the message that the command duration will be logged for.
-	 */
-	@Value
-	@EqualsAndHashCode(callSuper = false)
-	public static class Success extends SingletonResponse {
-		String content;
-	}
-
-	/**
-	 * An "action" type IRC message
-	 */
-	@Value
-	@EqualsAndHashCode(callSuper = false)
-	public static class Action extends SingletonResponse {
-		String content;
-	}
-
-	abstract static class SingletonResponse implements GameChatResponse {
-		@Override
-		public Iterator<GameChatResponse> iterator() {
-			return Arrays.asList((GameChatResponse) this).iterator();
-		}
-	}
-
 	/**
 	 * A special command handler, which will handle any input. It will at most
 	 * throw a {@link UserException} if the input is somehow invalid.

@@ -5,7 +5,7 @@ import java.util.Random;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
-import tillerino.tillerinobot.CommandHandler.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.recommendations.Recommendation;
 
 import javax.annotation.Nonnull;
