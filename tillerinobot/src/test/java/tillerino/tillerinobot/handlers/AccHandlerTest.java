@@ -16,16 +16,16 @@ import java.util.regex.Matcher;
 
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
+import org.tillerino.ppaddict.chat.LiveActivity;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
-import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 
 public class AccHandlerTest {
@@ -47,7 +47,7 @@ public class AccHandlerTest {
 		beatmap.setMaxCombo(100);
 		when(backend.loadBeatmap(anyInt(), anyLong(), isNull()))
 				.thenReturn(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)));
-		AccHandler accHandler = new AccHandler(backend, mock(LiveActivityEndpoint.class));
+		AccHandler accHandler = new AccHandler(backend, mock(LiveActivity.class));
 		
 		UserData userData = mock(UserData.class);
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
@@ -63,7 +63,7 @@ public class AccHandlerTest {
 		BotBackend backend = mock(BotBackend.class);
 		when(backend.loadBeatmap(anyInt(), anyLong(), any())).thenReturn(new BeatmapMeta(null, null, null));
 		try {
-			new AccHandler(backend, mock(LiveActivityEndpoint.class)).handle("acc 99 80000000000000000000x 1m", null, userData);
+			new AccHandler(backend, mock(LiveActivity.class)).handle("acc 99 80000000000000000000x 1m", null, userData);
 			fail();
 		} catch (Exception e) {
 			assertThat(e.getMessage(), containsString("800000000000"));
