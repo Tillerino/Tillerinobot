@@ -13,6 +13,7 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -25,7 +26,6 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NPHandler implements CommandHandler {
@@ -38,7 +38,7 @@ public class NPHandler implements CommandHandler {
 
 	private final BotBackend backend;
 
-	private final LiveActivityEndpoint live;
+	private final LiveActivity live;
 
 	@Override
 	public GameChatResponse handle(String message, OsuApiUser apiUser, UserData userData) throws UserException, IOException, SQLException, InterruptedException {

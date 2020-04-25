@@ -9,6 +9,8 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot</artifactId>
+	<name>Tillerinobot Core</name>
+	<description>The core of Tillerinobot: command handling, languages, recommendations, pp, APIs</description>
 
 	<build>
 		<plugins>

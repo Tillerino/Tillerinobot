@@ -11,6 +11,7 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,17 +24,16 @@ import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.Recommendation;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @Slf4j
 public class RecommendHandler extends CommandHandler.WithShorthand {
 	public static final String MDC_FLAG = "r";
 
 	private final RecommendationsManager manager;
-	private final LiveActivityEndpoint liveActivity;
+	private final LiveActivity liveActivity;
 
 	@Inject
-	public RecommendHandler(RecommendationsManager manager, LiveActivityEndpoint liveActivity) {
+	public RecommendHandler(RecommendationsManager manager, LiveActivity liveActivity) {
 		super("recommend");
 		this.manager = manager;
 		this.liveActivity = liveActivity;

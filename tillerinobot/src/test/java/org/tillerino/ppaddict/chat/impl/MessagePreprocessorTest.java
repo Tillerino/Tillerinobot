@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -13,18 +12,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.Joined;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
 import org.tillerino.ppaddict.util.Clock;
-
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessagePreprocessorTest {
@@ -38,7 +36,7 @@ public class MessagePreprocessorTest {
 	GameChatResponseQueue responses;
 
 	@Mock
-	LiveActivityEndpoint liveActivity;
+	LiveActivity liveActivity;
 
 	@Mock
 	Clock clock;
@@ -57,7 +55,7 @@ public class MessagePreprocessorTest {
 		verify(liveActivity).propagateReceivedMessage(event.getNick(), event.getEventId());
 
 		verify(queue).onEvent(event);
-		verifyZeroInteractions(responses);
+		verifyNoMoreInteractions(responses);
 	}
 
 	@Test
@@ -71,7 +69,7 @@ public class MessagePreprocessorTest {
 		verify(liveActivity).propagateReceivedMessage(event.getNick(), event.getEventId());
 
 		verify(queue).onEvent(event);
-		verifyZeroInteractions(responses);
+		verifyNoMoreInteractions(responses);
 	}
 
 	@Test
@@ -79,8 +77,8 @@ public class MessagePreprocessorTest {
 		Joined event = new Joined(1, "nick", 2);
 
 		preprocessor.onEvent(event);
-		verifyZeroInteractions(bouncer);
-		verifyZeroInteractions(responses);
+		verifyNoMoreInteractions(bouncer);
+		verifyNoMoreInteractions(responses);
 		verify(queue).onEvent(event);
 	}
 
@@ -94,7 +92,7 @@ public class MessagePreprocessorTest {
 		verify(bouncer).get("nick");
 		verifyNoMoreInteractions(bouncer);
 		verify(responses).onResponse(GameChatResponse.none(), event);
-		verifyZeroInteractions(queue);
+		verifyNoMoreInteractions(queue);
 	}
 
 	@Test
@@ -129,6 +127,6 @@ public class MessagePreprocessorTest {
 		verify(bouncer).updateIfPresent(eq("nick"), eq(0L), any());
 		verifyNoMoreInteractions(bouncer);
 		verify(responses).onResponse(new Message("[http://i.imgur.com/Ykfua8r.png ...]"), event);
-		verifyZeroInteractions(queue);
+		verifyNoMoreInteractions(queue);
 	}
 }

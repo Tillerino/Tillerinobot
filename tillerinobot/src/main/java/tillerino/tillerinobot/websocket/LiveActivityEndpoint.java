@@ -21,6 +21,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.IRCName;
+import org.tillerino.ppaddict.chat.LiveActivity;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
@@ -43,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Singleton
 @ServerEndpoint("/live/v0")
-public class LiveActivityEndpoint extends Endpoint {
+public class LiveActivityEndpoint extends Endpoint implements LiveActivity {
 	@Value
 	public static class Received {
 		long eventId;
@@ -112,15 +113,18 @@ public class LiveActivityEndpoint extends Endpoint {
 		}
 	}
 
+	@Override
 	public void propagateReceivedMessage(@IRCName String ircUserName, long eventId) {
 		sendToEachSession(session -> Message.builder().received(new Received(eventId, anonymizeHashCode(ircUserName, session))).build());
 	}
 
+	@Override
 	public void propagateSentMessage(@IRCName String ircUserName, long eventId) {
 		Integer ping = Optional.ofNullable(MDC.get("ping")).map(Integer::valueOf).orElse(null);
 		sendToEachSession(session -> Message.builder().sent(new Sent(eventId, anonymizeHashCode(ircUserName, session), ping)).build());
 	}
 
+	@Override
 	public void propagateMessageDetails(long eventId, String text) {
 		sendToEachSession(session -> Message.builder().messageDetails(new MessageDetails(eventId, text)).build());
 	}

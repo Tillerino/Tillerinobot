@@ -12,23 +12,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.UserChannelDao;
 import org.pircbotx.output.OutputUser;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 
 import tillerino.tillerinobot.RateLimiter;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IrcWriterTest {
 	@Mock
-	LiveActivityEndpoint liveActivity;
+    LiveActivity liveActivity;
 
 	@Mock
 	ExecutorService exec;

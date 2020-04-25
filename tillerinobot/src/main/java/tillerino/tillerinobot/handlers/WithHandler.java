@@ -10,6 +10,7 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -21,13 +22,12 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WithHandler implements CommandHandler {
 	private final BotBackend backend;
 
-	private final LiveActivityEndpoint live;
+	private final LiveActivity live;
 
 	@Override
 	public GameChatResponse handle(String originalMessage, OsuApiUser apiUser,

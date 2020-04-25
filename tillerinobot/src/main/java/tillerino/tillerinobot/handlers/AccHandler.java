@@ -11,6 +11,7 @@ import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,12 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AccHandler implements CommandHandler {
 	private final BotBackend backend;
 
-	private final LiveActivityEndpoint live;
+	private final LiveActivity live;
 
 	static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 	static Pattern superExtended = Pattern.compile("(\\d+)x100\\s+(?:(\\d+)x50\\s+)?(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);

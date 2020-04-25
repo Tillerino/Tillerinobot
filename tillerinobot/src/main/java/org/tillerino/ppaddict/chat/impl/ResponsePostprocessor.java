@@ -10,19 +10,19 @@ import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Action;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.GameChatResponseConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tillerino.ppaddict.chat.GameChatResponse.Action;
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
-import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.handlers.RecommendHandler;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
  * Prepares responses to be written out. Writing is done in synchronous fashion
@@ -36,7 +36,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 
 	private final GameChatWriter writer;
 
-	private final LiveActivityEndpoint liveActivity;
+	private final LiveActivity liveActivity;
 
 	private final GameChatMetrics botInfo;
 

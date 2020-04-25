@@ -7,7 +7,9 @@ import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
@@ -18,8 +20,6 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
  * Here we do anything that we can do right after we receive the message and
@@ -34,7 +34,7 @@ import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 public class MessagePreprocessor implements GameChatEventConsumer {
 	private final GameChatEventQueue queue;
 
-	private final LiveActivityEndpoint liveActivity;
+	private final LiveActivity liveActivity;
 
 	private final Bouncer bouncer;
 

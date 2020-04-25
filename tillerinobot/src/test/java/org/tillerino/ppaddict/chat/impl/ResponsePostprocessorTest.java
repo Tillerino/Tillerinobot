@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.jboss.logging.MDC;
@@ -12,20 +12,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Action;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
-
-import org.tillerino.ppaddict.chat.GameChatResponse.Action;
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
-import org.tillerino.ppaddict.chat.GameChatResponse.Success;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResponsePostprocessorTest {
@@ -36,7 +35,7 @@ public class ResponsePostprocessorTest {
 	private Bouncer bouncer;
 
 	@Mock
-	private LiveActivityEndpoint liveActivity;
+	private LiveActivity liveActivity;
 
 	@Mock
 	private GameChatWriter writer;
@@ -89,8 +88,8 @@ public class ResponsePostprocessorTest {
 	public void testNoResponse() throws Exception {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(GameChatResponse.none(), event);
-		verifyZeroInteractions(writer);
-		verifyZeroInteractions(liveActivity);
+		verifyNoInteractions(writer);
+		verifyNoInteractions(liveActivity);
 		verify(bouncer, times(1)).exit("nick", 1);
 	}
 
@@ -109,7 +108,7 @@ public class ResponsePostprocessorTest {
 		Sighted event = new Sighted(1, "nick", 2);
 		responsePostprocessor.onResponse(new Success("hai"), event);
 		verify(writer).message("hai", event);
-		verifyZeroInteractions(bouncer);
+		verifyNoInteractions(bouncer);
 	}
 
 	@Test
