@@ -1,5 +1,6 @@
 package tillerino.tillerinobot;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyCollectionOf;
@@ -38,22 +39,22 @@ import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Action;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.Joined;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 
-import org.tillerino.ppaddict.chat.GameChatResponse.Action;
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
-import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 public class IRCBotTest extends AbstractDatabaseTest {
 
@@ -84,7 +85,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	RecommendationsManager recommendationsManager;
 
 	@Mock
-	LiveActivityEndpoint liveActivity;	
+	LiveActivity liveActivity;
 
 	/**
 	 * Contains the messages and actions sent by the bot. At the end of each

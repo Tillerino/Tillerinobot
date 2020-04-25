@@ -26,9 +26,11 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
 import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.Joined;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
@@ -38,7 +40,6 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
@@ -61,7 +62,6 @@ import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.osutrack.UpdateResult;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
  * The name of this class is rather historical. It implements the basic chat
@@ -86,7 +86,7 @@ public class IRCBot implements GameChatEventConsumer {
 			UserDataManager userDataManager, ThreadLocalAutoCommittingEntityManager em,
 			EntityManagerFactory emf, IrcNameResolver resolver,
 			OsutrackDownloader osutrackDownloader,
-			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter, LiveActivityEndpoint liveActivity,
+			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter, LiveActivity liveActivity,
 			GameChatResponseQueue queue) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;

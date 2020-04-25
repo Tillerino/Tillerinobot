@@ -1,10 +1,16 @@
 package tillerino.tillerinobot.lang;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.LiveActivity;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData;
@@ -12,7 +18,6 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 public class TsundereTest {
 
@@ -24,7 +29,7 @@ public class TsundereTest {
 		// mock backend and create RecommendationsManager and RecommendHandler based on mocked backend
 		BotBackend backend = mock(BotBackend.class);
 		RecommendHandler handler = new RecommendHandler(
-				new RecommendationsManager(backend, null, null, new RecommendationRequestParser(backend)), mock(LiveActivityEndpoint.class));
+				new RecommendationsManager(backend, null, null, new RecommendationRequestParser(backend)), mock(LiveActivity.class));
 
 		// mock a user data object and make it return the tsundere object that we're spying on
 		UserData userData = mock(UserData.class);

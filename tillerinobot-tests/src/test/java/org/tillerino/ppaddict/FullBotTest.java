@@ -1,19 +1,39 @@
 package org.tillerino.ppaddict;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.name.Names;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static java.util.stream.Collectors.toList;
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import javax.inject.Singleton;
+
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
@@ -33,6 +53,14 @@ import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.name.Names;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IRCBot;
@@ -42,22 +70,13 @@ import tillerino.tillerinobot.TillerinobotConfigurationModule;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
-
-import javax.inject.Singleton;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toList;
-import static org.awaitility.Awaitility.await;
+import tillerino.tillerinobot.websocket.LiveActivityEndpointTest;
 
 /**
  * This test starts an embedded IRC server, mocks a backend and requests
  * recommendations from multiple users in parallel.
  */
+@RunWith(MockitoJUnitRunner.class)
 @Slf4j
 public class FullBotTest {
 	@SuppressWarnings({ "unchecked"})
@@ -72,7 +91,7 @@ public class FullBotTest {
 
 		private Client(int botNumber) {
 			Builder<PircBotX> configurationBuilder = new Configuration.Builder<>()
-					.setServer("127.0.0.1", server.getPort())
+					.setServer(ircHost(), ircPort())
 					.setName("user" + botNumber)
 					.setEncoding(StandardCharsets.UTF_8)
 					.setAutoReconnect(false)
@@ -96,11 +115,11 @@ public class FullBotTest {
 								lastReceivedRecommendation = System.currentTimeMillis();
 								recommendationCount.incrementAndGet();
 							}
-							if (receivedRecommendations < RECOMMENDATIONS_PER_USER) {
+							if (receivedRecommendations < recommendationsPerUser) {
 								Thread.sleep(10);
 								r();
 							} else {
-								log.debug("user{} received {} recommendations. Quitting.", botNumber, RECOMMENDATIONS_PER_USER);
+								log.debug("user{} received {} recommendations. Quitting.", botNumber, recommendationsPerUser);
 								event.getBot().sendIRC().quitServer();
 							}
 						}
@@ -122,9 +141,9 @@ public class FullBotTest {
 		}
 	}
 
-	private static final int USERS = 100;
+	protected int users = 100;
 
-	private static final int RECOMMENDATIONS_PER_USER = 20;
+	protected int recommendationsPerUser = 20;
 
 	@Rule
 	public final EmbeddedIrcServerRule server = new EmbeddedIrcServerRule();
@@ -137,28 +156,34 @@ public class FullBotTest {
 	public final ExecutorServiceRule coreWorkerPool = ExecutorServiceRule.fixedThreadPool("core", 4);
 
 	@Rule
-	public final JettyWebsocketServerResource websocket = new JettyWebsocketServerResource("localhost", 0);
+	public final JettyWebsocketServerResource webSocket = new JettyWebsocketServerResource("localhost", 0);
+
+	private final WebSocketClient webSocketClient = new WebSocketClient();
+
+	@Mock
+	private LiveActivityEndpointTest.GenericWebSocketClient client;
 
 	private final AtomicInteger recommendationCount = new AtomicInteger();
 
-	private GameChatClient botRunner;
+	private BotRunnerImpl botRunner;
 
 	private final List<Future<?>> started = new ArrayList<>();
 
 	@RequiredArgsConstructor
 	static class FullBotConfiguration extends AbstractModule {
+		private final String host;
 		private final int port;
 		private final ExecutorService maintenanceWorkerPool;
 		private final ExecutorService coreWorkerPool;
 
 		@Override
 		protected void configure() {
-			install(new CreateInMemoryDatabaseModule());
+			installMore();
 			install(new TillerinobotConfigurationModule());
 			install(new InMemoryQueuesModule());
 			install(new ProcessorsModule());
 
-			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance("localhost");
+			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance(host);
 			bind(Integer.class).annotatedWith(Names.named("tillerinobot.irc.port")).toInstance(port);
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.nickname")).toInstance("tillerinobot");
 			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.password")).toInstance("");
@@ -174,6 +199,10 @@ public class FullBotTest {
 			bind(ExecutorService.class).annotatedWith(Names.named("core")).toInstance(coreWorkerPool);
 			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 		}
+
+		protected void installMore() {
+			install(new CreateInMemoryDatabaseModule());
+		}
 	}
 
 	@BeforeClass
@@ -188,31 +217,49 @@ public class FullBotTest {
 
 	@Before
 	public void startBot() throws Exception {
-		Injector injector = Guice.createInjector(new FullBotConfiguration(server.getPort(), exec, coreWorkerPool));
+		Injector injector = createInjector();
 
-		websocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
+		webSocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
+		webSocketClient.start();
+		Future<Session> connect = webSocketClient.connect(client,
+				new URI("ws://localhost:" + webSocket.getPort() + "/live/v0"));
+		connect.get(10, TimeUnit.SECONDS);
 
 		LocalGameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
 		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
-		botRunner = injector.getInstance(GameChatClient.class);
+		botRunner = (BotRunnerImpl) injector.getInstance(GameChatClient.class);
 		started.add(exec.submit(botRunner));
 		started.add(exec.submit(injector.getInstance(LocalGameChatEventQueue.class)));
 		started.add(exec.submit(injector.getInstance(LocalGameChatResponseQueue.class)));
-		for (int botNumber = 0; botNumber < USERS; botNumber++) {
+		for (int botNumber = 0; botNumber < users; botNumber++) {
 			backend.hintUser("user" + botNumber, false, 12, 1000);
 		}
 		await().until(() -> botInfo.getLastInteraction() > 0);
 	}
 
+	protected Injector createInjector() {
+		return Guice.createInjector(new FullBotConfiguration(ircHost(), ircPort(), exec, coreWorkerPool));
+	}
+
+	protected int ircPort() {
+		return server.getPort();
+	}
+
+	protected String ircHost() {
+		return "127.0.0.1";
+	}
+
 	@After
-	public void stopBot() {
+	public void stopBot() throws Exception {
 		started.forEach(fut -> fut.cancel(true));
+		botRunner.stopReconnecting();
 		botRunner.disconnectSoftly();
+		webSocketClient.stop();
 	}
 
 	@Test
 	public void testMultipleUsers() {
-		List<Client> clients = IntStream.range(0, USERS).mapToObj(Client::new).collect(toList());
+		List<Client> clients = IntStream.range(0, users).mapToObj(Client::new).collect(toList());
 		clients.forEach(client -> {
 			try {
 				// we have to spread out our connection attempts a bit or they might fail
@@ -226,18 +273,19 @@ public class FullBotTest {
 			await().until(() -> client.connected);
 			client.r();
 		});
+		int total = users * recommendationsPerUser;
 		Callable<Boolean> allRecommendationsReceived = () -> {
 			log.debug("Received {} recommendations so far.", recommendationCount.get());
-			return recommendationCount.get() == USERS * RECOMMENDATIONS_PER_USER;
+			return recommendationCount.get() == total;
 		};
 		for (int i = 0; i < 100; i++) {
 			try {
-				log.info("Waiting for recommendation count to reach {}.", USERS * RECOMMENDATIONS_PER_USER);
+				log.info("Waiting for recommendation count to reach {}.", total);
 				await().atMost(Duration.TEN_SECONDS).until(allRecommendationsReceived);
 			} catch (ConditionTimeoutException e) {
 				log.info("Some clients got concurrent messages. Let's give 'em a push.");
 				clients.stream()
-						.filter(client -> client.receivedRecommendations < RECOMMENDATIONS_PER_USER)
+						.filter(client -> client.receivedRecommendations < recommendationsPerUser)
 						.filter(client -> client.lastReceivedRecommendation < System.currentTimeMillis() - 1000)
 						.forEach(Client::r);
 				continue;
@@ -245,6 +293,9 @@ public class FullBotTest {
 			break;
 		}
 		await().atMost(Duration.ONE_SECOND).until(allRecommendationsReceived);
+		verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"received\" :")));
+		verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"sent\" :")));
+		verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\" :")));
 		log.info("Received {} recommendations. Quitting.", recommendationCount.get());
 	}
 }

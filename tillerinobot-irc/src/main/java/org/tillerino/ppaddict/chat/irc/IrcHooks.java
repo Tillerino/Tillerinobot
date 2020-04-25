@@ -140,7 +140,10 @@ public class IrcHooks extends CoreHooks {
 			User user = null;
 			if (event instanceof GenericUserEvent<?>) {
 				user = ((GenericUserEvent) event).getUser();
-				mdc.add(MdcUtils.MDC_USER, user.getNick());
+				if (user != null) {
+					// looks like the mode event can have user == null ¯\_(ツ)_/¯
+					mdc.add(MdcUtils.MDC_USER, user.getNick());
+				}
 			}
 
 			super.onEvent(event);

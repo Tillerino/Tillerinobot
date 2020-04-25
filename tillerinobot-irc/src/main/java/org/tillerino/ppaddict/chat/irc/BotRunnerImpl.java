@@ -2,7 +2,7 @@ package org.tillerino.ppaddict.chat.irc;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -174,7 +174,7 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 	private final String nickname;
 	private final String password;
 	private final String autojoinChannel;
-	private TillerinobotGitProperties gitProperties;
+	private final TillerinobotGitProperties gitProperties;
 
 	private volatile boolean reconnect = true;
 	private int reconnectTimeout = 10000;
@@ -193,7 +193,7 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 							.setMessageDelay(MESSAGE_DELAY)
 							.setListenerManager(listenerManager)
 							.setName(nickname)
-							.setEncoding(Charset.forName("UTF-8"))
+							.setEncoding(StandardCharsets.UTF_8)
 							.setAutoReconnect(false)
 							.setBotFactory(new CustomBotFactory());
 					if (password != null && !password.isEmpty()) {
@@ -257,5 +257,9 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 		if (bot != null) {
 			bot.sendIRC().quitServer();
 		}
+	}
+
+	public void stopReconnecting() {
+		reconnect = false;
 	}
 }
