@@ -177,7 +177,7 @@ public class FullBotTest {
 
 		@Override
 		protected void configure() {
-			install(new CreateInMemoryDatabaseModule());
+			installMore();
 			install(new TillerinobotConfigurationModule());
 			install(new InMemoryQueuesModule());
 			install(new ProcessorsModule());
@@ -198,6 +198,10 @@ public class FullBotTest {
 			bind(ExecutorService.class).annotatedWith(Names.named("core")).toInstance(coreWorkerPool);
 			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 		}
+
+		protected void installMore() {
+			install(new CreateInMemoryDatabaseModule());
+		}
 	}
 
 	@BeforeClass
@@ -212,7 +216,7 @@ public class FullBotTest {
 
 	@Before
 	public void startBot() throws Exception {
-		Injector injector = Guice.createInjector(new FullBotConfiguration(server.getPort(), exec, coreWorkerPool));
+		Injector injector = createInjector();
 
 		webSocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
 		webSocketClient.start();
@@ -230,6 +234,10 @@ public class FullBotTest {
 			backend.hintUser("user" + botNumber, false, 12, 1000);
 		}
 		await().until(() -> botInfo.getLastInteraction() > 0);
+	}
+
+	protected Injector createInjector() {
+		return Guice.createInjector(new FullBotConfiguration(server.getPort(), exec, coreWorkerPool));
 	}
 
 	@After

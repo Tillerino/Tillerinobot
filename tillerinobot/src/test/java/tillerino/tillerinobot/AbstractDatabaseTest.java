@@ -1,6 +1,7 @@
 package tillerino.tillerinobot;
 
 import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -11,17 +12,17 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provides;
+
 import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
 import tillerino.tillerinobot.data.util.RepositoryModule;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
 
 public abstract class AbstractDatabaseTest {
 	public static class CreateInMemoryDatabaseModule extends AbstractModule {
@@ -33,10 +34,14 @@ public abstract class AbstractDatabaseTest {
 			LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 			factory.setJpaVendorAdapter(vendorAdapter);
 			factory.setPackagesToScan("tillerino.tillerinobot.data");
-			factory.setDataSource(new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).build());
+			factory.setDataSource(dataSource());
 			factory.afterPropertiesSet();
 
 			return factory.getObject();
+		}
+
+		protected DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).build();
 		}
 
 		@Override
