@@ -1,19 +1,39 @@
 package org.tillerino.ppaddict;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.name.Names;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static java.util.stream.Collectors.toList;
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import javax.inject.Singleton;
+
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
@@ -33,6 +53,14 @@ import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.name.Names;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IRCBot;
@@ -42,22 +70,13 @@ import tillerino.tillerinobot.TillerinobotConfigurationModule;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
-
-import javax.inject.Singleton;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toList;
-import static org.awaitility.Awaitility.await;
+import tillerino.tillerinobot.websocket.LiveActivityEndpointTest;
 
 /**
  * This test starts an embedded IRC server, mocks a backend and requests
  * recommendations from multiple users in parallel.
  */
+@RunWith(MockitoJUnitRunner.class)
 @Slf4j
 public class FullBotTest {
 	@SuppressWarnings({ "unchecked"})
@@ -137,7 +156,12 @@ public class FullBotTest {
 	public final ExecutorServiceRule coreWorkerPool = ExecutorServiceRule.fixedThreadPool("core", 4);
 
 	@Rule
-	public final JettyWebsocketServerResource websocket = new JettyWebsocketServerResource("localhost", 0);
+	public final JettyWebsocketServerResource webSocket = new JettyWebsocketServerResource("localhost", 0);
+
+	private final WebSocketClient webSocketClient = new WebSocketClient();
+
+	@Mock
+	private LiveActivityEndpointTest.GenericWebSocketClient client;
 
 	private final AtomicInteger recommendationCount = new AtomicInteger();
 
@@ -190,7 +214,11 @@ public class FullBotTest {
 	public void startBot() throws Exception {
 		Injector injector = Guice.createInjector(new FullBotConfiguration(server.getPort(), exec, coreWorkerPool));
 
-		websocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
+		webSocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
+		webSocketClient.start();
+		Future<Session> connect = webSocketClient.connect(client,
+				new URI("ws://localhost:" + webSocket.getPort() + "/live/v0"));
+		connect.get(10, TimeUnit.SECONDS);
 
 		LocalGameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
 		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
@@ -205,9 +233,10 @@ public class FullBotTest {
 	}
 
 	@After
-	public void stopBot() {
+	public void stopBot() throws Exception {
 		started.forEach(fut -> fut.cancel(true));
 		botRunner.disconnectSoftly();
+		webSocketClient.stop();
 	}
 
 	@Test
@@ -245,6 +274,9 @@ public class FullBotTest {
 			break;
 		}
 		await().atMost(Duration.ONE_SECOND).until(allRecommendationsReceived);
+		verify(client, timeout(1000).atLeast(2000)).message(argThat(s -> s.contains("\"received\" :")));
+		verify(client, timeout(1000).atLeast(2000)).message(argThat(s -> s.contains("\"sent\" :")));
+		verify(client, timeout(1000).atLeast(2000)).message(argThat(s -> s.contains("\"messageDetails\" :")));
 		log.info("Received {} recommendations. Quitting.", recommendationCount.get());
 	}
 }
