@@ -5,7 +5,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.NotFoundException;
 
 import org.tillerino.ppaddict.chat.GameChatClient;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 
@@ -21,7 +20,7 @@ public class BotInfoService implements BotStatus {
 	private final Clock clock;
 
 	@Override
-	public GameChatMetrics botinfo() {
+	public LocalGameChatMetrics botinfo() {
 		botInfo.setConnected(bot.isConnected());
 		return botInfo;
 	}
