@@ -2,17 +2,15 @@ package tillerino.tillerinobot.websocket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static tillerino.tillerinobot.websocket.LiveActivityEndpoint.anonymizeHashCode;
 
 import java.net.URI;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.awaitility.Awaitility;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -24,38 +22,26 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LiveActivityEndpointTest {
 	@WebSocket
-	public class GenericWebsocketClient {
-		private final GenericWebsocketClient delegate;
-
-		public GenericWebsocketClient(GenericWebsocketClient delegate) {
-			this.delegate = delegate;
-		}
-
+	public interface GenericWebSocketClient {
 		@OnWebSocketConnect
-		public void connect(Session session) {
-			LiveActivityEndpointTest.this.session.complete(session);
-			delegate.connect(session);
-		}
+		void connect(Session session);
 
 		@OnWebSocketMessage
-		public void message(String text) {
-			delegate.message(text);
-		}
+		void message(String text);
 
 		@OnWebSocketClose
-		public void disconnect(int code, String message) {
-			delegate.disconnect(code, message);
-		}
+		void disconnect(int code, String message);
 	}
 
 	@Test
-	public void testAnonymize() throws Exception {
+	public void testAnonymize() {
 		// deterministic
 		assertThat(anonymizeHashCode("a", "b")).isEqualTo(anonymizeHashCode("a", "b"));
 		// change salt
@@ -67,29 +53,25 @@ public class LiveActivityEndpointTest {
 	}
 
 	@Rule
-	public final JettyWebsocketServerResource websocketServer = new JettyWebsocketServerResource("localhost", 0);
-	private Future<Session> connect;
-	private WebSocketClient webSocketClient = new WebSocketClient();
+	public final JettyWebsocketServerResource webSocketServer = new JettyWebsocketServerResource("localhost", 0);
+	private final WebSocketClient webSocketClient = new WebSocketClient();
 
 	@Mock
-	private GenericWebsocketClient client;
-
-	private final CompletableFuture<Session> session = new CompletableFuture<>();
+	private GenericWebSocketClient client;
 
 	private final LiveActivityEndpoint liveActivity = new LiveActivityEndpoint();
 
 	@Before
 	public void setUp() throws Exception {
-		websocketServer.addEndpoint(liveActivity);
+		webSocketServer.addEndpoint(liveActivity);
 		webSocketClient.start();
-		connect = webSocketClient.connect(new GenericWebsocketClient(client),
-				new URI("ws://localhost:" + websocketServer.getPort() + "/live/v0"));
+		Future<Session> connect = webSocketClient.connect(client,
+				new URI("ws://localhost:" + webSocketServer.getPort() + "/live/v0"));
 		connect.get(10, TimeUnit.SECONDS);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		connect.cancel(true);
 		webSocketClient.stop();
 	}
 
@@ -101,7 +83,7 @@ public class LiveActivityEndpointTest {
 	}
 
 	@Test
-	public void testPropagateMessageReceived() throws Exception {
+	public void testPropagateMessageReceived() {
 		waitForConnectionEstablished();
 		liveActivity.propagateReceivedMessage("user", 15);
 		verify(client, timeout(1000)).message("{\n" + 
@@ -113,7 +95,7 @@ public class LiveActivityEndpointTest {
 	}
 
 	@Test
-	public void testPropagateMessageSent() throws Exception {
+	public void testPropagateMessageSent() {
 		waitForConnectionEstablished();
 		liveActivity.propagateSentMessage("user", 15);
 		verify(client, timeout(1000)).message("{\n" + 
@@ -125,7 +107,7 @@ public class LiveActivityEndpointTest {
 	}
 
 	@Test
-	public void testpropagateMessageDetails() throws Exception {
+	public void testPropagateMessageDetails() {
 		waitForConnectionEstablished();
 		liveActivity.propagateMessageDetails(15, "!r");
 		verify(client, timeout(1000)).message("{\n" + 
@@ -136,8 +118,10 @@ public class LiveActivityEndpointTest {
 				"}");
 	}
 
-	private Session session() throws Exception {
-		return session.get(1, TimeUnit.SECONDS);
+	private Session session() {
+		final ArgumentCaptor<Session> captor = ArgumentCaptor.forClass(Session.class);
+		verify(client, timeout(1000)).connect(captor.capture());
+		return captor.getValue();
 	}
 
 	private void waitForConnectionEstablished() {
