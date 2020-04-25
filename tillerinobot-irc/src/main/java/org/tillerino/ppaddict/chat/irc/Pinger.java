@@ -54,6 +54,7 @@ public class Pinger {
 
 		if(!pingLatch.await(10, TimeUnit.SECONDS)) {
 			MDC.put(MdcUtils.MDC_PING, 10000 + "");
+			botInfo.setLastPingDeath(clock.currentTimeMillis());
 			throw new IOException("ping timed out");
 		}
 

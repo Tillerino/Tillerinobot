@@ -11,7 +11,6 @@ import javax.inject.Singleton;
 
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.util.LoopingRunnable;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
@@ -28,10 +27,10 @@ public class LocalGameChatEventQueue extends LoopingRunnable implements GameChat
 
 	private final ExecutorService coreExecutorService;
 
-	private final GameChatMetrics botInfo;
+	private final LocalGameChatMetrics botInfo;
 
 	@Inject
-	public LocalGameChatEventQueue(IRCBot coreHandler, @Named("core") ExecutorService coreExecutorService, GameChatMetrics botInfo) {
+	public LocalGameChatEventQueue(IRCBot coreHandler, @Named("core") ExecutorService coreExecutorService, LocalGameChatMetrics botInfo) {
 		this.coreHandler = coreHandler;
 		this.coreExecutorService = coreExecutorService;
 		this.botInfo = botInfo;

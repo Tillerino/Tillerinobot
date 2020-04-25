@@ -32,7 +32,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEvent;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
@@ -43,7 +42,7 @@ import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 @RunWith(MockitoJUnitRunner.class)
 public class LocalGameChatEventQueueTest {
 	@Mock
-	private GameChatMetrics botInfo;
+	private LocalGameChatMetrics botInfo;
 
 	@Mock
 	private IRCBot coreHandler;
@@ -88,10 +87,10 @@ public class LocalGameChatEventQueueTest {
 	@Test
 	public void testQueueSizes() throws Exception {
 		ThreadPoolExecutor exec = mock(ThreadPoolExecutor.class);
-		BlockingQueue blockingQueue = new LinkedBlockingQueue<>();
+		BlockingQueue<Runnable> blockingQueue = new LinkedBlockingQueue<>();
 		when(exec.getQueue()).thenReturn(blockingQueue);
 		when(exec.submit(any(Runnable.class))).thenAnswer(x -> {
-			blockingQueue.put(x.getArguments()[0]);
+			blockingQueue.put(x.getArgument(0));
 			return null;
 		});
 		LocalGameChatEventQueue queue = new LocalGameChatEventQueue(coreHandler, exec, botInfo);

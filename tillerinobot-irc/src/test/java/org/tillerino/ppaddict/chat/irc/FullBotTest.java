@@ -33,8 +33,8 @@ import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.tillerino.ppaddict.chat.GameChatClient;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
@@ -197,7 +197,7 @@ public class FullBotTest {
 
 		websocket.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
 
-		GameChatMetrics botInfo = injector.getInstance(GameChatMetrics.class);
+		LocalGameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
 		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
 		botRunner = injector.getInstance(GameChatClient.class);
 		started.add(exec.submit(botRunner));

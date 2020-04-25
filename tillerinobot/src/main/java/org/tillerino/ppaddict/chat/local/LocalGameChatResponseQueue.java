@@ -8,11 +8,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.tillerino.ppaddict.chat.GameChatEvent;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
-import org.tillerino.ppaddict.chat.GameChatResponse;
-import org.tillerino.ppaddict.chat.GameChatResponseConsumer;
-import org.tillerino.ppaddict.chat.GameChatResponseQueue;
+import org.tillerino.ppaddict.chat.*;
 import org.tillerino.ppaddict.util.LoopingRunnable;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
@@ -33,7 +29,7 @@ public class LocalGameChatResponseQueue extends LoopingRunnable implements GameC
 
 	private final BlockingQueue<Pair<GameChatResponse, GameChatEvent>> queue = new LinkedBlockingQueue<>();
 
-	private final GameChatMetrics botInfo;
+	private final LocalGameChatMetrics botInfo;
 
 	@Override
 	public void onResponse(GameChatResponse response, GameChatEvent event) throws InterruptedException {

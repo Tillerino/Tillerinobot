@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponseConsumer;
@@ -33,7 +32,7 @@ import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 @RunWith(MockitoJUnitRunner.class)
 public class LocalGameChatResponseQueueTest {
 	@Mock
-	private GameChatMetrics botInfo;
+	private LocalGameChatMetrics botInfo;
 
 	@Mock
 	private GameChatResponseConsumer downstream;

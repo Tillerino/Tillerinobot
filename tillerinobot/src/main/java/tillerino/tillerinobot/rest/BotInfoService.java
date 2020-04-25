@@ -6,6 +6,7 @@ import javax.ws.rs.NotFoundException;
 
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class BotInfoService implements BotStatus {
 	private final GameChatClient bot;
 
-	private final GameChatMetrics botInfo;
+	private final LocalGameChatMetrics botInfo;
 
 	private final Clock clock;
 

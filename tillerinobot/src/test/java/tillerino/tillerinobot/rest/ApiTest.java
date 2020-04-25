@@ -27,15 +27,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestAppender;
-import org.tillerino.ppaddict.util.TestClock;
 import org.tillerino.ppaddict.util.TestAppender.LogEventWithMdc;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
+import org.tillerino.ppaddict.util.TestClock;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -112,7 +113,7 @@ public class ApiTest {
 	/**
 	 * API-internal object
 	 */
-	private GameChatMetrics botInfo = injector.getInstance(GameChatMetrics.class);
+	private GameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
 	
 	/**
 	 * Endpoint which goes through the started HTTP API
