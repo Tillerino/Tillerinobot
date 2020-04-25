@@ -8,6 +8,11 @@ import java.util.OptionalLong;
 
 import org.slf4j.MDC;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import lombok.RequiredArgsConstructor;
+
 /**
  * With the {@link MDC} we have two problems that originate from the fact that
  * the MDC is bound to a thread:
@@ -24,6 +29,14 @@ public class MdcUtils {
 		 * will restore the previous state. Keep the result in a try-with clause.
 		 */
 		MdcAttributes apply();
+
+		@JsonValue
+		Map<String, String> mdcValues();
+
+		@JsonCreator
+		static MdcSnapshot create(Map<String, String> snapshot) {
+			return new MdcSnapshotImpl(snapshot);
+		}
 	}
 
 	/**
@@ -88,11 +101,7 @@ public class MdcUtils {
 	 */
 	public static MdcSnapshot getSnapshot() {
 		Map<String, String> snapshot = Optional.ofNullable(MDC.getCopyOfContextMap()).orElseGet(Collections::emptyMap);
-		return () -> {
-			MdcAttributes attributes = new MdcAttributes();
-			snapshot.forEach(attributes::add);
-			return attributes;
-		};
+		return new MdcSnapshotImpl(snapshot);
 	}
 
 	/**
@@ -138,4 +147,21 @@ public class MdcUtils {
 	public static final String MDC_SUCCESS = "success";
 	public static final String MDC_THREAD_PRIORITY = "threadPriority";
 	public static final String MDC_USER = "user";
+
+	@RequiredArgsConstructor
+	private static final class MdcSnapshotImpl implements MdcSnapshot {
+		private final Map<String, String> snapshot;
+
+		@Override
+		public MdcAttributes apply() {
+			MdcAttributes attributes = new MdcAttributes();
+			snapshot.forEach(attributes::add);
+			return attributes;
+		}
+
+		@Override
+		public Map<String, String> mdcValues() {
+			return Collections.unmodifiableMap(snapshot);
+		}
+	}
 }

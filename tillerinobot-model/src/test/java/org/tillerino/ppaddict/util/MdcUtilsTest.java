@@ -2,6 +2,8 @@ package org.tillerino.ppaddict.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,6 +11,8 @@ import org.slf4j.MDC;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,7 +61,7 @@ public class MdcUtilsTest {
 	public void snapShot() throws Exception {
 		MDC.put("foo", "bar");
 		MDC.put("foos", "bars");
-		MdcSnapshot snapshot = MdcUtils.getSnapshot();
+		MdcSnapshot snapshot = serde(MdcUtils.getSnapshot());
 		MDC.put("foo", "baz");
 		MDC.remove("foos");
 		try (MdcAttributes with = snapshot.apply()) {
@@ -83,5 +87,11 @@ public class MdcUtilsTest {
 		assertThat(MdcUtils.getEventId()).isEmpty();
 		MDC.put("event", "123");
 		assertThat(MdcUtils.getEventId()).isPresent().satisfies(o -> assertThat(o.getAsLong()).isEqualTo(123L));
+	}
+
+	private MdcSnapshot serde(MdcSnapshot s) throws IOException {
+		final ObjectMapper mapper = new ObjectMapper();
+		final byte[] serialized = mapper.writeValueAsBytes(s);
+		return mapper.readerFor(MdcSnapshot.class).readValue(serialized);
 	}
 }
