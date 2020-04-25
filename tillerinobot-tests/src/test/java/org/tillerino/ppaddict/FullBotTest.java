@@ -1,22 +1,11 @@
-package org.tillerino.ppaddict.chat.irc;
+package org.tillerino.ppaddict;
 
-import static java.util.stream.Collectors.toList;
-import static org.awaitility.Awaitility.await;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
-
-import javax.inject.Singleton;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.name.Names;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.After;
@@ -34,21 +23,16 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatWriter;
-import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
+import org.tillerino.ppaddict.chat.irc.BotRunnerImpl;
+import org.tillerino.ppaddict.chat.irc.EmbeddedIrcServerRule;
+import org.tillerino.ppaddict.chat.irc.IrcWriter;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
+import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.name.Names;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IRCBot;
@@ -59,15 +43,26 @@ import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
 import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
+import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
+import static org.awaitility.Awaitility.await;
+
 /**
  * This test starts an embedded IRC server, mocks a backend and requests
  * recommendations from multiple users in parallel.
  */
 @Slf4j
 public class FullBotTest {
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked"})
 	private class Client implements Runnable {
-		private PircBotX bot;
+		private final PircBotX bot;
 
 		private long lastReceivedRecommendation = 0;
 
@@ -76,16 +71,16 @@ public class FullBotTest {
 		private boolean connected = false;
 
 		private Client(int botNumber) {
-			Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
+			Builder<PircBotX> configurationBuilder = new Configuration.Builder<>()
 					.setServer("127.0.0.1", server.getPort())
 					.setName("user" + botNumber)
-					.setEncoding(Charset.forName("UTF-8"))
+					.setEncoding(StandardCharsets.UTF_8)
 					.setAutoReconnect(false)
 					.setMessageDelay(50)
 					.setListenerManager(new ThreadedListenerManager<>(exec))
 					.addListener(new CoreHooks() {
 						@Override
-						public void onConnect(ConnectEvent event) throws Exception {
+						public void onConnect(ConnectEvent event) {
 							connected = true;
 						}
 
@@ -136,7 +131,7 @@ public class FullBotTest {
 
 	@Rule
 	public final ExecutorServiceRule exec = new ExecutorServiceRule(
-			() -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>()));
+			() -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<>()));
 
 	@Rule
 	public final ExecutorServiceRule coreWorkerPool = ExecutorServiceRule.fixedThreadPool("core", 4);
@@ -148,7 +143,7 @@ public class FullBotTest {
 
 	private GameChatClient botRunner;
 
-	private final List<Future> started = new ArrayList<>();
+	private final List<Future<?>> started = new ArrayList<>();
 
 	@RequiredArgsConstructor
 	static class FullBotConfiguration extends AbstractModule {
@@ -216,7 +211,7 @@ public class FullBotTest {
 	}
 
 	@Test
-	public void testMultipleUsers() throws Exception {
+	public void testMultipleUsers() {
 		List<Client> clients = IntStream.range(0, USERS).mapToObj(Client::new).collect(toList());
 		clients.forEach(client -> {
 			try {

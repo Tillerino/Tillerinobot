@@ -9,7 +9,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot-model</artifactId>
-	<name>Tillerinobot Model</name>
+	<name>Model</name>
 	<description>
 		Contains model and other common classes that are used in multiple Tillerinobot modules.
 		We do this to avoid direct dependencies between modules.

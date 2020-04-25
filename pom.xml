@@ -6,11 +6,13 @@
 	<artifactId>tillerinobot-parent</artifactId>
 	<version>0.18.0</version>
 	<packaging>pom</packaging>
+	<name>Tillerinobot</name>
 
 	<modules>
 		<module>tillerinobot-model</module>
 		<module>tillerinobot</module>
 		<module>tillerinobot-irc</module>
+		<module>tillerinobot-tests</module>
 	</modules>
 
 	<properties>
@@ -243,7 +245,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.8</version>
+			<version>1.18.10</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
