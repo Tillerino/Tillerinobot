@@ -34,19 +34,20 @@ public class LiveMain {
 	private final ConnectionFactory rabbitFactory;
 	final LiveActivityEndpoint live;
 	private final Undertow undertow;
+	private final XnioWorker xnioWorker;
 
 	private Connection rabbitConnection;
 	private Channel rabbitChannel;
 
 	public LiveMain(int port, String rabbitHost, int rabbitPort) throws ServletException, IOException, TimeoutException {
 		live = new LiveActivityEndpoint();
+		Xnio xnio = Xnio.getInstance("nio", Undertow.class.getClassLoader());
+		xnioWorker = xnio.createWorker(OptionMap.builder().getMap());
 		undertow = undertow(live, port);
 		rabbitFactory = RabbitMqConfiguration.connectionFactory(rabbitHost, rabbitPort);
 	}
 
 	private Undertow undertow(LiveActivityEndpoint live, int port) throws ServletException, IOException {
-		final Xnio xnio = Xnio.getInstance("nio", Undertow.class.getClassLoader());
-		final XnioWorker xnioWorker = xnio.createWorker(OptionMap.builder().getMap());
 		final WebSocketDeploymentInfo webSockets = new WebSocketDeploymentInfo()
 				.addEndpoint(buildServerEndpointConfig(live))
 				.setWorker(xnioWorker);
@@ -100,6 +101,7 @@ public class LiveMain {
 			rabbitConnection.close();
 		}
 		undertow.stop();
+		xnioWorker.shutdown();
 	}
 
 	public static void main(String[] args) throws Exception {
