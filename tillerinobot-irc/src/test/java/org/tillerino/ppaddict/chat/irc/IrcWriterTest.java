@@ -5,8 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.ExecutorService;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,9 +20,6 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 
-import tillerino.tillerinobot.RateLimiter;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-
 @RunWith(MockitoJUnitRunner.class)
 public class IrcWriterTest {
 	@Mock
@@ -37,16 +32,7 @@ public class IrcWriterTest {
 	Pinger pinger;
 
 	@Mock
-	EntityManagerFactory emf;
-
-	@Mock
-	ThreadLocalAutoCommittingEntityManager em;
-
-	@Mock
 	GameChatMetrics botInfo;
-
-	@Mock
-	RateLimiter rateLimiter;
 
 	@InjectMocks
 	IrcWriter queue;
