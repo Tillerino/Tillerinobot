@@ -73,7 +73,21 @@ abstract class AbstractRemoteQueue<T> {
 			channel.queueBind(key, exchange, queue);
 		}
 		channel.basicConsume(key, (consumerTag, message) -> {
-			consumer.accept(reader.readValue(message.getBody()));
+			/* The default exception handler (which appears to be ForgivingExceptionHandler)
+			* closes the channel when an exception is thrown here and just never recovers.
+			* We could mess around with other handlers or just catch everything here. */
+			T parsed;
+			try {
+				parsed = reader.readValue(message.getBody());
+			} catch (Exception e) {
+				log.error("Error parsing payload from {}", key, e);
+				return;
+			}
+			try {
+				consumer.accept(parsed);
+			} catch (Exception e) {
+				log.error("Error handling payload from {}", key, e);
+			}
 		}, consumerTag -> log.error("Consumer has been cancelled: {}", consumerTag));
 	}
 }
