@@ -6,9 +6,7 @@ import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.Rece
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.ReceivedMessageDetails;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.SentMessage;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
@@ -47,9 +45,10 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 		send(message);
 	}
 
-	@Data
-	@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-	@JsonSubTypes({
+	// older Java compiler needs the full qualifier :/
+	@lombok.Data
+	@com.fasterxml.jackson.annotation.JsonTypeInfo(use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME)
+	@com.fasterxml.jackson.annotation.JsonSubTypes({
 			@Type(ReceivedMessage.class),
 			@Type(SentMessage.class),
 			@Type(ReceivedMessageDetails.class)
