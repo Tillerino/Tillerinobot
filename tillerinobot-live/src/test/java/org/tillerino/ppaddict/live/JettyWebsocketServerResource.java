@@ -1,4 +1,4 @@
-package tillerino.tillerinobot.websocket;
+package org.tillerino.ppaddict.live;
 
 import java.util.Optional;
 
@@ -53,13 +53,13 @@ public class JettyWebsocketServerResource extends ExternalResource {
 		connector.setHost(host);
 		connector.setPort(port);
 		server.addConnector(connector);
-		
+
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);
-		
+
 		wscontainer = WebSocketServerContainerInitializer.configureContext(context);
-		
+
 		server.start();
 		actualPort = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
 		log.info("Started Jetty Websocket Server on http://{}:{}/", host, actualPort);

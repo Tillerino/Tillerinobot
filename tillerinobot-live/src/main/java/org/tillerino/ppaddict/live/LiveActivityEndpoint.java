@@ -1,4 +1,4 @@
-package tillerino.tillerinobot.websocket;
+package org.tillerino.ppaddict.live;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -12,6 +12,7 @@ import javax.inject.Singleton;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
+import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
@@ -44,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Singleton
 @ServerEndpoint("/live/v0")
-public class LiveActivityEndpoint extends Endpoint implements LiveActivity {
+public class LiveActivityEndpoint extends Endpoint implements LiveActivity, MessageHandler {
 	@Value
 	public static class Received {
 		long eventId;
@@ -74,6 +75,7 @@ public class LiveActivityEndpoint extends Endpoint implements LiveActivity {
 
 	final ObjectMapper mapper = new ObjectMapper();
 	final ObjectWriter writer;
+
 	{
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.setSerializationInclusion(Include.NON_NULL);
@@ -84,9 +86,23 @@ public class LiveActivityEndpoint extends Endpoint implements LiveActivity {
 	@Getter(AccessLevel.PACKAGE) // for unit tests
 	private final Set<Session> sessions = new HashSet<>();
 
+	/* this is a bit messy because we're implementing both JSR Websocket things:
+	 * The annotation way and the implementing-endpoint-class way */
 	@Override
+	public void onOpen(Session session, EndpointConfig config) {
+		onOpen(session);
+		session.addMessageHandler(new Whole<String>() {
+			// This cannot be a lambda. Looks like Overtow can't pull the type parameter
+			// if it is a lambda and the handler is be ignored.
+			@Override
+			public void onMessage(String msg) {
+				LiveActivityEndpoint.this.onMessage(msg, session);
+			}
+		});
+	}
+
 	@OnOpen
-	public synchronized void onOpen(Session session, EndpointConfig config) {
+	public synchronized void onOpen(Session session) {
 		sessions.add(session);
 	}
 
@@ -97,8 +113,8 @@ public class LiveActivityEndpoint extends Endpoint implements LiveActivity {
 		}
 	}
 
-	@Override
 	@OnClose
+	@Override
 	public synchronized void onClose(Session session, CloseReason closeReason) {
 		sessions.remove(session);
 	}

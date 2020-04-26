@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.tillerino.osu</groupId>
+        <artifactId>tillerinobot-parent</artifactId>
+        <version>0.19.0</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <artifactId>tillerinobot-rabbit</artifactId>
+    <name>Rabbit</name>
+
+    <dependencies>
+        <!-- Internal -->
+        <dependency>
+            <groupId>org.tillerino.osu</groupId>
+            <artifactId>tillerinobot-model</artifactId>
+            <version>0.19.0</version>
+        </dependency>
+
+        <!-- Libraries -->
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>5.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+    </dependencies>
+</project>

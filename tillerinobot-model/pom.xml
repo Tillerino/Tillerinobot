@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
-		<version>0.18.0</version>
+		<version>0.19.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>tillerinobot-model</artifactId>

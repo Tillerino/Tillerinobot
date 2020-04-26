@@ -34,12 +34,15 @@ import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.Joined;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
+import org.tillerino.ppaddict.live.JettyWebsocketServerResource;
+import org.tillerino.ppaddict.live.LiveActivityEndpoint;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 
@@ -55,8 +58,6 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
-import tillerino.tillerinobot.websocket.JettyWebsocketServerResource;
-import tillerino.tillerinobot.websocket.LiveActivityEndpoint;
 
 /**
  * The purpose of this class and its main function is to completely mock backend
@@ -89,6 +90,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		install(new InMemoryQueuesModule());
 		install(new ProcessorsModule());
 
+		bind(LiveActivity.class).to(LiveActivityEndpoint.class);
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
