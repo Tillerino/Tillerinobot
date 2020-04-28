@@ -72,7 +72,7 @@ abstract class AbstractRemoteQueue<T> {
 			key = declared.getQueue();
 			channel.queueBind(key, exchange, queue);
 		}
-		channel.basicConsume(key, (consumerTag, message) -> {
+		channel.basicConsume(key, true, (consumerTag, message) -> {
 			/* The default exception handler (which appears to be ForgivingExceptionHandler)
 			* closes the channel when an exception is thrown here and just never recovers.
 			* We could mess around with other handlers or just catch everything here. */
