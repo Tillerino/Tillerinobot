@@ -1,10 +1,17 @@
 package org.tillerino.ppaddict.rabbit;
 
+import java.util.Optional;
+
+import javax.annotation.CheckForNull;
+
+import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.ReceivedMessage;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.ReceivedMessageDetails;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.SentMessage;
+import org.tillerino.ppaddict.util.MdcUtils;
+import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -34,6 +41,7 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 		final SentMessage message = new SentMessage();
 		message.setIrcUserName(ircUserName);
 		message.setEventId(eventId);
+		Optional.ofNullable(MDC.get("ping")).map(Integer::valueOf).ifPresent(message::setPing);
 		send(message);
 	}
 
@@ -78,9 +86,14 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 			@IRCName
 			private String ircUserName;
 
+			@CheckForNull
+			private Integer ping;
+
 			@Override
 			public void visit(LiveActivity live) {
-				live.propagateSentMessage(getIrcUserName(), getEventId());
+				try(MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_PING, ping)) {
+					live.propagateSentMessage(getIrcUserName(), getEventId());
+				}
 			}
 		}
 

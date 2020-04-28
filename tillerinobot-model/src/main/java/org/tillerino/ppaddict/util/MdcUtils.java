@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 
+import javax.annotation.CheckForNull;
+
 import org.slf4j.MDC;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -117,8 +119,11 @@ public class MdcUtils {
 	 * @return use this as a try-with resource. You can pile on more changes to
 	 *         the MDC with {@link MdcAttributes#add(String, Object)}.
 	 */
-	public static MdcAttributes with(String key, Object val) {
-		return new MdcAttributes(key, val);
+	public static MdcAttributes with(String key, @CheckForNull Object val) {
+		if (val != null) {
+			return new MdcAttributes(key, val);
+		}
+		return new MdcAttributes();
 	}
 
 	/**

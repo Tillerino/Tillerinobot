@@ -23,6 +23,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.LiveActivity;
+import org.tillerino.ppaddict.util.MdcUtils;
+import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractLiveActivityEndpointTest {
@@ -92,6 +94,20 @@ public abstract class AbstractLiveActivityEndpointTest {
 				"    \"user\" : " + anonymizeHashCode("user", impl().getSessions().iterator().next()) + "\n" +
 				"  }\n" +
 				"}");
+	}
+
+	@Test
+	public void testPropagateMessageSentWithPing() {
+		try (MdcAttributes with = MdcUtils.with(MdcUtils.MDC_PING, 12345)) {
+			push().propagateSentMessage("user", 15);
+			Mockito.verify(client, Mockito.timeout(1000)).message("{\n" +
+					"  \"sent\" : {\n" +
+					"    \"eventId\" : 15,\n" +
+					"    \"user\" : " + anonymizeHashCode("user", impl().getSessions().iterator().next()) + ",\n" +
+					"    \"ping\" : 12345\n" +
+					"  }\n" +
+					"}");
+		}
 	}
 
 	@Test
