@@ -1,9 +1,10 @@
 package org.tillerino.ppaddict.live;
 
+import static org.tillerino.ppaddict.live.RabbitMqContainer.getRabbitMq;
+
 import java.net.BindException;
 import java.util.Random;
 
-import org.testcontainers.containers.RabbitMQContainer;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
@@ -13,12 +14,6 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
-	private static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer();
-
-	static {
-		RABBIT_MQ.start();
-	}
-
 	private LiveMain main;
 	private Connection connection;
 	private Channel channel;
@@ -27,7 +22,7 @@ public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 
 	@Override
 	public void setUp() throws Exception {
-		ConnectionFactory connectionFactory = RabbitMqConfiguration.connectionFactory(RABBIT_MQ.getContainerIpAddress(), RABBIT_MQ.getAmqpPort());
+		ConnectionFactory connectionFactory = RabbitMqConfiguration.connectionFactory(getRabbitMq().getContainerIpAddress(), getRabbitMq().getAmqpPort());
 		connection = connectionFactory.newConnection();
 		channel = connection.createChannel();
 		push = RabbitMqConfiguration.liveActivity(channel);
@@ -42,7 +37,7 @@ public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 		final Random rnd = new Random();
 		for (int i = 1; i <= 10; i++) {
 			port = 1024 + rnd.nextInt(60000);
-			main = new LiveMain(port, RABBIT_MQ.getContainerIpAddress(), RABBIT_MQ.getAmqpPort());
+			main = new LiveMain(port, getRabbitMq().getContainerIpAddress(), getRabbitMq().getAmqpPort());
 			try {
 				try {
 					main.start();
