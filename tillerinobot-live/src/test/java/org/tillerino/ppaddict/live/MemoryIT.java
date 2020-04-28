@@ -24,6 +24,8 @@ import org.junit.Test;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * We just want to stress the container a bit. It is supposed to run with 64MiB memory.
  *
@@ -36,6 +38,7 @@ import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
  *
  * 10000 clients lead to OOMs
  */
+@Slf4j
 public class MemoryIT {
 	private final int numberOfClients = 100;
 
@@ -66,15 +69,17 @@ public class MemoryIT {
 
 	@Before
 	public void setUp() throws Exception {
+		source = RabbitMqConfiguration.liveActivity(rabbitMq.getChannel());
+		URI uri = new URI("ws://" + getLive().getContainerIpAddress() + ":" + getLive().getMappedPort(8080) + "/live/v0");
+		log.info("Connecting clients");
+		Thread.sleep(1000); // flaky without :/
 		for (WebSocketClient webSocketClient: webSocketClients) {
 			webSocketClient.start();
 			CollectingWebSocketClient client = new CollectingWebSocketClient();
-			Future<Session> connect = webSocketClient.connect(client,
-					new URI("ws://" + getLive().getContainerIpAddress() + ":" + getLive().getMappedPort(8080) + "/live/v0"));
+			Future<Session> connect = webSocketClient.connect(client, uri);
 			connect.get(10, TimeUnit.SECONDS);
 			clients.add(client);
 		}
-		source = RabbitMqConfiguration.liveActivity(rabbitMq.getChannel());
 	}
 
 	@After

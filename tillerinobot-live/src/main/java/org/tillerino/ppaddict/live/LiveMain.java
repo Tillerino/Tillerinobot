@@ -82,7 +82,9 @@ public class LiveMain {
 	}
 
 	public void start() throws IOException, TimeoutException {
+		log.info("Starting Undertow");
 		undertow.start();
+		log.info("Undertow started");
 		try {
 			rabbitConnection = rabbitFactory.newConnection("tillerinobot-live");
 			log.info("Connected to RabbitMQ {}:{}", rabbitFactory.getHost(), rabbitFactory.getPort());

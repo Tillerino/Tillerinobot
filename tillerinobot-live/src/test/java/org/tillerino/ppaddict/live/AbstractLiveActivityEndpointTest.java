@@ -100,14 +100,14 @@ public abstract class AbstractLiveActivityEndpointTest {
 	public void testPropagateMessageSentWithPing() {
 		try (MdcAttributes with = MdcUtils.with(MdcUtils.MDC_PING, 12345)) {
 			push().propagateSentMessage("user", 15);
-			Mockito.verify(client, Mockito.timeout(1000)).message("{\n" +
-					"  \"sent\" : {\n" +
-					"    \"eventId\" : 15,\n" +
-					"    \"user\" : " + anonymizeHashCode("user", impl().getSessions().iterator().next()) + ",\n" +
-					"    \"ping\" : 12345\n" +
-					"  }\n" +
-					"}");
 		}
+		Mockito.verify(client, Mockito.timeout(1000)).message("{\n" +
+				"  \"sent\" : {\n" +
+				"    \"eventId\" : 15,\n" +
+				"    \"user\" : " + anonymizeHashCode("user", impl().getSessions().iterator().next()) + ",\n" +
+				"    \"ping\" : 12345\n" +
+				"  }\n" +
+				"}");
 	}
 
 	@Test
