@@ -1,7 +1,8 @@
 package org.tillerino.ppaddict.auth;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 
