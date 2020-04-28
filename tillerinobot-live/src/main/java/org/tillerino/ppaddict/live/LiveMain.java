@@ -29,7 +29,9 @@ import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.util.ImmediateInstanceHandle;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class LiveMain {
 	private final ConnectionFactory rabbitFactory;
 	final LiveActivityEndpoint live;
@@ -82,8 +84,10 @@ public class LiveMain {
 	public void start() throws IOException, TimeoutException {
 		undertow.start();
 		try {
-			rabbitConnection = rabbitFactory.newConnection();
+			rabbitConnection = rabbitFactory.newConnection("tillerinobot-live");
+			log.info("Connected to RabbitMQ {}:{}", rabbitFactory.getHost(), rabbitFactory.getPort());
 			rabbitChannel = rabbitConnection.createChannel();
+			log.info("Opened RabbitMQ channel");
 			RemoteLiveActivity queue = RabbitMqConfiguration.liveActivity(rabbitChannel);
 			queue.setup();
 			queue.subscribe(message -> message.visit(live));
