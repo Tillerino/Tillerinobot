@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -22,7 +23,6 @@ import java.util.stream.IntStream;
 import javax.inject.Singleton;
 import javax.websocket.DeploymentException;
 
-import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -262,7 +262,7 @@ public abstract class AbstractFullBotTest {
         for (int i = 0; i < 100; i++) {
             try {
                 log.info("Waiting for recommendation count to reach {}.", total);
-                await().atMost(Duration.TWO_SECONDS).until(allRecommendationsReceived);
+                await().atMost(Duration.ofSeconds(2)).until(allRecommendationsReceived);
             } catch (ConditionTimeoutException e) {
                 log.info("Some clients got concurrent messages. Let's give 'em a push.");
                 clients.stream()
@@ -273,7 +273,7 @@ public abstract class AbstractFullBotTest {
             }
             break;
         }
-        await().atMost(Duration.ONE_SECOND).until(allRecommendationsReceived);
+        await().atMost(Duration.ofSeconds(2)).until(allRecommendationsReceived);
         verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"received\" :")));
         verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"sent\" :")));
         verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\" :")));
