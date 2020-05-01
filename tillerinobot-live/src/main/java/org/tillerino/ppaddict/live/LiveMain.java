@@ -14,15 +14,12 @@ import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.tillerino.ppaddict.rabbit.AbstractRabbitMain;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
 import org.xnio.OptionMap;
 import org.xnio.Xnio;
 import org.xnio.XnioWorker;
-
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
@@ -32,21 +29,17 @@ import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LiveMain {
-	private final ConnectionFactory rabbitFactory;
+public class LiveMain extends AbstractRabbitMain {
 	final LiveActivityEndpoint live;
 	private final Undertow undertow;
 	private final XnioWorker xnioWorker;
 
-	private Connection rabbitConnection;
-	private Channel rabbitChannel;
-
 	public LiveMain(int port, String rabbitHost, int rabbitPort) throws ServletException, IOException, TimeoutException {
+		super(log, rabbitHost, rabbitPort);
 		live = new LiveActivityEndpoint();
 		Xnio xnio = Xnio.getInstance("nio", Undertow.class.getClassLoader());
 		xnioWorker = xnio.createWorker(OptionMap.builder().getMap());
 		undertow = undertow(live, port);
-		rabbitFactory = RabbitMqConfiguration.connectionFactory(rabbitHost, rabbitPort);
 	}
 
 	private Undertow undertow(LiveActivityEndpoint live, int port) throws ServletException, IOException {
@@ -60,7 +53,7 @@ public class LiveMain {
 						.setDeploymentName("embedded-websockets")
 						.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, webSockets)
 						.addServlet(new ServletInfo("health", HealthServlet.class, () ->
-								new ImmediateInstanceHandle<>(new HealthServlet(() -> rabbitChannel)))
+								new ImmediateInstanceHandle<>(new HealthServlet(this::getRabbitChannel)))
 								.addMappings("/live", "/ready")));
 
 		deployment.deploy();
@@ -81,16 +74,13 @@ public class LiveMain {
 				}).build();
 	}
 
-	public void start() throws IOException, TimeoutException {
+	public void start(String connectionName) throws IOException, TimeoutException {
 		log.info("Starting Undertow");
 		undertow.start();
 		log.info("Undertow started");
 		try {
-			rabbitConnection = rabbitFactory.newConnection("tillerinobot-live");
-			log.info("Connected to RabbitMQ {}:{}", rabbitFactory.getHost(), rabbitFactory.getPort());
-			rabbitChannel = rabbitConnection.createChannel();
-			log.info("Opened RabbitMQ channel");
-			RemoteLiveActivity queue = RabbitMqConfiguration.liveActivity(rabbitChannel);
+			super.start(connectionName);
+			RemoteLiveActivity queue = RabbitMqConfiguration.liveActivity(getRabbitChannel());
 			queue.setup();
 			queue.subscribe(message -> message.visit(live));
 		} catch (IOException | TimeoutException e) {
@@ -100,12 +90,7 @@ public class LiveMain {
 	}
 
 	public void stop() throws IOException, TimeoutException {
-		if (rabbitChannel != null) {
-			rabbitChannel.close();
-		}
-		if (rabbitConnection != null) {
-			rabbitConnection.close();
-		}
+		super.stop();
 		undertow.stop();
 		xnioWorker.shutdown();
 	}
@@ -114,7 +99,7 @@ public class LiveMain {
 		new LiveMain(env("PORT").map(parse("PORT")).orElse(8080),
 				env("RABBIT_HOST").orElse("rabbitmq"),
 				env("RABBIT_PORT").map(parse("RABBIT_PORT")).orElse(5672))
-				.start();
+				.start("tillerinobot-live");
 	}
 
 	private static Optional<String> env(String name) {

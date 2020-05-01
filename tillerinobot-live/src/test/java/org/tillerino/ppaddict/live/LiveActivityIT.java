@@ -40,7 +40,7 @@ public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 			main = new LiveMain(port, getRabbitMq().getContainerIpAddress(), getRabbitMq().getAmqpPort());
 			try {
 				try {
-					main.start();
+					main.start("tillerinobot-live");
 				} catch (RuntimeException e) {
 					if (e.getCause() instanceof BindException) {
 						throw (BindException) e.getCause();
