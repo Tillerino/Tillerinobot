@@ -159,12 +159,18 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				log.info("Starting Tillerinobot {}: {}", commit, commitMessage);
 
 				try (Scanner scanner = new Scanner(System.in)) {
-					for (; running.get() && userLoop(scanner);)
-						;
+					while (running.get()) {
+						if (!userLoop(scanner)) {
+							break;
+						}
+					}
 					return null;
 				}
 			}
 
+			/**
+			 * @return true for a user change; false to shut down
+			 */
 			private boolean userLoop(Scanner scanner) throws Exception {
 				System.out.println("please provide your name:");
 				username = scanner.nextLine();
@@ -200,15 +206,14 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 					dispatch(new Joined(System.currentTimeMillis(), username, System.currentTimeMillis()));
 				}
 
-				if (inputLoop(scanner)) {
-					return false;
-				} else {
-					return true;
-				}
+				return inputLoop(scanner);
 			}
-			
+
+			/**
+			 * @return true for a user change; false to shut down
+			 */
 			private boolean inputLoop(Scanner scanner) throws Exception {
-				for (; running.get();) {
+				while (running.get()) {
 					String line = scanner.nextLine();
 					
 					if(line.startsWith("/np ")) {
@@ -217,11 +222,13 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 						dispatch(new PrivateAction(System.currentTimeMillis(), username, System.currentTimeMillis(), "is listening to [https://osu.ppy.sh/b/" + line.substring(4) + " title]"));
 					} else if(line.startsWith("/q")) {
 						runner.disconnectSoftly();
+					} else if(line.startsWith("/r")) {
+						return true;
 					} else {
 						dispatch(new PrivateMessage(System.currentTimeMillis(), username, System.currentTimeMillis(), line));
 					}
 				}
-				return true;
+				return false;
 			}
 
 			ExecutorService exec = singleThreadExecutor("bot event loop");
