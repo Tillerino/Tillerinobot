@@ -69,6 +69,11 @@
 			<version>1.10</version>
 		</dependency>
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>20.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<version>4.1.0</version>
@@ -103,6 +108,13 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot</artifactId>
+			<version>${tillerinobot.version}</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-tests</artifactId>
 			<version>${tillerinobot.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
