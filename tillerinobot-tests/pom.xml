@@ -18,6 +18,13 @@
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-model</artifactId>
+			<version>0.19.0</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot</artifactId>
 			<version>0.19.0</version>
 			<scope>test</scope>

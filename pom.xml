@@ -29,7 +29,7 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<version>3.0</version>
+				<version>3.8.1</version>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.8</source>
@@ -39,6 +39,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -49,6 +50,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -104,6 +106,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.0.0-M4</version>
 				<executions>
 					<execution>
 						<goals>
@@ -150,8 +153,8 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<generateGitPropertiesFile>true</generateGitPropertiesFile>
-							<generateGitPropertiesFilename>${project.build.outputDirectory}/${artifactId}.git.properties</generateGitPropertiesFilename>
-							<prefix>${artifactId}.git</prefix>
+							<generateGitPropertiesFilename>${project.build.outputDirectory}/${project.artifactId}.git.properties</generateGitPropertiesFilename>
+							<prefix>${project.artifactId}.git</prefix>
 						</configuration>
 					</execution>
 				</executions>

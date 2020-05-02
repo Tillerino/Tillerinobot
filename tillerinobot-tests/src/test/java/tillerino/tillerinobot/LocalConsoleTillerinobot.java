@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.Scanner;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -19,8 +18,6 @@ import java.util.stream.Stream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.UriBuilder;
 
 import org.eclipse.jetty.server.Server;
@@ -68,21 +65,6 @@ import tillerino.tillerinobot.rest.BotApiDefinition;
  */
 @Slf4j
 public class LocalConsoleTillerinobot extends AbstractModule {
-	public static class FakeAuthenticationService implements AuthenticationService {
-		@Override
-		public Authorization findKey(String key) throws NotFoundException {
-			if (key.equals("testKey") || key.equals("valid-key")) {
-				return new Authorization(false);
-			}
-			throw new NotFoundException();
-		}
-
-		@Override
-		public String createKey(String adminKey, int osuUserId) throws NotFoundException, ForbiddenException {
-			return UUID.randomUUID().toString(); // not quite the usual format, but meh
-		}
-	}
-
 	@Override
 	protected void configure() {
 		install(new CreateInMemoryDatabaseModule());

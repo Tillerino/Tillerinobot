@@ -44,7 +44,7 @@ import com.google.inject.Injector;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.LocalConsoleTillerinobot.FakeAuthenticationService;
+import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.TestBackend;
 /**
  * Tests the Tillerinobot API on a live HTTP server including authentication.
