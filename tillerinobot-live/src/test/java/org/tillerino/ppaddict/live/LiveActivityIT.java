@@ -2,12 +2,10 @@ package org.tillerino.ppaddict.live;
 
 import static org.tillerino.ppaddict.live.RabbitMqContainer.getRabbitMq;
 
-import java.net.BindException;
-import java.util.Random;
-
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
+import org.tillerino.ppaddict.util.TestUtil;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -34,26 +32,11 @@ public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 	 * I couldn't find out how to start Undertow on an unspecified free port so we're just rolling the dice a few times.
 	 */
 	private void startOnFreePort() throws Exception {
-		final Random rnd = new Random();
-		for (int i = 1; i <= 10; i++) {
-			port = 1024 + rnd.nextInt(60000);
+		TestUtil.runOnRandomPort(10, p -> {
+			port = p;
 			main = new LiveMain(port, getRabbitMq().getContainerIpAddress(), getRabbitMq().getAmqpPort());
-			try {
-				try {
-					main.start("tillerinobot-live");
-				} catch (RuntimeException e) {
-					if (e.getCause() instanceof BindException) {
-						throw (BindException) e.getCause();
-					}
-				}
-			} catch (BindException e) {
-				if (i == 10) {
-					throw e;
-				}
-				continue;
-			}
-			break;
-		}
+			main.start("tillerinobot-live");
+		});
 	}
 
 	@Override
