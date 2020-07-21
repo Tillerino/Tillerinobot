@@ -287,8 +287,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		verifyResponse(bot, message("user", "!R"), anyResponse());
 
 		verify(backend).loadRecommendations(anyInt(),
-				anyCollectionOf(Integer.class),
-				eq(Model.GAMMA), anyBoolean(), anyLong());
+				any(),
+				eq(Model.GAMMA5), anyBoolean(), anyLong());
 	}
 
 	@Test
@@ -300,8 +300,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		verifyResponse(bot, message("user", "!R"), anyResponse());
 
 		verify(backend).loadRecommendations(anyInt(),
-				anyCollectionOf(Integer.class),
-				eq(Model.GAMMA), anyBoolean(), anyLong());
+				any(),
+				eq(Model.GAMMA5), anyBoolean(), anyLong());
 	}
 
 	@Test

@@ -141,7 +141,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	public void defaultSettings() throws Exception {
 		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
 		assertThat(recMan.getRecommendation(user, "", new Default())).isNotNull();
-		verify(backend).loadRecommendations(user.getUserId(), Collections.emptyList(), Model.GAMMA, false, 0L);
+		verify(backend).loadRecommendations(user.getUserId(), Collections.emptyList(), Model.GAMMA5, false, 0L);
 	}
 
 	@Test

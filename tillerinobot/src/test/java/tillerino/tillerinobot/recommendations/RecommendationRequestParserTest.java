@@ -17,6 +17,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.predicates.ExcludeMod;
+import tillerino.tillerinobot.predicates.MapLength;
 import tillerino.tillerinobot.predicates.NumericPropertyPredicate;
 import tillerino.tillerinobot.predicates.StarDiff;
 
@@ -53,5 +54,15 @@ public class RecommendationRequestParserTest {
 		assertThat(parse("gamma5 dt"))
 			.hasFieldOrPropertyWithValue("model", Model.GAMMA5)
 			.hasFieldOrPropertyWithValue("requestedMods", 64L);
+	}
+
+	@Test
+	public void testGamma5Len() throws Exception {
+		when(backend.getDonator(any())).thenReturn(1);
+		RecommendationRequest request = parse("gamma5 LEN<=150");
+		assertThat(request)
+			.hasFieldOrPropertyWithValue("model", Model.GAMMA5);
+		assertThat(request.getPredicates())
+			.containsExactly(new NumericPropertyPredicate<>("LEN<=150", new MapLength(), Double.NEGATIVE_INFINITY, true, 150D, true));
 	}
 }

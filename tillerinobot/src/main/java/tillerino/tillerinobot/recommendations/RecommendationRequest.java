@@ -14,15 +14,6 @@ import tillerino.tillerinobot.predicates.RecommendationPredicate;
 @Value
 @Builder
 public class RecommendationRequest {
-	public RecommendationRequest(boolean nomod, Model model, @BitwiseMods long requestedMods,
-			List<RecommendationPredicate> predicates) {
-		super();
-		this.nomod = nomod;
-		this.model = model;
-		this.requestedMods = requestedMods;
-		this.predicates = predicates;
-	}
-
 	public static class RecommendationRequestBuilder {
 		@Getter
 		@BitwiseMods
