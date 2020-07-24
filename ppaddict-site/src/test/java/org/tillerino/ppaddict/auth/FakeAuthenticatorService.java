@@ -1,6 +1,6 @@
 package org.tillerino.ppaddict.auth;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +18,8 @@ public class FakeAuthenticatorService implements AuthenticatorService {
   @Override
   public OAuthService getService() {
     OAuthService myService = mock(OAuthService.class);
-    when(myService.getAuthorizationUrl(any(Token.class))).thenReturn(FakeAuthenticatorWebsite.PATH);
+    when(myService.getAuthorizationUrl(argThat(x -> true /* match any including null */)))
+        .thenReturn(FakeAuthenticatorWebsite.PATH);
     return myService;
   }
 
