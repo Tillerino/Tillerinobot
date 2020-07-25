@@ -29,7 +29,7 @@ import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.ppaddict.server.PersistentUserData;
 import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.Credentials;
-import org.tillerino.ppaddict.shared.types.PpaddictId;
+import org.tillerino.ppaddict.web.types.PpaddictId;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import org.tillerino.ppaddict.shared.types.PpaddictId;
+import org.tillerino.ppaddict.web.types.PpaddictId;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 

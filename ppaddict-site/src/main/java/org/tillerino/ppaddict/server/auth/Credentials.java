@@ -2,7 +2,7 @@ package org.tillerino.ppaddict.server.auth;
 
 import java.io.Serializable;
 
-import org.tillerino.ppaddict.shared.types.PpaddictId;
+import org.tillerino.ppaddict.web.types.PpaddictId;
 
 public class Credentials implements Serializable {
   private static final long serialVersionUID = 1L;

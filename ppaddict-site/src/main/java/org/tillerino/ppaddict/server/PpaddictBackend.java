@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.server.auth.Credentials;
-import org.tillerino.ppaddict.shared.types.PpaddictId;
+import org.tillerino.ppaddict.web.types.PpaddictId;
 
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.PercentageEstimates;
