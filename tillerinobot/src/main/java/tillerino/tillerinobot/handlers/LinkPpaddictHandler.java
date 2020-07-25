@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
+import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -21,20 +22,22 @@ import tillerino.tillerinobot.UserException;
 @AllArgsConstructor(onConstructor=@__({@Inject}))
 public class LinkPpaddictHandler implements CommandHandler {
 	public static final Pattern TOKEN_PATTERN = Pattern.compile("[0-9a-z]{32}");
-	
-	BotBackend backend;
-	
+
+	private final BotBackend backend;
+	private final AbstractPpaddictUserDataService<?> ppaddictUserDataService;
+
 	@Override
 	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException {
 		if(!TOKEN_PATTERN.matcher(command).matches()) {
 			return null;
 		}
-		String ppaddictName = backend.tryLinkToPpaddict(command, apiUser);
-		if(ppaddictName == null)
+		String linkedName = ppaddictUserDataService.tryLinkToPpaddict(command, apiUser.getUserId())
+				.orElseGet(() -> backend.tryLinkToPatreon(command, apiUser));
+		if(linkedName == null)
 			throw new UserException("nothing happened.");
 		else
-			return new Success("linked to " + ppaddictName);
+			return new Success("linked to " + linkedName);
 	}
 
 }

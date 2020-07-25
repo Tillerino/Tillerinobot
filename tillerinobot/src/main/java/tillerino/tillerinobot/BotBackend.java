@@ -112,16 +112,15 @@ public interface BotBackend {
 	public @CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId) throws SQLException, IOException;
 	
 	/**
-	 * links the given user to a ppaddict account using a token string.
+	 * links the given user to a Patreon account using a token string.
 	 * 
-	 * @param token a token that was given to the user by the ppaddict website.
-	 * @param user 
-	 * @return the name of the ppaddict account that current user was linked to, or null if the token was not valid
-	 * @throws SQLException
+	 * @param token a token that was emailed to the Patron.
+	 * @param user osu account to link to
+	 * @return the name of the Patreon account that current user was linked to, or null if the token was not valid
 	 */
 	@CheckForNull
-	public String tryLinkToPpaddict(String token, OsuApiUser user) throws SQLException;
-	
+	public String tryLinkToPatreon(String token, OsuApiUser user);
+
 	/**
 	 * Retrieves the last plays from this user. These don't have pp and might be failed attempts.
 	 * @param userid

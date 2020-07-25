@@ -48,6 +48,7 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
+import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -94,6 +95,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@Mock
 	GameChatResponseQueue queue;
 
+	@Mock
+	AbstractPpaddictUserDataService ppaddictUserDataService;
+
 	@Before
 	public void initMocks() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -129,7 +133,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		IRCBot ircBot = new IRCBot(backend, recMan, userDataManager = new UserDataManager(backend, emf, em, userDataRepository),
 				em, emf, resolver, new TestOsutrackDownloader(),
-				exec, rateLimiter, liveActivity, queue) {{
+				exec, rateLimiter, liveActivity, queue, ppaddictUserDataService) {{
 		}};
 		return ircBot;
 	}

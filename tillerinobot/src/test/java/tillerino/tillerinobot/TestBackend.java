@@ -304,7 +304,7 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public String tryLinkToPpaddict(String token, OsuApiUser user) throws SQLException {
+	public String tryLinkToPatreon(String token, OsuApiUser user) {
 		return null;
 	}
 

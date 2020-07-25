@@ -56,6 +56,8 @@ import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSo
 import org.tillerino.ppaddict.live.LiveActivityEndpoint;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
+import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -165,6 +167,7 @@ public abstract class AbstractFullBotTest {
             bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance")).toInstance(maintenanceWorkerPool);
             bind(ExecutorService.class).annotatedWith(Names.named("core")).toInstance(coreWorkerPool);
             bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
+            bind(AbstractPpaddictUserDataService.class).to(BarePpaddictUserDataService.class);
         }
         protected void installMore() {
             install(new CreateInMemoryDatabaseModule());
@@ -234,10 +237,13 @@ public abstract class AbstractFullBotTest {
     @After
     public void stopBot() throws Exception {
         started.forEach(fut -> fut.cancel(true));
-        botRunner.stopReconnecting();
-        botRunner.disconnectSoftly();
+        if (botRunner != null) {
+          botRunner.stopReconnecting();
+          botRunner.disconnectSoftly();
+        }
         webSocketClient.stop();
     }
+
     @Test
     public void testMultipleUsers() {
         List<Client> clients = IntStream.range(0, users).mapToObj(Client::new).collect(toList());
@@ -274,7 +280,7 @@ public abstract class AbstractFullBotTest {
             break;
         }
         await().atMost(Duration.ofSeconds(2)).until(allRecommendationsReceived);
-        verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"received\" :")));
+        verify(client, timeout(10000).atLeast(total)).message(argThat(s -> s.contains("\"received\" :")));
         verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"sent\" :")));
         verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\" :")));
         log.info("Received {} recommendations. Quitting.", recommendationCount.get());

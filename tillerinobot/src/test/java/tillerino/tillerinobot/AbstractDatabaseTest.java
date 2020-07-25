@@ -11,6 +11,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
+import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -24,6 +26,9 @@ import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
 import tillerino.tillerinobot.data.util.RepositoryModule;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 
+/**
+ * Creates an embedded HSQL database for tests.
+ */
 public abstract class AbstractDatabaseTest {
 	public static class CreateInMemoryDatabaseModule extends AbstractModule {
 		@Provides
@@ -33,7 +38,7 @@ public abstract class AbstractDatabaseTest {
 
 			LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 			factory.setJpaVendorAdapter(vendorAdapter);
-			factory.setPackagesToScan("tillerino.tillerinobot.data");
+			factory.setPackagesToScan("tillerino.tillerinobot.data", "org.tillerino.ppaddict.web.data");
 			factory.setDataSource(dataSource());
 			factory.afterPropertiesSet();
 
@@ -59,6 +64,8 @@ public abstract class AbstractDatabaseTest {
 	protected static GivenRecommendationRepository recommendationsRepo;
 	protected static BotUserDataRepository userDataRepository;
 	protected static ActualBeatmapRepository beatmapFilesRepo;
+	protected static PpaddictUserRepository ppaddictUserRepository;
+	protected static PpaddictLinkKeyRepository ppaddictLinkKeyRepository;
 	
 	@BeforeClass
 	public static void injectAll() {
@@ -72,6 +79,8 @@ public abstract class AbstractDatabaseTest {
 		recommendationsRepo = injector.getInstance(GivenRecommendationRepository.class);
 		userDataRepository = injector.getInstance(BotUserDataRepository.class);
 		beatmapFilesRepo = injector.getInstance(ActualBeatmapRepository.class);
+		ppaddictUserRepository = injector.getInstance(PpaddictUserRepository.class);
+		ppaddictLinkKeyRepository = injector.getInstance(PpaddictLinkKeyRepository.class);
 	}
 	
 	@AfterClass
@@ -86,6 +95,8 @@ public abstract class AbstractDatabaseTest {
 	
 	@After
 	public void closeEntityManager() {
+		ppaddictUserRepository.deleteAll();
+		ppaddictLinkKeyRepository.deleteAll();
 		em.close();
 	}
 }

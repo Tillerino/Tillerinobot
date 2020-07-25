@@ -38,6 +38,7 @@ import org.tillerino.ppaddict.util.LoggingUtils;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
+import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.UserDataManager.UserData;
@@ -80,6 +81,7 @@ public class IRCBot implements GameChatEventConsumer {
 	private final RateLimiter rateLimiter;
 	private final GameChatResponseQueue queue;
 	private final NPHandler npHandler;
+	private final AbstractPpaddictUserDataService ppaddictUserDataService;
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
@@ -87,7 +89,7 @@ public class IRCBot implements GameChatEventConsumer {
 			EntityManagerFactory emf, IrcNameResolver resolver,
 			OsutrackDownloader osutrackDownloader,
 			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter, LiveActivity liveActivity,
-			GameChatResponseQueue queue) {
+			GameChatResponseQueue queue, AbstractPpaddictUserDataService ppaddictUserDataService) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;
 		this.em = em;
@@ -98,6 +100,7 @@ public class IRCBot implements GameChatEventConsumer {
 		this.rateLimiter = rateLimiter;
 		this.queue = queue;
 		this.npHandler = new NPHandler(backend, liveActivity);
+		this.ppaddictUserDataService = ppaddictUserDataService;
 
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
@@ -220,7 +223,7 @@ public class IRCBot implements GameChatEventConsumer {
 				return lang.hug(apiUser);
 			}
 
-			prelimResponse = prelimResponse.then(new LinkPpaddictHandler(backend).handle(message.getMessage(), apiUser, userData));
+			prelimResponse = prelimResponse.then(new LinkPpaddictHandler(backend, ppaddictUserDataService).handle(message.getMessage(), apiUser, userData));
 			if (!prelimResponse.isNone()) {
 				return prelimResponse;
 			}

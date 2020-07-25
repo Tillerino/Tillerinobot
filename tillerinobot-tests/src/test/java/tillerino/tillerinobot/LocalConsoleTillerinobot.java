@@ -42,6 +42,8 @@ import org.tillerino.ppaddict.live.JettyWebsocketServerResource;
 import org.tillerino.ppaddict.live.LiveActivityEndpoint;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
+import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -71,6 +73,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		install(new TillerinobotConfigurationModule());
 		install(new InMemoryQueuesModule());
 		install(new ProcessorsModule());
+		installMore();
 
 		bind(LiveActivity.class).to(LiveActivityEndpoint.class);
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
@@ -83,6 +86,11 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		bind(ExecutorService.class).annotatedWith(Names.named("core"))
 				.toInstance(Executors.newFixedThreadPool(4, threadFactory("core")));
 		bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
+	}
+
+	protected void installMore() {
+		// should not be done when in ppaddict
+		bind(AbstractPpaddictUserDataService.class).to(BarePpaddictUserDataService.class);
 	}
 
 	protected Clock createClock() {
