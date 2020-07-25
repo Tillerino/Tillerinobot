@@ -2,10 +2,12 @@ package org.tillerino.ppaddict;
 
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.EntityManagerFilter;
+import org.tillerino.ppaddict.server.PpaddictUserDataService;
 import org.tillerino.ppaddict.server.RateLimiterSettingsFilter;
 import org.tillerino.ppaddict.server.RecommendationsServiceImpl;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
 import org.tillerino.ppaddict.server.auth.AuthModule;
+import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import com.google.inject.servlet.ServletModule;
 
@@ -18,5 +20,6 @@ public class PpaddictModule extends ServletModule {
     filter("/ppaddict/*").through(EntityManagerFilter.class);
     filter("/ppaddict/*").through(RateLimiterSettingsFilter.class);
     install(new AuthModule());
+    bind(AbstractPpaddictUserDataService.class).to(PpaddictUserDataService.class);
   }
 }

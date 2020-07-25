@@ -11,15 +11,16 @@ import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
 import org.tillerino.ppaddict.shared.PpaddictException;
 import org.tillerino.ppaddict.shared.PpaddictException.NotLinked;
 import org.tillerino.ppaddict.shared.Settings;
+import org.tillerino.ppaddict.web.data.HasLinkedOsuId;
 
-public class PersistentUserData {
+public class PersistentUserData implements HasLinkedOsuId {
   public PersistentUserData() {
 
   }
 
   public PersistentUserData(PersistentUserData o) {
     if (o.beatmapComments != null) {
-      beatmapComments = new TreeSet<String>(o.beatmapComments);
+      beatmapComments = new TreeSet<>(o.beatmapComments);
     }
     if (o.lastRequest != null) {
       lastRequest = new BeatmapRangeRequest(o.lastRequest);

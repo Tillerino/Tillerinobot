@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
@@ -76,6 +77,9 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
   @Inject
   @Named("ppaddict.apiauth.key")
   String apiAuthKey;
+
+  @Inject
+  PpaddictUserDataService ppaddictUserDataService;
 
   public static final String CREDENTIALS_SESSION_KEY = "ppaddict.auth.credentials";
   public static final String CREDENTIALS_COOKIE_KEY = "ppaddict.auth.cookie";
@@ -204,18 +208,14 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
   @Nonnull
   public PersistentUserData getServerUserData(@Nonnull Credentials credentials)
       throws PpaddictException {
-    PersistentUserData data;
+    Optional<PersistentUserData> data;
     try {
-      data = backend.loadUserData(credentials);
-    } catch (SQLException e) {
+      data = ppaddictUserDataService.loadUserData(credentials.identifier);
+    } catch (Exception e) {
       throw ExceptionsUtil.getLoggedWrappedException(log, e);
     }
-    if (data == null) {
-      data = new PersistentUserData();
-    } else {
-      data = new PersistentUserData(data);
-    }
-    return data;
+    return data.map(/* creates a copy */ PersistentUserData::new)
+        .orElseGet(PersistentUserData::new);
   }
 
   @Override
@@ -243,8 +243,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       lastRequest.loadedUserRequest = false;
     }
     try {
-      backend.saveUserData(credentials, saving);
-    } catch (SQLException e) {
+      ppaddictUserDataService.saveUserData(credentials.identifier, saving);
+    } catch (Exception e) {
       throw ExceptionsUtil.getLoggedWrappedException(log, e);
     }
   }
@@ -354,8 +354,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
   public String getLinkString() throws PpaddictException {
     Credentials credentials = getCredentialsOrThrow();
     try {
-      return backend.getLinkString(credentials.identifier, credentials.displayName);
-    } catch (SQLException e) {
+      return ppaddictUserDataService.getLinkString(credentials.identifier, credentials.displayName);
+    } catch (Exception e) {
       throw ExceptionsUtil.getLoggedWrappedException(log, e);
     }
   }

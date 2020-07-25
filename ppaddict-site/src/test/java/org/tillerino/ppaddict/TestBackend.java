@@ -18,7 +18,6 @@ import java.io.Writer;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -99,27 +98,6 @@ public class TestBackend implements PpaddictBackend {
   Database database = new Database();
 
   @Override
-  public PersistentUserData loadUserData(Credentials userIdentifier) {
-    String string = userIdentifier.identifier;
-
-    while (database.forward.containsKey(string)) {
-      string = database.forward.get(string);
-    }
-    return database.userData.get(string);
-  }
-
-  @Override
-  public void saveUserData(Credentials userIdentifier, PersistentUserData data) {
-    String string = userIdentifier.identifier;
-
-    while (database.forward.containsKey(string)) {
-      string = database.forward.get(string);
-    }
-    database.userData.put(string, data);
-    writeDatabase();
-  }
-
-  @Override
   public Credentials resolveCookie(String cookie) {
     return database.cookies.get(cookie);
   }
@@ -130,49 +108,6 @@ public class TestBackend implements PpaddictBackend {
     database.cookies.put(cookie, userIdentifier);
     writeDatabase();
     return cookie;
-  }
-
-  @Override
-  public String getLinkString(@PpaddictId final String ppaddictId, String displayName) {
-    new Thread() {
-      @Override
-      public void run() {
-        String osuName = new Scanner(System.in).nextLine();
-        em.setThreadLocalEntityManager(emf.createEntityManager());
-        try {
-          link(ppaddictId, osuName);
-        } catch (SQLException | IOException | InterruptedException e) {
-          e.printStackTrace();
-        } finally {
-          em.close();
-        }
-      }
-    }.start();
-    System.out.print("Enter your osu name and press enter: ");
-    return "Hi, this is TestBackend. Enter your osu name into the console to link it!";
-  }
-
-
-  public void link(@PpaddictId String loginId, @OsuName String osuName)
-      throws SQLException, IOException, InterruptedException {
-    System.out.println("linking " + loginId + " to " + osuName);
-
-    botBackend.hintUser(osuName, false, 100, 1000);
-
-    int osuId = resolver.resolveIRCName(osuName);
-    @PpaddictId
-    String forwardedId = "osu:" + osuId;
-
-    database.forward.put(loginId, forwardedId);
-    PersistentUserData remove = database.userData.remove(loginId);
-    if (!database.userData.containsKey(forwardedId)) {
-      if (remove == null) {
-        remove = new PersistentUserData();
-      }
-      remove.setLinkedOsuId(osuId);
-      database.userData.put(forwardedId, remove);
-    }
-    writeDatabase();
   }
 
   @Override
