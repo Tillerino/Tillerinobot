@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>war</packaging>
-	<version>0.19.0</version>
+	<version>0.20.0</version>
 
 	<groupId>org.tillerino.osu</groupId>
 	<artifactId>ppaddict-site</artifactId>
@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwt-version>2.9.0</gwt-version>
-		<tillerinobot.version>0.19.0</tillerinobot.version>
+		<tillerinobot.version>0.20.0</tillerinobot.version>
 	</properties>
 
 	<prerequisites>
