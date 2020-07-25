@@ -49,16 +49,31 @@ public interface BotBackend {
 	public void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
 
 	/**
-	 * get a user's information
+	 * Get a user's information. If the user is not known in the database, the data will be downloaded from the osu API.
+	 *
 	 * @param userid user id
-	 * @param maxAge maximum age of the information. if <= 0 any cached information, if available, will be returned
-	 * @return null if the user can't be found
+	 * @param maxAge Maximum age of the information in milliseconds.
+	 *          If there is cached information in the database which is younger, the cached information will be returned.
+	 *          Otherwise, fresh data will be downloaded and cached.
+	 *          If <= 0, any cached information, if available, will be returned. 
+	 * @return null if the user can't be found at the osu API
 	 * @throws SQLException
 	 * @throws IOException API exception
 	 */
 	@CheckForNull
 	public OsuApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException;
-	
+
+	/**
+	 * Registers activity of a user. This information is not historized, i.e. a
+	 * single value is updated and the previous value is therefore erased. This
+	 * information is used to decide when to update top-scores of the users.
+	 *
+	 * The implementation is reasonably fast and can be called frequently.
+	 * It does not download anything from the API and is unrelated to {@link #getUser(int, long)}.
+	 *
+	 * @param userid osu user ID of a real user. It is not required that the user is known via {@link #getUser(int, long)}.
+	 * @throws SQLException only on connection errors
+	 */
 	public void registerActivity(@UserId int userid) throws SQLException;
 	
 	public long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
