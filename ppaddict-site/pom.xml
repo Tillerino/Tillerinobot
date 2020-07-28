@@ -10,6 +10,8 @@
 	<artifactId>ppaddict-site</artifactId>
 
 	<properties>
+		<!-- for reproducible build -->
+		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwt-version>2.9.0</gwt-version>
 		<tillerinobot.version>0.20.0</tillerinobot.version>
@@ -220,6 +222,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
+				<!-- min version for reproducible build -->
+				<version>3.3.1</version>
 				<configuration>
 					<attachClasses>true</attachClasses>
 				</configuration>
