@@ -17,10 +17,11 @@ public class LiveContainer {
 			.withFileFromPath(".", Paths.get(".")))
 			// accesing this static variable will make sure that RabbitMQ is started
 			.withNetwork(NETWORK)
+			.withExposedPorts(8080)
 			.waitingFor(Wait.forHttp("/ready").forStatusCode(200))
 			.withCreateContainerCmdModifier((Consumer<CreateContainerCmd>) cmd ->
-					cmd.withMemory(96 * 1024 * 1024L)
-							.withMemorySwap(96 * 1024 * 1024L))
+					cmd.withMemory(128 * 1024 * 1024L)
+							.withMemorySwap(128 * 1024 * 1024L))
 			.withLogConsumer((Consumer<OutputFrame>) frame -> System.out.println(frame.getUtf8String().trim()));
 
 	static {
