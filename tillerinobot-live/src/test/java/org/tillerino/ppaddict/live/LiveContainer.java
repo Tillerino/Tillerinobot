@@ -19,8 +19,8 @@ public class LiveContainer {
 			.withNetwork(NETWORK)
 			.waitingFor(Wait.forHttp("/ready").forStatusCode(200))
 			.withCreateContainerCmdModifier((Consumer<CreateContainerCmd>) cmd ->
-					cmd.withMemory(64 * 1024 * 1024L)
-							.withMemorySwap(64 * 1024 * 1024L))
+					cmd.withMemory(96 * 1024 * 1024L)
+							.withMemorySwap(96 * 1024 * 1024L))
 			.withLogConsumer((Consumer<OutputFrame>) frame -> System.out.println(frame.getUtf8String().trim()));
 
 	static {
