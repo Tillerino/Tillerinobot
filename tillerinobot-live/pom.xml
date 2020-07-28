@@ -54,7 +54,6 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>rabbitmq</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.tillerino.osu</groupId>
@@ -76,6 +75,7 @@
                 <executions>
                     <execution>
                         <goals>
+                            <!-- For Dockerfile: all dependency jars will be copied to target/dependency -->
                             <goal>copy-dependencies</goal>
                         </goals>
                     </execution>
@@ -85,6 +85,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
+                    <!-- For Dockerfile: jar will always be target/live.jar -->
                     <finalName>live</finalName>
                 </configuration>
             </plugin>
