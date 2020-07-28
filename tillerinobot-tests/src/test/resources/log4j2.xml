@@ -19,5 +19,6 @@
 		<Logger name="org.tillerino.irc" level="info"/>
 		<Logger name="com.github.dockerjava" level="info"/>
 		<Logger name="org.testcontainers" level="info"/>
+		<Logger name="org.tillerino.ppaddict.FullBotTest" level="info"/>
 	</Loggers>
 </Configuration>

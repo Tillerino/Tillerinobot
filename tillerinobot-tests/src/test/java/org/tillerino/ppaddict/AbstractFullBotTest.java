@@ -261,19 +261,16 @@ public abstract class AbstractFullBotTest {
             client.r();
         });
         int total = users * recommendationsPerUser;
-        Callable<Boolean> allRecommendationsReceived = () -> {
-            log.debug("Received {} recommendations so far.", recommendationCount.get());
-            return recommendationCount.get() == total;
-        };
+        Callable<Boolean> allRecommendationsReceived = () -> recommendationCount.get() == total;
         for (int i = 0; i < 100; i++) {
             try {
-                log.info("Waiting for recommendation count to reach {}.", total);
+                log.info("Waiting for recommendation count to reach {}. Current: {}.", total, recommendationCount.get());
                 await().atMost(Duration.ofSeconds(2)).until(allRecommendationsReceived);
             } catch (ConditionTimeoutException e) {
                 log.info("Some clients got concurrent messages. Let's give 'em a push.");
                 clients.stream()
                         .filter(client -> client.receivedRecommendations < recommendationsPerUser)
-                        .filter(client -> client.lastReceivedRecommendation < System.currentTimeMillis() - 1000)
+                        .filter(client -> client.lastReceivedRecommendation < System.currentTimeMillis() - 2000)
                         .forEach(Client::r);
                 continue;
             }
