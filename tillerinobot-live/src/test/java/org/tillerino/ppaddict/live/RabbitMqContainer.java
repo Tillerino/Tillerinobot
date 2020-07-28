@@ -1,11 +1,10 @@
 package org.tillerino.ppaddict.live;
 
-import org.testcontainers.containers.Network;
+import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
+
 import org.testcontainers.containers.RabbitMQContainer;
 
 public class RabbitMqContainer {
-	static final Network NETWORK = Network.newNetwork();
-
 	private static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer()
 			.withNetwork(NETWORK)
 			.withNetworkAliases("rabbitmq");

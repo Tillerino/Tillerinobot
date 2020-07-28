@@ -275,6 +275,11 @@
 				<artifactId>mysql</artifactId>
 				<version>${testcontainer.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers</artifactId>
+				<version>${testcontainer.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

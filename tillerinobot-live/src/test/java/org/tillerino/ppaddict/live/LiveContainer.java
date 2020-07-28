@@ -1,6 +1,6 @@
 package org.tillerino.ppaddict.live;
 
-import static org.tillerino.ppaddict.live.RabbitMqContainer.NETWORK;
+import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
 import java.nio.file.Paths;
 import java.util.function.Consumer;
@@ -14,7 +14,8 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 
 public class LiveContainer {
 	private static final GenericContainer LIVE = new GenericContainer(new ImageFromDockerfile()
-			.withFileFromPath(".", Paths.get(".")))
+			// move to parent so we can use this in multiple modules
+			.withFileFromPath(".", Paths.get("../tillerinobot-live/.")))
 			// accesing this static variable will make sure that RabbitMQ is started
 			.withNetwork(NETWORK)
 			.withExposedPorts(8080)

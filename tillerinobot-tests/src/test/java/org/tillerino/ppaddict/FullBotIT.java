@@ -1,10 +1,11 @@
 package org.tillerino.ppaddict;
 
+import static org.tillerino.ppaddict.live.LiveContainer.getLive;
+import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
+
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinTask;
-import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 import javax.websocket.DeploymentException;
@@ -12,14 +13,10 @@ import javax.websocket.DeploymentException;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
-import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
@@ -38,8 +35,6 @@ public class FullBotIT extends AbstractFullBotTest {
 	public static final String DOCKER_HOST = Optional.ofNullable(System.getenv("DOCKER_HOST"))
 			.map(URI::create).map(URI::getHost).orElse("localhost");
 
-	private static final Network NETWORK = Network.newNetwork();
-
 	private static final MySQLContainer MYSQL = new MySQLContainer<>();
 
 	private static final GenericContainer NGIRCD = new GenericContainer<>("linuxserver/ngircd:60428df3-ls19")
@@ -51,18 +46,12 @@ public class FullBotIT extends AbstractFullBotTest {
 			.withNetwork(NETWORK)
 			.withNetworkAliases("rabbitmq");
 
-	private static final GenericContainer LIVE = new GenericContainer(new ImageFromDockerfile()
-		.withFileFromPath(".", Paths.get("../tillerinobot-live")))
-		.withNetwork(NETWORK)
-		.waitingFor(Wait.forHttp("/ready").forStatusCode(200))
-		.withCreateContainerCmdModifier((Consumer<CreateContainerCmd>) cmd -> cmd.withMemory(64 * 1024 * 1024L));
-
 	static {
 		// these take a little longer to start, so we'll do that async
 		ForkJoinTask<?> ngircd = ForkJoinTask.adapt((Runnable) NGIRCD::start).fork();
 		ForkJoinTask<?> mysql = ForkJoinTask.adapt((Runnable) MYSQL::start).fork();
 		RABBIT_MQ.start();
-		LIVE.start();
+		getLive();
 		ngircd.join();
 		mysql.join();
 	}
@@ -94,7 +83,7 @@ public class FullBotIT extends AbstractFullBotTest {
 
 	@Override
 	protected String getWsUrl(Injector injector) throws DeploymentException {
-		return "ws://" + DOCKER_HOST + ":" + LIVE.getMappedPort(8080) + "/live/v0";
+		return "ws://" + DOCKER_HOST + ":" + getLive().getMappedPort(8080) + "/live/v0";
 	}
 
 	@Override
