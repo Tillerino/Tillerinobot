@@ -21,7 +21,7 @@
 		<jacoco.version>0.8.5</jacoco.version>
 		<jersey.version>2.25.1</jersey.version>
 		<jackson.version>2.10.3</jackson.version>
-		<testcontainer.version>1.14.0</testcontainer.version>
+		<testcontainers.version>1.14.3</testcontainers.version>
 		<slf4j.version>1.7.7</slf4j.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
 	</properties>
@@ -61,6 +61,12 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<archive>
+						<!-- makes build reproducible even if we change the pom -->
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
@@ -241,19 +247,19 @@
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>rabbitmq</artifactId>
-				<version>${testcontainer.version}</version>
+				<version>${testcontainers.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>mysql</artifactId>
-				<version>${testcontainer.version}</version>
+				<version>${testcontainers.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>testcontainers</artifactId>
-				<version>${testcontainer.version}</version>
+				<version>${testcontainers.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
