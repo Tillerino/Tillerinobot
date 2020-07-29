@@ -226,6 +226,10 @@
 				<version>3.3.1</version>
 				<configuration>
 					<attachClasses>true</attachClasses>
+					<archive>
+						<!-- makes build reproducible even if we change the pom -->
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
