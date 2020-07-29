@@ -16,7 +16,6 @@
         <dependency>
             <groupId>org.tillerino.osu</groupId>
             <artifactId>tillerinobot-model</artifactId>
-            <version>0.20.0</version>
         </dependency>
 
         <!-- Libraries -->

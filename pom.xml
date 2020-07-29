@@ -133,6 +133,60 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!--  -->
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-model</artifactId>
+				<version>0.20.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-model</artifactId>
+				<classifier>tests</classifier>
+				<version>0.20.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-live</artifactId>
+				<version>0.20.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-rabbit</artifactId>
+				<version>0.20.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-live</artifactId>
+				<classifier>tests</classifier>
+				<version>0.20.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-irc</artifactId>
+				<version>0.20.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-irc</artifactId>
+				<classifier>tests</classifier>
+				<version>0.20.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot</artifactId>
+				<version>0.20.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot</artifactId>
+				<classifier>tests</classifier>
+				<version>0.20.0</version>
+				<scope>test</scope>
+			</dependency>
 			<!-- APIs -->
 			<dependency>
 				<groupId>javax.ws.rs</groupId>

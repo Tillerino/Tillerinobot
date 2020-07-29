@@ -22,12 +22,10 @@
         <dependency>
             <groupId>org.tillerino.osu</groupId>
             <artifactId>tillerinobot-model</artifactId>
-            <version>0.20.0</version>
         </dependency>
         <dependency>
             <groupId>org.tillerino.osu</groupId>
             <artifactId>tillerinobot-rabbit</artifactId>
-            <version>0.20.0</version>
         </dependency>
 
         <!-- libraries -->
@@ -58,9 +56,7 @@
         <dependency>
             <groupId>org.tillerino.osu</groupId>
             <artifactId>tillerinobot-model</artifactId>
-            <version>0.20.0</version>
             <classifier>tests</classifier>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

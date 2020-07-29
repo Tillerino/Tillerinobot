@@ -20,7 +20,6 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
-			<version>0.20.0</version>
 		</dependency>
 
 		<!-- Specific dependencies -->
@@ -34,9 +33,7 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
-			<version>0.20.0</version>
 			<classifier>tests</classifier>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.tillerino.twirc</groupId>
