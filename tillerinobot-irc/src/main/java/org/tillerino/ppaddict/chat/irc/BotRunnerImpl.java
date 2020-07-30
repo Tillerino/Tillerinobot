@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.BotFactory;
@@ -27,7 +28,6 @@ import org.pircbotx.snapshot.UserChannelDaoSnapshot;
 import org.pircbotx.snapshot.UserSnapshot;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.util.TidyObject;
-import org.tillerino.ppaddict.util.TillerinobotGitProperties;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
@@ -155,8 +155,7 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 			@Named("tillerinobot.irc.port") int port,
 			@Named("tillerinobot.irc.nickname") String nickname,
 			@Named("tillerinobot.irc.password") String password,
-			@Named("tillerinobot.irc.autojoin") String autojoinChannel,
-			TillerinobotGitProperties gitProperties) {
+			@Named("tillerinobot.irc.autojoin") String autojoinChannel) {
 		super();
 		this.listener = tillerinoBot;
 		this.server = server.split(",");
@@ -164,7 +163,6 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 		this.nickname = nickname;
 		this.password = password;
 		this.autojoinChannel = autojoinChannel;
-		this.gitProperties = gitProperties;
 	}
 
 	private final IrcHooks listener;
@@ -174,14 +172,13 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 	private final String nickname;
 	private final String password;
 	private final String autojoinChannel;
-	private final TillerinobotGitProperties gitProperties;
 
 	private volatile boolean reconnect = true;
 	private int reconnectTimeout = 10000;
 
 	@Override
 	public void run() {
-		log.info("Starting Tillerinobot {}: {}", gitProperties.getCommit(), gitProperties.getCommitMessage());
+		log.info("Starting Tillerinobot tag {}", StringUtils.defaultIfBlank(System.getenv("TAG"), "(unknown)"));
 		for (int i = 0; reconnect; i++) {
 			try {
 				try {

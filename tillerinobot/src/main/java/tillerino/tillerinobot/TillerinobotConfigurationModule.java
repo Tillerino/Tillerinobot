@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TillerinobotConfigurationModule extends AbstractModule {
 	@Override
 	protected void configure() {
-		loadProperties("/tillerinobot.git.properties", binder(), false);
 		loadProperties("/tillerinobot.properties", binder(), true);
 		Names.bindProperties(binder(), System.getProperties());
 		loadFromEnvironmentVariable("TILLERINOBOT_IRC_SERVER", "tillerinobot.irc.server", binder());

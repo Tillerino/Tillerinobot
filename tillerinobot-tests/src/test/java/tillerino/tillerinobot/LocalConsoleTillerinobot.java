@@ -133,9 +133,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	@Singleton
 	public GameChatClient getRunner(@Named("messagePreprocessor") GameChatEventConsumer preprocessor,
 			final BotBackend backend, final IrcNameResolver resolver, EntityManagerFactory emf,
-			ThreadLocalAutoCommittingEntityManager em,
-			@Named("tillerinobot.git.commit.id.abbrev") String commit,
-			@Named("tillerinobot.git.commit.message.short") String commitMessage) throws Exception {
+			ThreadLocalAutoCommittingEntityManager em) throws Exception {
 
 		final AtomicBoolean running = new AtomicBoolean(true);
 
@@ -146,7 +144,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
-				log.info("Starting Tillerinobot {}: {}", commit, commitMessage);
+				log.info("Starting Tillerinobot");
 
 				try (Scanner scanner = new Scanner(System.in)) {
 					while (running.get()) {
