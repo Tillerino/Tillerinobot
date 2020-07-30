@@ -17,7 +17,7 @@
 			<plugin>
 				<groupId>com.github.kongchen</groupId>
 				<artifactId>swagger-maven-plugin</artifactId>
-				<version>3.1.5</version>
+				<!-- mvn -f tillerinobot com.github.kongchen:swagger-maven-plugin:generate && cp tillerinobot/target/generated-swagger/swagger.yaml docs/swagger/swagger.yml -->
 				<configuration>
 					<apiSources>
 						<apiSource>
