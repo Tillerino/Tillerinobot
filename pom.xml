@@ -22,7 +22,7 @@
 		<jersey.version>2.25.1</jersey.version>
 		<jackson.version>2.10.3</jackson.version>
 		<testcontainers.version>1.14.3</testcontainers.version>
-		<slf4j.version>1.7.7</slf4j.version>
+		<slf4j.version>1.7.26</slf4j.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
 	</properties>
 
@@ -338,6 +338,12 @@
 				<version>${testcontainers.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>mockserver</artifactId>
+				<version>${testcontainers.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -377,7 +383,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>4.13</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
