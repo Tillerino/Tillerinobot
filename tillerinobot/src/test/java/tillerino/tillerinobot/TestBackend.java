@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -96,6 +97,8 @@ public class TestBackend implements BotBackend {
 			try (Reader reader = new InputStreamReader(new BufferedInputStream(
 					new FileInputStream("tillerinobot-db.json")))) {
 				database = gson.fromJson(reader, Database.class);
+			} catch (FileNotFoundException e) {
+				System.err.println("Could not load existing database: " + e.getMessage());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
