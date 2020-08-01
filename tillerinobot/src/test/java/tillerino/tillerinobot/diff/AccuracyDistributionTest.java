@@ -1,16 +1,14 @@
 package tillerino.tillerinobot.diff;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiScore;
-import tillerino.tillerinobot.diff.AccuracyDistribution;
-
 
 public class AccuracyDistributionTest {
 	@Test
 	public void testOptimization() throws Exception {
-		for(int i = 0; i < 10000; i++) {
+		for(int i = 0; i < 1000000; i++) {
 			int _300s = (int) (Math.random() * 100);
 			int _100s = (int) (Math.random() * 100);
 			int _50s = (int) (Math.random() * 100);

@@ -60,15 +60,29 @@ public class AccuracyDistribution {
 	}
 
 	static int getBest300s(int allObjects, int misses, double acc) {
-		int best300s = 0;
-		Pair<Integer, Double> best = getBest100s(allObjects, 0, misses, acc);
-		for(int i = 1; i <= allObjects - misses; i++) {
-			Pair<Integer, Double> val = getBest100s(allObjects, i, misses, acc);
-			if(Math.abs(val.getRight() - acc) < Math.abs(best.getRight() - acc)) {
-				best = val;
-				best300s = i;
+		/*
+		 * Why does this work?
+		 *
+		 * _50s are uniquely determined by _300s and _50s.
+		 * => _50s becomes slack variable.
+		 * => Solution polytope is _300s + _100s <= allObjects - misses.
+		 * (Tip: draw this. It's 2D)
+		 * Figure out analytical, continuous solution.
+		 * => Discrete solution must be within +/- _300s, +/- 5 * _100s bounding box.
+		 * Make sure that 0 <= _300s <= allObjects - misses.
+		 *
+		 * Search for _100s can be optimized as well if need be.
+		 */
+		int guess = (int) Math.round((misses + 6 * allObjects * acc - allObjects) / 5);
+		int best = 0;
+		double bestError = Double.POSITIVE_INFINITY;
+		for (int i = Math.max(0, guess - 1); i <= Math.min(allObjects - misses, guess + 1); i++) {
+			double error = Math.abs(acc - getBest100s(allObjects, i, misses, acc).getRight());
+			if (error < bestError) {
+				best = i;
+				bestError = error;
 			}
 		}
-		return best300s;
+		return best;
 	}
 }
