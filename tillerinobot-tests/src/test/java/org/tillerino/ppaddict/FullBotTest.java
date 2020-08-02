@@ -37,7 +37,7 @@ public class FullBotTest extends AbstractFullBotTest {
 
 	@Override
 	Injector createInjector() {
-		return Guice.createInjector(new FullBotConfiguration(ircHost(), ircPort(), exec, coreWorkerPool));
+		return Guice.createInjector(new FullBotConfiguration(ircHost(), ircPort(), exec));
 	}
 
 	@Override

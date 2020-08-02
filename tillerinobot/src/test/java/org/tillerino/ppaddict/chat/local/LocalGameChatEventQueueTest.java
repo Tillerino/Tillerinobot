@@ -11,14 +11,11 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -33,6 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.PrivateMessage;
+import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
@@ -56,7 +54,7 @@ public class LocalGameChatEventQueueTest {
 
 	@Before
 	public void before() {
-		queue = new LocalGameChatEventQueue(coreHandler, exec, botInfo);
+		queue = new LocalGameChatEventQueue(new MessageHandlerScheduler(coreHandler, (ThreadPoolExecutor) exec.getExec()), botInfo);
 		queueRunner = exec.submit(queue);
 	}
 
@@ -87,13 +85,7 @@ public class LocalGameChatEventQueueTest {
 	@Test
 	public void testQueueSizes() throws Exception {
 		ThreadPoolExecutor exec = mock(ThreadPoolExecutor.class);
-		BlockingQueue<Runnable> blockingQueue = new LinkedBlockingQueue<>();
-		when(exec.getQueue()).thenReturn(blockingQueue);
-		when(exec.submit(any(Runnable.class))).thenAnswer(x -> {
-			blockingQueue.put(x.getArgument(0));
-			return null;
-		});
-		LocalGameChatEventQueue queue = new LocalGameChatEventQueue(coreHandler, exec, botInfo);
+		LocalGameChatEventQueue queue = new LocalGameChatEventQueue(new MessageHandlerScheduler(coreHandler, exec), botInfo);
 		queue.onEvent(new PrivateMessage(1, "sender", 125, "hello"));
 		verify(botInfo, only()).setEventQueueSize(1);
 		verify(exec, never()).submit(any(Runnable.class));
@@ -101,7 +93,7 @@ public class LocalGameChatEventQueueTest {
 
 		queue.loop();
 		verify(exec).submit(any(Runnable.class));
-		verify(botInfo, only()).setEventQueueSize(1);
+		verify(botInfo, only()).setEventQueueSize(0);
 	}
 
 	@Test
@@ -118,7 +110,8 @@ public class LocalGameChatEventQueueTest {
 		doAnswer(x -> { System.out.printf("setting to %s%n", (Long) x.getArgument(0)); return null; }).when(botInfo).setEventQueueSize(anyLong());
 
 		// we unwrap the executor here since we need to access the queue
-		LocalGameChatEventQueue queue = new LocalGameChatEventQueue(coreHandler, exec.getExec(), botInfo);
+		LocalGameChatEventQueue queue = new LocalGameChatEventQueue(
+				new MessageHandlerScheduler(coreHandler, (ThreadPoolExecutor) exec.getExec()), botInfo);
 
 		// since one thread in the pool is occupied, we can block the executor pool with a single task
 		queue.onEvent(new PrivateMessage(0, "sender", 125, "hello"));

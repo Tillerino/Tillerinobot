@@ -34,6 +34,7 @@ import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
+import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
@@ -57,7 +58,6 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
-
 /**
  * The purpose of this class and its main function is to completely mock backend
  * and IRC connection to quickly check out the functionality of Tillerinobot.
@@ -83,8 +83,8 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		bind(Clock.class).toInstance(createClock());
 		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
 				.toInstance(Executors.newSingleThreadExecutor(threadFactory("maintenance")));
-		bind(ExecutorService.class).annotatedWith(Names.named("core"))
-				.toInstance(Executors.newFixedThreadPool(4, threadFactory("core")));
+		bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(1);
+		install(new MessageHandlerSchedulerModule());
 		bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 	}
 

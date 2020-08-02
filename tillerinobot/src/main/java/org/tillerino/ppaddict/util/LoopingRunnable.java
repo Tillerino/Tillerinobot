@@ -20,6 +20,9 @@ public abstract class LoopingRunnable implements Runnable {
 				log.info("Interrupted. Stopping loop.");
 				Thread.currentThread().interrupt();
 				return;
+			} catch (Throwable e) {
+				log.error("Error", e);
+				throw e;
 			}
 		}
 	}

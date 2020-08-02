@@ -46,6 +46,7 @@ import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
+import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl;
 import org.tillerino.ppaddict.chat.irc.IrcWriter;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
@@ -61,6 +62,7 @@ import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import lombok.RequiredArgsConstructor;
@@ -143,8 +145,6 @@ public abstract class AbstractFullBotTest {
         private final int port;
         private final ExecutorService maintenanceWorkerPool;
 
-        private final ExecutorService coreWorkerPool;
-
         @Override
         protected void configure() {
             installMore();
@@ -165,7 +165,8 @@ public abstract class AbstractFullBotTest {
             bind(Clock.class).toInstance(Clock.system());
             bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
             bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance")).toInstance(maintenanceWorkerPool);
-            bind(ExecutorService.class).annotatedWith(Names.named("core")).toInstance(coreWorkerPool);
+            install(new MessageHandlerSchedulerModule());
+            bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(4);
             bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
             bind(AbstractPpaddictUserDataService.class).to(BarePpaddictUserDataService.class);
         }
@@ -182,11 +183,18 @@ public abstract class AbstractFullBotTest {
     private GenericWebSocketClient client;
     private final WebSocketClient webSocketClient = new WebSocketClient();
 
+    private final ThreadGroup clients = new ThreadGroup("Clients");
+    @Rule
+    public final ExecutorServiceRule clientExec = new ExecutorServiceRule(
+        () -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+            r -> new Thread(clients, r, "Client")));
+
     @Rule
     public final ExecutorServiceRule exec = new ExecutorServiceRule(
-            () -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<>()));
-    @Rule
-    public final ExecutorServiceRule coreWorkerPool = ExecutorServiceRule.fixedThreadPool("core", 4);
+        () -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+            r -> new Thread(r, "aux")));
+
+    public ExecutorService coreWorkerPool;
 
     private final AtomicInteger recommendationCount = new AtomicInteger();
     private final List<Future<?>> started = new ArrayList<>();
@@ -218,6 +226,7 @@ public abstract class AbstractFullBotTest {
     public void startBot() throws Exception {
         Injector injector = createInjector();
 
+        coreWorkerPool = injector.getInstance(Key.get(ThreadPoolExecutor.class, Names.named("core")));
         webSocketClient.start();
         Future<Session> connect = webSocketClient.connect(client, new URI(getWsUrl(injector)));
         connect.get(10, TimeUnit.SECONDS);
@@ -241,6 +250,9 @@ public abstract class AbstractFullBotTest {
           botRunner.stopReconnecting();
           botRunner.disconnectSoftly();
         }
+        if (coreWorkerPool != null) {
+          coreWorkerPool.shutdownNow();
+        }
         webSocketClient.stop();
     }
 
@@ -254,7 +266,7 @@ public abstract class AbstractFullBotTest {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            exec.submit(client);
+            clientExec.submit(client);
         });
         clients.forEach(client -> {
             await().until(() -> client.connected);

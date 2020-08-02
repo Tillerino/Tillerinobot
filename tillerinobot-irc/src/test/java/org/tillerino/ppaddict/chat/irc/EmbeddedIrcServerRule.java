@@ -24,7 +24,7 @@ public class EmbeddedIrcServerRule extends ExternalResource {
 	protected void before() throws Throwable {
 		socket = ServerSocketChannel.open().bind(new InetSocketAddress("localhost", 0));
 		ConnectionInitiator initiator = new ConnectionInitiator(socket);
-		thread = new Thread(initiator);
+		thread = new Thread(initiator, "twIRCd");
 		thread.start();
 	}
 
