@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.LiveActivityMessage> implements LiveActivity {
 	public RemoteLiveActivity(ObjectMapper mapper, Channel channel, String exchange, String queue) {
-		super(mapper, channel, exchange, queue, log, LiveActivityMessage.class);
+		super(mapper, channel, exchange, queue, log, LiveActivityMessage.class, null);
 	}
 
 	@Override

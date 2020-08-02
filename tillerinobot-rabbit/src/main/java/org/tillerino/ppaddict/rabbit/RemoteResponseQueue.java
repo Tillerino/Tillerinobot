@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RemoteResponseQueue extends AbstractRemoteQueue<RemoteResponseQueue.EventReponsePair> implements GameChatResponseQueue {
 
 	RemoteResponseQueue(ObjectMapper mapper, Channel channel, String exchange, String queue) {
-		super(mapper, channel, exchange, queue, log, EventReponsePair.class);
+		super(mapper, channel, exchange, queue, log, EventReponsePair.class, null);
 	}
 
 	@Override

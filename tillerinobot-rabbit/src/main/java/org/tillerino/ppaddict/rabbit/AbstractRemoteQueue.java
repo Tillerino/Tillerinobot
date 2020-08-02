@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.Queue.DeclareOk;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -24,10 +25,21 @@ abstract class AbstractRemoteQueue<T> {
 	private final String queue;
 	private final Logger log;
 	private final Class<T> cls;
+	private final Integer maxPriority;
 
 	protected void send(T event) {
+		send(event, null);
+	}
+
+	protected void send(T event, Integer priority) {
+		if (priority != null) {
+			if (priority < 0 || maxPriority == null || priority > maxPriority) {
+				throw new IllegalArgumentException();
+			}
+		}
 		try {
-			channel.basicPublish(exchange, queue, null, mapper.writeValueAsBytes(event));
+			BasicProperties properties = new BasicProperties.Builder().priority(priority).build();
+			channel.basicPublish(exchange, queue, properties, mapper.writeValueAsBytes(event));
 		} catch (IOException e) {
 			log.warn("Unable to queue message. Dropping message {}", event, e);
 		}
@@ -43,7 +55,7 @@ abstract class AbstractRemoteQueue<T> {
 	}
 
 	/**
-	 * Must be called before the first call to {@link #send(Object)} or {@link #subscribe(Consumer)}.
+	 * Must be called before the first call to {@link #send(Object, int)} or {@link #subscribe(Consumer)}.
 	 */
 	public void setup() throws IOException {
 		if (StringUtils.isBlank(exchange) == StringUtils.isBlank(queue)) {
@@ -55,6 +67,9 @@ abstract class AbstractRemoteQueue<T> {
 		if (StringUtils.isNotBlank(queue)) {
 			Map<String, Object> arguments = new HashMap<>();
 			arguments.put("x-message-ttl", 60000);
+			if (maxPriority != null) {
+				arguments.put("x-max-priority", maxPriority);
+			}
 			channel.queueDeclare(queue, true, false, false, arguments);
 		}
 	}
