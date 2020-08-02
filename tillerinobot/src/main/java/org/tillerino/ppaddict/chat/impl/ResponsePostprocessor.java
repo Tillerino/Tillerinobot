@@ -22,7 +22,6 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.handlers.RecommendHandler;
 
 /**
  * Prepares responses to be written out. Writing is done in synchronous fashion
@@ -45,7 +44,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	@Override
 	public void onResponse(GameChatResponse response, GameChatEvent event) throws InterruptedException {
 		try {
-			for (GameChatResponse r : response) {
+			for (GameChatResponse r : response.flatten()) {
 				handleResponse(r, event);
 			}
 		} catch (IOException e) {
@@ -85,7 +84,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 				mdc.add(MdcUtils.MDC_DURATION, clock.currentTimeMillis() - result.getTimestamp());
 				mdc.add(MdcUtils.MDC_SUCCESS, true);
 				mdc.add(MdcUtils.MCD_OSU_API_RATE_BLOCKED_TIME, result.getMeta().getRateLimiterBlockedTime());
-				if (Objects.equals(MDC.get(MdcUtils.MDC_HANDLER), RecommendHandler.MDC_FLAG)) {
+				if (Objects.equals(MDC.get(MdcUtils.MDC_HANDLER), MdcUtils.MDC_HANDLER_RECOMMEND)) {
 					botInfo.setLastRecommendation(clock.currentTimeMillis());
 				}
 			}

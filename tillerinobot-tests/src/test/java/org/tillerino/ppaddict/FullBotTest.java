@@ -4,6 +4,8 @@ import javax.websocket.DeploymentException;
 
 import org.junit.Rule;
 import org.tillerino.ppaddict.chat.irc.EmbeddedIrcServerRule;
+import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
+import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.live.JettyWebsocketServerResource;
 import org.tillerino.ppaddict.live.LiveActivityEndpoint;
 
@@ -38,6 +40,12 @@ public class FullBotTest extends AbstractFullBotTest {
 	@Override
 	Injector createInjector() {
 		return Guice.createInjector(new FullBotConfiguration(ircHost(), ircPort(), exec));
+	}
+
+	@Override
+	protected void startMore(Injector injector) {
+		started.add(exec.submit(injector.getInstance(LocalGameChatEventQueue.class)));
+		started.add(exec.submit(injector.getInstance(LocalGameChatResponseQueue.class)));
 	}
 
 	@Override

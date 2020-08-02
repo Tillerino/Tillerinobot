@@ -67,6 +67,10 @@
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-rabbit</artifactId>
+		</dependency>
 
 		<!-- APIs and annotations -->
 		<dependency>

@@ -24,7 +24,7 @@ public class AbstractRabbitMain {
 		rabbitFactory = RabbitMqConfiguration.connectionFactory(rabbitHost, rabbitPort);
 	}
 
-	protected void start(String connectionName) throws IOException, TimeoutException {
+	protected synchronized void start(String connectionName) throws IOException, TimeoutException {
 		log.info("Connecting to RabbitMQ {}:{}", rabbitFactory.getHost(), rabbitFactory.getPort());
 		rabbitConnection = rabbitFactory.newConnection(connectionName);
 		log.info("Connected  to RabbitMQ {}:{}", rabbitFactory.getHost(), rabbitFactory.getPort());
@@ -33,10 +33,11 @@ public class AbstractRabbitMain {
 		log.info("Opened  RabbitMQ channel");
 	}
 
-	protected void stop() throws IOException, TimeoutException {
+	protected synchronized void stop() {
 		if (rabbitChannel != null) {
 			try {
 				rabbitChannel.close();
+				rabbitChannel = null;
 			} catch (Exception e) {
 				log.error("Error closing RabbitMQ channel", e);
 			}
@@ -44,15 +45,16 @@ public class AbstractRabbitMain {
 		if (rabbitConnection != null) {
 			try {
 				rabbitConnection.close();
+				rabbitConnection = null;
 			} catch (Exception e) {
 				log.error("Error closing RabbitMQ connection", e);
 			}
 		}
 	}
 
-	protected Channel getRabbitChannel() {
+	protected synchronized Channel getRabbitChannel() {
 		if (rabbitChannel == null) {
-			throw new IllegalStateException("RabbitMQ connection not started");
+			throw new IllegalStateException("RabbitMQ connection not started or already shut down");
 		}
 		return rabbitChannel;
 	}

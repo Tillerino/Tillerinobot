@@ -74,6 +74,7 @@ public class LiveMain extends AbstractRabbitMain {
 				}).build();
 	}
 
+	@Override
 	public void start(String connectionName) throws IOException, TimeoutException {
 		log.info("Starting Undertow");
 		undertow.start();
@@ -89,7 +90,8 @@ public class LiveMain extends AbstractRabbitMain {
 		}
 	}
 
-	public void stop() throws IOException, TimeoutException {
+	@Override
+	public void stop() {
 		super.stop();
 		undertow.stop();
 		xnioWorker.shutdown();

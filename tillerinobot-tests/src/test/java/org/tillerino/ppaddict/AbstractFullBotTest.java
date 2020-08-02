@@ -149,7 +149,6 @@ public abstract class AbstractFullBotTest {
         protected void configure() {
             installMore();
             install(new TillerinobotConfigurationModule());
-            install(new InMemoryQueuesModule());
             install(new ProcessorsModule());
 
             bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance(host);
@@ -173,6 +172,7 @@ public abstract class AbstractFullBotTest {
         protected void installMore() {
             install(new CreateInMemoryDatabaseModule());
             bind(LiveActivity.class).to(LiveActivityEndpoint.class);
+            install(new InMemoryQueuesModule());
         }
 
     }
@@ -197,7 +197,7 @@ public abstract class AbstractFullBotTest {
     public ExecutorService coreWorkerPool;
 
     private final AtomicInteger recommendationCount = new AtomicInteger();
-    private final List<Future<?>> started = new ArrayList<>();
+    protected final List<Future<?>> started = new ArrayList<>();
 
     protected int users = 100;
     protected int recommendationsPerUser = 20;
@@ -235,12 +235,14 @@ public abstract class AbstractFullBotTest {
         TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
         botRunner = (BotRunnerImpl) injector.getInstance(GameChatClient.class);
         started.add(exec.submit(botRunner));
-        started.add(exec.submit(injector.getInstance(LocalGameChatEventQueue.class)));
-        started.add(exec.submit(injector.getInstance(LocalGameChatResponseQueue.class)));
+        startMore(injector);
         for (int botNumber = 0; botNumber < users; botNumber++) {
             backend.hintUser("user" + botNumber, false, 12, 1000);
         }
         await().until(() -> botInfo.getLastInteraction() > 0);
+    }
+
+    protected void startMore(Injector injector) {
     }
 
     @After

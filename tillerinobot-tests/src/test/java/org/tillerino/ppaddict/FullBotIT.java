@@ -15,6 +15,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.tillerino.ppaddict.chat.LiveActivity;
+import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
 import com.google.inject.Guice;
@@ -103,6 +104,9 @@ public class FullBotIT extends AbstractFullBotTest {
 				});
 
 				bind(LiveActivity.class).toInstance(RabbitMqConfiguration.liveActivity(channel));
+
+				bind(Channel.class).toInstance(channel);
+				install(new RabbitQueuesModule());
 			}
 		});
 	}

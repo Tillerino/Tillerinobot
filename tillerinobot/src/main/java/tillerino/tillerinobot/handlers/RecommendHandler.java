@@ -27,8 +27,6 @@ import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Slf4j
 public class RecommendHandler extends CommandHandler.WithShorthand {
-	public static final String MDC_FLAG = "r";
-
 	private final RecommendationsManager manager;
 	private final LiveActivity liveActivity;
 
@@ -42,7 +40,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 	@Override
 	public GameChatResponse handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
 			throws UserException, IOException, SQLException, InterruptedException {
-		MDC.put(MdcUtils.MDC_HANDLER, MDC_FLAG);
+		MDC.put(MdcUtils.MDC_HANDLER, MdcUtils.MDC_HANDLER_RECOMMEND);
 
 		Language lang = userData.getLanguage();
 

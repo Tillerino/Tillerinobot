@@ -8,6 +8,8 @@ import java.nio.channels.ServerSocketChannel;
 import org.junit.rules.ExternalResource;
 import org.tillerino.irc.server.ConnectionInitiator;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Wraps a TwIRC instance in an {@link ExternalResource}. The server runs in a
  * separate thread and binds to an open port which, can be accessed through
@@ -15,6 +17,7 @@ import org.tillerino.irc.server.ConnectionInitiator;
  * thread doesn't terminate after ten seconds an {@link AssertionError} is
  * thrown.
  */
+@Slf4j
 public class EmbeddedIrcServerRule extends ExternalResource {
 	private Thread thread;
 
@@ -26,6 +29,7 @@ public class EmbeddedIrcServerRule extends ExternalResource {
 		ConnectionInitiator initiator = new ConnectionInitiator(socket);
 		thread = new Thread(initiator, "twIRCd");
 		thread.start();
+		log.info("Started embedded IRC server on port {}", getPort());
 	}
 
 	public int getPort() {
@@ -41,5 +45,10 @@ public class EmbeddedIrcServerRule extends ExternalResource {
 			// ignore in unit test
 		}
 		assertFalse("IRC server quit", thread.isAlive());
+	}
+
+	@Override
+	public String toString() {
+		return String.format("TwIRC at port %s", socket != null ? socket.socket().getLocalPort() : "(not started)");
 	}
 }

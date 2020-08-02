@@ -13,6 +13,7 @@ import org.slf4j.MDC;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -153,7 +154,10 @@ public class MdcUtils {
 	public static final String MDC_THREAD_PRIORITY = "threadPriority";
 	public static final String MDC_USER = "user";
 
+	public static final String MDC_HANDLER_RECOMMEND = "r";
+
 	@RequiredArgsConstructor
+	@EqualsAndHashCode
 	private static final class MdcSnapshotImpl implements MdcSnapshot {
 		private final Map<String, String> snapshot;
 

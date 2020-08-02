@@ -1,28 +1,37 @@
 package org.tillerino.ppaddict.chat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
 
 /**
  * Response sent to the user as the result of a command
  */
-public interface GameChatResponse extends Iterable<GameChatResponse> {
+@JsonTypeInfo(use = Id.MINIMAL_CLASS)
+public interface GameChatResponse {
 	/**
 	 * A regular IRC message. This should not be used as the direct response to
 	 * a command, but for other auxiliary messages, see {@link Success}.
 	 */
 	@Value
 	@EqualsAndHashCode(callSuper = false)
+	@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 	public static class Message extends GameChatResponse.SingletonResponse {
 		String content;
 	}
@@ -33,6 +42,7 @@ public interface GameChatResponse extends Iterable<GameChatResponse> {
 	 */
 	@Value
 	@EqualsAndHashCode(callSuper = false)
+	@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 	public static class Success extends GameChatResponse.SingletonResponse {
 		String content;
 	}
@@ -42,6 +52,7 @@ public interface GameChatResponse extends Iterable<GameChatResponse> {
 	 */
 	@Value
 	@EqualsAndHashCode(callSuper = false)
+	@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 	public static class Action extends GameChatResponse.SingletonResponse {
 		String content;
 	}
@@ -74,9 +85,13 @@ public interface GameChatResponse extends Iterable<GameChatResponse> {
 		return new NoResponse();
 	}
 
+	@JsonIgnore
 	default boolean isNone() {
 		return this instanceof NoResponse;
 	}
+
+	@JsonIgnore
+	Iterable<GameChatResponse> flatten();
 
 	/**
 	 * Returned by the handler to clarify that the command was handled, but no
@@ -90,27 +105,29 @@ public interface GameChatResponse extends Iterable<GameChatResponse> {
 		}
 
 		@Override
-		public Iterator<GameChatResponse> iterator() {
-			return Collections.emptyIterator();
+		public Iterable<GameChatResponse> flatten() {
+			return Collections.emptyList();
 		}
 	}
 
 	@EqualsAndHashCode
 	@ToString
 	@SuppressFBWarnings(value = "RCN", justification = "Generated code")
+	@AllArgsConstructor(access = AccessLevel.PACKAGE, onConstructor = @__(@JsonCreator))
 	public static final class ResponseList implements GameChatResponse {
+		@Getter
 		private final List<GameChatResponse> responses = new ArrayList<>();
 
 		@Override
-		public Iterator<GameChatResponse> iterator() {
-			return responses.iterator();
+		public Iterable<GameChatResponse> flatten() {
+			return Collections.unmodifiableList(responses);
 		}
 	}
 
 	abstract class SingletonResponse implements GameChatResponse {
 		@Override
-		public Iterator<GameChatResponse> iterator() {
-			return Arrays.asList((GameChatResponse) this).iterator();
+		public Iterable<GameChatResponse> flatten() {
+			return Collections.singletonList(this);
 		}
 	}
 }

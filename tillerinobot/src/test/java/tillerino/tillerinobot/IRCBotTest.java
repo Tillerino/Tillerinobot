@@ -396,7 +396,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			}
 
 			@Override
-			public Iterator<GameChatResponse> iterator() {
+			public Iterable<GameChatResponse> flatten() {
 				throw new NotImplementedException("nono");
 			}
 		};
@@ -415,7 +415,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			}
 
 			@Override
-			public Iterator<GameChatResponse> iterator() {
+			public Iterable<GameChatResponse> flatten() {
 				throw new NotImplementedException("nono");
 			}
 		};
@@ -434,7 +434,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			}
 
 			@Override
-			public Iterator<GameChatResponse> iterator() {
+			public Iterable<GameChatResponse> flatten() {
 				throw new NotImplementedException("nono");
 			}
 		};
@@ -453,7 +453,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			}
 
 			@Override
-			public Iterator<GameChatResponse> iterator() {
+			public Iterable<GameChatResponse> flatten() {
 				throw new NotImplementedException("nono");
 			}
 		};
