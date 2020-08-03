@@ -1,6 +1,7 @@
 package org.tillerino.ppaddict;
 
 import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.timeout;
@@ -50,13 +51,13 @@ import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSc
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl;
 import org.tillerino.ppaddict.chat.irc.IrcWriter;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
-import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
-import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
 import org.tillerino.ppaddict.live.LiveActivityEndpoint;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.util.TestAppender;
+import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 
@@ -194,7 +195,10 @@ public abstract class AbstractFullBotTest {
         () -> new ThreadPoolExecutor(0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<>(),
             r -> new Thread(r, "aux")));
 
-    public ExecutorService coreWorkerPool;
+    private ExecutorService coreWorkerPool;
+
+    @Rule
+  	public final LogRule logRule = TestAppender.rule();
 
     private final AtomicInteger recommendationCount = new AtomicInteger();
     protected final List<Future<?>> started = new ArrayList<>();
@@ -291,9 +295,13 @@ public abstract class AbstractFullBotTest {
             break;
         }
         await().atMost(Duration.ofSeconds(2)).until(allRecommendationsReceived);
+
         verify(client, timeout(10000).atLeast(total)).message(argThat(s -> s.contains("\"received\" :")));
         verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"sent\" :")));
         verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\" :")));
+
+        logRule.assertThat().anySatisfy(event -> assertThat(event.getContextData().toMap()).containsEntry("handler", "r"));
+
         log.info("Received {} recommendations. Quitting.", recommendationCount.get());
     }
 }
