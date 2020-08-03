@@ -7,7 +7,7 @@ addons:
       secure: "U7IZ4JYpiL9PuxEHeDCA09TkFmgPT93+lGg4fwm9fRna+O+we8lH++aMc7Ca/hwnHdDc2PJtasuMJ1yVje8iBJzJn6AF7eyx+48oa+LhYPUD98ccaLrCODoS4QIoPMRJMkTdJ+Z/lGcf8U/XgMnBYBrEohwOi6KD9K4TnddzRBw="
 
 before_script:
-  - wget https://raw.githubusercontent.com/sormuras/bach/e5e6492645f181df0a5a596b090a6b0bafda679f/install-jdk.sh
+  - wget https://raw.githubusercontent.com/sormuras/bach/14b594549555f7b50ee4e4e6f79ec2bc6cb62e93/install-jdk.sh
   - source ./install-jdk.sh --feature 14
 
 # we're not installing anything
