@@ -9,6 +9,7 @@ import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 import org.tillerino.ppaddict.rabbit.RemoteResponseQueue;
+import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -45,11 +46,13 @@ public class RabbitQueuesModule extends AbstractModule {
 		RemoteResponseQueue queue = RabbitMqConfiguration.responseQueue(channel);
 		queue.setup();
 		queue.subscribe(response -> {
-			try {
+			try (MdcAttributes mdc = response.getEvent().getMeta().getMdc().apply()) {
 				post.onResponse(response.getResponse(), response.getEvent());
 			} catch (InterruptedException e) {
 				log.warn("Interrupted. Ignoring response to {}.", response.getEvent().getEventId());
 				Thread.currentThread().interrupt();
+			} catch (Exception e) {
+				log.error("Exception while handling response", e);
 			}
 		});
 		return queue;
