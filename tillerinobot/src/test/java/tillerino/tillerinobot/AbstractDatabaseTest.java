@@ -1,5 +1,6 @@
 package tillerino.tillerinobot;
 
+import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
@@ -31,6 +32,7 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
  */
 public abstract class AbstractDatabaseTest {
 	public static class CreateInMemoryDatabaseModule extends AbstractModule {
+		@Singleton
 		@Provides
 		public EntityManagerFactory newEntityManagerFactory() {
 			HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

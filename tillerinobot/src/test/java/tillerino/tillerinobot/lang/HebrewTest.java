@@ -4,14 +4,25 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
+@RunWith(MockitoJUnitRunner.class)
 public class HebrewTest {
 	Hebrew lang = new Hebrew();
+
+	@Mock
+	OsuApiUser apiUser;
+
+	@Before
+	public void setupMocks() {
+		when(apiUser.getUserName()).thenReturn("username");
+	}
 
 	@Test
 	public void testUnknownBeatmap() throws Exception {
@@ -35,15 +46,6 @@ public class HebrewTest {
 	public void testNoInformationForModsShort() throws Exception {
 		System.out.println("noInformationForModsShort");
 		System.out.println(lang.noInformationForModsShort());
-	}
-	
-	@Mock
-	OsuApiUser apiUser;
-	
-	public HebrewTest() {
-		MockitoAnnotations.initMocks(this);
-		
-		when(apiUser.getUserName()).thenReturn("username");
 	}
 	
 	@Test

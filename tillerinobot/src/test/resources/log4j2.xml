@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="DEBUG" packages="org.tillerino.ppaddict.util">
+<Configuration status="info" packages="org.tillerino.ppaddict.util">
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout
@@ -14,7 +14,9 @@
 		</Root>
 		<Logger name="org.pircbotx" level="error"/>
 		<Logger name="org.eclipse.jetty" level="info"/>
-		<Logger name="org.springframework" level="info"/>
-		<Logger name="org.hibernate" level="info"/>
+		<Logger name="org.springframework" level="warn"/>
+		<Logger name="org.hibernate" level="warn"/>
+		<Logger name="org.jboss.logging" level="info"/>
+		<Logger name="jndi" level="info"/>
 	</Loggers>
 </Configuration>

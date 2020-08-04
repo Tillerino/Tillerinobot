@@ -15,9 +15,12 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.assertj.core.api.ListAssert;
 import org.awaitility.Awaitility;
 import org.hamcrest.core.IsEqual;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,10 +64,12 @@ public class LoggingTest {
 
 	private TestBackend backend;
 
+	private Injector injector;
+
 	@Before
 	public void setUp() throws Exception {
 		MDC.clear(); // it might be that there's some garbage from other tests in the MDC
-		Injector injector = Guice.createInjector(new LocalConsoleTillerinobot() {
+		injector = Guice.createInjector(new LocalConsoleTillerinobot() {
 			@Override
 			protected Clock createClock() {
 				return clock;
@@ -86,6 +91,12 @@ public class LoggingTest {
 			MDC.put("ping", "14");
 			return null;
 		}).when(out).message(anyString(), any());
+	}
+
+	@After
+	public void cleanUp() throws Exception {
+		injector.getInstance(UserDataManager.class).tidyUp(false);
+		injector.getInstance(EntityManagerFactory.class).close();
 	}
 
 	@Test

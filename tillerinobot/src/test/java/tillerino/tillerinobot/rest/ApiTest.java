@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map.Entry;
 
+import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
@@ -23,6 +24,7 @@ import javax.ws.rs.client.WebTarget;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.ListAssert;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -134,6 +136,11 @@ public class ApiTest {
 		WebTarget target = client.target("http://localhost:" + server.getPort());
 		botStatus = WebResourceFactory.newResource(BotStatus.class, target);
 		beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
+	}
+
+	@After
+	public void stop() throws Exception {
+		injector.getInstance(EntityManagerFactory.class).close();
 	}
 
 	@Test

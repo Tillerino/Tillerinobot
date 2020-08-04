@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
@@ -23,7 +22,8 @@ public class LiveContainer {
 			.withCreateContainerCmdModifier((Consumer<CreateContainerCmd>) cmd ->
 					cmd.withMemory(128 * 1024 * 1024L)
 							.withMemorySwap(128 * 1024 * 1024L))
-			.withLogConsumer((Consumer<OutputFrame>) frame -> System.out.println(frame.getUtf8String().trim()));
+//			.withLogConsumer((Consumer<OutputFrame>) frame -> System.out.println(frame.getUtf8String().trim()))
+			;
 
 	static {
 		LIVE.start();
