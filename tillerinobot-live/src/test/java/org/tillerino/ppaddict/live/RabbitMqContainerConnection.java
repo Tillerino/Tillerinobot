@@ -1,7 +1,6 @@
 package org.tillerino.ppaddict.live;
 
 import org.junit.rules.ExternalResource;
-import org.testcontainers.containers.RabbitMQContainer;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
 import com.rabbitmq.client.Channel;
@@ -12,9 +11,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class RabbitMqContainerConnection extends ExternalResource {
-	private final RabbitMQContainer container;
-
-	@Getter
 	private Connection connection;
 
 	@Getter
@@ -22,7 +18,9 @@ public class RabbitMqContainerConnection extends ExternalResource {
 
 	@Override
 	protected void before() throws Throwable {
-		connection = RabbitMqConfiguration.connectionFactory("" + container.getContainerIpAddress(), container.getMappedPort(5672))
+		connection = RabbitMqConfiguration
+				.connectionFactory("" + RabbitMqContainer.getRabbitMq().getContainerIpAddress(),
+						RabbitMqContainer.getRabbitMq().getMappedPort(5672))
 				.newConnection("test");
 		channel = connection.createChannel();
 	}

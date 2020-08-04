@@ -63,7 +63,7 @@ public class MemoryIT {
 	private List<CollectingWebSocketClient> clients = new ArrayList<>();
 
 	@Rule
-	public final RabbitMqContainerConnection rabbitMq = new RabbitMqContainerConnection(RabbitMqContainer.getRabbitMq());
+	public final RabbitMqContainerConnection rabbitMq = new RabbitMqContainerConnection();
 
 	LiveActivity source;
 

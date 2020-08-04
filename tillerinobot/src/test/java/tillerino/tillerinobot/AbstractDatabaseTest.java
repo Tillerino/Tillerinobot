@@ -85,7 +85,9 @@ public abstract class AbstractDatabaseTest {
 	
 	@AfterClass
 	public static void closeEmf() {
-		emf.close();
+		if (emf != null) {
+			emf.close();
+		}
 	}
 	
 	@Before

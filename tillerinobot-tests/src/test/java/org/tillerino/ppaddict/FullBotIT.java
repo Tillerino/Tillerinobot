@@ -1,7 +1,6 @@
 package org.tillerino.ppaddict;
 
 import static org.tillerino.ppaddict.live.LiveContainer.getLive;
-import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
 import java.net.URI;
 import java.util.Optional;
@@ -10,20 +9,20 @@ import java.util.concurrent.ForkJoinTask;
 import javax.sql.DataSource;
 import javax.websocket.DeploymentException;
 
+import org.junit.ClassRule;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.RabbitMQContainer;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
+import org.tillerino.ppaddict.live.RabbitMqContainer;
+import org.tillerino.ppaddict.live.RabbitMqContainerConnection;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
@@ -43,22 +42,18 @@ public class FullBotIT extends AbstractFullBotTest {
 			.withClasspathResourceMapping("/irc/ngircd.motd", "/etc/ngircd/ngircd.motd", BindMode.READ_ONLY)
 			.withExposedPorts(6667);
 
-	private static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer()
-			.withNetwork(NETWORK)
-			.withNetworkAliases("rabbitmq");
+	@ClassRule
+	public static RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection();
 
 	static {
 		// these take a little longer to start, so we'll do that async
 		ForkJoinTask<?> ngircd = ForkJoinTask.adapt((Runnable) NGIRCD::start).fork();
 		ForkJoinTask<?> mysql = ForkJoinTask.adapt((Runnable) MYSQL::start).fork();
-		RABBIT_MQ.start();
+		RabbitMqContainer.getRabbitMq(); // make sure it's started
 		getLive();
 		ngircd.join();
 		mysql.join();
 	}
-
-	private Connection connection;
-	private Channel channel;
 
 	public FullBotIT() {
 		super(log);
@@ -68,18 +63,8 @@ public class FullBotIT extends AbstractFullBotTest {
 
 	@Override
 	public void startBot() throws Exception {
-		final ConnectionFactory rabbit = RabbitMqConfiguration.connectionFactory(DOCKER_HOST, RABBIT_MQ.getAmqpPort());
-		connection = rabbit.newConnection();
-		channel = connection.createChannel();
-		RabbitMqConfiguration.liveActivity(channel).setup();
+		RabbitMqConfiguration.liveActivity(rabbit.getChannel()).setup();
 		super.startBot();
-	}
-
-	@Override
-	public void stopBot() throws Exception {
-		super.stopBot();
-		channel.close();
-		connection.close();
 	}
 
 	@Override
@@ -103,9 +88,9 @@ public class FullBotIT extends AbstractFullBotTest {
 					}
 				});
 
-				bind(LiveActivity.class).toInstance(RabbitMqConfiguration.liveActivity(channel));
+				bind(LiveActivity.class).toInstance(RabbitMqConfiguration.liveActivity(rabbit.getChannel()));
 
-				bind(Channel.class).toInstance(channel);
+				bind(Channel.class).toInstance(rabbit.getChannel());
 				install(new RabbitQueuesModule());
 			}
 		});
