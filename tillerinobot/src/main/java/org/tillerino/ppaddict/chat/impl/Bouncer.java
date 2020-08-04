@@ -20,7 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Wither;
+import lombok.With;
 
 /**
  * This guy ensures that only a single interactive request from each user is
@@ -44,10 +44,10 @@ public class Bouncer {
 
 		private final long enteredTime;
 
-		@Wither(AccessLevel.PRIVATE)
+		@With(AccessLevel.PRIVATE)
 		private final int attemptsSinceEntered;
 
-		@Wither
+		@With
 		private final boolean warningSent;
 	}
 

@@ -172,5 +172,10 @@ public class MdcUtils {
 		public Map<String, String> mdcValues() {
 			return Collections.unmodifiableMap(snapshot);
 		}
+
+		@Override
+		public String toString() {
+			return snapshot.toString();
+		}
 	}
 }
