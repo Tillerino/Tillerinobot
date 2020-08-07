@@ -37,6 +37,7 @@ public enum LanguageIdentifier {
 	Slovenščina(Slovenian.class),
 	Schwiizerdütsch(Swissgerman.class),
 	Slovenčina(Slovak.class),
+	Vietnamese(Vietnamese.class),
 	; // please end identifier entries with a comma and leave this semicolon here
 	
 	public final Class<? extends Language> cls;
