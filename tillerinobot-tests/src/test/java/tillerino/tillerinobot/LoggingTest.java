@@ -95,7 +95,6 @@ public class LoggingTest {
 
 	@After
 	public void cleanUp() throws Exception {
-		injector.getInstance(UserDataManager.class).tidyUp(false);
 		injector.getInstance(EntityManagerFactory.class).close();
 	}
 

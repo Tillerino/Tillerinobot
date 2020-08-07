@@ -26,17 +26,15 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 		UserData data = manager.getData(534678);
 		assertFalse(data.isAllowedToDebug());
 		data.setAllowedToDebug(true);
+		data.close();
 
 		reloadManager();
 
 		data = manager.getData(534678);
 		assertTrue(data.isAllowedToDebug());
-		manager.tidyUp(false);
 	}
 
 	private void reloadManager() {
-		manager.tidyUp(false);
-		
 		em.close();
 		em.setThreadLocalEntityManager(emf.createEntityManager());
 		manager = new UserDataManager(null, emf, em, userDataRepository);
@@ -57,6 +55,8 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 			}
 			answers.add(answer);
 		}
+		data.close();
+
 		// at this point we got the first answer again. Time go serialize, deserialize and check if we get the second answer next.
 		reloadManager();
 		data = manager.getData(534678);

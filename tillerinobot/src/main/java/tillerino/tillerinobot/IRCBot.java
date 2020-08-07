@@ -119,12 +119,13 @@ public class IRCBot implements GameChatEventConsumer {
 		GameChatResponse versionInfo = GameChatResponse.none();
 		try {
 			OsuApiUser apiUser = getUserOrThrow(action.getNick());
-			UserData userData = userDataManager.getData(apiUser.getUserId());
-			lang = userData.getLanguage();
-			
-			versionInfo = checkVersionInfo(action);
+			try (UserData userData = userDataManager.getData(apiUser.getUserId())) {
+				lang = userData.getLanguage();
 
-			return versionInfo.then(npHandler.handle(action.getAction(), apiUser, userData));
+				versionInfo = checkVersionInfo(action);
+
+				return versionInfo.then(npHandler.handle(action.getAction(), apiUser, userData));
+			}
 		} catch (RuntimeException | Error | UserException | IOException | SQLException e) {
 			return versionInfo.then(handleException(e, lang));
 		}
@@ -214,40 +215,42 @@ public class IRCBot implements GameChatEventConsumer {
 				return prelimResponse;
 			}
 			OsuApiUser apiUser = getUserOrThrow(message.getNick());
-			UserData userData = userDataManager.getData(apiUser.getUserId());
-			lang = userData.getLanguage();
-			
-			Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
-			
-			if(hugPattern.matcher(message.getMessage()).find() && userData.getHearts() > 0) {
-				return lang.hug(apiUser);
-			}
+			try (UserData userData = userDataManager.getData(apiUser.getUserId())) {
+				lang = userData.getLanguage();
 
-			prelimResponse = prelimResponse.then(new LinkPpaddictHandler(backend, ppaddictUserDataService).handle(message.getMessage(), apiUser, userData));
-			if (!prelimResponse.isNone()) {
-				return prelimResponse;
-			}
+				Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
 
-			if (!message.getMessage().startsWith("!")) {
-				return GameChatResponse.none();
-			}
-			String originalMessage = message.getMessage().substring(1).trim();
-
-			prelimResponse = checkVersionInfo(message);
-
-			GameChatResponse response = null;
-			for (CommandHandler handler : commandHandlers) {
-				if ((response = handler.handle(originalMessage, apiUser, userData)) != null) {
-					break;
+				if (hugPattern.matcher(message.getMessage()).find() && userData.getHearts() > 0) {
+					return lang.hug(apiUser);
 				}
-				// removes the current handler's label from the MDC since it didn't work and we don't want it
-				// around for the next one
-				MDC.remove(MdcUtils.MDC_HANDLER);
+
+				prelimResponse = prelimResponse.then(
+						new LinkPpaddictHandler(backend, ppaddictUserDataService).handle(message.getMessage(), apiUser, userData));
+				if (!prelimResponse.isNone()) {
+					return prelimResponse;
+				}
+
+				if (!message.getMessage().startsWith("!")) {
+					return GameChatResponse.none();
+				}
+				String originalMessage = message.getMessage().substring(1).trim();
+
+				prelimResponse = checkVersionInfo(message);
+
+				GameChatResponse response = null;
+				for (CommandHandler handler : commandHandlers) {
+					if ((response = handler.handle(originalMessage, apiUser, userData)) != null) {
+						break;
+					}
+					// removes the current handler's label from the MDC since it didn't work and we
+					// don't want it around for the next one
+					MDC.remove(MdcUtils.MDC_HANDLER);
+				}
+				if (response == null) {
+					throw new UserException(lang.unknownCommand(originalMessage));
+				}
+				return prelimResponse.then(response);
 			}
-			if (response == null) {
-				throw new UserException(lang.unknownCommand(originalMessage));
-			}
-			return prelimResponse.then(response);
 		} catch (RuntimeException | Error | UserException | IOException | SQLException e) {
 			return prelimResponse.then(handleException(e, lang));
 		}
@@ -356,23 +359,23 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 
 		// this is a donator, let's welcome them!
-		UserData data = userDataManager.getData(userid);
-		
-		if (!data.isShowWelcomeMessage()) {
-			return GameChatResponse.none();
+		try (UserData data = userDataManager.getData(userid)) {
+			if (!data.isShowWelcomeMessage()) {
+				return GameChatResponse.none();
+			}
+
+			long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
+
+			GameChatResponse response = data.getLanguage().welcomeUser(apiUser,
+					inactiveTime);
+
+			if (data.isOsuTrackWelcomeEnabled()) {
+				UpdateResult update = osutrackDownloader.getUpdate(user.getNick());
+				response = response.then(OsuTrackHandler.updateResultToResponse(update));
+			}
+
+			return response.then(checkVersionInfo(user));
 		}
-
-		long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
-
-		GameChatResponse response = data.getLanguage().welcomeUser(apiUser,
-				inactiveTime);
-
-		if (data.isOsuTrackWelcomeEnabled()) {
-			UpdateResult update = osutrackDownloader.getUpdate(user.getNick());
-			response = response.then(OsuTrackHandler.updateResultToResponse(update));
-		}
-		
-		return response.then(checkVersionInfo(user));
 	}
 
 	private void scheduleRegisterActivity(final @IRCName String nick) {

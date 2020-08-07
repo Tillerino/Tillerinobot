@@ -1,11 +1,10 @@
 package tillerino.tillerinobot;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -17,14 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
-import org.tillerino.ppaddict.util.ShutdownHook;
-import org.tillerino.ppaddict.util.TidyObject;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -33,7 +25,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.data.BotUserData;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
@@ -49,9 +40,8 @@ import tillerino.tillerinobot.util.IsMutable;
  * 
  * @author Tillerino
  */
-@Slf4j
 @Singleton
-public class UserDataManager implements TidyObject {
+public class UserDataManager {
 	/**
 	 * Bot-specific user data. It is only saved when changed and responsible for
 	 * determining if it has been changed. Manual getters and setters must be
@@ -59,7 +49,7 @@ public class UserDataManager implements TidyObject {
 	 * 
 	 * @author Tillerino
 	 */
-	public static class UserData implements Serializable {
+	public static class UserData implements Serializable, Closeable {
 		private static final long serialVersionUID = 1L;
 
 		@Data
@@ -158,13 +148,13 @@ public class UserDataManager implements TidyObject {
 		@SuppressFBWarnings("SE_BAD_FIELD")
 		JsonObject serializedLanguage;
 
-		transient BotBackend backend;
+		transient UserDataManager manager;
 
 		@UserId
 		transient int userid;
 
 		public int getHearts() throws SQLException, IOException {
-			return backend.getDonator(userid);
+			return manager.backend.getDonator(userid);
 		}
 
 		@Getter
@@ -182,6 +172,11 @@ public class UserDataManager implements TidyObject {
 			changed |= doOsuTrackUpdateOnWelcome != this.osuTrackWelcomeEnabled;
 			this.osuTrackWelcomeEnabled = doOsuTrackUpdateOnWelcome;
 		}
+
+		@Override
+		public void close() {
+			manager.saveOptions(userid, this);
+		}
 	}
 	
 	final BotBackend backend;
@@ -191,9 +186,7 @@ public class UserDataManager implements TidyObject {
 	final ThreadLocalAutoCommittingEntityManager em;
 	
 	final BotUserDataRepository repository;
-	
-	final ShutdownHook hook = new ShutdownHook(this);
-	
+
 	@Inject
 	public UserDataManager(BotBackend backend, EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em,
 			BotUserDataRepository repository) {
@@ -202,49 +195,14 @@ public class UserDataManager implements TidyObject {
 		this.emf = emf;
 		this.em = em;
 		this.repository = repository;
-
-		hook.add();
 	}
 
-	public UserData getData(int userid) {
-		try {
-			return cache.get(userid);
-		} catch (ExecutionException e) {
-			try {
-				throw e.getCause();
-			} catch (RuntimeException f) {
-				throw f;
-			} catch (Throwable f) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	LoadingCache<Integer, UserData> cache = CacheBuilder.newBuilder()
-			.expireAfterAccess(1, TimeUnit.HOURS).maximumSize(1000).recordStats()
-			.removalListener(new RemovalListener<Integer, UserData>() {
-				@Override
-				@SuppressFBWarnings(value = "TQ")
-				public void onRemoval(RemovalNotification<Integer, UserData> notification) {
-					try {
-						saveOptions(notification.getKey(), notification.getValue());
-					} catch (SQLException e) {
-						log.error("error saving user data", e);
-					}
-				}
-			}).build(new CacheLoader<Integer, UserData>() {
-				@Override
-				public UserData load(Integer key) {
-					return UserDataManager.this.load(key);
-				}
-			});
-	
 	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
 			.create();
-	
-	private UserData load(@UserId int key) {
-		BotUserData data = repository.findByUserId(key);
-		
+
+	public UserData getData(@UserId int userid) {
+		BotUserData data = repository.findByUserId(userid);
+
 		UserData options;
 		if(data == null || StringUtils.isEmpty(data.getUserdata())) {
 			options = new UserData();
@@ -252,54 +210,24 @@ public class UserDataManager implements TidyObject {
 			options = gson.fromJson(data.getUserdata(), UserData.class);
 		}
 
-		options.backend = backend;
-		options.userid = key;
+		options.manager = this;
+		options.userid = userid;
 
 		return options;
 	}
 
-	void saveOptions(@UserId int userid, UserData options) throws SQLException {
-		if(!options.isChanged()) {
+	void saveOptions(@UserId int userid, UserData options) {
+		if (!options.isChanged()) {
 			return;
 		}
-		
-		preSerialization(options);
+
+		options.serializedLanguage = (JsonObject) gson.toJsonTree(options.getLanguage());
 		String serialized = gson.toJson(options);
-		postSerialization(options);
-		
+
 		BotUserData data = new BotUserData();
 		data.setUserId(userid);
 		data.setUserdata(serialized);
 		repository.save(data);
 		options.setChanged(false);
-	}
-
-	private void preSerialization(UserData options) {
-		options.serializedLanguage = (JsonObject) gson
-				.toJsonTree(options.getLanguage());
-	}
-	
-	private void postSerialization(UserData options) {
-		options.serializedLanguage = null;
-	}
-
-	@Override
-	public void tidyUp(boolean fromShutdownHook) {
-		log.info("tidyUp({})", fromShutdownHook);
-		
-		boolean createEm = false;
-		if (!em.isThreadLocalEntityManagerPresent() || !em.isOpen()) {
-			createEm = true;
-			em.setThreadLocalEntityManager(emf.createEntityManager());
-		}
-		try {
-			cache.invalidateAll();
-		} finally {
-			if (createEm) {
-				em.close();
-			}
-		}
-		
-		hook.remove(fromShutdownHook);
 	}
 }

@@ -72,8 +72,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@Rule
 	public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
 
-	UserDataManager userDataManager;
-
 	RateLimiter rateLimiter = new RateLimiter();
 
 	@Spy
@@ -115,9 +113,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@After
 	public void tearDown() {
 		verifyNoMoreInteractions(queue);
-		if (userDataManager != null) {
-			userDataManager.tidyUp(false);
-		}
 	}
 	
 	IRCBot getTestBot(BotBackend backend) {
@@ -129,7 +124,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 					recommendationsRepo, em, new RecommendationRequestParser(backend)));
 		}
 
-		IRCBot ircBot = new IRCBot(backend, recMan, userDataManager = new UserDataManager(backend, emf, em, userDataRepository),
+		IRCBot ircBot = new IRCBot(backend, recMan, new UserDataManager(backend, emf, em, userDataRepository),
 				em, emf, resolver, new TestOsutrackDownloader(),
 				exec, rateLimiter, liveActivity, queue, ppaddictUserDataService) {{
 		}};
