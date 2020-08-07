@@ -83,8 +83,8 @@ public interface BotBackend {
 	 *
 	 * @return a positive value if the user is a donator/patron.
 	 */
-	public int getDonator(@Nonnull OsuApiUser user) throws SQLException, IOException;
-	
+	public int getDonator(@UserId int user) throws SQLException, IOException;
+
 	/**
 	 * will load a sampler
 	 * @param userid

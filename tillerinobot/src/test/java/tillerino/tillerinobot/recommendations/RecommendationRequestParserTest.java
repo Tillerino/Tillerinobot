@@ -3,6 +3,7 @@ package tillerino.tillerinobot.recommendations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
@@ -30,12 +31,14 @@ public class RecommendationRequestParserTest {
 	private RecommendationRequestParser recommendationRequestParser;
 
 	private RecommendationRequest parse(String settings) throws Exception {
-		return recommendationRequestParser.parseSamplerSettings(new OsuApiUser(), settings, new Default());
+		OsuApiUser user = new OsuApiUser();
+		user.setUserId(1);
+		return recommendationRequestParser.parseSamplerSettings(user, settings, new Default());
 	}
 
 	@Test
 	public void testModContradiction() throws Exception {
-		when(backend.getDonator(any())).thenReturn(1);
+		when(backend.getDonator(anyInt())).thenReturn(1);
 		assertThat(parse("dt")).hasFieldOrPropertyWithValue("requestedMods", 64L);
 		assertThat(parse("-dt").getPredicates()).containsExactly(new ExcludeMod(Mods.DoubleTime));
 		assertThatThrownBy(() -> parse("dt -dt")).isInstanceOfAny(UserException.class).hasMessageContaining("DT -DT");
@@ -43,7 +46,7 @@ public class RecommendationRequestParserTest {
 
 	@Test
 	public void testModVsStar() throws Exception {
-		when(backend.getDonator(any())).thenReturn(1);
+		when(backend.getDonator(anyInt())).thenReturn(1);
 		assertThat(parse("dt")).hasFieldOrPropertyWithValue("requestedMods", 64L);
 		assertThat(parse("STAR=5").getPredicates()).containsExactly(new NumericPropertyPredicate<>("STAR=5", new StarDiff(), 5, true, 5, true));
 		assertThatThrownBy(() -> parse("dt STAR=5")).isInstanceOfAny(UserException.class).hasMessageContaining("DT STAR");
@@ -58,7 +61,7 @@ public class RecommendationRequestParserTest {
 
 	@Test
 	public void testGamma5Len() throws Exception {
-		when(backend.getDonator(any())).thenReturn(1);
+		when(backend.getDonator(anyInt())).thenReturn(1);
 		RecommendationRequest request = parse("gamma5 LEN<=150");
 		assertThat(request)
 			.hasFieldOrPropertyWithValue("model", Model.GAMMA5);

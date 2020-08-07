@@ -14,7 +14,6 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
@@ -165,10 +164,7 @@ public class UserDataManager implements TidyObject {
 		transient int userid;
 
 		public int getHearts() throws SQLException, IOException {
-			OsuApiUser user = backend.getUser(userid, 0);
-			if (user == null)
-				return 0;
-			return backend.getDonator(user);
+			return backend.getDonator(userid);
 		}
 
 		@Getter
@@ -210,13 +206,13 @@ public class UserDataManager implements TidyObject {
 		hook.add();
 	}
 
-	public UserData getData(int userid) throws SQLException {
+	public UserData getData(int userid) {
 		try {
 			return cache.get(userid);
 		} catch (ExecutionException e) {
 			try {
 				throw e.getCause();
-			} catch (SQLException | RuntimeException f) {
+			} catch (RuntimeException f) {
 				throw f;
 			} catch (Throwable f) {
 				throw new RuntimeException(e);
@@ -238,7 +234,7 @@ public class UserDataManager implements TidyObject {
 				}
 			}).build(new CacheLoader<Integer, UserData>() {
 				@Override
-				public UserData load(Integer key) throws SQLException {
+				public UserData load(Integer key) {
 					return UserDataManager.this.load(key);
 				}
 			});
@@ -246,7 +242,7 @@ public class UserDataManager implements TidyObject {
 	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
 			.create();
 	
-	private UserData load(@UserId int key) throws SQLException {
+	private UserData load(@UserId int key) {
 		BotUserData data = repository.findByUserId(key);
 		
 		UserData options;

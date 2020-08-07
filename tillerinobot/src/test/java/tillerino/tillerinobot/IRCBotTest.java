@@ -1,13 +1,12 @@
 package tillerino.tillerinobot;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -24,7 +23,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.After;
@@ -183,14 +181,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		BotBackend backend = mock(BotBackend.class);
 		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
 		
-		OsuApiUser osuApiUser = mock(OsuApiUser.class);
-		when(osuApiUser.getUserName()).thenReturn("TheDonator");
-
 		this.backend.hintUser("TheDonator", true, 1, 1);
 		int userid = resolver.getIDByUserName("TheDonator");
+
+		OsuApiUser osuApiUser = mock(OsuApiUser.class);
+		when(osuApiUser.getUserName()).thenReturn("TheDonator");
+		when(osuApiUser.getUserId()).thenReturn(userid);
+
 		when(backend.getUser(eq(userid), anyLong())).thenReturn(osuApiUser);
-		when(backend.getDonator(any(OsuApiUser.class))).thenReturn(1);
-		
+		when(backend.getDonator(userid)).thenReturn(1);
+
 		IRCBot bot = getTestBot(backend);
 		
 		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 1000);

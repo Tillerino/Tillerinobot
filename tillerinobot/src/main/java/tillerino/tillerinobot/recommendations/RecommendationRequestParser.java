@@ -118,7 +118,7 @@ public class RecommendationRequestParser {
 
 	private boolean parsePredicates(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser apiUser,
 			Language lang) throws SQLException, IOException, UserException {
-		if (backend.getDonator(apiUser) > 0) {
+		if (backend.getDonator(apiUser.getUserId()) > 0) {
 			RecommendationPredicate predicate = parser.tryParse(param, lang);
 			if (predicate != null) {
 				for (RecommendationPredicate existingPredicate : settingsBuilder.getPredicates()) {

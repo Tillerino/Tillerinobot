@@ -351,7 +351,7 @@ public class IRCBot implements GameChatEventConsumer {
 			throw e;
 		}
 		
-		if(apiUser == null || backend.getDonator(apiUser) <= 0) {
+		if(apiUser == null || backend.getDonator(apiUser.getUserId()) <= 0) {
 			return GameChatResponse.none();
 		}
 

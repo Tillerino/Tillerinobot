@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData;
@@ -92,7 +93,9 @@ public class OptionsHandlerTest {
     public void testInvalidDefaultSettings() throws Exception {
       OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
 
-      handler.handle("set default invalid", null, userData);
+      OsuApiUser user = new OsuApiUser();
+      user.setUserId(1);
+      handler.handle("set default invalid", user , userData);
     }
 
     @Test

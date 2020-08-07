@@ -241,8 +241,8 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public int getDonator(OsuApiUser user) throws SQLException, IOException {
-		return database.users.get(user.getUserId()).isDonator ? 1 : 0;
+	public int getDonator(int user) throws SQLException, IOException {
+		return database.users.get(user).isDonator ? 1 : 0;
 	}
 
 	@Override
