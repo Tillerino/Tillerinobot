@@ -144,7 +144,6 @@ public abstract class AbstractFullBotTest {
     protected static class FullBotConfiguration extends AbstractModule {
         private final String host;
         private final int port;
-        private final ExecutorService maintenanceWorkerPool;
 
         @Override
         protected void configure() {
@@ -164,7 +163,6 @@ public abstract class AbstractFullBotTest {
             bind(GameChatWriter.class).to(IrcWriter.class);
             bind(Clock.class).toInstance(Clock.system());
             bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
-            bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance")).toInstance(maintenanceWorkerPool);
             install(new MessageHandlerSchedulerModule());
             bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(4);
             bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());

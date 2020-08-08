@@ -1,8 +1,5 @@
 package org.tillerino.ppaddict.chat.irc;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javax.inject.Singleton;
 
 import org.tillerino.ppaddict.chat.GameChatClient;
@@ -34,13 +31,6 @@ public class IrcTillerinobot extends AbstractModule {
 		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore")).toInstance(false);
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(true);
-
-		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
-				.toInstance(Executors.newFixedThreadPool(4, r -> {
-					Thread thread = new Thread(r, "maintenance");
-					thread.setDaemon(true);
-					return thread;
-				}));
 	}
 
 	public static void main(String[] args) {

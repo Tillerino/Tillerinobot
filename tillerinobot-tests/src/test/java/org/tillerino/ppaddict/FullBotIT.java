@@ -74,7 +74,7 @@ public class FullBotIT extends AbstractFullBotTest {
 
 	@Override
 	protected Injector createInjector() {
-		return Guice.createInjector(new FullBotConfiguration(ircHost(), ircPort(), exec) {
+		return Guice.createInjector(new FullBotConfiguration(ircHost(), ircPort()) {
 			@Override
 			protected void installMore() {
 				install(new CreateInMemoryDatabaseModule() {

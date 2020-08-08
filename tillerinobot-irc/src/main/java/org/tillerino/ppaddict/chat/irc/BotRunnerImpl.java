@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +25,8 @@ import org.pircbotx.snapshot.UserChannelDaoSnapshot;
 import org.pircbotx.snapshot.UserSnapshot;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.util.TidyObject;
+
+import com.google.common.util.concurrent.MoreExecutors;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
@@ -138,7 +137,7 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 			 * preprocessing and then push everything into a queue.
 			 * This thread is allowed to time out.
 			 */
-			super(new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>()));
+			super(MoreExecutors.newDirectExecutorService());
 		}
 
 		@Override

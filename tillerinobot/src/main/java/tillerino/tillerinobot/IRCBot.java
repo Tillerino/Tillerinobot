@@ -6,14 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.ServiceUnavailableException;
@@ -36,8 +33,6 @@ import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.LoggingUtils;
 import org.tillerino.ppaddict.util.MdcUtils;
-import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
-import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -86,17 +81,15 @@ public class IRCBot implements GameChatEventConsumer {
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
 			UserDataManager userDataManager, ThreadLocalAutoCommittingEntityManager em,
-			EntityManagerFactory emf, IrcNameResolver resolver,
-			OsutrackDownloader osutrackDownloader,
-			@Named("tillerinobot.maintenance") ExecutorService exec, RateLimiter rateLimiter, LiveActivity liveActivity,
-			GameChatResponseQueue queue, AbstractPpaddictUserDataService ppaddictUserDataService) {
+			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
+			RateLimiter rateLimiter, LiveActivity liveActivity, GameChatResponseQueue queue,
+			AbstractPpaddictUserDataService ppaddictUserDataService) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;
 		this.em = em;
 		this.emf = emf;
 		this.resolver = resolver;
 		this.osutrackDownloader = osutrackDownloader;
-		this.exec = exec;
 		this.rateLimiter = rateLimiter;
 		this.queue = queue;
 		this.npHandler = new NPHandler(backend, liveActivity);
@@ -290,7 +283,7 @@ public class IRCBot implements GameChatEventConsumer {
 			 * avoid a race condition and to make sure that the event handler can find
 			 * out the actual last active time.
 			 */
-			scheduleRegisterActivity(event.getNick());
+			registerActivity(event.getNick());
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			return;
@@ -325,8 +318,6 @@ public class IRCBot implements GameChatEventConsumer {
 	public static final int CURRENT_VERSION = 13;
 	public static final String VERSION_MESSAGE = "This is embarrasing. Looks like I didn't know about the HD nerf for a quite a while."
 			+ " Don't worry: I'm all caught up now. I'll be updating my pp records over the following days.";
-
-	private final ExecutorService exec;
 
 	private GameChatResponse welcomeIfDonator(GameChatEvent user) throws SQLException, InterruptedException, IOException, UserException {
 		Integer userid;
@@ -375,25 +366,6 @@ public class IRCBot implements GameChatEventConsumer {
 			}
 
 			return response.then(checkVersionInfo(user));
-		}
-	}
-
-	private void scheduleRegisterActivity(final @IRCName String nick) {
-		try {
-			MdcSnapshot snapshot = MdcUtils.getSnapshot();
-			exec.submit(new Runnable() {
-				@Override
-				public void run() {
-					em.setThreadLocalEntityManager(emf.createEntityManager());
-					try (MdcAttributes mdc = snapshot.apply()) {
-						registerActivity(nick);
-					} finally {
-						em.close();
-					}
-				}
-			});
-		} catch (RejectedExecutionException e) {
-			// bot is shutting down
 		}
 	}
 

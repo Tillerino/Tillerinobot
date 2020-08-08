@@ -81,8 +81,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
 		bind(Clock.class).toInstance(createClock());
-		bind(ExecutorService.class).annotatedWith(Names.named("tillerinobot.maintenance"))
-				.toInstance(Executors.newSingleThreadExecutor(threadFactory("maintenance")));
 		bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(1);
 		install(new MessageHandlerSchedulerModule());
 		bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
