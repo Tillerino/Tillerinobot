@@ -6,17 +6,58 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import org.mapstruct.factory.Mappers;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.ppaddict.server.auth.Credentials;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.Value;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.OsuApiBeatmapForDiff;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 public interface PpaddictBackend {
-  public interface BeatmapData {
-    OsuApiBeatmap getBeatmap();
+  /**
+   * Extends {@link OsuApiBeatmapForDiff} with a few fields which we require in ppaddict. The goal
+   * it to not have to use the much larger {@link OsuApiBeatmap} which has a lot of fields we don't
+   * need and needlessly increases memory usage.
+   */
+  @Data
+  @EqualsAndHashCode(callSuper = true)
+  @ToString(callSuper = true)
+  class OsuApiBeatmapForPpaddict extends OsuApiBeatmapForDiff {
+    int beatmapId, setId, totalLength;
+    String artist, title, version;
+    double bpm, circleSize;
 
-    PercentageEstimates getEstimates();
+    public double getCircleSize(@BitwiseMods long mods) {
+      return OsuApiBeatmap.calcCircleSize(getCircleSize(), mods);
+    }
+
+    public double getBpm(@BitwiseMods long mods) {
+      return OsuApiBeatmap.calcBpm(getBpm(), mods);
+    }
+
+    public int getTotalLength(@BitwiseMods long mods) {
+      return OsuApiBeatmap.calcTotalLength(getTotalLength(), mods);
+    }
+
+    @org.mapstruct.Mapper
+    public interface Mapper {
+      Mapper INSTANCE = Mappers.getMapper(Mapper.class);
+
+      OsuApiBeatmapForPpaddict shrink(OsuApiBeatmap large);
+    }
+  }
+
+  @Value
+  class BeatmapData {
+    PercentageEstimates estimates;
+
+    OsuApiBeatmapForPpaddict beatmap;
   }
 
   @CheckForNull

@@ -18,10 +18,10 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.client.services.BeatmapTableService;
 import org.tillerino.ppaddict.server.PersistentUserData.Comment;
 import org.tillerino.ppaddict.server.PpaddictBackend.BeatmapData;
+import org.tillerino.ppaddict.server.PpaddictBackend.OsuApiBeatmapForPpaddict;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.Beatmap;
 import org.tillerino.ppaddict.shared.Beatmap.Personalization;
@@ -115,7 +115,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
       throw new PpaddictException("The server is restarting or something.");
     }
     beatmaps: for (BeatmapData data : beatmaps.values()) {
-      OsuApiBeatmap apiBeatmap = data.getBeatmap();
+      OsuApiBeatmapForPpaddict apiBeatmap = data.getBeatmap();
       PercentageEstimates estimate = data.getEstimates();
 
       for (Predicate<BeatmapData> predicate : predicates) {
@@ -285,7 +285,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
   public Beatmap makeBeatmap(PersistentUserData userData, BeatmapData data) {
     Settings settings = userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS;
 
-    OsuApiBeatmap apiBeatmap = data.getBeatmap();
+    OsuApiBeatmapForPpaddict apiBeatmap = data.getBeatmap();
     PercentageEstimates estimates = data.getEstimates();
     long mods = estimates.getMods();
 
@@ -450,19 +450,9 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
   }
 
   public Beatmap makeBeatmap(PersistentUserData userData, final BeatmapMeta meta) {
-    BeatmapData data = new BeatmapData() {
-      @Override
-      public PercentageEstimates getEstimates() {
-        return meta.getEstimates();
-      }
-
-      @Override
-      public OsuApiBeatmap getBeatmap() {
-        return meta.getBeatmap();
-      }
-    };
-    Beatmap beatmap = makeBeatmap(userData, data);
-    return beatmap;
+    BeatmapData data = new BeatmapData(meta.getEstimates(),
+        OsuApiBeatmapForPpaddict.Mapper.INSTANCE.shrink(meta.getBeatmap()));
+    return makeBeatmap(userData, data);
   }
 
 }

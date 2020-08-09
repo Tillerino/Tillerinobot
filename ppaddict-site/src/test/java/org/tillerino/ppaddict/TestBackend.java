@@ -21,24 +21,17 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.persistence.EntityManagerFactory;
 
-import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.ppaddict.server.PersistentUserData;
 import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.Credentials;
-import org.tillerino.ppaddict.web.types.PpaddictId;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
 /**
@@ -52,21 +45,11 @@ import tillerino.tillerinobot.lang.Default;
 public class TestBackend implements PpaddictBackend {
   private final tillerino.tillerinobot.TestBackend botBackend;
 
-  private final IrcNameResolver resolver;
-
-  private final EntityManagerFactory emf;
-
-  private final ThreadLocalAutoCommittingEntityManager em;
-
   Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
   @Inject
-  public TestBackend(tillerino.tillerinobot.TestBackend backend, IrcNameResolver resolver,
-      EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em) {
+  public TestBackend(tillerino.tillerinobot.TestBackend backend) {
     this.botBackend = backend;
-    this.resolver = resolver;
-    this.emf = emf;
-    this.em = em;
 
     try (Reader reader =
         new InputStreamReader(new BufferedInputStream(new FileInputStream("ppaddict-db.json")))) {
@@ -118,17 +101,8 @@ public class TestBackend implements PpaddictBackend {
       for (long mods : new long[] {0, getMask(Hidden, HardRock), getMask(DoubleTime)}) {
         try {
           final BeatmapMeta meta = botBackend.loadBeatmap(id, mods, new Default());
-          ret.put(new BeatmapWithMods(id, mods), new BeatmapData() {
-            @Override
-            public PercentageEstimates getEstimates() {
-              return meta.getEstimates();
-            }
-
-            @Override
-            public OsuApiBeatmap getBeatmap() {
-              return meta.getBeatmap();
-            }
-          });
+          ret.put(new BeatmapWithMods(id, mods), new BeatmapData(meta.getEstimates(),
+              OsuApiBeatmapForPpaddict.Mapper.INSTANCE.shrink(meta.getBeatmap())));
         } catch (SQLException | IOException | UserException e) {
           throw new RuntimeException(e);
         }
