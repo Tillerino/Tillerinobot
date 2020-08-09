@@ -1,6 +1,8 @@
 package org.tillerino.ppaddict.chat.irc;
 
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
@@ -50,6 +52,8 @@ public class IrcHooks extends CoreHooks {
 
 	private final AtomicLong lastSerial;
 	private final AtomicLong lastListTime;
+
+	private final Queue<ServerResponseEvent> userListEvents = new LinkedList<>();
 
 	@Inject
 	public IrcHooks(@Named("messagePreprocessor") GameChatEventConsumer downStream,
@@ -148,6 +152,14 @@ public class IrcHooks extends CoreHooks {
 
 			super.onEvent(event);
 		}
+
+		if (event instanceof PrivateMessageEvent) {
+			// we want to process these on events which are regular but not too frequent to clog up things.
+			ServerResponseEvent listEvent = userListEvents.poll();
+			if (listEvent != null) {
+				processUserListEvent(listEvent);
+			}
+		}
 	}
 
 	@Override
@@ -174,28 +186,33 @@ public class IrcHooks extends CoreHooks {
 	@Override
 	public void onServerResponse(ServerResponseEvent event) throws Exception {
 		if(event.getCode() == 353) {
-			ImmutableList<String> parsedResponse = event.getParsedResponse();
-
-			String[] usernames = parsedResponse.get(parsedResponse.size() - 1).split(" ");
-
-			for (int i = 0; i < usernames.length; i++) {
-				if (i > 0) {
-					// make sure that event IDs are unique
-					MDC.put(MdcUtils.MDC_EVENT, "" + lastSerial.getAndIncrement());
-				}
-				String nick = usernames[i];
-				
-				if(nick.startsWith("@") || nick.startsWith("+"))
-					nick = nick.substring(1);
-				
-				downStream.onEvent(new Sighted(MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
-						nick, event.getTimestamp()));
-			}
-
-			System.out.println("processed user list event");
+			// these come in bursts and we don't want them to clog up our processing pipeline.
+			// especially when going online, this is awkward since the bot doesn't answer for a while.
+			// since the original event is the most compact form for this, we store it for later processing.
+			userListEvents.add(event);
 		} else {
 			super.onServerResponse(event);
 		}
+	}
+
+	private void processUserListEvent(ServerResponseEvent event) throws InterruptedException {
+		ImmutableList<String> parsedResponse = event.getParsedResponse();
+
+		String[] usernames = parsedResponse.get(parsedResponse.size() - 1).split(" ");
+
+		for (int i = 0; i < usernames.length; i++) {
+			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, lastSerial.getAndIncrement())) {
+				String nick = usernames[i];
+
+				if (nick.startsWith("@") || nick.startsWith("+"))
+					nick = nick.substring(1);
+
+				downStream.onEvent(new Sighted(MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
+						nick, event.getTimestamp()));
+			}
+		}
+
+		System.out.println("processed user list event");
 	}
 
 	@SuppressFBWarnings("TQ")

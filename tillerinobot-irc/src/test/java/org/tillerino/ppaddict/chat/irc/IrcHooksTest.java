@@ -175,9 +175,13 @@ public class IrcHooksTest {
 		when(event.getParsedResponse()).thenReturn(ImmutableList.of("stuff", "nick1 @nick2 +nick3"));
 		when(event.getCode()).thenReturn(353);
 		irc.onEvent(event);
-		verify(eventHandler).onEvent(new Sighted(12_300, "nick1", 123));
-		verify(eventHandler).onEvent(new Sighted(12_301, "nick2", 123));
-		verify(eventHandler).onEvent(new Sighted(12_302, "nick3", 123));
+		verifyNoInteractions(eventHandler);
+		irc.onEvent(mockPrivateMessage("bump"));
+		// event 0 was original server event
+		// event 1 was bump
+		verify(eventHandler).onEvent(new Sighted(12_302, "nick1", 123));
+		verify(eventHandler).onEvent(new Sighted(12_303, "nick2", 123));
+		verify(eventHandler).onEvent(new Sighted(12_304, "nick3", 123));
 	}
 
 	@Test
