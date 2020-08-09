@@ -34,6 +34,7 @@ import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.BeatmapImpl;
+import tillerino.tillerinobot.diff.OsuApiBeatmapForDiff;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 import tillerino.tillerinobot.lang.Language;
@@ -139,7 +140,8 @@ public class TestBackend implements BotBackend {
 		PercentageEstimates estimates = database.estimates.get(entry);
 
 		if (estimates == null) {
-			BeatmapImpl cBeatmap = new BeatmapImpl(beatmap, beatmap.getStarDifficulty() / 2,
+			BeatmapImpl cBeatmap = new BeatmapImpl(OsuApiBeatmapForDiff.Mapper.INSTANCE.shrink(beatmap),
+					beatmap.getStarDifficulty() / 2,
 					beatmap.getStarDifficulty() / 2, 200, 250, false, false, true);
 			estimates = new PercentageEstimatesImpl(cBeatmap, mods);
 		}

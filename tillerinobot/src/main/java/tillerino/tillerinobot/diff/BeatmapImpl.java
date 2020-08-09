@@ -1,6 +1,5 @@
 package tillerino.tillerinobot.diff;
 
-import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 // suppress warning about case-insensitive field collision, because we cannot change the names in CBeatmap
 @SuppressWarnings("squid:S1845")
 public class BeatmapImpl implements Beatmap {
-	private OsuApiBeatmap beatmap;
+	private OsuApiBeatmapForDiff beatmap;
 	private double speed;
 	private double aim;
 	private int circleCount;

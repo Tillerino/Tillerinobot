@@ -7,6 +7,7 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import tillerino.tillerinobot.diff.BeatmapImpl;
+import tillerino.tillerinobot.diff.OsuApiBeatmapForDiff;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 
@@ -26,7 +27,6 @@ public class BeatmapMetaTest {
 
 	public static BeatmapMeta fakeBeatmapMeta(Integer personalPp) {
 		OsuApiBeatmap beatmap = new OsuApiBeatmap();
-		BeatmapImpl cBeatmap = new BeatmapImpl(beatmap, 1.45, 1, 200, 250, false, false, true);
 		beatmap.setArtist("Artist");
 		beatmap.setTitle("Title");
 		beatmap.setVersion("Version");
@@ -35,8 +35,9 @@ public class BeatmapMetaTest {
 		beatmap.setOverallDifficulty(7);
 		beatmap.setBpm(420);
 		beatmap.setBeatmapId(69);
-		beatmap.setStarDifficulty(cBeatmap.getStarDiff());
 		beatmap.setMaxCombo(100);
+		BeatmapImpl cBeatmap = new BeatmapImpl(OsuApiBeatmapForDiff.Mapper.INSTANCE.shrink(beatmap), 1.45, 1, 200, 250, false, false, true);
+		beatmap.setStarDifficulty(cBeatmap.getStarDiff());
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, Mods.getMask(Mods.DoubleTime));
 		return new BeatmapMeta(beatmap, personalPp, estimates);
 	}
