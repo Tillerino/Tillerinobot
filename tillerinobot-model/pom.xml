@@ -16,6 +16,16 @@
 	</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.github.tillerino</groupId>
+			<artifactId>osu-api-connector</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.code.gson</groupId>
+					<artifactId>gson-parent</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<!-- tests -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

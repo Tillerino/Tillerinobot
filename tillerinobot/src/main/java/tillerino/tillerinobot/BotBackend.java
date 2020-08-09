@@ -14,6 +14,7 @@ import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
+import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
 
@@ -72,9 +73,10 @@ public interface BotBackend {
 	 * It does not download anything from the API and is unrelated to {@link #getUser(int, long)}.
 	 *
 	 * @param userid osu user ID of a real user. It is not required that the user is known via {@link #getUser(int, long)}.
+	 * @param timestamp when the user was sighted
 	 * @throws SQLException only on connection errors
 	 */
-	public void registerActivity(@UserId int userid) throws SQLException;
+	public void registerActivity(@UserId int userid, @MillisSinceEpoch long timestamp) throws SQLException;
 	
 	public long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
 

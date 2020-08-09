@@ -360,7 +360,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		Sighted event = new Sighted(12, "aRareUserAppears", 15);
 		bot.onEvent(event);
 		verify(queue).onResponse(GameChatResponse.none(), event);
-		verify(backend, timeout(1000)).registerActivity(18);
+		verify(backend, timeout(1000)).registerActivity(18, 15);
 	}
 
 	@Test

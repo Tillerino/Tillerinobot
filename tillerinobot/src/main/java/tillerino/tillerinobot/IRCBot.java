@@ -20,6 +20,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatResponse;
@@ -283,7 +284,7 @@ public class IRCBot implements GameChatEventConsumer {
 			 * avoid a race condition and to make sure that the event handler can find
 			 * out the actual last active time.
 			 */
-			registerActivity(event.getNick());
+			registerActivity(event.getNick(), event.getTimestamp());
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			return;
@@ -369,7 +370,7 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 	}
 
-	private void registerActivity(final @IRCName String fNick) {
+	private void registerActivity(final @IRCName String fNick, @MillisSinceEpoch long timestamp) {
 		try {
 			Integer userid = resolver.resolveIRCName(fNick);
 			
@@ -377,7 +378,7 @@ public class IRCBot implements GameChatEventConsumer {
 				return;
 			}
 			
-			backend.registerActivity(userid);
+			backend.registerActivity(userid, timestamp);
 		} catch (Exception e) {
 			if (isTimeout(e)) {
 				log.debug("osu api timeout while logging activity of user {}", fNick);

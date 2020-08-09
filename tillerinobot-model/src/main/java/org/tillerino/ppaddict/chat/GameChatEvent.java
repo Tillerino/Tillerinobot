@@ -1,5 +1,7 @@
 package org.tillerino.ppaddict.chat;
 
+import org.tillerino.osuApiModel.types.MillisSinceEpoch;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -16,6 +18,7 @@ public abstract class GameChatEvent {
 
 	private final @IRCName String nick;
 
+	@MillisSinceEpoch
 	private final long timestamp;
 
 	/**

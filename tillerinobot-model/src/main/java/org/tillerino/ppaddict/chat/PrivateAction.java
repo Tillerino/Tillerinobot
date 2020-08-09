@@ -1,5 +1,7 @@
 package org.tillerino.ppaddict.chat;
 
+import org.tillerino.osuApiModel.types.MillisSinceEpoch;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,7 +12,7 @@ import lombok.ToString;
 public class PrivateAction extends GameChatEvent {
 	private final String action;
 
-	public PrivateAction(long eventId, @IRCName String ircNick, long timestamp, String action) {
+	public PrivateAction(long eventId, @IRCName String ircNick, @MillisSinceEpoch long timestamp, String action) {
 		super(eventId, ircNick, timestamp);
 		this.action = action;
 	}

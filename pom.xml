@@ -228,6 +228,12 @@
 	<dependencyManagement>
 		<dependencies>
 			<!-- internal -->
+
+			<dependency>
+				<groupId>com.github.tillerino</groupId>
+				<artifactId>osu-api-connector</artifactId>
+				<version>0.15.0</version>
+			</dependency>
 			<dependency>
 				<groupId>org.tillerino.osu</groupId>
 				<artifactId>tillerinobot-model</artifactId>
@@ -288,6 +294,7 @@
 				<version>0.20.0</version>
 				<scope>test</scope>
 			</dependency>
+
 			<!-- APIs -->
 			<dependency>
 				<groupId>javax.ws.rs</groupId>
@@ -316,7 +323,6 @@
 			</dependency>
 
 			<!-- Standard Libraries -->
-
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-slf4j-impl</artifactId>

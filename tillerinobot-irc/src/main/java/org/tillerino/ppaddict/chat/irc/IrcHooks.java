@@ -20,6 +20,7 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
+import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.IRCName;
@@ -90,14 +91,19 @@ public class IrcHooks extends CoreHooks {
 
 	@Override
 	public void onConnect(ConnectEvent event) throws Exception {
-		botInfo.setRunningSince(event.getTimestamp());
+		botInfo.setRunningSince(timestamp(event));
 		log.info("connected");
 		queue.setBot((CloseableBot) event.getBot());
 	}
 
+	@SuppressFBWarnings("TQ")
+	private @MillisSinceEpoch long timestamp(Event event) {
+		return event.getTimestamp();
+	}
+
 	@Override
 	public void onAction(ActionEvent event) throws Exception {
-		botInfo.setLastReceivedMessage(event.getTimestamp());
+		botInfo.setLastReceivedMessage(timestamp(event));
 		if(silent)
 			return;
 
@@ -105,24 +111,24 @@ public class IrcHooks extends CoreHooks {
 		if (event.getChannel() == null) {
 			downStream.onEvent(new PrivateAction(
 					MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
-					nick, event.getTimestamp(), event.getMessage()));
+					nick, timestamp(event), event.getMessage()));
 		}
 	}
 
 	@Override
 	public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
-		botInfo.setLastReceivedMessage(event.getTimestamp());
+		botInfo.setLastReceivedMessage(timestamp(event));
 		if(silent)
 			return;
 
 		downStream.onEvent(new PrivateMessage(
 				MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
-				getNick(event), event.getTimestamp(), event.getMessage()));
+				getNick(event), timestamp(event), event.getMessage()));
 	}
 
 	@Override
 	public void onMessage(MessageEvent event) throws Exception {
-		botInfo.setLastReceivedMessage(event.getTimestamp());
+		botInfo.setLastReceivedMessage(timestamp(event));
 	}
 
 	@Override
@@ -132,10 +138,10 @@ public class IrcHooks extends CoreHooks {
 
 	@Override
 	public void onEvent(Event event) throws Exception {
-		botInfo.setLastInteraction(event.getTimestamp());
+		botInfo.setLastInteraction(timestamp(event));
 		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, lastSerial.getAndIncrement())) {
-			if (lastListTime.get() <= event.getTimestamp() - 60 * 60 * 1000) {
-				lastListTime.set(event.getTimestamp());
+			if (lastListTime.get() <= timestamp(event) - 60 * 60 * 1000) {
+				lastListTime.set(timestamp(event));
 
 				event.getBot().sendRaw().rawLine("NAMES #osu");
 			}
@@ -152,7 +158,7 @@ public class IrcHooks extends CoreHooks {
 			super.onEvent(event);
 		}
 
-		if (event instanceof PrivateMessageEvent) {
+		if (event instanceof PrivateMessageEvent || event instanceof ActionEvent) {
 			// we want to process these on events which are regular but not too frequent to clog up things.
 			ServerResponseEvent listEvent = userListEvents.poll();
 			if (listEvent != null) {
@@ -178,7 +184,7 @@ public class IrcHooks extends CoreHooks {
 		}
 
 		downStream.onEvent(new Joined(MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
-				getNick(event), event.getTimestamp()));
+				getNick(event), timestamp(event)));
 	}
 
 	@Override
@@ -207,11 +213,11 @@ public class IrcHooks extends CoreHooks {
 					nick = nick.substring(1);
 
 				downStream.onEvent(new Sighted(MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
-						nick, event.getTimestamp()));
+						nick, timestamp(event)));
 			}
 		}
 
-		System.out.println("processed user list event");
+		System.out.println("processed user list event " + userListEvents.size() + " remaining");
 	}
 
 	@SuppressFBWarnings("TQ")

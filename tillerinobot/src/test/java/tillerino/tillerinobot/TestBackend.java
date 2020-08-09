@@ -232,8 +232,8 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public void registerActivity(int userid) throws SQLException {
-		database.users.get(userid).lastActivity = System.currentTimeMillis();
+	public void registerActivity(int userid, long timestamp) throws SQLException {
+		database.users.get(userid).lastActivity = timestamp;
 		writeDatabase();
 	}
 
