@@ -20,7 +20,6 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
-import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.IRCName;
@@ -182,7 +181,6 @@ public class IrcHooks extends CoreHooks {
 				getNick(event), event.getTimestamp()));
 	}
 
-	@SuppressFBWarnings("TQ")
 	@Override
 	public void onServerResponse(ServerResponseEvent event) throws Exception {
 		if(event.getCode() == 353) {
@@ -195,6 +193,7 @@ public class IrcHooks extends CoreHooks {
 		}
 	}
 
+	@SuppressFBWarnings("TQ")
 	private void processUserListEvent(ServerResponseEvent event) throws InterruptedException {
 		ImmutableList<String> parsedResponse = event.getParsedResponse();
 
