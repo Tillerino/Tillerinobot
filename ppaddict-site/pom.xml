@@ -9,7 +9,7 @@
 		<groupId>org.tillerino.osu</groupId>
 		<artifactId>tillerinobot-parent</artifactId>
 		<version>0.20.0</version>
-		<relativePath>../Tillerinobot</relativePath>
+		<relativePath>../../Tillerinobot</relativePath>
 	</parent>
 
 	<artifactId>ppaddict-site</artifactId>
