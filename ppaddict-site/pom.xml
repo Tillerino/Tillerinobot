@@ -4,22 +4,19 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>war</packaging>
-	<version>0.20.0</version>
 
-	<groupId>org.tillerino.osu</groupId>
+	<parent>
+		<groupId>org.tillerino.osu</groupId>
+		<artifactId>tillerinobot-parent</artifactId>
+		<version>0.20.0</version>
+		<relativePath>../Tillerinobot</relativePath>
+	</parent>
+
 	<artifactId>ppaddict-site</artifactId>
 
 	<properties>
-		<!-- for reproducible build -->
-		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwt-version>2.9.0</gwt-version>
-		<tillerinobot.version>0.20.0</tillerinobot.version>
 	</properties>
-
-	<prerequisites>
-		<maven>3.3.1</maven>
-	</prerequisites>
 
 	<dependencies>
 		<dependency>
@@ -35,7 +32,6 @@
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
-			<version>2.1.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -55,11 +51,6 @@
 			<version>${gwt-version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.scribe</groupId>
 			<artifactId>scribe</artifactId>
 			<version>1.3.2</version>
@@ -68,22 +59,19 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<!-- This overwrites scribe's version -->
-			<version>1.10</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>20.0</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
-			<version>4.1.0</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-servlet</artifactId>
-			<version>4.1.0</version>
+			<version>${guice.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -98,68 +86,47 @@
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
-			<version>1.3.1.Final</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct-processor</artifactId>
-			<version>1.3.1.Final</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- tests -->
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>3.1.0</version>
-			<scope>test</scope>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot</artifactId>
-			<version>${tillerinobot.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.projectlombok</groupId>
-					<artifactId>lombok</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.tillerino.osu</groupId>
-			<artifactId>tillerinobot</artifactId>
-			<version>${tillerinobot.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-live</artifactId>
-			<version>${tillerinobot.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-tests</artifactId>
-			<version>${tillerinobot.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.3.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>5.1.0.Final</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>5.1.0.Final</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -205,7 +172,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
-				<version>2.1</version>
 				<executions>
 					<execution>
 						<phase>compile</phase>
@@ -218,7 +184,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<version>3.1</version>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.8</source>
