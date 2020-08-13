@@ -22,7 +22,9 @@
 		<jersey.version>2.25.1</jersey.version>
 		<jackson.version>2.10.3</jackson.version>
 		<testcontainers.version>1.14.3</testcontainers.version>
-		<slf4j.version>1.7.26</slf4j.version>
+		<!-- determined by container -->
+		<mockserver.version>5.5.4</mockserver.version>
+		<slf4j.version>1.7.30</slf4j.version>
 		<mapstruct.version>1.3.1.Final</mapstruct.version>
 		<guice.version>4.1.0</guice.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
@@ -45,7 +47,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.2.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -74,12 +76,12 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.8.2</version>
+					<version>3.9.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
-					<version>2.7</version>
+					<version>2.8.1</version>
 				</plugin>
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
@@ -123,10 +125,21 @@
 				<artifactId>versions-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>plugins</id>
 						<goals>
 							<goal>display-plugin-updates</goal>
 						</goals>
 						<phase>validate</phase>
+					</execution>
+					<execution>
+						<id>dependencies</id>
+						<goals>
+							<goal>display-dependency-updates</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<rulesUri>https://gist.githubusercontent.com/Tillerino/43ce134419eb8b5f2f46e75c9664a623/raw/maven-versions-plugin-rules.xml</rulesUri>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -152,9 +165,7 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>
-							test-jar
-							</goal>
+							<goal>test-jar</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -234,6 +245,13 @@
 				<groupId>com.github.tillerino</groupId>
 				<artifactId>osu-api-connector</artifactId>
 				<version>0.15.0</version>
+				<exclusions>
+					<!-- replaced with spotbugs jar -->
+					<exclusion>
+						<groupId>com.google.code.findbugs</groupId>
+						<artifactId>annotations</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.tillerino.osu</groupId>
@@ -310,7 +328,7 @@
 			<dependency>
 				<groupId>javax.websocket</groupId>
 				<artifactId>javax.websocket-api</artifactId>
-				<version>1.0</version>
+				<version>1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
@@ -327,7 +345,7 @@
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-slf4j-impl</artifactId>
-				<version>2.12.1</version>
+				<version>2.13.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -338,13 +356,13 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<!-- This overwrites pircbotx' version -->
+				<!-- scribe and pircbotx both use older versions, we can't use a newer one -->
 				<version>1.10</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.6</version>
+				<version>2.7</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -395,7 +413,7 @@
 			<dependency>
 				<groupId>io.undertow</groupId>
 				<artifactId>undertow-websockets-jsr</artifactId>
-				<version>2.0.1.Final</version>
+				<version>2.1.3.Final</version>
 			</dependency>
 
 			<dependency>
@@ -418,7 +436,7 @@
 			<dependency>
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
-				<version>2.3.2</version>
+				<version>2.5.1</version>
 			</dependency>
 			<dependency>
 				<groupId>mysql</groupId>
@@ -461,6 +479,12 @@
 				<version>${testcontainers.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.mock-server</groupId>
+				<artifactId>mockserver-client-java</artifactId>
+				<version>${mockserver.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -473,18 +497,13 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.10</version>
+			<version>1.18.12</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>annotations</artifactId>
-			<version>3.0.0</version>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-annotations</artifactId>
+			<version>4.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -511,19 +530,19 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.1.0</version>
+			<version>3.4.6</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.11.1</version>
+			<version>3.16.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
-			<version>4.0.1</version>
+			<version>4.0.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
