@@ -139,7 +139,7 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.4.30.v20200611</version>
+				<version>${jetty.version}</version>
 
 				<dependencies>
 					<dependency>
@@ -150,7 +150,7 @@
 					<dependency>
 						<groupId>javax.xml.bind</groupId>
 						<artifactId>jaxb-api</artifactId>
-						<version>2.2.11</version>
+						<version>${jaxb.api.version}</version>
 					</dependency>
 				</dependencies>
 
