@@ -1,9 +1,13 @@
 package tillerino.tillerinobot;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -11,7 +15,7 @@ import org.junit.BeforeClass;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
 import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
 import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
@@ -35,11 +39,15 @@ public abstract class AbstractDatabaseTest {
 		@Singleton
 		@Provides
 		public EntityManagerFactory newEntityManagerFactory() {
-			HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+			EclipseLinkJpaVendorAdapter vendorAdapter = new EclipseLinkJpaVendorAdapter();
 			vendorAdapter.setGenerateDdl(true);
 
 			LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 			factory.setJpaVendorAdapter(vendorAdapter);
+			Map<String, Object> jpaProperties = new LinkedHashMap<>();
+			jpaProperties.put(PersistenceUnitProperties.WEAVING, "false");
+			jpaProperties.put(PersistenceUnitProperties.CACHE_SHARED_DEFAULT, "false");
+			factory.setJpaPropertyMap(jpaProperties);
 			factory.setPackagesToScan("tillerino.tillerinobot.data", "org.tillerino.ppaddict.web.data");
 			factory.setDataSource(dataSource());
 			factory.afterPropertiesSet();

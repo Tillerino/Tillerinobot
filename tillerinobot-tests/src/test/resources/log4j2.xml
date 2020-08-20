@@ -15,7 +15,6 @@
 		<Logger name="org.pircbotx" level="error"/>
 		<Logger name="org.eclipse.jetty" level="info"/>
 		<Logger name="org.springframework" level="warn"/>
-		<Logger name="org.hibernate" level="warn"/>
 		<Logger name="org.jboss.logging" level="info"/>
 		<Logger name="org.tillerino.irc" level="info"/>
 		<Logger name="com.github.dockerjava" level="info"/>

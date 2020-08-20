@@ -4,6 +4,7 @@ import javax.annotation.CheckForNull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.tillerino.ppaddict.web.types.PpaddictId;
 
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "ppaddictusers")
 @Entity(name = "ppaddictusers")
 public class PpaddictUser {
 	@PpaddictId

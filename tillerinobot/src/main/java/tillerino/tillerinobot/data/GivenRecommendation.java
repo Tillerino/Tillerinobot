@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -11,6 +12,7 @@ import org.tillerino.osuApiModel.types.UserId;
 
 import lombok.Data;
 
+@Table(name = "givenrecommendations")
 @Entity(name = "givenrecommendations")
 @Data
 public class GivenRecommendation {

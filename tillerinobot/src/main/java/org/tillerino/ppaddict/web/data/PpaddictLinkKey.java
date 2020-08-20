@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.web.data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.tillerino.ppaddict.web.types.PpaddictId;
 
@@ -10,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Table(name = "ppaddictlinkkeys")
 @Entity(name = "ppaddictlinkkeys")
 @NoArgsConstructor
 @AllArgsConstructor

@@ -79,9 +79,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate.javax.persistence</groupId>
-			<artifactId>hibernate-jpa-2.1-api</artifactId>
-			<version>1.0.2.Final</version>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+			<version>2.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>io.swagger</groupId>
@@ -181,25 +181,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<!-- required by Hibernate Java 9+ -->
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<!-- required by Hibernate Java 9+ -->
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.jpa</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
