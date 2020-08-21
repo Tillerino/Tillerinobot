@@ -150,8 +150,9 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>14</source>
+					<target>14</target>
+					<release>14</release>
 					<encoding>UTF-8</encoding>
 					<compilerArgs>
 						<compilerArg>-parameters</compilerArg>
