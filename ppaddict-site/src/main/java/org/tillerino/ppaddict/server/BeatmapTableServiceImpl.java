@@ -14,7 +14,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
@@ -422,31 +421,6 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         comparator = null;
     }
     return comparator;
-  }
-
-  public static Beatmap fromRecord(CSVRecord record) {
-    if (record.size() != 12) {
-      throw new RuntimeException(
-          "unexpected line length: " + record.size() + " in record " + record.getRecordNumber());
-    }
-    Beatmap b = new Beatmap();
-    b.title = record.get("Title");
-    b.artist = record.get("Artist");
-    b.version = record.get("Version");
-
-    b.beatmapid = Integer.parseInt(record.get("beatmapid"));
-    b.setid = Integer.parseInt(record.get("setid"));
-    b.approachRate = Integer.parseInt(record.get("ApproachRate"));
-    b.circleSize = Integer.parseInt(record.get("CircleSize"));
-    b.bpm = Integer.parseInt(record.get("BPM"));
-    b.setFormattedLength(record.get("length"));
-
-    String perfectpp = record.get("perfectpp");
-    b.highPP = Integer.parseInt(perfectpp);
-
-    b.starDifficulty = Double.valueOf(record.get("StarDifficulty"));
-    b.lowPP = Double.valueOf(record.get("expectedpp"));
-    return b;
   }
 
   public Beatmap makeBeatmap(PersistentUserData userData, final BeatmapMeta meta) {
