@@ -21,7 +21,7 @@ public class AccuracyDistribution {
 		return new AccuracyDistribution(best300s, best100s, allObjects - best300s - best100s - misses, misses);
 	}
 
-	static Pair<Integer, Double> bisect(int min, int max, IntToDoubleFunction fun, double target) {
+	private static Pair<Integer, Double> bisect(int min, int max, IntToDoubleFunction fun, double target) {
 		double minVal = fun.applyAsDouble(min);
 		if(minVal >= target || min == max) {
 			return Pair.of(min, minVal);
@@ -30,26 +30,13 @@ public class AccuracyDistribution {
 		if(maxVal <= target) {
 			return Pair.of(max, maxVal);
 		}
-		/*
-		 * invariant: minVal < target, maxVal > target, min != max
-		 */
-		for(;;) {
-			if(max == min + 1) {
-				if(Math.abs(minVal - target) < Math.abs(maxVal - target)) {
-					return Pair.of(min, minVal);
-				}
-				return Pair.of(max, maxVal);
-			}
-			int center = (max + min) / 2;
-			double centerVal = fun.applyAsDouble(center);
-			if(centerVal <= target) {
-				min = center;
-				minVal = centerVal;
-			} else {
-				max = center;
-				maxVal = centerVal;
-			}
+		double rational = min + (max - min) / (maxVal - minVal) * (target - minVal);
+		double downVal = fun.applyAsDouble((int) Math.floor(rational));
+		double upVal = fun.applyAsDouble((int) Math.ceil(rational));
+		if (Math.abs(target - downVal) <= Math.abs(target - upVal)) {
+			return Pair.of((int) Math.floor(rational), downVal);
 		}
+		return Pair.of((int) Math.ceil(rational), upVal);
 	}
 
 	private static Pair<Integer, Double> getBest100s(int allObjects, int x300, int misses, double acc) {
