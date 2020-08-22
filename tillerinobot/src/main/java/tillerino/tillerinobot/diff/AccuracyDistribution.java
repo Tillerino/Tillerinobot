@@ -9,11 +9,11 @@ import org.tillerino.osuApiModel.OsuApiScore;
 
 @Value
 public class AccuracyDistribution {
-	final int x300;
-	final int x100;
-	final int x50;
-	final int miss;
-	
+	int x300;
+	int x100;
+	int x50;
+	int miss;
+
 	public static AccuracyDistribution get(int allObjects, int misses, double acc) {
 		int best300s = getBest300s(allObjects, misses, acc);
 		int best100s = getBest100s(allObjects, best300s, misses, acc).getLeft();
