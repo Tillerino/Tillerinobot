@@ -1,11 +1,8 @@
 package tillerino.tillerinobot.diff;
 
-import java.util.function.IntToDoubleFunction;
-
 import lombok.Value;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.tillerino.osuApiModel.OsuApiScore;
 
 @Value
 public class AccuracyDistribution {
@@ -21,30 +18,9 @@ public class AccuracyDistribution {
 		return new AccuracyDistribution(best300s, best100s, allObjects - best300s - best100s - misses, misses);
 	}
 
-	private static Pair<Integer, Double> bisect(int min, int max, IntToDoubleFunction fun, double target) {
-		double minVal = fun.applyAsDouble(min);
-		if(minVal >= target || min == max) {
-			return Pair.of(min, minVal);
-		}
-		double maxVal = fun.applyAsDouble(max);
-		if(maxVal <= target) {
-			return Pair.of(max, maxVal);
-		}
-		double rational = min + (max - min) / (maxVal - minVal) * (target - minVal);
-		double downVal = fun.applyAsDouble((int) Math.floor(rational));
-		double upVal = fun.applyAsDouble((int) Math.ceil(rational));
-		if (Math.abs(target - downVal) <= Math.abs(target - upVal)) {
-			return Pair.of((int) Math.floor(rational), downVal);
-		}
-		return Pair.of((int) Math.ceil(rational), upVal);
-	}
-
 	private static Pair<Integer, Double> getBest100s(int allObjects, int x300, int misses, double acc) {
-		return bisect(
-				0,
-				allObjects - x300 - misses,
-				x -> OsuApiScore.getAccuracy(x300, x, allObjects - x300 - x
-						- misses, misses), acc);
+		int best = Math.min(2 * (allObjects - misses) + x300 * 4, Math.max(allObjects - misses + x300 * 5, (int) Math.round(acc * allObjects * 6)));
+		return Pair.of(best - (allObjects - misses + x300 * 5), (double) best / allObjects / 6);
 	}
 
 	private static Pair<Integer, Integer> getBest300s(int allObjects, int misses, double acc) {
