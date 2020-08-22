@@ -8,7 +8,10 @@ import org.tillerino.osuApiModel.OsuApiScore;
 public class AccuracyDistributionTest {
 	@Test
 	public void testOptimization() throws Exception {
-		for(int i = 0; i < 1000000; i++) {
+		// takes one second.
+		// the randoms and the first getaccuracy takes about .66 seconds.
+		// => get accuracy distribution takes about 16 ns
+		for(int i = 0; i < 20000000; i++) {
 			int _300s = (int) (Math.random() * 100);
 			int _100s = (int) (Math.random() * 100);
 			int _50s = (int) (Math.random() * 100);
