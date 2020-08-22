@@ -15,8 +15,9 @@ public class AccuracyDistribution {
 	int miss;
 
 	public static AccuracyDistribution get(int allObjects, int misses, double acc) {
-		int best300s = getBest300s(allObjects, misses, acc);
-		int best100s = getBest100s(allObjects, best300s, misses, acc).getLeft();
+		Pair<Integer, Integer> best = getBest300s(allObjects, misses, acc);
+		int best300s = best.getLeft();
+		int best100s = best.getRight();
 		return new AccuracyDistribution(best300s, best100s, allObjects - best300s - best100s - misses, misses);
 	}
 
@@ -51,7 +52,7 @@ public class AccuracyDistribution {
 		}
 	}
 
-	static Pair<Integer, Double> getBest100s(int allObjects, int x300, int misses, double acc) {
+	private static Pair<Integer, Double> getBest100s(int allObjects, int x300, int misses, double acc) {
 		return bisect(
 				0,
 				allObjects - x300 - misses,
@@ -59,7 +60,7 @@ public class AccuracyDistribution {
 						- misses, misses), acc);
 	}
 
-	static int getBest300s(int allObjects, int misses, double acc) {
+	private static Pair<Integer, Integer> getBest300s(int allObjects, int misses, double acc) {
 		/*
 		 * Why does this work?
 		 *
@@ -75,14 +76,17 @@ public class AccuracyDistribution {
 		 */
 		int guess = (int) Math.round((misses + 6 * allObjects * acc - allObjects) / 5);
 		int best = 0;
+		int best100s = 0;
 		double bestError = Double.POSITIVE_INFINITY;
 		for (int i = Math.max(0, guess - 1); i <= Math.min(allObjects - misses, guess + 1); i++) {
-			double error = Math.abs(acc - getBest100s(allObjects, i, misses, acc).getRight());
+			Pair<Integer, Double> inner = getBest100s(allObjects, i, misses, acc);
+			double error = Math.abs(acc - inner.getRight());
 			if (error < bestError) {
 				best = i;
 				bestError = error;
+				best100s = inner.getLeft();
 			}
 		}
-		return best;
+		return Pair.of(best, best100s);
 	}
 }
