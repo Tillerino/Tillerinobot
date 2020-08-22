@@ -98,7 +98,6 @@
 		<dependency>
 			<groupId>com.github.tillerino.twirc</groupId>
 			<artifactId>twirc-server</artifactId>
-			<version>0.0.1</version>
 			<scope>test</scope>
 		</dependency>
 
