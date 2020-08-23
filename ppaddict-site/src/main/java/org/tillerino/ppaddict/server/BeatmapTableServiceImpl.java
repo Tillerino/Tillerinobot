@@ -1,13 +1,17 @@
 package org.tillerino.ppaddict.server;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.IntStream;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -32,7 +36,6 @@ import org.tillerino.ppaddict.shared.Settings;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
@@ -107,7 +110,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     boolean useRangeFilters = (textSearchNeedle == null && commentSearchNeedle == null)
         || (settings.isApplyOtherFiltersWithTextFilter());
 
-    Collection<BeatmapData> selection = new ArrayList<>();
+    List<BeatmapData> selection = new ArrayList<>();
 
     Map<BeatmapWithMods, BeatmapData> beatmaps = backend.getBeatmaps();
     if (beatmaps == null) {
@@ -243,23 +246,44 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     return beatmapBundle;
   }
 
-  public Collection<BeatmapData> sort(final BeatmapRangeRequest request,
-      Collection<BeatmapData> selection, Settings settings) {
+  public List<BeatmapData> sort(final BeatmapRangeRequest request,
+      List<BeatmapData> selection, Settings settings) {
     if (request.sortBy != null) {
       final ToDoubleFunction<BeatmapData> sortProperty = getComparator(request.sortBy, settings);
       if (sortProperty != null) {
-        /*
-         * n * log n sorting, but with one-time evaluation of function.
-         */
-        TreeMap<Double, BeatmapData> sortedBeatmaps = new TreeMap<>();
-        for (BeatmapData beatmapData : selection) {
-          sortedBeatmaps.put(request.direction * sortProperty.applyAsDouble(beatmapData),
-              beatmapData);
-        }
-        selection = sortedBeatmaps.values();
+        ToDoubleFunction<? super BeatmapData> property =
+            beatmapData -> request.direction * sortProperty.applyAsDouble(beatmapData);
+        return sortedView(selection, property);
       }
     }
     return selection;
+  }
+
+  /**
+   * Returns a sorted view of a list.
+   *
+   * @param not modified. Modifications of this object will affect the returned value.
+   * @param property the property to sort by. This is only evaluated once per item.
+   */
+  static List<BeatmapData> sortedView(List<BeatmapData> selection,
+      ToDoubleFunction<? super BeatmapData> property) {
+    // can't sort a primitive array with a comparator :(
+    Integer[] positions = IntStream.range(0, selection.size()).boxed().toArray(Integer[]::new);
+    double[] values = selection.stream().mapToDouble(property).toArray();
+
+    Arrays.sort(positions, Comparator.comparingDouble(i -> values[i]));
+
+    return new AbstractList<PpaddictBackend.BeatmapData>() {
+      @Override
+      public BeatmapData get(int index) {
+        return selection.get(positions[index]);
+      }
+
+      @Override
+      public int size() {
+        return positions.length;
+      }
+    };
   }
 
   public BeatmapBundle makeBundle(final BeatmapRangeRequest request, PersistentUserData userData,
@@ -374,53 +398,20 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
   private static ToDoubleFunction<BeatmapData> getComparator(final Sort sortBy,
       final Settings settings) {
-    final ToDoubleFunction<BeatmapData> comparator;
     switch (sortBy) {
       case EXPECTED:
-        comparator = new ToDoubleFunction<BeatmapData>() {
-          @Override
-          public double applyAsDouble(BeatmapData value) {
-            return value.getEstimates().getPP(settings.getLowAccuracy() / 100);
-          }
-        };
-        break;
+        return value -> value.getEstimates().getPP(settings.getLowAccuracy() / 100);
       case PERFECT:
-        comparator = new ToDoubleFunction<BeatmapData>() {
-          @Override
-          public double applyAsDouble(BeatmapData value) {
-            return value.getEstimates().getPP(settings.getHighAccuracy() / 100);
-          }
-        };
-        break;
+        return value -> value.getEstimates().getPP(settings.getHighAccuracy() / 100);
       case BPM:
-        comparator = new ToDoubleFunction<BeatmapData>() {
-          @Override
-          public double applyAsDouble(BeatmapData value) {
-            return value.getBeatmap().getBpm(value.getEstimates().getMods());
-          }
-        };
-        break;
+        return value -> value.getBeatmap().getBpm(value.getEstimates().getMods());
       case LENGTH:
-        comparator = new ToDoubleFunction<BeatmapData>() {
-          @Override
-          public double applyAsDouble(BeatmapData value) {
-            return value.getBeatmap().getTotalLength(value.getEstimates().getMods());
-          }
-        };
-        break;
+        return value -> value.getBeatmap().getTotalLength(value.getEstimates().getMods());
       case STAR_DIFF:
-        comparator = new ToDoubleFunction<BeatmapData>() {
-          @SuppressFBWarnings(value = "NP", justification = "null star diff was filtered out")
-          @Override
-          public double applyAsDouble(BeatmapData value) {
-            return value.getEstimates().getStarDiff();
-          }
-        };
-        break;
+        return value -> value.getEstimates().getStarDiff();
       default:
-        comparator = null;
+        return null;
     }
-    return comparator;
   }
 
   public Beatmap makeBeatmap(PersistentUserData userData, final BeatmapMeta meta) {
