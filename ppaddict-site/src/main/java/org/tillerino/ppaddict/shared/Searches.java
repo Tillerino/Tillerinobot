@@ -14,6 +14,8 @@ public class Searches implements IsSerializable {
   public Searches(Searches searches) {
     searchText = searches.searchText;
     searchComment = searches.searchComment;
+    beatmapId = searches.beatmapId;
+    setId = searches.setId;
   }
 
   private String searchText = "";
