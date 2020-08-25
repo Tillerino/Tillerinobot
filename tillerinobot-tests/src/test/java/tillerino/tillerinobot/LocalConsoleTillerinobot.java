@@ -54,6 +54,8 @@ import com.google.inject.name.Names;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
+import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
@@ -80,6 +82,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
+		bind(BeatmapsLoader.class).to(TestBeatmapsLoader.class);
 		bind(Clock.class).toInstance(createClock());
 		bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(1);
 		install(new MessageHandlerSchedulerModule());
@@ -101,7 +104,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 	@Provides
 	@Singleton
-	public BeatmapsService getBeatmapsService(BotBackend backend) {
+	public BeatmapsService getBeatmapsService(BeatmapsLoader backend) {
 		BeatmapsService beatService = mock(BeatmapsService.class);
 		when(beatService.byId(anyInt())).thenAnswer(req -> {
 			BeatmapResource res = mock(BeatmapResource.class);

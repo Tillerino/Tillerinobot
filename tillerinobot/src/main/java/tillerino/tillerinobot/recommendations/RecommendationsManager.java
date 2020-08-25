@@ -29,6 +29,7 @@ import com.google.common.cache.LoadingCache;
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
@@ -52,6 +53,8 @@ public class RecommendationsManager {
 	private final ThreadLocalAutoCommittingEntityManager em;
 
 	private final RecommendationRequestParser parser;
+
+	private final BeatmapsLoader beatmapsLoader;
 
 	private final Cache<Integer, Recommendation> lastRecommendation = CacheBuilder.newBuilder()
 			.expireAfterWrite(1, TimeUnit.HOURS)
@@ -194,7 +197,7 @@ public class RecommendationsManager {
 			OsuApiBeatmap beatmap = null;
 			for (RecommendationPredicate predicate : predicates) {
 				if (beatmap == null) {
-					beatmap = backend.getBeatmap(bareRecommendation.getBeatmapId());
+					beatmap = beatmapsLoader.getBeatmap(bareRecommendation.getBeatmapId());
 				}
 				if (!predicate.test(bareRecommendation, beatmap)) {
 					continue recommendationsLoop;

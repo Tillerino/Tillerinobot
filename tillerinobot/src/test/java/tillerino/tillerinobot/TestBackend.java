@@ -22,6 +22,7 @@ import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
@@ -86,14 +87,28 @@ public class TestBackend implements BotBackend {
 			.enableComplexMapKeySerialization().create();
 
 	boolean serialize;
-	
+
+	BeatmapsLoader loader;
+
 	@Getter
-	Map<Integer, Integer> setIds = new HashMap<>();
+	static Map<Integer, Integer> setIds = new HashMap<>();
+	static {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+				TestBackend.class.getResourceAsStream("/beatmapIds.txt")))) {
+			for (String line; (line = reader.readLine()) != null;) {
+				String[] s = line.split("\t");
+				setIds.put(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Inject
 	public TestBackend(
-			@Named("tillerinobot.test.persistentBackend") boolean serialize) {
+			@Named("tillerinobot.test.persistentBackend") boolean serialize, BeatmapsLoader loader) {
 		this.serialize = serialize;
+		this.loader = loader;
 		if(serialize) {
 			try (Reader reader = new InputStreamReader(new BufferedInputStream(
 					new FileInputStream("tillerinobot-db.json")))) {
@@ -103,16 +118,6 @@ public class TestBackend implements BotBackend {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-				TestBackend.class.getResourceAsStream("/beatmapIds.txt")))) {
-			for (String line; (line = reader.readLine()) != null;) {
-				String[] s = line.split("\t");
-				setIds.put(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -133,7 +138,7 @@ public class TestBackend implements BotBackend {
 	@Override
 	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
 			throws SQLException, IOException, UserException {
-		OsuApiBeatmap beatmap = getBeatmap(beatmapid);
+		OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid);
 
 		BeatmapWithMods entry = new BeatmapWithMods(beatmapid, mods);
 
@@ -147,43 +152,6 @@ public class TestBackend implements BotBackend {
 		}
 
 		return new BeatmapMeta(beatmap, null, estimates);
-	}
-
-	@Override
-	public OsuApiBeatmap getBeatmap(int beatmapid) {
-		Random rand = new Random(beatmapid);
-		OsuApiBeatmap beatmap = database.beatmaps.get(beatmapid);
-		if (beatmap == null) {
-			beatmap = new OsuApiBeatmap();
-			beatmap.setBeatmapId(beatmapid);
-			if (setIds.containsKey(beatmapid)) {
-				beatmap.setSetId(setIds.get(beatmapid));
-			}
-			{
-				// ARTIST
-				String[] artists = { "Hatsune Miku", "IOSYS", "Nightcore",
-						"DragonForce", "ClariS" };
-				beatmap.setArtist(artists[beatmapid % artists.length]);
-			}
-			beatmap.setTitle("Beatmap " + beatmapid);
-			{
-				// VERSION AND DIFFICULTY
-				String[] versions = { "Easy", "Normal", "Hard", "Hyper",
-						"Insane", "Another", "Extra" };
-				int diff = beatmapid % versions.length;
-				beatmap.setVersion(versions[diff]);
-
-				beatmap.setStarDifficulty(diff + rand.nextDouble());
-				beatmap.setTotalLength((int) (30 + Math.pow(rand.nextDouble(),
-						3) * 600));
-				beatmap.setApproachRate(5 + Math.min(4, diff)
-						+ (int) (rand.nextDouble() + .5));
-				beatmap.setCircleSize(diff + 1);
-				beatmap.setBpm(50 * Math.pow(2, diff * .4 + rand.nextDouble()));
-				beatmap.setMaxCombo(100);
-			}
-		}
-		return beatmap;
 	}
 
 	public void hintUser(String username, boolean isDonator, int rank, double pp)
@@ -326,5 +294,45 @@ public class TestBackend implements BotBackend {
 			return null;
 		}
 		return database.users.get(userid).apiUser;
+	}
+
+	@Singleton
+	public static class TestBeatmapsLoader implements BeatmapsLoader {
+		@Override
+		public OsuApiBeatmap getBeatmap(int beatmapid, long mods) {
+			Random rand = new Random(beatmapid);
+			OsuApiBeatmap beatmap = database.beatmaps.get(beatmapid);
+			if (beatmap == null) {
+				beatmap = new OsuApiBeatmap();
+				beatmap.setBeatmapId(beatmapid);
+				if (setIds.containsKey(beatmapid)) {
+					beatmap.setSetId(setIds.get(beatmapid));
+				}
+				{
+					// ARTIST
+					String[] artists = { "Hatsune Miku", "IOSYS", "Nightcore",
+							"DragonForce", "ClariS" };
+					beatmap.setArtist(artists[beatmapid % artists.length]);
+				}
+				beatmap.setTitle("Beatmap " + beatmapid);
+				{
+					// VERSION AND DIFFICULTY
+					String[] versions = { "Easy", "Normal", "Hard", "Hyper",
+							"Insane", "Another", "Extra" };
+					int diff = beatmapid % versions.length;
+					beatmap.setVersion(versions[diff]);
+
+					beatmap.setStarDifficulty(diff + rand.nextDouble());
+					beatmap.setTotalLength((int) (30 + Math.pow(rand.nextDouble(),
+							3) * 600));
+					beatmap.setApproachRate(5 + Math.min(4, diff)
+							+ (int) (rand.nextDouble() + .5));
+					beatmap.setCircleSize(diff + 1);
+					beatmap.setBpm(50 * Math.pow(2, diff * .4 + rand.nextDouble()));
+					beatmap.setMaxCombo(100);
+				}
+			}
+			return beatmap;
+		}
 	}
 }

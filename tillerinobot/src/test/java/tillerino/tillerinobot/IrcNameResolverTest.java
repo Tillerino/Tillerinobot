@@ -13,7 +13,7 @@ public class IrcNameResolverTest extends AbstractDatabaseTest {
 	
 	@Before
 	public void init() {
-		backend = new TestBackend(false);
+		backend = new TestBackend(false, new TestBackend.TestBeatmapsLoader());
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 	}
 	

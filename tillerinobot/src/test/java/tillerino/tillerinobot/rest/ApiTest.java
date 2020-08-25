@@ -43,8 +43,10 @@ import org.tillerino.ppaddict.util.TestClock;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.name.Names;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.TestBackend;
@@ -57,7 +59,9 @@ public class ApiTest {
 		@Override
 		protected void configure() {
 			install(new CreateInMemoryDatabaseModule());
-			bind(BotBackend.class).toInstance(new TestBackend(false));
+			bind(boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
+			bind(BotBackend.BeatmapsLoader.class).to(TestBeatmapsLoader.class);
+			bind(BotBackend.class).to(TestBackend.class);
 			bind(GameChatClient.class).toInstance(mock(GameChatClient.class));
 			bind(BeatmapsService.class).toInstance(mock(BeatmapsService.class));
 			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());

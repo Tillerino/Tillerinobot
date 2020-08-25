@@ -68,6 +68,8 @@ import com.google.inject.name.Names;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
+import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.IRCBot;
@@ -163,6 +165,7 @@ public abstract class AbstractFullBotTest {
             bind(GameChatWriter.class).to(IrcWriter.class);
             bind(Clock.class).toInstance(Clock.system());
             bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
+            bind(BeatmapsLoader.class).to(TestBeatmapsLoader.class);
             install(new MessageHandlerSchedulerModule());
             bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(4);
             bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());

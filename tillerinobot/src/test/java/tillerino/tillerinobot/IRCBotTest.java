@@ -75,7 +75,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	RateLimiter rateLimiter = new RateLimiter();
 
 	@Spy
-	TestBackend backend = new TestBackend(false);
+	TestBackend backend = new TestBackend(false, new TestBackend.TestBeatmapsLoader());
 
 	IrcNameResolver resolver;
 
@@ -100,7 +100,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		resolver = new IrcNameResolver(userNameMappingRepo, backend);
 
-		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend)));
+		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em,
+				new RecommendationRequestParser(backend), backend.loader));
 
 		makeQueuePrint();
 	}
@@ -120,8 +121,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		if (backend == this.backend) {
 			recMan = this.recommendationsManager;
 		} else {
-			recMan = spy(new RecommendationsManager(backend,
-					recommendationsRepo, em, new RecommendationRequestParser(backend)));
+			recMan = spy(new RecommendationsManager(backend, recommendationsRepo, em,
+					new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader()));
 		}
 
 		IRCBot ircBot = new IRCBot(backend, recMan, new UserDataManager(backend, emf, em, userDataRepository),
@@ -241,7 +242,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testProperEmptySamplerHandling() throws Exception {
-		TestBackend backend = new TestBackend(false) {
+		TestBackend backend = new TestBackend(false, new TestBackend.TestBeatmapsLoader()) {
 			@Override
 			public Collection<BareRecommendation> loadRecommendations(
 					int userid, Collection<Integer> exclude, Model model,

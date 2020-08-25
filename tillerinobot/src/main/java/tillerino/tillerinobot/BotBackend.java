@@ -101,18 +101,7 @@ public interface BotBackend {
 	 */
 	public Collection<BareRecommendation> loadRecommendations(@UserId int userid, @Nonnull Collection<Integer> exclude,
 			@Nonnull Model model, boolean nomod, @BitwiseMods long requestMods) throws SQLException, IOException, UserException;
-	
-	/**
-	 * Retreives beatmap. Implementation hint: this might be called a *lot* when
-	 * checking recommendation predicates and should probably be cached.
-	 * 
-	 * @param beatmapId
-	 * @return null if not found
-	 * @throws IOException
-	 * @throws SQLException
-	 */
-	public @CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId) throws SQLException, IOException;
-	
+
 	/**
 	 * links the given user to a Patreon account using a token string.
 	 * 
@@ -133,4 +122,19 @@ public interface BotBackend {
 
 	@CheckForNull
 	public OsuApiUser downloadUser(String userName) throws IOException, SQLException;
+
+	public interface BeatmapsLoader {
+		default @CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId) throws SQLException, IOException {
+			return getBeatmap(beatmapId, 0L);
+		}
+
+		/**
+		 * Retreives beatmap. Implementation hint: this might be called a *lot* when
+		 * checking recommendation predicates and should probably be cached.
+		 * 
+		 * @param beatmapId
+		 * @return null if not found
+		 */
+		@CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId, @BitwiseMods long mods) throws SQLException, IOException;
+	}
 }

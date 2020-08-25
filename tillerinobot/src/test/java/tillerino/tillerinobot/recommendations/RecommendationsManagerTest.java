@@ -1,7 +1,6 @@
 package tillerino.tillerinobot.recommendations;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -22,16 +21,16 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.lang.Default;
-import tillerino.tillerinobot.recommendations.RecommendationRequest;
-import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
-import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
-	TestBackend backend = spy(new TestBackend(false));
+	BeatmapsLoader beatmapsLoader = new TestBackend.TestBeatmapsLoader();
+
+	TestBackend backend = spy(new TestBackend(false, beatmapsLoader));
 
 	RecommendationsManager manager;
 
@@ -46,7 +45,8 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	
 	@Before
 	public void createRecommendationsManager() {
-		manager = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		manager = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend),
+				beatmapsLoader);
 	}
 
 	@Test
@@ -109,7 +109,8 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testHiding() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		RecommendationsManager recMan = new RecommendationsManager(null, recommendationsRepo, em,
+				new RecommendationRequestParser(backend), beatmapsLoader);
 
 		// save a recommendation and reload it
 		recMan.saveGivenRecommendation(1954, 2, 0);
@@ -139,21 +140,24 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void defaultSettings() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em,
+				new RecommendationRequestParser(backend), beatmapsLoader);
 		assertThat(recMan.getRecommendation(user, "", new Default())).isNotNull();
 		verify(backend).loadRecommendations(user.getUserId(), Collections.emptyList(), Model.GAMMA5, false, 0L);
 	}
 
 	@Test
 	public void testGamma5() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em,
+				new RecommendationRequestParser(backend), beatmapsLoader);
 		assertThat(recMan.getRecommendation(user, "gamma5", new Default())).isNotNull();
 		verify(backend).loadRecommendations(anyInt(), any(), eq(Model.GAMMA5), anyBoolean(), anyLong());
 	}
 
 	@Test
 	public void gamma5NotRestricted() throws Exception {
-		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em, new RecommendationRequestParser(backend));
+		RecommendationsManager recMan = new RecommendationsManager(backend, recommendationsRepo, em,
+				new RecommendationRequestParser(backend), beatmapsLoader);
 		backend.hintUser("guy", false, 123, 123);
 		user = backend.downloadUser("guy");
 		assertThat(recMan.getRecommendation(user, "gamma5", new Default()))
