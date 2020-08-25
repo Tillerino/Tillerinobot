@@ -255,16 +255,15 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
     if (comment == null) {
       return;
     }
-    Long modsAsLong = null;
+    long modsAsLong;
     if (mods != null) {
       if (mods.equals("?")) {
         modsAsLong = -1l;
       } else {
         modsAsLong = Mods.fromShortNamesContinuous(mods);
       }
-    }
-    if (modsAsLong == null) {
-      throw new PpaddictException("communication error");
+    } else {
+      modsAsLong = 0;
     }
 
     comment = comment.trim();
