@@ -3,27 +3,18 @@ package org.tillerino.ppaddict.shared;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import org.tillerino.ppaddict.shared.PpaddictException.OutOfBoundsException;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-public class Settings implements IsSerializable {
+public class Settings extends BeatmapFilterSettings {
   public static final Settings DEFAULT_SETTINGS = new Settings();
 
   public Settings() {}
 
   private boolean openDirectOnMapSelect = false;
-  private boolean applyOtherFiltersWithTextFilter = false;
-
-  private double lowAccuracy = 93, highAccuracy = 100;
 
   private String recommendationsParameters = null;
 
   public Settings(@Nonnull Settings o) {
+    super(o);
     openDirectOnMapSelect = o.openDirectOnMapSelect;
-    applyOtherFiltersWithTextFilter = o.applyOtherFiltersWithTextFilter;
-    lowAccuracy = o.lowAccuracy;
-    highAccuracy = o.highAccuracy;
     recommendationsParameters = o.recommendationsParameters;
   }
 
@@ -33,31 +24,6 @@ public class Settings implements IsSerializable {
 
   public void setOpenDirectOnMapSelect(boolean openDirectOnMapSelect) {
     this.openDirectOnMapSelect = openDirectOnMapSelect;
-  }
-
-  public boolean isApplyOtherFiltersWithTextFilter() {
-    return applyOtherFiltersWithTextFilter;
-  }
-
-  public void setApplyOtherFiltersWithTextFilter(boolean applyOtherFiltersWithTextFilter) {
-    this.applyOtherFiltersWithTextFilter = applyOtherFiltersWithTextFilter;
-  }
-
-  public double getLowAccuracy() {
-    return lowAccuracy;
-  }
-
-  public void setLowAccuracy(double lowAccuracy) throws OutOfBoundsException {
-    this.lowAccuracy = PpaddictException.checkBounds("High accuracy", lowAccuracy, 0, highAccuracy);
-  }
-
-  public double getHighAccuracy() {
-    return highAccuracy;
-  }
-
-  public void setHighAccuracy(double highAccuracy) throws OutOfBoundsException {
-    this.highAccuracy =
-        PpaddictException.checkBounds("High accuracy", highAccuracy, lowAccuracy, 100);
   }
 
   @CheckForNull
@@ -72,13 +38,7 @@ public class Settings implements IsSerializable {
   @Override
   public int hashCode() {
     final int prime = 31;
-    int result = 1;
-    result = prime * result + (applyOtherFiltersWithTextFilter ? 1231 : 1237);
-    long temp;
-    temp = Double.doubleToLongBits(highAccuracy);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(lowAccuracy);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
+    int result = super.hashCode();
     result = prime * result + (openDirectOnMapSelect ? 1231 : 1237);
     result = prime * result
         + ((recommendationsParameters == null) ? 0 : recommendationsParameters.hashCode());
@@ -90,22 +50,13 @@ public class Settings implements IsSerializable {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
+    if (!super.equals(obj)) {
       return false;
     }
     if (getClass() != obj.getClass()) {
       return false;
     }
     Settings other = (Settings) obj;
-    if (applyOtherFiltersWithTextFilter != other.applyOtherFiltersWithTextFilter) {
-      return false;
-    }
-    if (Double.doubleToLongBits(highAccuracy) != Double.doubleToLongBits(other.highAccuracy)) {
-      return false;
-    }
-    if (Double.doubleToLongBits(lowAccuracy) != Double.doubleToLongBits(other.lowAccuracy)) {
-      return false;
-    }
     if (openDirectOnMapSelect != other.openDirectOnMapSelect) {
       return false;
     }
