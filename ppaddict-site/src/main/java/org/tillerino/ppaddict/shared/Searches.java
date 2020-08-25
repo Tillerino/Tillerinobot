@@ -88,4 +88,47 @@ public class Searches implements IsSerializable {
     return "Searches [searchText=" + searchText + ", searchComment=" + searchComment
         + ", beatmapId=" + beatmapId + ", beatmapSetId=" + setId + "]";
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((beatmapId == null) ? 0 : beatmapId.hashCode());
+    result = prime * result + ((searchComment == null) ? 0 : searchComment.hashCode());
+    result = prime * result + ((searchText == null) ? 0 : searchText.hashCode());
+    result = prime * result + ((setId == null) ? 0 : setId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Searches other = (Searches) obj;
+    if (beatmapId == null) {
+      if (other.beatmapId != null)
+        return false;
+    } else if (!beatmapId.equals(other.beatmapId))
+      return false;
+    if (searchComment == null) {
+      if (other.searchComment != null)
+        return false;
+    } else if (!searchComment.equals(other.searchComment))
+      return false;
+    if (searchText == null) {
+      if (other.searchText != null)
+        return false;
+    } else if (!searchText.equals(other.searchText))
+      return false;
+    if (setId == null) {
+      if (other.setId != null)
+        return false;
+    } else if (!setId.equals(other.setId))
+      return false;
+    return true;
+  }
 }

@@ -1,5 +1,6 @@
 package org.tillerino.ppaddict.server;
 
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -58,25 +59,13 @@ public class PersistentUserData implements HasLinkedOsuId {
   @CheckForNull
   private TreeSet<String> beatmapComments;
 
+  public Comments getComments() {
+    return new Comments(beatmapComments);
+  }
+
   @CheckForNull
   public Comment getBeatMapComment(int id, long mods) {
-    TreeSet<String> comments = getBeatmapComments();
-    if (comments == null) {
-      return null;
-    }
-
-    SortedSet<String> tail = comments.tailSet(id + "-" + mods + "-");
-
-    if (tail.isEmpty()) {
-      return null;
-    }
-
-    String entry = tail.first();
-    if (!entry.startsWith(id + "-" + mods + "-")) {
-      return null;
-    }
-
-    return new Comment(entry.substring(entry.indexOf('-', entry.indexOf('-') + 1) + 1));
+    return getComments().getComment(id, mods);
   }
 
   public static class Comment {
@@ -92,6 +81,52 @@ public class PersistentUserData implements HasLinkedOsuId {
     @Override
     public String toString() {
       return date + "-" + text;
+    }
+  }
+
+  public static class Comments {
+    @CheckForNull
+    private final TreeSet<String> comments;
+
+    public Comments(@CheckForNull TreeSet<String> comments) {
+      this.comments = comments;
+    }
+
+    @CheckForNull
+    public Comment getComment(int id, long mods) {
+      if (comments == null) {
+        return null;
+      }
+
+      SortedSet<String> tail = comments.tailSet(id + "-" + mods + "-");
+
+      if (tail.isEmpty()) {
+        return null;
+      }
+
+      String entry = tail.first();
+      if (!entry.startsWith(id + "-" + mods + "-")) {
+        return null;
+      }
+
+      return new Comment(entry.substring(entry.indexOf('-', entry.indexOf('-') + 1) + 1));
+    }
+
+    @Override
+    public int hashCode() {
+      return ((comments == null) ? 0 : comments.hashCode());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      Comments other = (Comments) obj;
+      return Objects.equals(comments, other.comments);
     }
   }
 

@@ -23,19 +23,25 @@ import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.ppaddict.client.services.BeatmapTableService;
 import org.tillerino.ppaddict.server.PersistentUserData.Comment;
+import org.tillerino.ppaddict.server.PersistentUserData.Comments;
 import org.tillerino.ppaddict.server.PpaddictBackend.BeatmapData;
 import org.tillerino.ppaddict.server.PpaddictBackend.OsuApiBeatmapForPpaddict;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.Beatmap;
 import org.tillerino.ppaddict.shared.Beatmap.Personalization;
 import org.tillerino.ppaddict.shared.BeatmapBundle;
+import org.tillerino.ppaddict.shared.BeatmapFilter;
+import org.tillerino.ppaddict.shared.BeatmapFilterSettings;
 import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
 import org.tillerino.ppaddict.shared.BeatmapRangeRequest.Sort;
 import org.tillerino.ppaddict.shared.PpaddictException;
 import org.tillerino.ppaddict.shared.Settings;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import lombok.Value;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
@@ -63,6 +69,11 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
   @Inject
   RecommendationsManager recommendationsManager;
 
+  private final Cache<BeatmapsCacheKey, List<BeatmapData>> requestCache = CacheBuilder.newBuilder()
+      .softValues()
+      .maximumSize(100)
+      .build();
+
   @Override
   public BeatmapBundle getRange(final BeatmapRangeRequest request) throws PpaddictException {
     Credentials credentials = userDataService.getCredentials(getThreadLocalRequest());
@@ -77,10 +88,44 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
   }
 
   public BeatmapBundle executeGetRange(@Nonnull final BeatmapRangeRequest request,
-      @CheckForNull Credentials credentials, PersistentUserData userData) throws PpaddictException {
-    System.out.println("server got request: " + request);
-    Settings settings = userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS;
+      @CheckForNull Credentials credentials, @CheckForNull PersistentUserData userData) throws PpaddictException {
+    BeatmapFilterSettings settings = new BeatmapFilterSettings(userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS);
+    Comments comments = userData != null ? userData.getComments() : null;
 
+    List<BeatmapData> selection = getAll(new BeatmapFilter(request), settings, comments);
+
+    if (request.loadedUserRequest && request.getSearches().getBeatmapId() == null
+        && request.getSearches().getSetId() == null) {
+      if (userData != null) {
+        System.out.println("persisting " + request);
+        userData.setLastRequest(request);
+        userDataService.saveUserData(credentials, userData);
+      }
+    }
+
+    BeatmapBundle beatmapBundle = makeBundle(request, userData, selection);
+
+    System.out.println(beatmapBundle.beatmaps.size());
+
+    return beatmapBundle;
+  }
+
+  private List<BeatmapData> getAll(BeatmapFilter request, BeatmapFilterSettings settings,
+      Comments comments) throws PpaddictException {
+    requestCache.cleanUp();
+    BeatmapsCacheKey key = new BeatmapsCacheKey(request, settings, comments);
+    List<BeatmapData> cached = requestCache.getIfPresent(key);
+    if (cached != null) {
+      return cached;
+    }
+    System.out.println("running beatmap search for: " + key);
+    List<BeatmapData> fresh = executeBeatmapSearch(request, settings, comments);
+    requestCache.put(key, fresh);
+    return fresh;
+  }
+
+  private List<BeatmapData> executeBeatmapSearch(BeatmapFilter request,
+      BeatmapFilterSettings settings, Comments comments) throws PpaddictException {
     Collection<Predicate<BeatmapData>> predicates = new ArrayList<>();
     if (request.getSearches().getBeatmapId() != null) {
       int beatmapId = request.getSearches().getBeatmapId();
@@ -101,7 +146,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
       textSearchNeedle = null;
     }
     String commentSearchNeedle;
-    if (userData != null && request.getSearches().getSearchComment().length() > 0) {
+    if (comments != null && request.getSearches().getSearchComment().length() > 0) {
       commentSearchNeedle = request.getSearches().getSearchComment().toLowerCase();
     } else {
       commentSearchNeedle = null;
@@ -140,7 +185,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
        * search in comment
        */
       if (commentSearchNeedle != null) {
-        Comment c = userData.getBeatMapComment(apiBeatmap.getBeatmapId(), estimate.getMods());
+        Comment c = comments.getComment(apiBeatmap.getBeatmapId(), estimate.getMods());
 
         if (c == null) {
           continue;
@@ -229,25 +274,11 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     }
 
     selection = sort(request, selection, settings);
-
-    if (request.loadedUserRequest && request.getSearches().getBeatmapId() == null
-        && request.getSearches().getSetId() == null) {
-      if (userData != null) {
-        System.out.println("persisting " + request);
-        userData.setLastRequest(request);
-        userDataService.saveUserData(credentials, userData);
-      }
-    }
-
-    BeatmapBundle beatmapBundle = makeBundle(request, userData, selection);
-
-    System.out.println(beatmapBundle.beatmaps.size());
-
-    return beatmapBundle;
+    return selection;
   }
 
-  public List<BeatmapData> sort(final BeatmapRangeRequest request,
-      List<BeatmapData> selection, Settings settings) {
+  public List<BeatmapData> sort(final BeatmapFilter request,
+      List<BeatmapData> selection, BeatmapFilterSettings settings) {
     if (request.sortBy != null) {
       final ToDoubleFunction<BeatmapData> sortProperty = getComparator(request.sortBy, settings);
       if (sortProperty != null) {
@@ -397,7 +428,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
   }
 
   private static ToDoubleFunction<BeatmapData> getComparator(final Sort sortBy,
-      final Settings settings) {
+      final BeatmapFilterSettings settings) {
     switch (sortBy) {
       case EXPECTED:
         return value -> value.getEstimates().getPP(settings.getLowAccuracy() / 100);
@@ -420,4 +451,10 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     return makeBeatmap(userData, data);
   }
 
+  @Value
+  private static class BeatmapsCacheKey {
+    BeatmapFilter request;
+    BeatmapFilterSettings settings;
+    Comments comments;
+  }
 }

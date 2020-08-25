@@ -17,6 +17,9 @@ public interface UserDataService extends RemoteService {
 
   void saveSettings(Settings s) throws PpaddictException;
 
+  /**
+   * @param request non-null if coming from a beatmap(set) link
+   */
   InitialData getInitialData(@CheckForNull BeatmapRangeRequest request) throws PpaddictException;
 
   String getLinkString() throws PpaddictException;
