@@ -112,8 +112,13 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
   private List<BeatmapData> getAll(BeatmapFilter request, BeatmapFilterSettings settings,
       Comments comments) throws PpaddictException {
+    if (backend.getBeatmapsGeneration() < 0) {
+      // do not cache while the beatmaps are being loaded
+      return executeBeatmapSearch(request, settings, comments);
+    }
+
     requestCache.cleanUp();
-    BeatmapsCacheKey key = new BeatmapsCacheKey(request, settings, comments);
+    BeatmapsCacheKey key = new BeatmapsCacheKey(backend.getBeatmapsGeneration(), request, settings, comments);
     List<BeatmapData> cached = requestCache.getIfPresent(key);
     if (cached != null) {
       return cached;
@@ -453,6 +458,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
   @Value
   private static class BeatmapsCacheKey {
+    long generation;
     BeatmapFilter request;
     BeatmapFilterSettings settings;
     Comments comments;

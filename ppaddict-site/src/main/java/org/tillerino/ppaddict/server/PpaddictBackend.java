@@ -67,8 +67,16 @@ public interface PpaddictBackend {
   String createCookie(Credentials userIdentifier) throws SQLException;
 
   /**
-   * @return may return null if the server is shutting down or if there are errors in the backend
+   * @return may return null if the server is shutting down or if there are errors in the backend.
+   *         The map may change and periodically is replaced entirely. During startup, the map is
+   *         filled gradually. See also {@link #getBeatmapsGeneration()}.
    */
   @CheckForNull
   Map<BeatmapWithMods, BeatmapData> getBeatmaps();
+
+  /**
+   * @return increased whenever beatmaps are reloaded. This signals that caches need to be cleared.
+   *         -1 during the initial load
+   */
+  long getBeatmapsGeneration();
 }

@@ -111,4 +111,9 @@ public class TestBackend implements PpaddictBackend {
 
     return ret;
   }
+
+  @Override
+  public long getBeatmapsGeneration() {
+    return 0;
+  }
 }
