@@ -14,10 +14,12 @@ import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.BotFactory;
 import org.pircbotx.Configuration.Builder;
+import org.pircbotx.exception.IrcException;
 import org.pircbotx.InputParser;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.UserChannelDao;
+import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
@@ -97,6 +99,16 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 		}
 		
 		final UserChannelDaoSnapshot userDaoSnapshot = new UserChannelDaoSnapshot(null, null, null, null, null, null, null);
+
+		@Override
+		public void handleLine(String line) throws IOException, IrcException {
+			List<String> parsedLine = Utils.tokenizeLine(line);
+			if (parsedLine.isEmpty()) {
+				// bancho started sending empty lines on 2020-08-27
+				return;
+			}
+			super.handleLine(line);
+		}
 
 		@Override
 		public void processCommand(String target, String sourceNick, String sourceLogin, String sourceHostname, String command, String line, List<String> parsedLine) throws IOException {
