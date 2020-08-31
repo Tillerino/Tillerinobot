@@ -22,6 +22,7 @@ import org.xnio.Xnio;
 import org.xnio.XnioWorker;
 
 import io.undertow.Undertow;
+import io.undertow.server.HttpHandler;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.util.ImmediateInstanceHandle;
@@ -39,10 +40,13 @@ public class LiveMain extends AbstractRabbitMain {
 		live = new LiveActivityEndpoint();
 		Xnio xnio = Xnio.getInstance("nio", Undertow.class.getClassLoader());
 		xnioWorker = xnio.createWorker(OptionMap.builder().getMap());
-		undertow = undertow(live, port);
+		undertow = Undertow.builder()
+				.addHttpListener(port, "0.0.0.0")
+				.setHandler(httpHandler(live))
+				.setWorker(xnioWorker).build();
 	}
 
-	private Undertow undertow(LiveActivityEndpoint live, int port) throws ServletException, IOException {
+	private HttpHandler httpHandler(LiveActivityEndpoint live) throws ServletException, IOException {
 		final WebSocketDeploymentInfo webSockets = new WebSocketDeploymentInfo()
 				.addEndpoint(buildServerEndpointConfig(live))
 				.setWorker(xnioWorker);
@@ -57,9 +61,7 @@ public class LiveMain extends AbstractRabbitMain {
 								.addMappings("/live", "/ready")));
 
 		deployment.deploy();
-		return Undertow.builder().addHttpListener(port, "0.0.0.0")
-				.setHandler(deployment.start())
-				.build();
+		return deployment.start();
 	}
 
 	private static ServerEndpointConfig buildServerEndpointConfig(LiveActivityEndpoint endpoint) {
