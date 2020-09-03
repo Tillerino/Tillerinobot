@@ -6,8 +6,8 @@ import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
@@ -62,11 +62,11 @@ public class OptionsHandler implements CommandHandler {
 			if (set) {
 				LanguageIdentifier ident;
 				try {
-					ident = find(LanguageIdentifier.values(), value);
+					ident = find(LanguageIdentifier.values(), i -> i.token, value);
 				} catch (IllegalArgumentException e) {
 					String choices = Stream.of(LanguageIdentifier.values())
-							.sorted(Comparator.comparing(Object::toString))
-							.map(Object::toString)
+							.map(i -> i.token)
+							.sorted()
 							.collect(joining(", "));
 					throw new UserException(userData.getLanguage().invalidChoice(value, choices));
 				}
@@ -75,7 +75,7 @@ public class OptionsHandler implements CommandHandler {
 
 				return userData.getLanguage().optionalCommentOnLanguage(apiUser);
 			} else {
-				return new Message("Language: " + userData.getLanguageIdentifier().toString());
+				return new Message("Language: " + userData.getLanguageIdentifier().token);
 			}
 		} else if (getLevenshteinDistance(option, "welcome") <= 1 && userData.getHearts() > 0) {
 			if (set) {
@@ -121,14 +121,14 @@ public class OptionsHandler implements CommandHandler {
 		throw new UserException(lang.invalidChoice(original, "on|true|yes|1|off|false|no|0"));
 	}
 	
-	public static @Nonnull <E extends Enum<E>> E find(@Nonnull E[] haystack, @Nonnull String needle) {
+	public static @Nonnull <E extends Enum<E>> E find(@Nonnull E[] haystack, Function<E, String> token, @Nonnull String needle) {
 		needle = needle.toLowerCase();
 		
 		List<E> found = new ArrayList<>();
 		int bestDistance = Integer.MAX_VALUE;
 		
 		for (int i = 0; i < haystack.length; i++) {
-			int distance = getLevenshteinDistance(haystack[i].toString().toLowerCase(), needle);
+			int distance = getLevenshteinDistance(token.apply(haystack[i]).toLowerCase(), needle);
 			if (distance > 1) {
 				continue;
 			}
@@ -142,7 +142,7 @@ public class OptionsHandler implements CommandHandler {
 		}
 		
 		if(found.isEmpty()) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(String.format("nothing matches %s", needle));
 		}
 
 		if(found.size() > 1) {
