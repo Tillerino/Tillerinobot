@@ -37,12 +37,20 @@ public enum LanguageIdentifier {
 	Slovenščina(Slovenian.class),
 	Schwiizerdütsch(Swissgerman.class),
 	Slovenčina(Slovak.class),
-	Vietnamese(Vietnamese.class),
+	Vietnamese(Vietnamese.class, "Tiếng Việt"),
 	; // please end identifier entries with a comma and leave this semicolon here
 	
 	public final Class<? extends Language> cls;
 
+	public final String token;
+
 	private LanguageIdentifier(Class<? extends Language> cls) {
 		this.cls = cls;
+		this.token = name();
+	}
+
+	private LanguageIdentifier(Class<? extends Language> cls, String token) {
+		this.cls = cls;
+		this.token = token;
 	}
 }
