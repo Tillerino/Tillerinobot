@@ -1,6 +1,8 @@
 package org.tillerino.ppaddict.rabbit;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ public class AbstractRabbitMain {
 
 	private Connection rabbitConnection;
 	private Channel rabbitChannel;
+	private ExecutorService rabbitExecutor;
 
 	public AbstractRabbitMain(Logger log, String rabbitHost, int rabbitPort) {
 		this.log = log;
@@ -25,8 +28,9 @@ public class AbstractRabbitMain {
 	}
 
 	protected synchronized void start(String connectionName) throws IOException, TimeoutException {
+		rabbitExecutor = Executors.newSingleThreadExecutor(r -> new Thread(r, "RabbitMQ task executor"));
 		log.info("Connecting to RabbitMQ {}:{}", rabbitFactory.getHost(), rabbitFactory.getPort());
-		rabbitConnection = rabbitFactory.newConnection(connectionName);
+		rabbitConnection = rabbitFactory.newConnection(rabbitExecutor, connectionName);
 		log.info("Connected  to RabbitMQ {}:{}", rabbitFactory.getHost(), rabbitFactory.getPort());
 		log.info("Opening RabbitMQ channel");
 		rabbitChannel = rabbitConnection.createChannel();
@@ -49,6 +53,10 @@ public class AbstractRabbitMain {
 			} catch (Exception e) {
 				log.error("Error closing RabbitMQ connection", e);
 			}
+		}
+		if (rabbitExecutor != null) {
+			rabbitExecutor.shutdown();
+			rabbitExecutor = null;
 		}
 	}
 
