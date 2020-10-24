@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Singleton;
@@ -10,13 +9,11 @@ import org.tillerino.ppaddict.auth.FakeAuthenticatorWebsite;
 import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.AuthArriveService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
-import org.tillerino.ppaddict.server.auth.AuthenticatorServices;
 
-import tillerino.tillerinobot.LocalConsoleTillerinobot;
-
-import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
+
+import tillerino.tillerinobot.LocalConsoleTillerinobot;
 
 
 public class PpaddictTestModule extends ServletModule {
@@ -44,17 +41,13 @@ public class PpaddictTestModule extends ServletModule {
 
     serve("/showErrorPage").with(ProducesError.class);
 
-    install(new PpaddictModule());
-  }
-
-  @Provides
-  @Singleton
-  @AuthenticatorServices
-  public Map<String, AuthenticatorService> getAuthServices(FakeAuthenticatorService local) {
-    Map<String, AuthenticatorService> map = new HashMap<>();
-
-    map.put("local", local);
-
-    return map;
+    install(new PpaddictModule() {
+      @Override
+      protected Map<String, AuthenticatorService> createAuthServices(String returnUrl) {
+        Map<String, AuthenticatorService> services = super.createAuthServices(returnUrl);
+        services.put("local", new FakeAuthenticatorService());
+        return services;
+      }
+    });
   }
 }
