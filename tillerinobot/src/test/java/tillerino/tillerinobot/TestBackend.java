@@ -154,13 +154,14 @@ public class TestBackend implements BotBackend {
 		return new BeatmapMeta(beatmap, null, estimates);
 	}
 
-	public void hintUser(String username, boolean isDonator, int rank, double pp)
-			throws SQLException, IOException {
+	public void hintUser(String username, boolean isDonator, int rank, double pp) {
+		hintUser(username, isDonator, rank, pp, database.userNames.size() + 1);
+	}
+	public void hintUser(String username, boolean isDonator, int rank, double pp, int userid) {
 		User user;
 		boolean write = false;
 		if (!database.userNames.containsKey(username)) {
 			write = true;
-			int userid = database.userNames.size() + 1;
 			user = new User();
 			user.apiUser = new OsuApiUser();
 			user.apiUser.setUserId(userid);
@@ -196,7 +197,8 @@ public class TestBackend implements BotBackend {
 	@Override
 	public OsuApiUser getUser(int userid, long maxAge) throws SQLException,
 			IOException {
-		return database.users.get(userid).apiUser;
+		User user = database.users.get(userid);
+		return user.apiUser;
 	}
 
 	@Override
