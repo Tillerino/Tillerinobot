@@ -8,7 +8,7 @@ addons:
 
 before_script:
   - wget https://raw.githubusercontent.com/sormuras/bach/14b594549555f7b50ee4e4e6f79ec2bc6cb62e93/install-jdk.sh
-  - source ./install-jdk.sh --feature 14
+  - source ./install-jdk.sh --feature 15
 
 # we're not installing anything
 install: true
