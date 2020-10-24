@@ -172,14 +172,23 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       data.nickname = credentials.displayName;
       data.logoutURL = logoutService.getLogoutURL(referer);
       PersistentUserData persistent = getServerUserData(credentials);
-      data.settings = persistent.getSettings();
-      Integer linkedId = persistent.getLinkedOsuId();
-      if(linkedId == null && credentials instanceof CredentialsWithOsu) {
+
+      if(persistent.getLinkedOsuId() == null && credentials instanceof CredentialsWithOsu) {
+        // we've logged in with osu! OAuth and can immediately link this account :)
         CredentialsWithOsu osuCred = (CredentialsWithOsu) credentials;
         String token = ppaddictUserDataService.getLinkString(osuCred.identifier, osuCred.displayName);
         ppaddictUserDataService.tryLinkToPpaddict(token, osuCred.osuUserId);
-        linkedId = osuCred.osuUserId;
+
+        // reload data right away in case that we already had settings stored in the osu:*** settings.
+        persistent = getServerUserData(credentials);
+        if (persistent.getLinkedOsuId() == null) {
+          throw new PpaddictException("This is hecked. Please get an adult.");
+        }
       }
+
+      Integer linkedId = persistent.getLinkedOsuId();
+      data.settings = persistent.getSettings();
+
       if (linkedId != null) {
         try {
           OsuApiUser user = botBackend.getUser(linkedId, 0);
