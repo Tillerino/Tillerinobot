@@ -5,3 +5,12 @@
 /.settings/
 /ppaddict-db.json
 /tillerinobot-db.json
+
+
+# IntelliJ IDEA
+**/.idea
+**/*.iml
+/.settings/
+/target/
+/.project
+**/.DS_Store

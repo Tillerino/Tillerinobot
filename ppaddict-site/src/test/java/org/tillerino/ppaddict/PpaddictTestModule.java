@@ -1,19 +1,24 @@
 package org.tillerino.ppaddict;
 
-import java.util.Map;
-
-import javax.inject.Singleton;
-
+import com.google.inject.Provides;
+import com.google.inject.name.Names;
+import com.google.inject.servlet.ServletModule;
+import org.mockito.Mockito;
 import org.tillerino.ppaddict.auth.FakeAuthenticatorService;
 import org.tillerino.ppaddict.auth.FakeAuthenticatorWebsite;
 import org.tillerino.ppaddict.server.PpaddictBackend;
+import org.tillerino.ppaddict.server.PpaddictUserDataService;
 import org.tillerino.ppaddict.server.auth.AuthArriveService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
-
-import com.google.inject.name.Names;
-import com.google.inject.servlet.ServletModule;
-
+import org.tillerino.ppaddict.server.auth.CredentialsWithOsu;
+import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
+import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
+import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.LocalConsoleTillerinobot;
+
+import javax.inject.Singleton;
+import java.util.Map;
 
 
 public class PpaddictTestModule extends ServletModule {
@@ -49,5 +54,21 @@ public class PpaddictTestModule extends ServletModule {
         return services;
       }
     });
+  }
+
+  @Provides
+  @Singleton
+  public PpaddictUserDataService getPpaddictUserDataService(PpaddictUserRepository users, PpaddictLinkKeyRepository linkKeys, Clock clock, BotBackend botBackend) {
+    PpaddictUserDataService ppaddictUserDataService = Mockito.spy(new PpaddictUserDataService(users, linkKeys, clock));
+    Mockito.doAnswer(x -> {
+      String id = x.getArgument(0);
+      String displayName = x.getArgument(1);
+      int osuId = Integer.parseInt(id.substring(CredentialsWithOsu.OSU_OAUTH_PREFIX.length()));
+      ((tillerino.tillerinobot.TestBackend) botBackend).hintUser(displayName, false, 100000, 1000, osuId);
+
+      return x.callRealMethod();
+    }).when(ppaddictUserDataService).getLinkString(Mockito.startsWith(CredentialsWithOsu.OSU_OAUTH_PREFIX), Mockito.anyString());
+    return ppaddictUserDataService
+    ;
   }
 }

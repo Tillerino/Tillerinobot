@@ -29,6 +29,7 @@ import org.tillerino.ppaddict.server.auth.AuthLogoutService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorServices;
 import org.tillerino.ppaddict.server.auth.Credentials;
+import org.tillerino.ppaddict.server.auth.CredentialsWithOsu;
 import org.tillerino.ppaddict.shared.BeatmapBundle;
 import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
 import org.tillerino.ppaddict.shared.ClientUserData;
@@ -173,6 +174,12 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       PersistentUserData persistent = getServerUserData(credentials);
       data.settings = persistent.getSettings();
       Integer linkedId = persistent.getLinkedOsuId();
+      if(linkedId == null && credentials instanceof CredentialsWithOsu) {
+        CredentialsWithOsu osuCred = (CredentialsWithOsu) credentials;
+        String token = ppaddictUserDataService.getLinkString(osuCred.identifier, osuCred.displayName);
+        ppaddictUserDataService.tryLinkToPpaddict(token, osuCred.osuUserId);
+        linkedId = osuCred.osuUserId;
+      }
       if (linkedId != null) {
         try {
           OsuApiUser user = botBackend.getUser(linkedId, 0);
