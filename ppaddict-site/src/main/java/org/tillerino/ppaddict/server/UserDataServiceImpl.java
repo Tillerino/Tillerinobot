@@ -3,7 +3,7 @@ package org.tillerino.ppaddict.server;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 
@@ -67,7 +67,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
   @Inject
   @AuthenticatorServices
-  Map<String, AuthenticatorService> authServices;
+  List<AuthenticatorService> authServices;
 
   @Inject
   RecommendationsManager recommendationsManager;
@@ -202,12 +202,12 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       return new UserData(data, persistent);
     } else {
       data.loginElements = new ArrayList<>();
-      for (String providerName : authServices.keySet()) {
-        String loginUrl = leaveService.getURL(providerName, referer);
+      for (AuthenticatorService authService : authServices) {
+        String loginUrl = leaveService.getURL(authService.getIdentifier(), referer);
 
         data.loginElements
             .add(new SafeHtmlBuilder().appendHtmlConstant("<a href=\"" + loginUrl + "\">")
-                .appendEscaped(providerName).appendHtmlConstant("</a>").toSafeHtml().asString());
+                .appendEscaped(authService.getDisplayName()).appendHtmlConstant("</a>").toSafeHtml().asString());
 
       }
       return new UserData(data);

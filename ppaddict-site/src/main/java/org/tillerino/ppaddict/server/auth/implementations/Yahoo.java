@@ -33,6 +33,16 @@ public class Yahoo implements AuthenticatorService {
   }
 
   @Override
+  public String getIdentifier() {
+    return "yahoo";
+  }
+
+  @Override
+  public String getDisplayName() {
+    return "Yahoo!";
+  }
+
+  @Override
   public OAuthService getService() {
     return service;
   }

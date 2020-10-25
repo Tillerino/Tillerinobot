@@ -35,6 +35,16 @@ public class Twitter implements AuthenticatorService {
   }
 
   @Override
+  public String getIdentifier() {
+    return "twitter";
+  }
+
+  @Override
+  public String getDisplayName() {
+    return "Twitter";
+  }
+
+  @Override
   public OAuthService getService() {
     return service;
   }

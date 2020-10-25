@@ -35,6 +35,16 @@ public class Facebook implements AuthenticatorService {
   }
 
   @Override
+  public String getIdentifier() {
+    return "facebook";
+  }
+
+  @Override
+  public String getDisplayName() {
+    return "Facebook";
+  }
+
+  @Override
   public OAuthService getService() {
     return service;
   }

@@ -16,6 +16,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class FakeAuthenticatorService implements AuthenticatorService {
 
   @Override
+  public String getIdentifier() {
+    return "local";
+  }
+
+  @Override
+  public String getDisplayName() {
+    return "Local";
+  }
+
+  @Override
   public OAuthService getService() {
     OAuthService myService = mock(OAuthService.class);
     when(myService.getAuthorizationUrl(argThat(x -> true /* match any including null */)))

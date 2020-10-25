@@ -35,6 +35,16 @@ public class Google implements AuthenticatorService {
   }
 
   @Override
+  public String getIdentifier() {
+    return "google";
+  }
+
+  @Override
+  public String getDisplayName() {
+    return "Google";
+  }
+
+  @Override
   public OAuthService getService() {
     return service;
   }

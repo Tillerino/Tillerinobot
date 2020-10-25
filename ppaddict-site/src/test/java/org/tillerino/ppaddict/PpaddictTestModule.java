@@ -18,7 +18,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.LocalConsoleTillerinobot;
 
 import javax.inject.Singleton;
-import java.util.Map;
+import java.util.List;
 
 
 public class PpaddictTestModule extends ServletModule {
@@ -48,9 +48,9 @@ public class PpaddictTestModule extends ServletModule {
 
     install(new PpaddictModule() {
       @Override
-      protected Map<String, AuthenticatorService> createAuthServices(String returnUrl) {
-        Map<String, AuthenticatorService> services = super.createAuthServices(returnUrl);
-        services.put("local", new FakeAuthenticatorService());
+      protected List<AuthenticatorService> createAuthServices(String returnUrl) {
+        List<AuthenticatorService> services = super.createAuthServices(returnUrl);
+        services.add(new FakeAuthenticatorService());
         return services;
       }
     });

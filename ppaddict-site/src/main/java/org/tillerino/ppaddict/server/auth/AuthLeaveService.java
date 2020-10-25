@@ -3,7 +3,8 @@ package org.tillerino.ppaddict.server.auth;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -24,7 +25,7 @@ public class AuthLeaveService extends HttpServlet {
 
   @Inject
   @AuthenticatorServices
-  Map<String, AuthenticatorService> services;
+  List<AuthenticatorService> services;
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
@@ -33,9 +34,14 @@ public class AuthLeaveService extends HttpServlet {
 
     String serviceKey = req.getParameter("service");
 
-    AuthenticatorService authService = services.get(serviceKey);
+    Optional<AuthenticatorService> authService = services.stream().filter(s -> s.getIdentifier().equals(serviceKey)).findAny();
+    if(authService.isEmpty()) {
+      // send 400, its a user error, serviceKey is user-input
+      resp.sendError(400);
+      return;
+    }
 
-    OAuthService service = authService.getService();
+    OAuthService service = authService.get().getService();
 
     req.getSession().setAttribute(AuthArriveService.AUTH_RETURN_TO_SESSION_KEY, finalReturnUrl);
     req.getSession().setAttribute(AuthArriveService.AUTH_SERVICE_SESSION_KEY, serviceKey);
@@ -48,9 +54,9 @@ public class AuthLeaveService extends HttpServlet {
     resp.sendRedirect(service.getAuthorizationUrl(token));
   }
 
-  public String getURL(String service, String returnTo) {
+  public String getURL(String serviceIdentifier, String returnTo) {
     try {
-      return PATH + "?service=" + service + "&returnTo=" + URLEncoder.encode(returnTo, "UTF-8");
+      return PATH + "?service=" + serviceIdentifier + "&returnTo=" + URLEncoder.encode(returnTo, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }

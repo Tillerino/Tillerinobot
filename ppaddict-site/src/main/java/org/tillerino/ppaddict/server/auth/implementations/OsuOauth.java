@@ -29,6 +29,16 @@ public class OsuOauth implements AuthenticatorService {
   }
 
   @Override
+  public String getIdentifier() {
+    return "osu";
+  }
+
+  @Override
+  public String getDisplayName() {
+    return "osu!";
+  }
+
+  @Override
   public OAuthService getService() {
     return service;
   }
