@@ -1,8 +1,8 @@
 package org.tillerino.ppaddict.server.auth;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,10 +55,6 @@ public class AuthLeaveService extends HttpServlet {
   }
 
   public String getURL(String serviceIdentifier, String returnTo) {
-    try {
-      return PATH + "?service=" + serviceIdentifier + "&returnTo=" + URLEncoder.encode(returnTo, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    return PATH + "?service=" + serviceIdentifier + "&returnTo=" + URLEncoder.encode(returnTo, StandardCharsets.UTF_8);
   }
 }
