@@ -13,8 +13,7 @@ import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
-import org.scribe.oauth.OAuthService;
-import org.tillerino.ppaddict.server.auth.AuthenticatorService;
+import org.tillerino.ppaddict.server.auth.AbstractAuthenticatorService;
 import org.tillerino.ppaddict.server.auth.Credentials;
 
 import com.google.gson.Gson;
@@ -22,31 +21,17 @@ import com.google.gson.Gson;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @Singleton
-public class Twitter implements AuthenticatorService {
-  final OAuthService service;
-
+public class Twitter extends AbstractAuthenticatorService {
   @Inject
   public Twitter(@Named("ppaddict.auth.returnURL") String returnURL,
       @Named("ppaddict.auth.twitter.apiKey") String apiKey,
       @Named("ppaddict.auth.twitter.apiSecret") String apiSecret) {
-    service =
-        new ServiceBuilder().provider(TwitterApi.SSL.class).apiKey(apiKey).apiSecret(apiSecret)
-            .callback(returnURL).build();
-  }
-
-  @Override
-  public String getIdentifier() {
-    return "twitter";
-  }
-
-  @Override
-  public String getDisplayName() {
-    return "Twitter";
-  }
-
-  @Override
-  public OAuthService getService() {
-    return service;
+    super("twitter", "Twitter", new ServiceBuilder()
+            .provider(TwitterApi.SSL.class)
+            .apiKey(apiKey)
+            .apiSecret(apiSecret)
+            .callback(returnURL)
+            .build());
   }
 
   Gson gson = new Gson();
@@ -61,18 +46,18 @@ public class Twitter implements AuthenticatorService {
   public Credentials createUser(HttpServletRequest req, Token requestToken) {
     Verifier verifier = new Verifier(req.getParameter(OAuthConstants.VERIFIER));
 
-    Token accessToken = service.getAccessToken(requestToken, verifier);
+    Token accessToken = getService().getAccessToken(requestToken, verifier);
 
     OAuthRequest request =
         new OAuthRequest(Verb.GET, "https://api.twitter.com/1.1/account/verify_credentials.json");
 
-    service.signRequest(accessToken, request);
+    getService().signRequest(accessToken, request);
 
     Response response = request.send();
 
     TwitterVerifyBody fromJson = gson.fromJson(response.getBody(), TwitterVerifyBody.class);
 
-    Credentials user = new Credentials("twitter:" + fromJson.id, "@" + fromJson.screen_name);
+    Credentials user = new Credentials(getIdentifier() + ":" + fromJson.id, "@" + fromJson.screen_name);
 
     return user;
   }

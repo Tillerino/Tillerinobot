@@ -10,7 +10,7 @@ import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.PpaddictUserDataService;
 import org.tillerino.ppaddict.server.auth.AuthArriveService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
-import org.tillerino.ppaddict.server.auth.CredentialsWithOsu;
+import org.tillerino.ppaddict.server.auth.implementations.OsuOauth;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
 import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
@@ -59,15 +59,17 @@ public class PpaddictTestModule extends ServletModule {
   @Provides
   @Singleton
   public PpaddictUserDataService getPpaddictUserDataService(PpaddictUserRepository users, PpaddictLinkKeyRepository linkKeys, Clock clock, BotBackend botBackend) {
+    final String osuOAuthPrefix = OsuOauth.OSU_AUTH_SERVICE_IDENTIFIER + ":";
+
     PpaddictUserDataService ppaddictUserDataService = Mockito.spy(new PpaddictUserDataService(users, linkKeys, clock));
     Mockito.doAnswer(x -> {
       String id = x.getArgument(0);
       String displayName = x.getArgument(1);
-      int osuId = Integer.parseInt(id.substring(CredentialsWithOsu.OSU_OAUTH_PREFIX.length()));
+      int osuId = Integer.parseInt(id.substring(osuOAuthPrefix.length()));
       ((tillerino.tillerinobot.TestBackend) botBackend).hintUser(displayName, false, 100000, 1000, osuId);
 
       return x.callRealMethod();
-    }).when(ppaddictUserDataService).getLinkString(Mockito.startsWith(CredentialsWithOsu.OSU_OAUTH_PREFIX), Mockito.anyString());
+    }).when(ppaddictUserDataService).getLinkString(Mockito.startsWith(osuOAuthPrefix), Mockito.anyString());
     return ppaddictUserDataService
     ;
   }

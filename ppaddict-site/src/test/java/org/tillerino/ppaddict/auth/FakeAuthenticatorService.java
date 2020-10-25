@@ -8,25 +8,18 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
-import org.tillerino.ppaddict.server.auth.AuthenticatorService;
+import org.tillerino.ppaddict.server.auth.AbstractAuthenticatorService;
 import org.tillerino.ppaddict.server.auth.Credentials;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class FakeAuthenticatorService implements AuthenticatorService {
+public class FakeAuthenticatorService extends AbstractAuthenticatorService {
 
-  @Override
-  public String getIdentifier() {
-    return "local";
+  public FakeAuthenticatorService() {
+    super("local", "Local", getMockedService());
   }
 
-  @Override
-  public String getDisplayName() {
-    return "Local";
-  }
-
-  @Override
-  public OAuthService getService() {
+  private static OAuthService getMockedService() {
     OAuthService myService = mock(OAuthService.class);
     when(myService.getAuthorizationUrl(argThat(x -> true /* match any including null */)))
         .thenReturn(FakeAuthenticatorWebsite.PATH);
@@ -37,7 +30,7 @@ public class FakeAuthenticatorService implements AuthenticatorService {
   @Override
   public Credentials createUser(HttpServletRequest req, Token requestToken) {
     Credentials credentials =
-        new Credentials("local:" + req.getParameter("username"), req.getParameter("username"));
+        new Credentials(getIdentifier() + ":" + req.getParameter("username"), req.getParameter("username"));
     return credentials;
   }
 
