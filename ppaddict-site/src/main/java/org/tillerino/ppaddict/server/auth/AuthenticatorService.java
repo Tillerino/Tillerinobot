@@ -18,5 +18,5 @@ public interface AuthenticatorService {
 
   OAuthService getService();
 
-  Credentials createUser(OAuthService service, HttpServletRequest req, Token requestToken);
+  Credentials createUser(HttpServletRequest req, Token requestToken);
 }

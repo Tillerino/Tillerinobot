@@ -35,7 +35,7 @@ public class FakeAuthenticatorService implements AuthenticatorService {
 
   @SuppressFBWarnings(value = "TQ", justification = "Producer")
   @Override
-  public Credentials createUser(OAuthService service, HttpServletRequest req, Token requestToken) {
+  public Credentials createUser(HttpServletRequest req, Token requestToken) {
     Credentials credentials =
         new Credentials("local:" + req.getParameter("username"), req.getParameter("username"));
     return credentials;

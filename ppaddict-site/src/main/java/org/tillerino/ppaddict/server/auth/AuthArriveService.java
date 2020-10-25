@@ -49,7 +49,7 @@ public class AuthArriveService extends HttpServlet {
       return;
     }
 
-    Credentials credentials = service.get().createUser(service.get().getService(), req, requestToken);
+    Credentials credentials = service.get().createUser(req, requestToken);
 
     try {
       userDataService.rememberCredentials(req, resp, credentials);

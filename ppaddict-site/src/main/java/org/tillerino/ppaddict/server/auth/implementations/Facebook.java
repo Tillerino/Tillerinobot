@@ -58,7 +58,7 @@ public class Facebook implements AuthenticatorService {
 
   @SuppressFBWarnings(value = "TQ", justification = "Producer")
   @Override
-  public Credentials createUser(OAuthService service, HttpServletRequest req, Token requestToken) {
+  public Credentials createUser(HttpServletRequest req, Token requestToken) {
     Verifier verifier = new Verifier(req.getParameter(OAuthConstants.CODE));
 
     Token accessToken = service.getAccessToken(requestToken, verifier);
