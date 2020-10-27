@@ -1,8 +1,8 @@
 package org.tillerino.ppaddict.server.auth;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,10 +31,6 @@ public class AuthLogoutService extends HttpServlet {
   }
 
   public String getLogoutURL(String returnToUrl) {
-    try {
-      return PATH + "?returnTo=" + URLEncoder.encode(returnToUrl, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    return PATH + "?returnTo=" + URLEncoder.encode(returnToUrl, StandardCharsets.UTF_8);
   }
 }

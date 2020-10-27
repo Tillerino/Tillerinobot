@@ -1,7 +1,8 @@
 package org.tillerino.ppaddict.server.auth;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,7 +23,7 @@ public class AuthArriveService extends HttpServlet {
 
   @Inject
   @AuthenticatorServices
-  Map<String, AuthenticatorService> services;
+  List<AuthenticatorService> services;
 
   @Inject
   UserDataServiceImpl userDataService;
@@ -42,9 +43,13 @@ public class AuthArriveService extends HttpServlet {
     req.getSession().removeAttribute(AUTH_REQUEST_TOKEN_SESSION_KEY);
     req.getSession().removeAttribute(AUTH_SERVICE_SESSION_KEY);
 
-    AuthenticatorService service = services.get(serviceKey);
+    Optional<AuthenticatorService> service = services.stream().filter(s -> s.getIdentifier().equals(serviceKey)).findAny();
+    if(service.isEmpty()) {
+      resp.sendError(500);
+      return;
+    }
 
-    Credentials credentials = service.createUser(service.getService(), req, requestToken);
+    Credentials credentials = service.get().createUser(req, requestToken);
 
     try {
       userDataService.rememberCredentials(req, resp, credentials);

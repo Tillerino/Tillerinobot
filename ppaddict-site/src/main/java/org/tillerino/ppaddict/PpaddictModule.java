@@ -1,12 +1,11 @@
 package org.tillerino.ppaddict;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.inject.name.Names;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.EntityManagerFilter;
 import org.tillerino.ppaddict.server.PpaddictUserDataService;
@@ -37,19 +36,19 @@ public class PpaddictModule extends ServletModule {
   @Provides
   @Singleton
   @AuthenticatorServices
-  public Map<String, AuthenticatorService> getAuthServices(@Named("ppaddict.auth.returnURL") String returnUrl) {
+  public List<AuthenticatorService> getAuthServices(@Named("ppaddict.auth.returnURL") String returnUrl) {
     return createAuthServices(returnUrl);
   }
 
-  protected Map<String, AuthenticatorService> createAuthServices(String returnUrl) {
-    LinkedHashMap<String, AuthenticatorService> map = new LinkedHashMap<>();
+  protected List<AuthenticatorService> createAuthServices(String returnUrl) {
+    List<AuthenticatorService> services = new ArrayList<>();
 
     String oauthOsuClientId = System.getenv("PPADDICT_OAUTH_OSU_CLIENT_ID");
     String oauthOsuClientSecret = System.getenv("PPADDICT_OAUTH_OSU_CLIENT_SECRET");
     if(oauthOsuClientId != null && oauthOsuClientSecret != null) {
-      map.put("osu!", new OsuOauth(returnUrl, oauthOsuClientId, oauthOsuClientSecret));
+      services.add(new OsuOauth(returnUrl, oauthOsuClientId, oauthOsuClientSecret));
     }
 
-    return map;
+    return services;
   }
 }

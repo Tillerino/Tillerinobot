@@ -13,8 +13,7 @@ import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
-import org.scribe.oauth.OAuthService;
-import org.tillerino.ppaddict.server.auth.AuthenticatorService;
+import org.tillerino.ppaddict.server.auth.AbstractAuthenticatorService;
 import org.tillerino.ppaddict.server.auth.Credentials;
 
 import com.google.gson.Gson;
@@ -22,21 +21,17 @@ import com.google.gson.Gson;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @Singleton
-public class Facebook implements AuthenticatorService {
-  final OAuthService service;
-
+public class Facebook extends AbstractAuthenticatorService {
   @Inject
   public Facebook(@Named("ppaddict.auth.returnURL") String returnURL,
       @Named("ppaddict.auth.facebook.appId") String apiKey,
       @Named("ppaddict.auth.facebook.appSecret") String apiSecret) {
-    service =
-        new ServiceBuilder().provider(FacebookApi.class).apiKey(apiKey).apiSecret(apiSecret)
-            .callback(returnURL).build();
-  }
-
-  @Override
-  public OAuthService getService() {
-    return service;
+    super("facebook", "Facebook", new ServiceBuilder()
+            .provider(FacebookApi.class)
+            .apiKey(apiKey)
+            .apiSecret(apiSecret)
+            .callback(returnURL)
+            .build());
   }
 
   Gson gson = new Gson();
@@ -48,20 +43,20 @@ public class Facebook implements AuthenticatorService {
 
   @SuppressFBWarnings(value = "TQ", justification = "Producer")
   @Override
-  public Credentials createUser(OAuthService service, HttpServletRequest req, Token requestToken) {
+  public Credentials createUser(HttpServletRequest req, Token requestToken) {
     Verifier verifier = new Verifier(req.getParameter(OAuthConstants.CODE));
 
-    Token accessToken = service.getAccessToken(requestToken, verifier);
+    Token accessToken = getService().getAccessToken(requestToken, verifier);
 
     OAuthRequest request = new OAuthRequest(Verb.GET, "https://graph.facebook.com/me");
 
-    service.signRequest(accessToken, request);
+    getService().signRequest(accessToken, request);
 
     Response response = request.send();
 
     FacebookMeBody fromJson = gson.fromJson(response.getBody(), FacebookMeBody.class);
 
-    Credentials user = new Credentials("facebook:" + fromJson.id, fromJson.name);
+    Credentials user = new Credentials(getIdentifier() + ":" + fromJson.id, fromJson.name);
 
     return user;
   }
