@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuth10aServiceImpl;
 import org.scribe.oauth.OAuthService;
+import org.tillerino.ppaddict.server.auth.implementations.OauthServiceIdentifier;
 
 @Singleton
 public class AuthLeaveService extends HttpServlet {
@@ -54,7 +55,7 @@ public class AuthLeaveService extends HttpServlet {
     resp.sendRedirect(service.getAuthorizationUrl(token));
   }
 
-  public String getURL(String serviceIdentifier, String returnTo) {
+  public String getURL(@OauthServiceIdentifier String serviceIdentifier, String returnTo) {
     return PATH + "?service=" + serviceIdentifier + "&returnTo=" + URLEncoder.encode(returnTo, StandardCharsets.UTF_8);
   }
 }

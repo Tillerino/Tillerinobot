@@ -1,12 +1,21 @@
 package org.tillerino.ppaddict.server.auth;
 
+import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.server.auth.implementations.OsuOauth;
 import org.tillerino.ppaddict.web.types.PpaddictId;
 
-public class CredentialsWithOsu extends Credentials {
-    public int osuUserId;
+import lombok.Getter;
 
-    public CredentialsWithOsu(@PpaddictId String identifier, String userName, int osuUserId) {
-        super(identifier, userName);
-        this.osuUserId = osuUserId;
-    }
+/**
+ * Intermediate credentials returned by {@link OsuOauth} when logging in.
+ */
+public class CredentialsWithOsu extends Credentials {
+  @Getter
+  @UserId
+  private final int osuUserId;
+
+  public CredentialsWithOsu(@PpaddictId String identifier, String userName, @UserId int osuUserId) {
+    super(identifier, userName);
+    this.osuUserId = osuUserId;
+  }
 }

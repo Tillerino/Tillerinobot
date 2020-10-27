@@ -26,7 +26,7 @@ public class OsuOauth extends AbstractAuthenticatorService {
   public OsuOauth(@Named("ppaddict.auth.returnURL") String returnURL,
                   @Named("ppaddict.auth.osu.clientId") String clientId,
                   @Named("ppaddict.auth.osu.clientSecret") String clientSecret) {
-    super("osu-oauth", "osu!", new ServiceBuilder()
+    super(OSU_AUTH_SERVICE_IDENTIFIER, "osu!", new ServiceBuilder()
             .provider(OsuOauthApi.class)
             .apiKey(clientId)
             .apiSecret(clientSecret)

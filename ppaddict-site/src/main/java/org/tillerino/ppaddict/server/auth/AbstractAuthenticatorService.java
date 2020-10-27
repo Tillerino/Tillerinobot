@@ -1,30 +1,15 @@
 package org.tillerino.ppaddict.server.auth;
 
 import org.scribe.oauth.OAuthService;
+import org.tillerino.ppaddict.server.auth.implementations.OauthServiceIdentifier;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public abstract class AbstractAuthenticatorService implements AuthenticatorService {
-    private final String identifier;
-    private final String displayName;
-    private final OAuthService service;
-
-    public AbstractAuthenticatorService(String identifier, String displayName, OAuthService service) {
-        this.identifier = identifier;
-        this.displayName = displayName;
-        this.service = service;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public OAuthService getService() {
-        return service;
-    }
+  private final @OauthServiceIdentifier String identifier;
+  private final String displayName;
+  private final OAuthService service;
 }
