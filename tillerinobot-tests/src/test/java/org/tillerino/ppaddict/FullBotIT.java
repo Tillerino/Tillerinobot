@@ -21,7 +21,7 @@ import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import com.rabbitmq.client.Channel;
 
 import lombok.extern.slf4j.Slf4j;
