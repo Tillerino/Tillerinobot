@@ -401,6 +401,8 @@ public class IRCBot implements GameChatEventConsumer {
 					// oh no, detected wrong mapping, mismatch between API user and IRC user
 					
 					// sets the mapping according to the API user (who doesnt belong to the current IRC user)
+					log.info("Detected mapping weirdness. Nick {}; id {}; username {}; api->irc name {}", nick, userId,
+							apiUser.getUserName(), apiUserIrcName);
 					resolver.setMapping(apiUserIrcName, apiUser.getUserId());
 					
 					// fix the now known broken mapping with the current irc user
