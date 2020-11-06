@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk14:alpine-jre
+FROM adoptopenjdk/openjdk15:alpine-jre
 
 RUN mkdir /cp
 
