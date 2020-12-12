@@ -20,8 +20,8 @@ public class LiveContainer {
 			.withExposedPorts(8080)
 			.waitingFor(Wait.forHttp("/ready").forStatusCode(200))
 			.withCreateContainerCmdModifier((Consumer<CreateContainerCmd>) cmd ->
-					cmd.withMemory(105 * 1024 * 1024L)
-							.withMemorySwap(105 * 1024 * 1024L))
+					cmd.withMemory(106 * 1024 * 1024L)
+							.withMemorySwap(106 * 1024 * 1024L))
 //			.withLogConsumer((Consumer<OutputFrame>) frame -> System.out.println(frame.getUtf8String().trim()))
 			;
 
