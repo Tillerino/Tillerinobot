@@ -105,7 +105,7 @@ public class RecommendationRequestParser {
 			Long mods = Mods.fromShortNamesContinuous(lowerCase);
 			if (mods != null) {
 				mods = Mods.fixNC(mods);
-				if (mods == (mods & Mods.getMask(Mods.DoubleTime, Mods.HardRock, Mods.Hidden))) {
+				if (mods == (mods & Mods.getMask(Mods.DoubleTime, Mods.HardRock, Mods.Hidden, Mods.HalfTime, Mods.Easy, Mods.Flashlight))) {
 					for (Mods mod : Mods.getMods(mods)) {
 						settingsBuilder.requestedMods(Mods.add(settingsBuilder.getRequestedMods(), mod));
 					}
