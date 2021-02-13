@@ -137,10 +137,13 @@ public class Main extends Composite implements HasHelpElements {
     return null;
   }
 
-  public static final int VERSION = 2;
+  public static final int VERSION = 3;
   public static final String VERSION_MESSAGE =
-      "<ul><li>AR, CS, and OD filters now support decimals. This might have messed up your saved filter settings. If your beatmap table is suddenly empty, check your AR/CS/OD settings!</li>"
-          + "<li>You can now jump directly to specific beatmaps or beatmap sets by adding ?b=beatmapid or ?s=setid to the URL.</li></ul>";
+      "You can now login with your osu! account."
+      + " At the same time, we removed the possibility to login with facebook."
+      + " If you used to log in with a facebook account which was linked your account to an osu! account, just login with the osu! account directly and all your settings and data will be right there."
+      + " Data and settings of unlinked facebook accounts are no longer available."
+      + " If you super urgently absolutely totally really need to recover your settings and data, please contact us and we'll figure something out.";
 
   @Override
   protected void onLoad() {
