@@ -15,7 +15,7 @@ import lombok.Data;
 @Entity(name = "botconfig")
 public class BotConfig {
 	@Id
-	private String key;
+	private String path;
 
 	private String value;
 }
