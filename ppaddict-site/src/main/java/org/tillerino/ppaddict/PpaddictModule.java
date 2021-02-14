@@ -19,6 +19,7 @@ import org.tillerino.ppaddict.server.auth.implementations.OsuOauth;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import com.google.inject.servlet.ServletModule;
 
 public class PpaddictModule extends ServletModule {
@@ -30,7 +31,7 @@ public class PpaddictModule extends ServletModule {
     filter("/ppaddict/*").through(EntityManagerFilter.class);
     filter("/ppaddict/*").through(RateLimiterSettingsFilter.class);
     install(new AuthModule());
-    bind(AbstractPpaddictUserDataService.class).to(PpaddictUserDataService.class);
+    bind(new TypeLiteral<AbstractPpaddictUserDataService<?>>() { }).to(PpaddictUserDataService.class);
   }
 
   @Provides
