@@ -9,6 +9,7 @@ import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
 import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
 import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
+import tillerino.tillerinobot.data.repos.BotConfigRepository;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
@@ -30,6 +31,7 @@ public class RepositoryModule extends AbstractModule {
 	private ActualBeatmapRepository beatmapFilesRepo;
 	private PpaddictUserRepository ppaddictUserRepository;
 	private PpaddictLinkKeyRepository ppaddictLinkKeyRepository;
+	private BotConfigRepository botConfigRepository;
 
 	@Provides
 	@Singleton
@@ -52,6 +54,7 @@ public class RepositoryModule extends AbstractModule {
 		beatmapFilesRepo = factory.getRepository(ActualBeatmapRepository.class);
 		ppaddictUserRepository = factory.getRepository(PpaddictUserRepository.class);
 		ppaddictLinkKeyRepository = factory.getRepository(PpaddictLinkKeyRepository.class);
+		botConfigRepository = factory.getRepository(BotConfigRepository.class);
 	}
 
 	@Provides
@@ -88,5 +91,11 @@ public class RepositoryModule extends AbstractModule {
 	@Singleton
 	public PpaddictLinkKeyRepository ppaddictLinkKeyRepository(JpaRepositoryFactory factory) {
 		return ppaddictLinkKeyRepository;
+	}
+
+	@Provides
+	@Singleton
+	public BotConfigRepository botConfigRepository(JpaRepositoryFactory factory) {
+		return botConfigRepository;
 	}
 }

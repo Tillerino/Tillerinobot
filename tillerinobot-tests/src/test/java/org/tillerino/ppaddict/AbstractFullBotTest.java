@@ -46,12 +46,13 @@ import org.slf4j.Logger;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.LiveActivity;
-import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
+import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl;
 import org.tillerino.ppaddict.chat.irc.IrcWriter;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
+import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
 import org.tillerino.ppaddict.live.LiveActivityEndpoint;
 import org.tillerino.ppaddict.rest.AuthenticationService;
@@ -64,16 +65,17 @@ import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
-import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.TestBackend;
+import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 
@@ -152,6 +154,7 @@ public abstract class AbstractFullBotTest {
             installMore();
             install(new TillerinobotConfigurationModule());
             install(new ProcessorsModule());
+            install(new CachedDatabaseConfigServiceModule());
 
             bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance(host);
             bind(Integer.class).annotatedWith(Names.named("tillerinobot.irc.port")).toInstance(port);
@@ -169,7 +172,7 @@ public abstract class AbstractFullBotTest {
             install(new MessageHandlerSchedulerModule());
             bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(4);
             bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
-            bind(AbstractPpaddictUserDataService.class).to(BarePpaddictUserDataService.class);
+            bind(new TypeLiteral<AbstractPpaddictUserDataService<?>>() { }).to(BarePpaddictUserDataService.class);
         }
         protected void installMore() {
             install(new CreateInMemoryDatabaseModule());

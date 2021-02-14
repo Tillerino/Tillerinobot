@@ -3,28 +3,28 @@ package tillerino.tillerinobot;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
+import org.tillerino.ppaddict.util.AbstractInjectingTest;
+import org.tillerino.ppaddict.util.TestModule;
 import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
 import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
 
 import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
+import tillerino.tillerinobot.data.repos.BotConfigRepository;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
@@ -34,11 +34,16 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 /**
  * Creates an embedded HSQL database for tests.
  */
-public abstract class AbstractDatabaseTest {
+@TestModule(AbstractDatabaseTest.CreateInMemoryDatabaseModule.class)
+public abstract class AbstractDatabaseTest extends AbstractInjectingTest {
 	public static class CreateInMemoryDatabaseModule extends AbstractModule {
+		EntityManagerFactory emf;
 		@Singleton
 		@Provides
 		public EntityManagerFactory newEntityManagerFactory() {
+			if (emf != null) {
+				return emf;
+			}
 			EclipseLinkJpaVendorAdapter vendorAdapter = new EclipseLinkJpaVendorAdapter();
 			vendorAdapter.setGenerateDdl(true);
 
@@ -52,7 +57,7 @@ public abstract class AbstractDatabaseTest {
 			factory.setDataSource(dataSource());
 			factory.afterPropertiesSet();
 
-			return factory.getObject();
+			return emf = factory.getObject();
 		}
 
 		protected DataSource dataSource() {
@@ -64,51 +69,38 @@ public abstract class AbstractDatabaseTest {
 			install(new RepositoryModule());
 		}
 	}
-	protected static Injector injector;
-	                 
-	protected static EntityManagerFactory emf;
-	                 
-	protected static ThreadLocalAutoCommittingEntityManager em;
-	                 
-	protected static UserNameMappingRepository userNameMappingRepo;
-	protected static GivenRecommendationRepository recommendationsRepo;
-	protected static BotUserDataRepository userDataRepository;
-	protected static ActualBeatmapRepository beatmapFilesRepo;
-	protected static PpaddictUserRepository ppaddictUserRepository;
-	protected static PpaddictLinkKeyRepository ppaddictLinkKeyRepository;
-	
-	@BeforeClass
-	public static void injectAll() {
-		injector = Guice.createInjector(new CreateInMemoryDatabaseModule());
+	@Inject
+	protected EntityManagerFactory emf;
+	@Inject
+	protected ThreadLocalAutoCommittingEntityManager em;
+	@Inject
+	protected UserNameMappingRepository userNameMappingRepo;
+	@Inject
+	protected GivenRecommendationRepository recommendationsRepo;
+	@Inject
+	protected BotUserDataRepository userDataRepository;
+	@Inject
+	protected ActualBeatmapRepository beatmapFilesRepo;
+	@Inject
+	protected PpaddictUserRepository ppaddictUserRepository;
+	@Inject
+	protected PpaddictLinkKeyRepository ppaddictLinkKeyRepository;
+	@Inject
+	protected BotConfigRepository botConfigRepository;
+	@Inject
+	protected GivenRecommendationRepository givenRecommendationRepository;
 
-		emf = injector.getInstance(EntityManagerFactory.class);
-		
-		em = injector.getInstance(ThreadLocalAutoCommittingEntityManager.class);
-		
-		userNameMappingRepo = injector.getInstance(UserNameMappingRepository.class);
-		recommendationsRepo = injector.getInstance(GivenRecommendationRepository.class);
-		userDataRepository = injector.getInstance(BotUserDataRepository.class);
-		beatmapFilesRepo = injector.getInstance(ActualBeatmapRepository.class);
-		ppaddictUserRepository = injector.getInstance(PpaddictUserRepository.class);
-		ppaddictLinkKeyRepository = injector.getInstance(PpaddictLinkKeyRepository.class);
-	}
-	
-	@AfterClass
-	public static void closeEmf() {
-		if (emf != null) {
-			emf.close();
-		}
-	}
-	
 	@Before
 	public void createEntityManager() {
 		em.setThreadLocalEntityManager(emf.createEntityManager());
 	}
-	
+
 	@After
 	public void closeEntityManager() {
 		ppaddictUserRepository.deleteAll();
 		ppaddictLinkKeyRepository.deleteAll();
+		botConfigRepository.deleteAll();
+		givenRecommendationRepository.deleteAll();
 		em.close();
 	}
 }

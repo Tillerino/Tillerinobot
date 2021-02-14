@@ -33,6 +33,7 @@ import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.LoggingUtils;
+import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
@@ -77,14 +78,14 @@ public class IRCBot implements GameChatEventConsumer {
 	private final RateLimiter rateLimiter;
 	private final GameChatResponseQueue queue;
 	private final NPHandler npHandler;
-	private final AbstractPpaddictUserDataService ppaddictUserDataService;
+	private final AbstractPpaddictUserDataService<?> ppaddictUserDataService;
 	
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
 			UserDataManager userDataManager, ThreadLocalAutoCommittingEntityManager em,
 			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
 			RateLimiter rateLimiter, LiveActivity liveActivity, GameChatResponseQueue queue,
-			AbstractPpaddictUserDataService ppaddictUserDataService) {
+			AbstractPpaddictUserDataService<?> ppaddictUserDataService) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;
 		this.em = em;
@@ -132,6 +133,9 @@ public class IRCBot implements GameChatEventConsumer {
 			}
 			if(e instanceof InterruptedException) {
 				return GameChatResponse.none();
+			}
+			if (e instanceof MaintenanceException) {
+				return new Message("I'm undergoing maintenance and can't do that right now.");
 			}
 			if(e instanceof UserException) {
 				if(e instanceof QuietException) {

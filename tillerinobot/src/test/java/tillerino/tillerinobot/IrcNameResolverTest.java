@@ -3,20 +3,21 @@ package tillerino.tillerinobot;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Before;
-import org.junit.Test;
+import javax.inject.Inject;
 
+import org.junit.Test;
+import org.tillerino.ppaddict.util.TestModule;
+
+import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+
+@TestModule({ CreateInMemoryDatabaseModule.class, TestBackend.Module.class })
 public class IrcNameResolverTest extends AbstractDatabaseTest {
+	@Inject
 	TestBackend backend;
-	
+
+	@Inject
 	IrcNameResolver resolver;
-	
-	@Before
-	public void init() {
-		backend = new TestBackend(false, new TestBackend.TestBeatmapsLoader());
-		resolver = new IrcNameResolver(userNameMappingRepo, backend);
-	}
-	
+
 	@Test
 	public void testBasic() throws Exception {
 		userNameMappingRepo.deleteAll();

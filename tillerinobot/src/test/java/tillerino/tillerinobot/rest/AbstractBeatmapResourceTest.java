@@ -3,15 +3,16 @@ package tillerino.tillerinobot.rest;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import javax.ws.rs.WebApplicationException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
@@ -23,6 +24,7 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
  * handles downloading and saving beatmaps files correctly with respect to the
  * expected hash value.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
   @Mock
   BeatmapDownloader downloader;
@@ -33,7 +35,6 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
 
   @Before
   public void init() {
-    MockitoAnnotations.initMocks(this);
     resource = new AbstractBeatmapResource(beatmapFilesRepo, downloader, beatmap) {
       @Override
       public OsuApiBeatmap get() {
@@ -50,7 +51,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
     beatmap.setBeatmapId(12);
     beatmap.setFileMd5(md5Hex(content));
     assertEquals(content, resource.getFile());
-    verifyZeroInteractions(downloader);
+    verifyNoInteractions(downloader);
   }
 
   @Test

@@ -7,19 +7,19 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import javax.inject.Inject;
 
+import org.junit.Test;
+import org.tillerino.ppaddict.util.TestModule;
+
+import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.lang.Language;
 
+@TestModule({ CreateInMemoryDatabaseModule.class, TestBackend.Module.class })
 public class UserDataManagerTest extends AbstractDatabaseTest {
+	@Inject
 	UserDataManager manager;
-
-	@Before
-	public void createManager() {
-		manager = new UserDataManager(null, emf, em, userDataRepository);
-	}
 
 	@Test
 	public void testSaveLoad() throws Exception {
@@ -43,23 +43,24 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 	@Test
 	public void testLanguageMutability() throws Exception {
 		UserDataManager manager = new UserDataManager(null, emf, em, userDataRepository);
-		UserData data = manager.getData(534678);
-		Language language = data.getLanguage();
 		List<String> answers = new ArrayList<>();
-		answers.add(language.apiTimeoutException());
-		for (;;) {
-			String answer = language.apiTimeoutException();
-			if (answer.equals(answers.get(0))) {
-				assertThat(answers).size().as("number of responses to API timeout").isGreaterThan(1);
-				break;
+		try(UserData data = manager.getData(534678)) {
+			Language language = data.getLanguage();
+			answers.add(language.apiTimeoutException());
+			for (;;) {
+				String answer = language.apiTimeoutException();
+				if (answer.equals(answers.get(0))) {
+					assertThat(answers).size().as("number of responses to API timeout").isGreaterThan(1);
+					break;
+				}
+				answers.add(answer);
 			}
-			answers.add(answer);
 		}
-		data.close();
 
 		// at this point we got the first answer again. Time go serialize, deserialize and check if we get the second answer next.
 		reloadManager();
-		data = manager.getData(534678);
-		assertThat(data.getLanguage().apiTimeoutException()).as("API timeout message after reload").isEqualTo(answers.get(1));
+		try(UserData data = manager.getData(534678)) {
+			assertThat(data.getLanguage().apiTimeoutException()).as("API timeout message after reload").isEqualTo(answers.get(1));
+		}
 	}
 }

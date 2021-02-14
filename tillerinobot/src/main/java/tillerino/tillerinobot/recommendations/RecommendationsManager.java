@@ -259,7 +259,7 @@ public class RecommendationsManager {
 
 	/**
 	 * non-hidden recommendations. These might be older than four weeks.
-	 * @returnordered by date given from newest to oldest
+	 * @return ordered by date given from newest to oldest
 	 */
 	public List<GivenRecommendation> loadVisibleRecommendations(@UserId int userId) {
 		return recommendationsRepo.findByUseridAndHiddenFalseOrderByDateDesc(userId);

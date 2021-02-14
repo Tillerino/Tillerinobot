@@ -2,16 +2,22 @@ package org.tillerino.ppaddict.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.inject.Inject;
+
 import org.junit.Test;
 import org.tillerino.ppaddict.util.TestClock;
+import org.tillerino.ppaddict.util.TestModule;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 
+@TestModule({ CreateInMemoryDatabaseModule.class, TestClock.Module.class })
 public class AbstractPpaddictUserDataServiceTest extends AbstractDatabaseTest {
-	TestClock clock = new TestClock();
+	@Inject
+	TestClock clock;
 
-	BarePpaddictUserDataService userDataService = new BarePpaddictUserDataService(ppaddictUserRepository,
-			ppaddictLinkKeyRepository, clock);
+	@Inject
+	BarePpaddictUserDataService userDataService;
 
 	@Test
 	public void testServerUserData() throws Exception {

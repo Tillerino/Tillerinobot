@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
@@ -24,14 +25,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.osuApiModel.types.UserId;
@@ -46,8 +50,11 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
+import org.tillerino.ppaddict.util.MaintenanceException;
+import org.tillerino.ppaddict.util.TestModule;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
+import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
@@ -55,6 +62,8 @@ import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
+@TestModule({ CreateInMemoryDatabaseModule.class, TestBackend.Module.class })
+@RunWith(MockitoJUnitRunner.class)
 public class IRCBotTest extends AbstractDatabaseTest {
 
 	protected PrivateAction action(String nick, String action) {
@@ -74,11 +83,13 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	RateLimiter rateLimiter = new RateLimiter();
 
-	@Spy
-	TestBackend backend = new TestBackend(false, new TestBackend.TestBeatmapsLoader());
+	@Inject
+	TestBackend backend;
 
+	@Inject
 	IrcNameResolver resolver;
 
+	@Inject
 	RecommendationsManager recommendationsManager;
 
 	@Mock
@@ -92,17 +103,10 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	GameChatResponseQueue queue;
 
 	@Mock
-	AbstractPpaddictUserDataService ppaddictUserDataService;
+	AbstractPpaddictUserDataService<?> ppaddictUserDataService;
 
 	@Before
 	public void initMocks() throws Exception {
-		MockitoAnnotations.initMocks(this);
-
-		resolver = new IrcNameResolver(userNameMappingRepo, backend);
-
-		recommendationsManager = spy(new RecommendationsManager(backend, recommendationsRepo, em,
-				new RecommendationRequestParser(backend), backend.loader));
-
 		makeQueuePrint();
 	}
 
@@ -119,6 +123,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	IRCBot getTestBot(BotBackend backend) {
 		RecommendationsManager recMan;
 		if (backend == this.backend) {
+			if (!Mockito.mockingDetails(this.recommendationsManager).isSpy()) {
+				this.recommendationsManager = spy(recommendationsManager);
+			}
 			recMan = this.recommendationsManager;
 		} else {
 			recMan = spy(new RecommendationsManager(backend, recommendationsRepo, em,
@@ -341,11 +348,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		assertEquals(1, (int) bot.getUserOrThrow("user1_old").getUserId());
 
 		// meanwhile, user 1 changed her name
-		when(backend.downloadUser("user1_new")).thenReturn(user(1, "user1 new"));
 		when(backend.getUser(eq(1), anyLong())).thenReturn(user(1, "user1 new"));
 		// and user 2 hijacked her old name
 		when(backend.downloadUser("user1_old")).thenReturn(user(2, "user1 old"));
-		when(backend.getUser(eq(2), anyLong())).thenReturn(user(2, "user1 new"));
 
 		assertEquals(2, (int) bot.getUserOrThrow("user1_old").getUserId());
 		assertEquals(1, (int) bot.getUserOrThrow("user1_new").getUserId());
@@ -370,6 +375,15 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		backend.hintUser("user", false, 1000, 1000);
 		turnOffVersionMessage();
 		verifyResponse(bot, action("user", "is listening to [https://osu.ppy.sh/b/125 map]"), successContaining("pp"));
+	}
+
+	@Test
+	public void maintenance() throws Exception {
+		IRCBot bot = getTestBot(backend);
+		doThrow(MaintenanceException.class).when(backend).loadRecommendations(anyInt(), any(), any(), anyBoolean(), anyLong());
+		backend.hintUser("user", false, 1000, 1000);
+		turnOffVersionMessage();
+		verifyResponse(bot, message("user", "!r"), messageContaining("maintenance"));
 	}
 
 	OsuApiUser user(@UserId int id, @OsuName String name) {

@@ -50,6 +50,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +92,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 	protected void installMore() {
 		// should not be done when in ppaddict
-		bind(AbstractPpaddictUserDataService.class).to(BarePpaddictUserDataService.class);
+		bind(new TypeLiteral<AbstractPpaddictUserDataService<?>>() { }).to(BarePpaddictUserDataService.class);
 	}
 
 	protected Clock createClock() {

@@ -1,5 +1,7 @@
 package tillerino.tillerinobot;
 
+import static org.mockito.Mockito.spy;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -24,13 +26,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.mockito.Mockito;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.util.ResettableModule;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
 import lombok.Getter;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
@@ -133,7 +139,7 @@ public class TestBackend implements BotBackend {
 		}
 	}
 
-	public static Database database = new Database();
+	private static Database database = new Database();
 
 	@Override
 	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
@@ -335,6 +341,37 @@ public class TestBackend implements BotBackend {
 				}
 			}
 			return beatmap;
+		}
+	}
+
+	public static class Module extends AbstractModule implements ResettableModule {
+		private TestBackend backend;
+
+		@Override
+		protected void configure() {
+			bind(BotBackend.class).to(TestBackend.class);
+		}
+
+		@Provides
+		@Singleton
+		public TestBackend testBackend(BeatmapsLoader loader) {
+			return backend = spy(new TestBackend(false, loader));
+		}
+
+		@Provides
+		@Singleton
+		public BeatmapsLoader loader() {
+			return createLoader();
+		}
+
+		protected BeatmapsLoader createLoader() {
+			return new TestBackend.TestBeatmapsLoader();
+		}
+
+		@Override
+		public void reset() throws Exception {
+			database = new Database();
+			Mockito.reset(backend);
 		}
 	}
 }
