@@ -43,7 +43,7 @@ public class MemoryIT {
 	private final int numberOfClients = 100;
 
 	// turn this up for real testing
-	private final int messages = 1000;
+	private final int messages = 10000;
 
 	int chunkSize = 100;
 
