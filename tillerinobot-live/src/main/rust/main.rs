@@ -1,20 +1,21 @@
 #![feature(drain_filter)]
 
+#[macro_use]
+extern crate lazy_static;
+
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread::spawn;
 
 use lapin::{Connection, ConnectionProperties, Consumer, ExchangeKind, message::Delivery, options::*, Result, types::FieldTable};
-use lapinou::LapinSmolExt;
 use rand::{ChaChaRng, FromEntropy, RngCore};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use sha2::Digest;
-use smol::{prelude::*, Task};
+use tokio_amqp::LapinTokioExt;
 use tungstenite::{error::Error::SendQueueFull, Message, protocol::WebSocketConfig, server::accept_with_config, WebSocket};
-use tungstenite::server::accept_hdr_with_config;
-use tungstenite::handshake::server::{Callback, Response, Request, ErrorResponse};
-use tungstenite::http::StatusCode;
+
+use futures_util::stream::StreamExt;
 
 struct Conn {
     web: WebSocket<TcpStream>,
@@ -36,69 +37,57 @@ enum FrontendMessage {
     #[serde(rename="messageDetails")] MessageDetails { #[serde(rename="eventId")] event_id: u64, message: String }
 }
 
-struct HeaderFilter {
 
-}
-
-impl Callback for HeaderFilter {
-    fn on_request(self, request: &Request, response: Response) -> std::result::Result<Response, ErrorResponse> {
-        println!("{}", request.uri().path());
-        let result1 = Response::builder().status(StatusCode::OK).body(()).unwrap();
-
-        match request.uri().path() {
-            "/live" => // this sends a 200 and aborts the websocket handshake
-                Ok(result1),
-            _ => Ok(response)
-        }
-    }
+lazy_static! {
+    static ref CONNECTIONS: Mutex<Vec<Conn>> = Mutex::new(vec![]);
 }
 
 static WEBSOCKET_CONFIG: WebSocketConfig = WebSocketConfig { max_send_queue: None, max_message_size: None, max_frame_size: Some(1000), accept_unmasked_frames: false };
 
-fn main() {
-    let connections: Arc<Mutex<Vec<Conn>>> = Arc::new(Mutex::new(vec![]));
+#[tokio::main]
+async fn main() -> Result<()> {
 
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
 
-    run_rabbit(Arc::clone(&connections)).detach();
+    tokio::spawn(run_rabbit());
 
     let server = TcpListener::bind("0.0.0.0:8080").unwrap();
     let rnd = Arc::new(Mutex::new(ChaChaRng::from_entropy()));
     for stream in server.incoming() {
-        let c2 = Arc::clone(&connections);
         let r = Arc::clone(&rnd);
         spawn(move || {
-            let web = accept_hdr_with_config(stream.unwrap(), HeaderFilter { }, Some(WEBSOCKET_CONFIG)).unwrap();
+            let web = accept_with_config(stream.unwrap(), Some(WEBSOCKET_CONFIG)).unwrap();
 
             let salt = {
                 let mut rnd = r.lock().unwrap();
                 rnd.next_u64()
             };
 
-            let mut all = c2.lock().unwrap();
+            let mut all = CONNECTIONS.lock().unwrap();
             all.push(Conn { web, salt })
         });
     }
+    Ok(())
 }
 
-fn run_rabbit(c3: Arc<Mutex<Vec<Conn>>>) -> Task<()> {
-    smol::spawn(async move {
-        loop {
-            match consume(c3.clone()).await {
-                Ok(_) => println!("rabbit body succeeded. what the hell?"),
-                Err(e) => println!("Rabbit error: {}", e)
-            }
+async fn run_rabbit() {
+    loop {
+        match consume().await {
+            Ok(_) => println!("rabbit body succeeded. what the hell?"),
+            Err(e) => println!("Rabbit error: {}", e)
         }
-    })
+    }
 }
 
 async fn connect() -> Result<Consumer> {
-    let addr = std::env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://rabbitmq:5672/%2f".into());
+    let rabbit_host = std::env::var("RABBIT_HOST").unwrap_or_else(|_| "rabbitmq".into());
+    let rabbit_port: u16 = std::env::var("RABBIT_PORT").ok().and_then(|s| str::parse(s.as_str()).ok()).unwrap_or(5672);
+    let addr = format!("amqp://{}:{}/%2f", rabbit_host, rabbit_port);
 
     println!("Connecting to {}", addr);
-    let conn = Connection::connect(&addr, ConnectionProperties::default().with_smol()).await?;
+    let conn = Connection::connect(&addr, ConnectionProperties::default().with_tokio()).await?;
     println!("Connected to {}", addr);
     let channel_a = conn.create_channel().await?;
 
@@ -108,26 +97,26 @@ async fn connect() -> Result<Consumer> {
     let q = channel_a.queue_declare("", options, FieldTable::default()).await?;
     channel_a.queue_bind(q.name().as_str(), "live-activity", "", QueueBindOptions::default(), FieldTable::default()).await?;
 
-    channel_a.basic_consume(q.name().as_str(), "live-activity", BasicConsumeOptions::default(), FieldTable::default()).await
+    channel_a.basic_consume(q.name().as_str(), "live-activity", BasicConsumeOptions { no_local: false, no_ack: false, exclusive: false, nowait: false }, FieldTable::default()).await
 }
 
-async fn consume(c3: Arc<Mutex<Vec<Conn>>>) -> Result<()> {
+async fn consume() -> Result<()> {
     let mut consumer = connect().await?;
     println!("Listening to events");
     while let Some(Ok((_, delivery))) = consumer.next().await {
         delivery.ack(BasicAckOptions::default()).await?;
-        if let Err(e) = consume_single(c3.clone(), delivery) {
+        if let Err(e) = consume_single(delivery) {
             println!("Error consuming event: {}", e);
         }
     }
     Ok(())
 }
 
-fn consume_single(c3: Arc<Mutex<Vec<Conn>>>, delivery: Delivery) -> Result<()> {
+fn consume_single(delivery: Delivery) -> Result<()> {
     let s: serde_json::Result<LiveActivityMessage>  = serde_json::from_slice(delivery.data.as_ref());
     match s {
         Ok(str) => {
-            c3.lock().unwrap().drain_filter(|c| {
+            CONNECTIONS.lock().unwrap().drain_filter(|c| {
                 match c.web.write_message(Message::text(serde_json::to_string(&convert_message(&c, &str)).unwrap())) {
                     Ok(_) => false,
                     Err(SendQueueFull(_)) => false,
