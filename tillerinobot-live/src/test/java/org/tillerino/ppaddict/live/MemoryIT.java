@@ -97,7 +97,7 @@ public class MemoryIT {
 				source.propagateReceivedMessage("yoosr", i + j);
 			}
 			for (int j = 0; j < chunkSize; j++) {
-				String expected = "\"received\" : {\n    \"eventId\" : " + (i + j) + ",";
+				String expected = "\"received\":{\"eventId\":" + (i + j) + ",";
 				for (CollectingWebSocketClient client: clients) {
 					String msg = client.messages.poll(1, TimeUnit.SECONDS);
 					assertThat(msg).contains(expected);

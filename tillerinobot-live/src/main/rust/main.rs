@@ -3,22 +3,23 @@
 #[macro_use]
 extern crate lazy_static;
 
-use std::sync::{Mutex};
+use std::sync::Mutex;
 
-use lapin::{Connection, ConnectionProperties, Consumer, ExchangeKind, message::Delivery, options::*, types::FieldTable};
+use futures_util::FutureExt;
+use futures_util::stream::StreamExt;
+use lapin::{ChannelStatus, Connection, ConnectionProperties, Consumer, ExchangeKind, message::Delivery, options::*, types::FieldTable, ChannelState};
 use rand::{ChaChaRng, FromEntropy, RngCore};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use sha2::Digest;
-use tokio_amqp::LapinTokioExt;
-use warp::filters::ws::{Message};
-use tokio_stream::wrappers::ReceiverStream;
-
-use futures_util::stream::StreamExt;
-use futures_util::FutureExt;
-use warp::{Filter};
 use tokio::sync::mpsc;
-use tokio::sync::mpsc::error::{TrySendError};
+use tokio::sync::mpsc::error::TrySendError;
+use tokio_amqp::LapinTokioExt;
+use tokio_stream::wrappers::ReceiverStream;
+use warp::Filter;
+use warp::filters::ws::Message;
+use std::net::Shutdown::Read;
+use warp::http::StatusCode;
 
 struct Conn {
     web: mpsc::Sender<Result<Message, warp::Error>>,
@@ -44,6 +45,7 @@ enum FrontendMessage {
 lazy_static! {
     static ref CONNECTIONS: Mutex<Vec<Conn>> = Mutex::new(vec![]);
     static ref RND: Mutex<ChaChaRng> = Mutex::new(ChaChaRng::from_entropy());
+    static ref READY: Mutex<ChannelStatus> = Mutex::default();
 }
 
 #[tokio::main]
@@ -55,7 +57,7 @@ async fn main() {
 
     tokio::spawn(run_rabbit());
 
-    let routes = warp::path("echo")
+    let websocket = warp::path!("live" / "v0")
         .and(warp::ws())
         .map(|ws: warp::ws::Ws| {
             ws.max_send_queue(100).on_upgrade(|web| async {
@@ -80,7 +82,23 @@ async fn main() {
             })
         });
 
-    warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
+    let liveness = warp::get()
+        .and(warp::path!("live"))
+        .map(|| {
+            "live\n"
+        });
+
+    let readiness = warp::get()
+        .and(warp::path!("ready"))
+        .map(|| {
+            if (READY.lock().unwrap().connected()) {
+                warp::reply::with_status("ready\n", StatusCode::OK)
+            } else {
+                warp::reply::with_status("not ready\n", StatusCode::NOT_FOUND)
+            }
+        });
+
+    warp::serve(websocket.or(liveness).or(readiness)).run(([0, 0, 0, 0], 8080)).await;
 }
 
 async fn run_rabbit() {
@@ -101,6 +119,10 @@ async fn connect() -> lapin::Result<Consumer> {
     let conn = Connection::connect(&addr, ConnectionProperties::default().with_tokio()).await?;
     println!("Connected to {}", addr);
     let channel_a = conn.create_channel().await?;
+    {
+        let mut r = READY.lock().unwrap();
+        *r = channel_a.status().clone();
+    }
 
     channel_a.exchange_declare("live-activity", ExchangeKind::Fanout, ExchangeDeclareOptions::default(), FieldTable::default()).await?;
 
