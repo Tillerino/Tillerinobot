@@ -3,22 +3,25 @@
 #[macro_use]
 extern crate lazy_static;
 
-use std::net::{TcpListener, TcpStream};
-use std::sync::{Arc, Mutex};
-use std::thread::spawn;
+use std::sync::{Mutex};
 
-use lapin::{Connection, ConnectionProperties, Consumer, ExchangeKind, message::Delivery, options::*, Result, types::FieldTable};
+use lapin::{Connection, ConnectionProperties, Consumer, ExchangeKind, message::Delivery, options::*, types::FieldTable};
 use rand::{ChaChaRng, FromEntropy, RngCore};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use sha2::Digest;
 use tokio_amqp::LapinTokioExt;
-use tungstenite::{error::Error::SendQueueFull, Message, protocol::WebSocketConfig, server::accept_with_config, WebSocket};
+use warp::filters::ws::{Message};
+use tokio_stream::wrappers::ReceiverStream;
 
 use futures_util::stream::StreamExt;
+use futures_util::FutureExt;
+use warp::{Filter};
+use tokio::sync::mpsc;
+use tokio::sync::mpsc::error::{TrySendError};
 
 struct Conn {
-    web: WebSocket<TcpStream>,
+    web: mpsc::Sender<Result<Message, warp::Error>>,
     salt: u64,
 }
 
@@ -40,12 +43,11 @@ enum FrontendMessage {
 
 lazy_static! {
     static ref CONNECTIONS: Mutex<Vec<Conn>> = Mutex::new(vec![]);
+    static ref RND: Mutex<ChaChaRng> = Mutex::new(ChaChaRng::from_entropy());
 }
 
-static WEBSOCKET_CONFIG: WebSocketConfig = WebSocketConfig { max_send_queue: None, max_message_size: None, max_frame_size: Some(1000), accept_unmasked_frames: false };
-
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
 
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
@@ -53,23 +55,32 @@ async fn main() -> Result<()> {
 
     tokio::spawn(run_rabbit());
 
-    let server = TcpListener::bind("0.0.0.0:8080").unwrap();
-    let rnd = Arc::new(Mutex::new(ChaChaRng::from_entropy()));
-    for stream in server.incoming() {
-        let r = Arc::clone(&rnd);
-        spawn(move || {
-            let web = accept_with_config(stream.unwrap(), Some(WEBSOCKET_CONFIG)).unwrap();
+    let routes = warp::path("echo")
+        .and(warp::ws())
+        .map(|ws: warp::ws::Ws| {
+            ws.max_send_queue(100).on_upgrade(|web| async {
+                // Just echo all messages back...
+                let (sink, _) = web.split();
+                let salt = {
+                    let mut rnd = RND.lock().unwrap();
+                    rnd.next_u64()
+                };
 
-            let salt = {
-                let mut rnd = r.lock().unwrap();
-                rnd.next_u64()
-            };
+                let mut all = CONNECTIONS.lock().unwrap();
 
-            let mut all = CONNECTIONS.lock().unwrap();
-            all.push(Conn { web, salt })
+                let (tx, rx) = mpsc::channel(100);
+                let rx = ReceiverStream::new(rx);
+                tokio::task::spawn(rx.forward(sink).map(|result| {
+                    if let Err(e) = result {
+                        eprintln!("websocket send error: {}", e);
+                    }
+                }));
+
+                all.push(Conn { web: tx, salt })
+            })
         });
-    }
-    Ok(())
+
+    warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
 }
 
 async fn run_rabbit() {
@@ -81,7 +92,7 @@ async fn run_rabbit() {
     }
 }
 
-async fn connect() -> Result<Consumer> {
+async fn connect() -> lapin::Result<Consumer> {
     let rabbit_host = std::env::var("RABBIT_HOST").unwrap_or_else(|_| "rabbitmq".into());
     let rabbit_port: u16 = std::env::var("RABBIT_PORT").ok().and_then(|s| str::parse(s.as_str()).ok()).unwrap_or(5672);
     let addr = format!("amqp://{}:{}/%2f", rabbit_host, rabbit_port);
@@ -100,7 +111,7 @@ async fn connect() -> Result<Consumer> {
     channel_a.basic_consume(q.name().as_str(), "live-activity", BasicConsumeOptions { no_local: false, no_ack: false, exclusive: false, nowait: false }, FieldTable::default()).await
 }
 
-async fn consume() -> Result<()> {
+async fn consume() -> lapin::Result<()> {
     let mut consumer = connect().await?;
     println!("Listening to events");
     while let Some(Ok((_, delivery))) = consumer.next().await {
@@ -112,15 +123,15 @@ async fn consume() -> Result<()> {
     Ok(())
 }
 
-fn consume_single(delivery: Delivery) -> Result<()> {
+fn consume_single(delivery: Delivery) -> lapin::Result<()> {
     let s: serde_json::Result<LiveActivityMessage>  = serde_json::from_slice(delivery.data.as_ref());
     match s {
         Ok(str) => {
             CONNECTIONS.lock().unwrap().drain_filter(|c| {
-                match c.web.write_message(Message::text(serde_json::to_string(&convert_message(&c, &str)).unwrap())) {
+                match c.web.try_send(Ok(Message::text(serde_json::to_string(&convert_message(&c, &str)).unwrap()))) {
                     Ok(_) => false,
-                    Err(SendQueueFull(_)) => false,
-                    Err(_) => { println!("Dropping connection {}", c.salt); true }
+                    Err(TrySendError::Full(_)) => false,
+                    Err(TrySendError::Closed(_)) => { println!("Dropping connection {}", c.salt); true }
                 }
             });
             Ok(())
