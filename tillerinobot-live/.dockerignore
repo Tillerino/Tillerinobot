@@ -1,0 +1,6 @@
+**
+
+!/src/main/rust
+!/target/release/main
+!/Cargo.*
+!/rust-toolchain

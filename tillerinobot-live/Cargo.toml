@@ -1,0 +1,23 @@
+[package]
+name = "ppaddict_live"
+# We're getting the version from the first line of CHANGELOG.md to keep the Cargo.toml file constant.
+# This allows us to cache the building of dependencies in our Docker images.
+# i.e. don't change this version
+version = "0.1.0"
+authors = ["Tillerino <tillmann.gaida@gmail.com>"]
+edition = '2018'
+
+[dependencies]
+tungstenite = { version = "0.13", default-features = false }
+lapinou = { version = "1.1", default-features = false }
+lapin = { version = "1.1", default-features = false }
+smol = { version = "1.2", default-features = false }
+serde_derive = { version = "1.0" }
+serde_json = { version = "1.0" }
+serde = { version = "1.0" }
+sha2 = "0.9"
+rand = "0.5"
+
+[[bin]]
+name = "main"
+path = "src/main/rust/main.rs"

@@ -1,17 +1,26 @@
-FROM adoptopenjdk/openjdk15:alpine-jre
+# BUILD
+FROM rust:1.50-alpine
 
-RUN mkdir /cp
+# we need to install one library on alpine
+RUN apk add --no-cache musl-dev
 
-ADD target/dependency/*.jar /cp/
-ADD target/live.jar /cp/live.jar
+WORKDIR /build/
 
-# -XX:-TieredCompilation switches off tiered compilation. While this _sounds_ bad, it's actually quite handy for us.
-# It simply means that there are no intermediate compilations. We _skip_ the intermediate tiers.
-# The result is far less code cache usage and fewer compiler threads :)
+# selection in .dockerignore
+ADD . .
 
-# For debugging the memory usage, you can try the option -XX:NativeMemoryTracking=summary (use the non-alpine image)
-# and then run the command docker exec $CONTAINER_ID jcmd $PID VM.native_memory summary
+RUN (ls target/release/main && echo "already built") || cargo build --release
 
-CMD java -XX:+PrintFlagsFinal -XX:+UseSerialGC -verbose:gc -XX:-TieredCompilation -XX:MetaspaceSize=22M -XX:MaxMetaspaceSize=22M -XX:CompressedClassSpaceSize=3M -Xms32M -Xmx32M -Xss256k -Djdk.nio.maxCachedBufferSize=0 -cp "/cp/*" org.tillerino.ppaddict.live.LiveMain
+# RUN
+# curl image is based on alpine, so we're compatible
+FROM curlimages/curl
 
-EXPOSE 8080
+USER root
+RUN apk add --no-cache musl-dev
+USER curl_user
+
+COPY --from=0 /build/target/release/main .
+
+CMD [ "./main" ]
+
+EXPOSE 9001
