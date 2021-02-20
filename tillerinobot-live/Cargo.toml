@@ -16,10 +16,12 @@ serde_derive = { version = "1.0" }
 serde_json = { version = "1.0" }
 serde = { version = "1.0" }
 sha2 = "0.9"
-rand = "0.5"
+rand_chacha = "0.3"
+rand_core = "0.6"
 lazy_static = "1.4"
 futures-util = "0.3"
 warp = { version = "0.3", default-features = false, features = [ "websocket" ] }
+futures-macro = { version = "0.3" }
 
 [[bin]]
 name = "main"
