@@ -81,11 +81,11 @@ fn consume_single(delivery: Delivery) -> serde_json::Result<()> {
     let str: RabbitMessage = serde_json::from_slice(delivery.data.as_ref())?;
 
     // remove broken connections while iterating
-    CONNECTIONS.lock().unwrap().drain_filter(|c| {
+    CONNECTIONS.lock().unwrap().retain(|c| {
         match c.web.try_send(Ok(Message::text(serde_json::to_string(&convert_message(&c, &str)).unwrap()))) {
-            Ok(_) => false,
-            Err(TrySendError::Full(_)) => false, // keep the connection for now
-            Err(TrySendError::Closed(_)) => { println!("Dropping connection {}", c.salt); true }
+            Ok(_) => true,
+            Err(TrySendError::Full(_)) => true, // keep the connection for now
+            Err(TrySendError::Closed(_)) => { println!("Dropping connection {}", c.salt); false }
         }
     });
 

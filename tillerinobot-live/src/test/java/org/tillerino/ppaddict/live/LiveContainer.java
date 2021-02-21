@@ -25,8 +25,7 @@ public class LiveContainer {
 			.withFileFromPath("Dockerfile", Paths.get("../tillerinobot-live/Dockerfile"))
 			.withFileFromPath("src/main/rust", Paths.get("../tillerinobot-live/src/main/rust"))
 			.withFileFromPath("Cargo.toml", Paths.get("../tillerinobot-live/Cargo.toml"))
-			.withFileFromPath("Cargo.lock", Paths.get("../tillerinobot-live/Cargo.lock"))
-			.withFileFromPath("rust-toolchain", Paths.get("../tillerinobot-live/rust-toolchain")))
+			.withFileFromPath("Cargo.lock", Paths.get("../tillerinobot-live/Cargo.lock")))
 			// accesing this static variable will make sure that RabbitMQ is started
 			.withNetwork(NETWORK)
 			.withExposedPorts(8080)
