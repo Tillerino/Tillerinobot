@@ -17,16 +17,52 @@ lazy_static! {
 #[derive(Deserialize, Debug)]
 #[serde(tag = "@type")]
 pub enum RabbitMessage {
-    #[serde(rename="RECEIVED")] Received { #[serde(rename="eventId")] event_id: u64, #[serde(rename="ircUserName")] irc_user_name: String },
-    #[serde(rename="SENT")] Sent { #[serde(rename="eventId")] event_id: u64, #[serde(rename="ircUserName")] irc_user_name: String, ping: Option<i32> },
-    #[serde(rename="RECEIVED_DETAILS")] ReceivedDetails { #[serde(rename="eventId")] event_id: u64, text: String }
+    #[serde(rename="RECEIVED")]
+    Received {
+        #[serde(rename="eventId")]
+        event_id: u64,
+        #[serde(rename="ircUserName")]
+        irc_user_name: String
+    },
+    #[serde(rename="SENT")]
+    Sent {
+        #[serde(rename="eventId")]
+        event_id: u64,
+        #[serde(rename="ircUserName")]
+        irc_user_name: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        ping: Option<i32>
+    },
+    #[serde(rename="RECEIVED_DETAILS")]
+    ReceivedDetails {
+        #[serde(rename="eventId")]
+        event_id: u64,
+        text: String
+    }
 }
 
 #[derive(Serialize, Debug)]
 enum FrontendMessage {
-    #[serde(rename="received")] Received { #[serde(rename="eventId")] event_id: u64, user: i32 },
-    #[serde(rename="sent")] Sent { #[serde(rename="eventId")] event_id: u64, user: i32, ping: Option<i32> },
-    #[serde(rename="messageDetails")] MessageDetails { #[serde(rename="eventId")] event_id: u64, message: String }
+    #[serde(rename="received")]
+    Received {
+        #[serde(rename="eventId")]
+        event_id: u64,
+        user: i32
+    },
+    #[serde(rename="sent")]
+    Sent {
+        #[serde(rename="eventId")]
+        event_id: u64,
+        user: i32,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        ping: Option<i32>
+    },
+    #[serde(rename="messageDetails")]
+    MessageDetails {
+        #[serde(rename="eventId")]
+        event_id: u64,
+        message: String
+    }
 }
 
 pub(crate) async fn run_rabbit() {

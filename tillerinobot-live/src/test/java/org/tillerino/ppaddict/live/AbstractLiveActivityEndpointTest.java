@@ -1,7 +1,5 @@
 package org.tillerino.ppaddict.live;
 
-import static org.tillerino.ppaddict.live.LiveActivityEndpoint.anonymizeHashCode;
-
 import java.net.URI;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -49,8 +47,6 @@ public abstract class AbstractLiveActivityEndpointTest {
 
 	abstract protected String host();
 
-	abstract protected LiveActivityEndpoint impl();
-
 	abstract protected LiveActivity push();
 
 	@Before
@@ -77,23 +73,23 @@ public abstract class AbstractLiveActivityEndpointTest {
 	@Test
 	public void testPropagateMessageReceived() {
 		push().propagateReceivedMessage("user", 15);
-		Mockito.verify(client, Mockito.timeout(1000)).message("{\n" +
-				"  \"received\" : {\n" +
-				"    \"eventId\" : 15,\n" +
-				"    \"user\" : " + anonymizeHashCode("user", impl().getSessions().iterator().next()) + "\n" +
-				"  }\n" +
-				"}");
+		Mockito.verify(client, Mockito.timeout(1000)).message(Mockito.argThat(s -> s.matches("\\{" +
+				"\"received\":\\{" +
+				"\"eventId\":15," +
+				"\"user\":(-?\\d+)" +
+				"\\}" +
+				"\\}")));
 	}
 
 	@Test
 	public void testPropagateMessageSent() {
 		push().propagateSentMessage("user", 15);
-		Mockito.verify(client, Mockito.timeout(1000)).message("{\n" +
-				"  \"sent\" : {\n" +
-				"    \"eventId\" : 15,\n" +
-				"    \"user\" : " + anonymizeHashCode("user", impl().getSessions().iterator().next()) + "\n" +
-				"  }\n" +
-				"}");
+		Mockito.verify(client, Mockito.timeout(1000)).message(Mockito.argThat(s -> s.matches("\\{" +
+				"\"sent\":\\{" +
+				"\"eventId\":15," +
+				"\"user\":(-?\\d+)" +
+				"\\}" +
+				"\\}")));
 	}
 
 	@Test
@@ -101,23 +97,23 @@ public abstract class AbstractLiveActivityEndpointTest {
 		try (MdcAttributes with = MdcUtils.with(MdcUtils.MDC_PING, 12345)) {
 			push().propagateSentMessage("user", 15);
 		}
-		Mockito.verify(client, Mockito.timeout(1000)).message("{\n" +
-				"  \"sent\" : {\n" +
-				"    \"eventId\" : 15,\n" +
-				"    \"user\" : " + anonymizeHashCode("user", impl().getSessions().iterator().next()) + ",\n" +
-				"    \"ping\" : 12345\n" +
-				"  }\n" +
-				"}");
+		Mockito.verify(client, Mockito.timeout(1000)).message(Mockito.argThat(s -> s.matches("\\{" +
+				"\"sent\":\\{" +
+				"\"eventId\":15," +
+				"\"user\":(-?\\d+)," +
+				"\"ping\":12345" +
+				"\\}" +
+				"\\}")));
 	}
 
 	@Test
 	public void testPropagateMessageDetails() {
 		push().propagateMessageDetails(15, "!r");
-		Mockito.verify(client, Mockito.timeout(1000)).message("{\n" +
-				"  \"messageDetails\" : {\n" +
-				"    \"eventId\" : 15,\n" +
-				"    \"message\" : \"!r\"\n" +
-				"  }\n" +
+		Mockito.verify(client, Mockito.timeout(1000)).message("{" +
+				"\"messageDetails\":{" +
+				"\"eventId\":15," +
+				"\"message\":\"!r\"" +
+				"}" +
 				"}");
 	}
 
@@ -129,6 +125,5 @@ public abstract class AbstractLiveActivityEndpointTest {
 
 	private void waitForConnectionEstablished() {
 		Mockito.verify(client, Mockito.timeout(1000)).connect(ArgumentMatchers.any());
-		Awaitility.await().until(() -> !impl().getSessions().isEmpty());
 	}
 }

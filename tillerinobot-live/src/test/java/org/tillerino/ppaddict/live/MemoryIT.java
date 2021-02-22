@@ -43,9 +43,11 @@ public class MemoryIT {
 	private final int numberOfClients = 100;
 
 	// turn this up for real testing
-	private final int messages = 10000;
+	private final int messages = 1000;
 
 	int chunkSize = 100;
+
+	int readerBufferSize = 100;
 
 	private final List<WebSocketClient> webSocketClients = IntStream.range(0, numberOfClients)
 			.mapToObj(x -> new WebSocketClient())
@@ -53,7 +55,7 @@ public class MemoryIT {
 
 	@WebSocket
 	public class CollectingWebSocketClient {
-		BlockingQueue<String> messages = new ArrayBlockingQueue<>(2 * chunkSize);
+		BlockingQueue<String> messages = new ArrayBlockingQueue<>(readerBufferSize);
 		@OnWebSocketMessage
 		public void message(String text) throws InterruptedException {
 			messages.put(text);
@@ -93,9 +95,11 @@ public class MemoryIT {
 	public void throughput() throws InterruptedException {
 		for (int i = 0; i < messages; i += chunkSize) {
 			long start = System.currentTimeMillis();
+			System.out.print("s...\t");
 			for (int j = 0; j < chunkSize; j++) {
 				source.propagateReceivedMessage("yoosr", i + j);
 			}
+			System.out.print("s!\t");
 			for (int j = 0; j < chunkSize; j++) {
 				String expected = "\"received\":{\"eventId\":" + (i + j) + ",";
 				for (CollectingWebSocketClient client: clients) {

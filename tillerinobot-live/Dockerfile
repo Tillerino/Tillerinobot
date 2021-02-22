@@ -23,4 +23,4 @@ COPY --from=0 /build/target/release/main .
 
 CMD [ "./main" ]
 
-EXPOSE 9001
+EXPOSE 8080

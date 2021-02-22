@@ -69,7 +69,7 @@ public class FullBotIT extends AbstractFullBotTest {
 
 	@Override
 	protected String getWsUrl(Injector injector) throws DeploymentException {
-		return "ws://" + DOCKER_HOST + ":" + getLive().getMappedPort(8080) + "/live/v0";
+		return "ws://" + getLive().getContainerIpAddress() + ":" + getLive().getMappedPort(8080) + "/live/v0";
 	}
 
 	@Override

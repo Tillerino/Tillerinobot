@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -18,6 +19,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -43,6 +45,7 @@ import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.slf4j.Logger;
+import org.testcontainers.containers.RabbitMQContainer;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.LiveActivity;
@@ -54,7 +57,8 @@ import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
-import org.tillerino.ppaddict.live.LiveActivityEndpoint;
+import org.tillerino.ppaddict.live.RabbitMqContainer;
+import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestAppender;
@@ -67,6 +71,8 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConnectionFactory;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
@@ -174,9 +180,18 @@ public abstract class AbstractFullBotTest {
             bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
             bind(new TypeLiteral<AbstractPpaddictUserDataService<?>>() { }).to(BarePpaddictUserDataService.class);
         }
+
         protected void installMore() {
             install(new CreateInMemoryDatabaseModule());
-            bind(LiveActivity.class).to(LiveActivityEndpoint.class);
+            try {
+                RabbitMQContainer rabbit = RabbitMqContainer.getRabbitMq();
+                ConnectionFactory connectionFactory = RabbitMqConfiguration
+                        .connectionFactory(rabbit.getContainerIpAddress(), rabbit.getMappedPort(5672));
+                Channel channel = connectionFactory.newConnection().createChannel();
+                bind(LiveActivity.class).toInstance(RabbitMqConfiguration.liveActivity(channel));
+            } catch (IOException | TimeoutException e) {
+                throw new RuntimeException(e);
+            }
             install(new InMemoryQueuesModule());
         }
 
@@ -202,7 +217,7 @@ public abstract class AbstractFullBotTest {
     private ExecutorService coreWorkerPool;
 
     @Rule
-  	public final LogRule logRule = TestAppender.rule();
+    public final LogRule logRule = TestAppender.rule();
 
     private final AtomicInteger recommendationCount = new AtomicInteger();
     protected final List<Future<?>> started = new ArrayList<>();
@@ -236,7 +251,9 @@ public abstract class AbstractFullBotTest {
 
         coreWorkerPool = injector.getInstance(Key.get(ThreadPoolExecutor.class, Names.named("core")));
         webSocketClient.start();
-        Future<Session> connect = webSocketClient.connect(client, new URI(getWsUrl(injector)));
+        String wsUrl = getWsUrl(injector);
+        log.info("Connecting to websocket at {}", wsUrl);
+        Future<Session> connect = webSocketClient.connect(client, new URI(wsUrl));
         connect.get(10, TimeUnit.SECONDS);
 
         LocalGameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
@@ -300,9 +317,9 @@ public abstract class AbstractFullBotTest {
         }
         await().atMost(Duration.ofSeconds(2)).until(allRecommendationsReceived);
 
-        verify(client, timeout(10000).atLeast(total)).message(argThat(s -> s.contains("\"received\" :")));
-        verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"sent\" :")));
-        verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\" :")));
+        verify(client, timeout(10000).atLeast(total)).message(argThat(s -> s.contains("\"received\":")));
+        verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"sent\":")));
+        verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\":")));
 
         logRule.assertThat().anySatisfy(event -> assertThat(event.getContextData().toMap()).containsEntry("handler", "r"));
 

@@ -26,7 +26,7 @@ pub async fn run_http() {
         .map(|ws: warp::ws::Ws| {
             ws.max_send_queue(100).on_upgrade(|web| async {
                 // Just echo all messages back...
-                let (sink, _) = web.split();
+                let (sink, mut source) = web.split();
                 let salt = {
                     let mut rnd = RND.lock().unwrap();
                     rnd.next_u64()
@@ -40,8 +40,17 @@ pub async fn run_http() {
                     }
                 }));
 
-                let mut all = CONNECTIONS.lock().unwrap();
-                all.push(Conn { web: tx, salt })
+                {
+                    let mut all = CONNECTIONS.lock().unwrap();
+                    all.push(Conn { web: tx.clone(), salt });
+                }
+
+                while let Some(x) = source.next().await {
+                    match x {
+                        Ok(msg) => if let Ok(str) = msg.to_str() { if str.eq_ignore_ascii_case("PING") { tx.send(Ok(Message::text("PONG"))).await; } }
+                        Err(_) => {}
+                    }
+                }
             })
         });
 

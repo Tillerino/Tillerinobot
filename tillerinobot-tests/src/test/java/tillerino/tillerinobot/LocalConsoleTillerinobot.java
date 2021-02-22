@@ -39,8 +39,6 @@ import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
-import org.tillerino.ppaddict.live.JettyWebsocketServerResource;
-import org.tillerino.ppaddict.live.LiveActivityEndpoint;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
@@ -78,7 +76,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		install(new ProcessorsModule());
 		installMore();
 
-		bind(LiveActivity.class).to(LiveActivityEndpoint.class);
+		bind(LiveActivity.class).toInstance(mock(LiveActivity.class));
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
@@ -263,15 +261,10 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		((QueuedThreadPool) apiServer.getThreadPool()).setMaxThreads(32);
 		apiServer.start();
 
-		JettyWebsocketServerResource websocketServer = new JettyWebsocketServerResource("localhost", 0);
-		websocketServer.start();
-		websocketServer.addEndpoint(injector.getInstance(LiveActivityEndpoint.class));
-
 		singleThreadExecutor("event queue").submit(injector.getInstance(LocalGameChatEventQueue.class));
 		singleThreadExecutor("response queue").submit(injector.getInstance(LocalGameChatResponseQueue.class));
 		injector.getInstance(GameChatClient.class).run();
 		
 		apiServer.stop();
-		websocketServer.stop();
 	}
 }
