@@ -88,8 +88,7 @@ abstract class AbstractRemoteQueue<T> {
 			channel.queueBind(key, exchange, queue);
 		}
 		channel.basicConsume(key, false, (consumerTag, message) -> {
-			/* We need to ack manually. Otherwise, the client will always keep the queue
-			 * empty, even if we're not handling events fast enough. */
+			/* We ack manually to be sure that prefetched values are not acked. */
 			channel.basicAck(message.getEnvelope().getDeliveryTag(), false);
 			/* The default exception handler (which appears to be ForgivingExceptionHandler)
 			* closes the channel when an exception is thrown here and just never recovers.

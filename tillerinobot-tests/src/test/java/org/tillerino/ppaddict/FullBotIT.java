@@ -23,6 +23,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
@@ -62,12 +63,6 @@ public class FullBotIT extends AbstractFullBotTest {
 	}
 
 	@Override
-	public void startBot() throws Exception {
-		RabbitMqConfiguration.liveActivity(rabbit.getChannel()).setup();
-		super.startBot();
-	}
-
-	@Override
 	protected String getWsUrl(Injector injector) throws DeploymentException {
 		return "ws://" + getLive().getContainerIpAddress() + ":" + getLive().getMappedPort(8080) + "/live/v0";
 	}
@@ -88,10 +83,8 @@ public class FullBotIT extends AbstractFullBotTest {
 					}
 				});
 
-				bind(LiveActivity.class).toInstance(RabbitMqConfiguration.liveActivity(rabbit.getChannel()));
-
-				bind(Channel.class).toInstance(rabbit.getChannel());
 				install(new RabbitQueuesModule());
+				bind(Connection.class).toInstance(rabbit.getConnection());
 			}
 		});
 	}

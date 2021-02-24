@@ -71,7 +71,7 @@ public class MemoryIT {
 
 	@Before
 	public void setUp() throws Exception {
-		source = RabbitMqConfiguration.liveActivity(rabbitMq.getChannel());
+		source = RabbitMqConfiguration.liveActivity(rabbitMq.getConnection());
 		URI uri = new URI("ws://" + getLive().getContainerIpAddress() + ":" + getLive().getMappedPort(8080) + "/live/v0");
 		log.info("Connecting clients");
 		Thread.sleep(1000); // flaky without :/

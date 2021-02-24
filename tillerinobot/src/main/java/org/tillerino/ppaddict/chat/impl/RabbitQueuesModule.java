@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
+import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
@@ -13,7 +14,7 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,8 +28,8 @@ public class RabbitQueuesModule extends AbstractModule {
 	}
 
 	@Provides
-	RemoteEventQueue remoteQueue(Channel channel, MessageHandlerScheduler scheduler) throws IOException {
-		RemoteEventQueue queue = RabbitMqConfiguration.eventQueue(channel);
+	RemoteEventQueue remoteQueue(Connection connection, MessageHandlerScheduler scheduler) throws IOException {
+		RemoteEventQueue queue = RabbitMqConfiguration.eventQueue(connection);
 		queue.setup();
 		queue.subscribe(event -> {
 			try {
@@ -42,8 +43,8 @@ public class RabbitQueuesModule extends AbstractModule {
 	}
 
 	@Provides
-	RemoteResponseQueue responseQueue(Channel channel, ResponsePostprocessor post) throws IOException {
-		RemoteResponseQueue queue = RabbitMqConfiguration.responseQueue(channel);
+	RemoteResponseQueue responseQueue(Connection connection, ResponsePostprocessor post) throws IOException {
+		RemoteResponseQueue queue = RabbitMqConfiguration.responseQueue(connection);
 		queue.setup();
 		queue.subscribe(response -> {
 			try (MdcAttributes mdc = response.getEvent().getMeta().getMdc().apply()) {
@@ -56,5 +57,10 @@ public class RabbitQueuesModule extends AbstractModule {
 			}
 		});
 		return queue;
+	}
+
+	@Provides
+	LiveActivity liveActicity(Connection connection) throws IOException {
+		return RabbitMqConfiguration.liveActivity(connection);
 	}
 }

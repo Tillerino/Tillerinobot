@@ -187,8 +187,7 @@ public abstract class AbstractFullBotTest {
                 RabbitMQContainer rabbit = RabbitMqContainer.getRabbitMq();
                 ConnectionFactory connectionFactory = RabbitMqConfiguration
                         .connectionFactory(rabbit.getContainerIpAddress(), rabbit.getMappedPort(5672));
-                Channel channel = connectionFactory.newConnection().createChannel();
-                bind(LiveActivity.class).toInstance(RabbitMqConfiguration.liveActivity(channel));
+                bind(LiveActivity.class).toInstance(RabbitMqConfiguration.liveActivity(connectionFactory.newConnection()));
             } catch (IOException | TimeoutException e) {
                 throw new RuntimeException(e);
             }

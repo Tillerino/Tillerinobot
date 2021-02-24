@@ -14,7 +14,7 @@ public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 
 	@Override
 	public void setUp() throws Exception {
-		push = RabbitMqConfiguration.liveActivity(rabbit.getChannel());
+		push = RabbitMqConfiguration.liveActivity(rabbit.getConnection());
 		super.setUp();
 	}
 	@Override
