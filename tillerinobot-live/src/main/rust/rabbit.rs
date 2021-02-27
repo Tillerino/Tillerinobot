@@ -76,6 +76,7 @@ pub(crate) async fn run_rabbit() {
 
 async fn consume_rabbit() -> lapin::Result<()> {
     let channel_a = connect_rabbit_channel().await?;
+    channel_a.basic_qos(100, BasicQosOptions::default()).await?;
     let mut consumer = create_rabbit_consumer(channel_a).await?;
     println!("Listening to events");
     while let Some(Ok((_, delivery))) = consumer.next().await {
