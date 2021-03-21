@@ -123,8 +123,8 @@ public class Italiano extends AbstractMutableLanguage {
 		return "Ciao! Sono il robot che ha ucciso Tillerino e preso possesso del suo account. Sto scherzando, ma uso lo stesso il suo account."
 				+ " [https://twitter.com/Tillerinobot stato e aggiornamenti]"
 				+ " - [https://github.com/Tillerino/Tillerinobot/wiki comandi]"
-			    + " - [http://ppaddict.tillerino.org/ ppaddict]"
-			    + " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contatti]";
+			    	+ " - [http://ppaddict.tillerino.org/ ppaddict]"
+			    	+ " - [https://github.com/Tillerino/Tillerinobot/wiki/Contact contatti]";
 	}
  
 	@Override
