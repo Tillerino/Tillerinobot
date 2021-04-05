@@ -12,12 +12,6 @@
     <name>Real-time API</name>
 
     <dependencies>
-        <!-- APIs -->
-        <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-        </dependency>
-
         <!-- Internal -->
         <dependency>
             <groupId>org.tillerino.osu</groupId>
@@ -26,21 +20,6 @@
         <dependency>
             <groupId>org.tillerino.osu</groupId>
             <artifactId>tillerinobot-rabbit</artifactId>
-        </dependency>
-
-        <!-- libraries -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.undertow</groupId>
-            <artifactId>undertow-websockets-jsr</artifactId>
         </dependency>
 
         <!-- Tests -->
@@ -59,32 +38,4 @@
             <classifier>tests</classifier>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <configuration>
-                    <includeScope>runtime</includeScope>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <!-- For Dockerfile: all dependency jars will be copied to target/dependency -->
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <!-- For Dockerfile: jar will always be target/live.jar -->
-                    <finalName>live</finalName>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
