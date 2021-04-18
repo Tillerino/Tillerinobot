@@ -2,16 +2,16 @@ package tillerino.tillerinobot.lang;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
-
-import tillerino.tillerinobot.BeatmapMeta;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
-import tillerino.tillerinobot.diff.PercentageEstimates;
 
-import javax.annotation.Nonnull;
+import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.diff.PercentageEstimates;
 
 public class TsundereGerman extends TsundereBase {
 	private static final long serialVersionUID = 1L;

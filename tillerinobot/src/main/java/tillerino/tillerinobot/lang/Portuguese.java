@@ -1,18 +1,16 @@
 package tillerino.tillerinobot.lang;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
-
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
 public class Portuguese extends AbstractMutableLanguage {
 	private static final long serialVersionUID = 1L;
-	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
@@ -59,9 +57,7 @@ public class Portuguese extends AbstractMutableLanguage {
 					"o que você está a fim de fazer hoje?",
 			};
 			
-			Random random = new Random();
-			
-			String message = messages[random.nextInt(messages.length)];
+			String message = messages[ThreadLocalRandom.current().nextInt(messages.length)];
 			
 			return new Message(apiUser.getUserName() + ", " + message);
 		}
@@ -169,7 +165,7 @@ public class Portuguese extends AbstractMutableLanguage {
 		return "A sintaxe para definir um parâmetro é !set valor. Tente !help se você precisa de mais ajuda";
 	}
 	
-	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(ThreadLocalRandom.current());
 	
 	@Override
 	public String apiTimeoutException() {

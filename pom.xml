@@ -22,7 +22,7 @@
 		<jersey.version>2.32</jersey.version>
 		<jetty.version>9.4.28.v20200408</jetty.version>
 		<jackson.version>2.11.3</jackson.version>
-		<testcontainers.version>1.15.2</testcontainers.version>
+		<testcontainers.version>1.15.3</testcontainers.version>
 		<!-- determined by container -->
 		<mockserver.version>5.5.4</mockserver.version>
 		<slf4j.version>1.7.30</slf4j.version>
@@ -30,8 +30,10 @@
 		<guice.version>5.0.1</guice.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
 		<eclipselink.version>2.7.7</eclipselink.version>
-		<spotbugs.version>4.2.2</spotbugs.version>
+		<spotbugs.version>4.2.3</spotbugs.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
+		<mockito.version>3.9.0</mockito.version>
+		<hsqldb.version>2.6.0</hsqldb.version>
 	</properties>
 
 	<build>
@@ -423,7 +425,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.jetty.websocket</groupId>
-				<artifactId>javax-websocket-server-impl</artifactId>
+				<artifactId>javax-websocket-client-impl</artifactId>
 				<version>${jetty.version}</version>
 			</dependency>
 
@@ -447,7 +449,7 @@
 			<dependency>
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
-				<version>2.5.1</version>
+				<version>${hsqldb.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>mysql</groupId>
@@ -553,7 +555,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.8.0</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

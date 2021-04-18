@@ -1,35 +1,35 @@
 package tillerino.tillerinobot.lang;
 
-import java.util.Random;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.Nonnull;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
-
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
-import tillerino.tillerinobot.recommendations.Recommendation;
 
-import javax.annotation.Nonnull;
+import tillerino.tillerinobot.recommendations.Recommendation;
 
 public abstract class TsundereBase extends AbstractMutableLanguage {
 	private static final long serialVersionUID = 1L;
 	//random object
-	static final Random rnd = new Random();
 	//Recent counters, reset if inactive for a while
 	private int recentRecommendations = 0;
 	private int recentHugs = 0;
 	private int lastHug = 0;
 	private int invalidRecommendationParameterCount = 0;
 
-	StringShuffler welcomeUserShortShuffler = new StringShuffler(rnd);
-	StringShuffler welcomeUserShuffler = new StringShuffler(rnd);
-	StringShuffler welcomeUserLongShuffler = new StringShuffler(rnd);
-	StringShuffler invalidAccuracyShuffler = new StringShuffler(rnd);
-	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(rnd);
-	StringShuffler tryWithModsShuffler = new StringShuffler(rnd);
-	StringShuffler tryWithModsListShuffler = new StringShuffler(rnd);
-	StringShuffler noInformationForModsShortShuffler = new StringShuffler(rnd);
-	StringShuffler noInformationForModsShuffler = new StringShuffler(rnd);
-	StringShuffler unknownBeatmapShuffler = new StringShuffler(rnd);
+	StringShuffler welcomeUserShortShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler welcomeUserShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler welcomeUserLongShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler invalidAccuracyShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler optionalCommentOnLanguageShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler tryWithModsShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler tryWithModsListShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler noInformationForModsShortShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler noInformationForModsShuffler = new StringShuffler(ThreadLocalRandom.current());
+	StringShuffler unknownBeatmapShuffler = new StringShuffler(ThreadLocalRandom.current());
 
 	@Override
 	public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
@@ -68,7 +68,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
 
 		// do some random stuff
 		// Ranges from -2 to 10 (but it intentionally never reaches max)
-		int hugLevel = (baseLevel<8?baseLevel:8) + rnd.nextInt(3) + rnd.nextInt(3) - 3;
+		int hugLevel = (baseLevel<8?baseLevel:8) + ThreadLocalRandom.current().nextInt(3) + ThreadLocalRandom.current().nextInt(3) - 3;
 		// because where we check if its the last thing, and if it is we ++
 		if(hugLevel >= lastHug) {
 			hugLevel++;
@@ -351,7 +351,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
 			"[http://osu.ppy.sh/b/333871 Foreground Eclipse - Calm Eyes Fixed On Me, Screaming [Easy]]   95%: 2pp | 98%: 3pp | 99%: 4pp | 100%: 7pp | 3:53 ★ 1.38 ♫ 184 AR3 ♠",
 			"[http://osu.ppy.sh/b/422580 Pierce The Veil - May These Noises Startle You In Your Sleep Tonight [Insane]]   95%: 61pp | 98%: 70pp | 99%: 77pp | 100%: 90pp | 1:49 ★ 3.99 ♫ 130 AR8.5 ♠"
 		};
-		return fakes[rnd.nextInt(fakes.length)];
+		return fakes[ThreadLocalRandom.current().nextInt(fakes.length)];
 	}
 
 	@Override

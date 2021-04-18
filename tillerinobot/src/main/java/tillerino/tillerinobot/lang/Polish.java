@@ -1,12 +1,11 @@
 package tillerino.tillerinobot.lang;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
-
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
@@ -16,7 +15,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  */
 public class Polish extends AbstractMutableLanguage {
 	private static final long serialVersionUID = 1L;
-	static final Random rnd = new Random();
 
 	@Override
 	public String unknownBeatmap() {
@@ -63,9 +61,7 @@ public class Polish extends AbstractMutableLanguage {
 					"na co masz dzisiaj ochotę?",
 			};
 
-			Random random = new Random();
-
-			String message = messages[random.nextInt(messages.length)];
+			String message = messages[ThreadLocalRandom.current().nextInt(messages.length)];
 
 			return new Message(apiUser.getUserName() + ", " + message);
 		}
@@ -175,7 +171,7 @@ public class Polish extends AbstractMutableLanguage {
 		return "Składnia polecenia !set jest następująca: !set opcja wartość. Wpisz !help jeśli potrzebujesz więcej wskazówek.";
 	}
 	
-	StringShuffler apiTimeoutShuffler = new StringShuffler(rnd);
+	StringShuffler apiTimeoutShuffler = new StringShuffler(ThreadLocalRandom.current());
 	
 	@Override
 	public String apiTimeoutException() {

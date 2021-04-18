@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /*
  * 20 bytes
  */
@@ -21,6 +23,7 @@ public class StringShuffler implements Serializable {
 	 */
 	final long seed;
 
+	@SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE", justification = "false positive")
 	public StringShuffler(Random globalRandom) {
 		seed = globalRandom.nextLong();
 	}

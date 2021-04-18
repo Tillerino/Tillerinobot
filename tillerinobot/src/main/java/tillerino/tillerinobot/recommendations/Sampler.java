@@ -2,9 +2,9 @@ package tillerino.tillerinobot.recommendations;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.ToDoubleFunction;
 
 import lombok.Getter;
@@ -19,7 +19,6 @@ import lombok.Getter;
 public class Sampler<T, S> {
 	private final SortedMap<Double, T> distribution = new TreeMap<>();
 	private double sum = 0;
-	private final Random random = new Random();
 	@Getter
 	private final S settings;
 	private final ToDoubleFunction<T> probabilityDistribution;
@@ -45,7 +44,7 @@ public class Sampler<T, S> {
 	}
 
 	public synchronized T sample() {
-		double x = random.nextDouble() * sum;
+		double x = ThreadLocalRandom.current().nextDouble() * sum;
 		
 		SortedMap<Double, T> rest = distribution.tailMap(x);
 		if(rest.size() == 0) {

@@ -78,7 +78,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty.websocket</groupId>
-			<artifactId>javax-websocket-server-impl</artifactId>
+			<artifactId>javax-websocket-client-impl</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -1,12 +1,11 @@
 package tillerino.tillerinobot.lang;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
-
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
@@ -60,9 +59,7 @@ public class Turkish implements Language {
 					"Bugün canın ne yapmayı istiyor ?",
 			};
 			
-			Random random = new Random();
-			
-			String message = messages[random.nextInt(messages.length)];
+			String message = messages[ThreadLocalRandom.current().nextInt(messages.length)];
 			
 			return new Message(apiUser.getUserName() + ", " + message);
 		}
