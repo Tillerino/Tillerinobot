@@ -20,9 +20,7 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.core.UriBuilder;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -50,6 +48,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.sun.net.httpserver.HttpServer;
 
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
@@ -59,6 +58,7 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
+
 /**
  * The purpose of this class and its main function is to completely mock backend
  * and IRC connection to quickly check out the functionality of Tillerinobot.
@@ -256,15 +256,14 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 		URI baseUri = UriBuilder.fromUri("http://localhost/")
 				.port(Integer.parseInt(Stream.of(args).findAny().orElse("0"))).build();
-		Server apiServer = JettyHttpContainerFactory.createServer(baseUri, 
+		HttpServer apiServer = JdkHttpServerFactory.createHttpServer(baseUri, 
 				ResourceConfig.forApplication(injector.getInstance(BotApiDefinition.class)));
-		((QueuedThreadPool) apiServer.getThreadPool()).setMaxThreads(32);
-		apiServer.start();
+		log.info("Started API at port {}", apiServer.getAddress().getPort());
 
 		singleThreadExecutor("event queue").submit(injector.getInstance(LocalGameChatEventQueue.class));
 		singleThreadExecutor("response queue").submit(injector.getInstance(LocalGameChatResponseQueue.class));
 		injector.getInstance(GameChatClient.class).run();
-		
-		apiServer.stop();
+
+		apiServer.stop(1);
 	}
 }

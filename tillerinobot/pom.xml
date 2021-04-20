@@ -151,7 +151,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-jetty-http</artifactId>
+			<artifactId>jersey-container-jdk-http</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
