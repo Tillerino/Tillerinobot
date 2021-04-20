@@ -111,7 +111,7 @@ public class ApiTest {
 	 * Jetty server
 	 */
 	@Rule
-	public JettyServerResource server = new JettyServerResource(injector.getInstance(BotApiDefinition.class), "localhost", 0);
+	public JdkServerResource server = new JdkServerResource(injector.getInstance(BotApiDefinition.class), "localhost", 0);
 
 	@Rule
 	public final LogRule log = TestAppender.rule();
