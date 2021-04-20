@@ -18,7 +18,8 @@ import java.util.stream.Stream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.core.UriBuilder;
+
+import jakarta.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;

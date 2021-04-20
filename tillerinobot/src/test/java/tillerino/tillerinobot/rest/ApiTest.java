@@ -13,13 +13,14 @@ import java.util.Collections;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.WebTarget;
+
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.ListAssert;
@@ -46,10 +47,10 @@ import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.TestBackend;
+import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 /**
  * Tests the Tillerinobot API on a live HTTP server including authentication.
  */

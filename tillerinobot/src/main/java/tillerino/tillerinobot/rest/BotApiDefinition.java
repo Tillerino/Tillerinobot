@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.Application;
+
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.Application;
 
 import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
 

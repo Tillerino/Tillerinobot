@@ -1,6 +1,6 @@
 package org.tillerino.ppaddict.util;
 
-import javax.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.ServiceUnavailableException;
 
 /**
  * This can be thrown from anywhere in the code to indicate that something does

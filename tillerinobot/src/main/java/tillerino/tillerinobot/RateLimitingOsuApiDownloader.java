@@ -5,7 +5,8 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.ServiceUnavailableException;
+
+import jakarta.ws.rs.ServiceUnavailableException;
 
 import org.tillerino.osuApiModel.Downloader;
 

@@ -2,7 +2,8 @@ package tillerino.tillerinobot.rest;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.NotFoundException;
+
+import jakarta.ws.rs.NotFoundException;
 
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;

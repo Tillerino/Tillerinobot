@@ -1,7 +1,7 @@
 package tillerino.tillerinobot.rest;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

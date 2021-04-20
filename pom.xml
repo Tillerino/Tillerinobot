@@ -19,7 +19,7 @@
 
 	<properties>
 		<jacoco.version>0.8.6</jacoco.version>
-		<jersey.version>2.33</jersey.version>
+		<jersey.version>3.0.1</jersey.version>
 		<jetty.version>9.4.40.v20210413</jetty.version>
 		<jackson.version>2.12.3</jackson.version>
 		<testcontainers.version>1.15.3</testcontainers.version>
@@ -325,9 +325,9 @@
 			<!-- APIs -->
 			<dependency>
 				<!-- TODO: switch to Jakarta jar -->
-				<groupId>javax.ws.rs</groupId>
-				<artifactId>javax.ws.rs-api</artifactId>
-				<version>2.1.1</version>
+				<groupId>jakarta.ws.rs</groupId>
+				<artifactId>jakarta.ws.rs-api</artifactId>
+				<version>3.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.inject</groupId>
@@ -410,7 +410,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jersey.media</groupId>
-				<artifactId>jersey-media-moxy</artifactId>
+				<artifactId>jersey-media-json-jackson</artifactId>
 				<version>${jersey.version}</version>
 			</dependency>
 			<dependency>
@@ -447,6 +447,11 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.module</groupId>
 				<artifactId>jackson-module-parameter-names</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.module</groupId>
+				<artifactId>jackson-module-jaxb-annotations</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
 
@@ -538,7 +543,6 @@
 		<dependency>
 			<groupId>javax.inject</groupId>
 			<artifactId>javax.inject</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

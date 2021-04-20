@@ -2,8 +2,8 @@ package tillerino.tillerinobot;
 
 import java.util.UUID;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
 
 import org.tillerino.ppaddict.rest.AuthenticationService;
 
