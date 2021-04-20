@@ -2,13 +2,13 @@ package tillerino.tillerinobot.rest;
 
 import java.net.URI;
 
+import javax.ws.rs.core.Application;
+
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.rules.ExternalResource;
 
 import com.sun.net.httpserver.HttpServer;
-
-import jakarta.ws.rs.core.Application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
