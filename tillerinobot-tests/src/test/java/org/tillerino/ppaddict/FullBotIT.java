@@ -13,16 +13,13 @@ import org.junit.ClassRule;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
-import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
 import org.tillerino.ppaddict.live.RabbitMqContainer;
 import org.tillerino.ppaddict.live.RabbitMqContainerConnection;
-import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mysql.cj.jdbc.MysqlDataSource;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
 import lombok.extern.slf4j.Slf4j;

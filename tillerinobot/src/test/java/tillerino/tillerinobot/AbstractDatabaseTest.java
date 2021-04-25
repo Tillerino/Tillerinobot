@@ -11,11 +11,12 @@ import javax.sql.DataSource;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
-import org.tillerino.ppaddict.util.AbstractInjectingTest;
+import org.tillerino.ppaddict.util.InjectionRunner;
 import org.tillerino.ppaddict.util.TestModule;
 import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
 import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
@@ -35,7 +36,8 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
  * Creates an embedded HSQL database for tests.
  */
 @TestModule(AbstractDatabaseTest.CreateInMemoryDatabaseModule.class)
-public abstract class AbstractDatabaseTest extends AbstractInjectingTest {
+@RunWith(InjectionRunner.class)
+public abstract class AbstractDatabaseTest {
 	public static class CreateInMemoryDatabaseModule extends AbstractModule {
 		EntityManagerFactory emf;
 		@Singleton

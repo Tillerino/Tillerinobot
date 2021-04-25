@@ -12,5 +12,7 @@ import com.google.inject.AbstractModule;
 public @interface TestModule {
 	Class<? extends AbstractModule>[] value();
 
+	Class<?>[] mocks() default { };
+
 	boolean cache() default true;
 }

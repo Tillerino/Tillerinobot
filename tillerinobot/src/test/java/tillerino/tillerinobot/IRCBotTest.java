@@ -32,10 +32,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.osuApiModel.types.UserId;
@@ -54,7 +52,6 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.TestModule;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
@@ -62,8 +59,7 @@ import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
-@TestModule({ CreateInMemoryDatabaseModule.class, TestBackend.Module.class })
-@RunWith(MockitoJUnitRunner.class)
+@TestModule(value = TestBackend.Module.class, mocks = { LiveActivity.class, GameChatResponseQueue.class })
 public class IRCBotTest extends AbstractDatabaseTest {
 
 	protected PrivateAction action(String nick, String action) {
@@ -92,18 +88,17 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@Inject
 	RecommendationsManager recommendationsManager;
 
-	@Mock
+	@Inject
 	LiveActivity liveActivity;
 
 	/**
 	 * Contains the messages and actions sent by the bot. At the end of each
 	 * test, it must be empty or the test fails.
 	 */
-	@Mock
+	@Inject
 	GameChatResponseQueue queue;
 
-	@Mock
-	AbstractPpaddictUserDataService<?> ppaddictUserDataService;
+	AbstractPpaddictUserDataService<?> ppaddictUserDataService = mock(AbstractPpaddictUserDataService.class);
 
 	@Before
 	public void initMocks() throws Exception {

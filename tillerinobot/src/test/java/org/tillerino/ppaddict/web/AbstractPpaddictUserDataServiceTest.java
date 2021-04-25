@@ -9,9 +9,8 @@ import org.tillerino.ppaddict.util.TestClock;
 import org.tillerino.ppaddict.util.TestModule;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 
-@TestModule({ CreateInMemoryDatabaseModule.class, TestClock.Module.class })
+@TestModule(TestClock.Module.class)
 public class AbstractPpaddictUserDataServiceTest extends AbstractDatabaseTest {
 	@Inject
 	TestClock clock;

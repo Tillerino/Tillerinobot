@@ -24,13 +24,12 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.util.TestModule;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.lang.Default;
 
-@TestModule({ CreateInMemoryDatabaseModule.class, TestBackend.Module.class })
+@TestModule(TestBackend.Module.class)
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	@Inject
 	TestBackend backend;

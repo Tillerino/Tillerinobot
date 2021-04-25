@@ -8,9 +8,7 @@ import javax.inject.Inject;
 import org.junit.Test;
 import org.tillerino.ppaddict.util.TestModule;
 
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
-
-@TestModule({ CreateInMemoryDatabaseModule.class, TestBackend.Module.class })
+@TestModule(TestBackend.Module.class)
 public class IrcNameResolverTest extends AbstractDatabaseTest {
 	@Inject
 	TestBackend backend;

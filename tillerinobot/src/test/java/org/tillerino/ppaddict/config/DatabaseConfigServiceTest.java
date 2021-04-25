@@ -8,10 +8,9 @@ import org.junit.Test;
 import org.tillerino.ppaddict.util.TestModule;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.data.BotConfig;
 
-@TestModule({ CreateInMemoryDatabaseModule.class, CachedDatabaseConfigServiceModule.class })
+@TestModule({ CachedDatabaseConfigServiceModule.class })
 public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
 	@Inject
 	ConfigService config;

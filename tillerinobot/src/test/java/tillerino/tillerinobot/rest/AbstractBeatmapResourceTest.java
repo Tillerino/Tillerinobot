@@ -6,14 +6,14 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import javax.inject.Inject;
+
 import jakarta.ws.rs.WebApplicationException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.ppaddict.util.TestModule;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.data.ActualBeatmap;
@@ -24,9 +24,9 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
  * handles downloading and saving beatmaps files correctly with respect to the
  * expected hash value.
  */
-@RunWith(MockitoJUnitRunner.class)
+@TestModule(value = {}, mocks = BeatmapDownloader.class)
 public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
-  @Mock
+  @Inject
   BeatmapDownloader downloader;
 
   OsuApiBeatmap beatmap = new OsuApiBeatmap();
