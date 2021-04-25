@@ -9,7 +9,7 @@ import org.tillerino.ppaddict.rest.AuthenticationService;
 
 public class FakeAuthenticationService implements AuthenticationService {
 	@Override
-	public Authorization findKey(String key) throws NotFoundException {
+	public Authorization getAuthorization(String key) throws NotFoundException {
 		if (key.equals("testKey") || key.equals("valid-key")) {
 			return new Authorization(false);
 		}

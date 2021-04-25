@@ -35,7 +35,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			if (apiKey == null) {
 				throw new NotFoundException();
 			}
-			authentication.findKey(apiKey);
+			authentication.getAuthorization(apiKey);
 		} catch (NotFoundException e) {
 			throw new WebApplicationException("Unknown API key", Status.UNAUTHORIZED);
 		}
