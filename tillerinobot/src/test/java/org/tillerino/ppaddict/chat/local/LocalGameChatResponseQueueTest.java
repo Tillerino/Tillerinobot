@@ -70,7 +70,7 @@ public class LocalGameChatResponseQueueTest {
 		queueFuture = exec.submit(queue);
 		verify(downstream, timeout(1000)).onResponse(GameChatResponse.none(), event);
 		verify(botInfo, only()).setResponseQueueSize(0);
-		assertThat(queue.size()).as("Declared queue size").isEqualTo(0);
+		assertThat(queue.size()).as("Declared queue size").isZero();
 	}
 
 	@Test
