@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -32,11 +33,11 @@ public class NPHandler implements CommandHandler {
 	static final Pattern npPattern = Pattern
 			.compile("(?:is listening to|is watching|is playing|is editing)"
 					+ " \\[https?://osu.ppy.sh"
-					// new style
-					+ "(/beatmapsets/\\d+(#(?<mode>[a-z]+))?"
+					// new style: mode is optional, set urls have no beatmap id.
+					+ "(/beatmapsets/\\d+(#((?<mode>[a-z]+)/)?(?<newid>\\d+))?"
 					// old style
-					+ "|/(?<idtype>b|s))"
-					+ "(/(?<id>\\d+))?.*\\]"
+					+ "|/(?<idtype>b|s)/(?<oldid>\\d+))"
+					+ ".*\\]"
 					+ "(?<mods>(?: "
 					+ "(?:"
 					+ "-Easy|-NoFail|-HalfTime"
@@ -88,15 +89,16 @@ public class NPHandler implements CommandHandler {
 			return null;
 		}
 
-		if(m.group("id") == null || "s".equals(m.group("idtype"))) {
+		String anyId = StringUtils.defaultIfBlank(m.group("oldid"), m.group("newid"));
+		if(anyId == null || "s".equals(m.group("idtype"))) {
 			throw new UserException(lang.isSetId());
 		}
 
-		if (m.group("mode") != null && !m.group("mode").equals("osu")) {
+		if (!StringUtils.defaultIfBlank(m.group("mode"), "osu").equals("osu")) {
 			throw new UserException("where osu");
 		}
 
-		int beatmapid = Integer.parseInt(m.group("id"));
+		int beatmapid = Integer.parseInt(anyId);
 
 		long mods = 0;
 

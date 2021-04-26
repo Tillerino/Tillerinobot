@@ -6,6 +6,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -50,9 +52,15 @@ public class NPHandlerTest {
 	public void testNewStyle() throws Exception {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(new Default());
-		assertThat(handler.handle("is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]", null, userData))
-			.isNotNull()
-			.isInstanceOf(GameChatResponse.Success.class);
+		for (String cmd : Arrays.asList(
+				"is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]",
+				// game mode is optional?
+				"is listening to [https://osu.ppy.sh/beatmapsets/1158561#2419085 AliA - Kakurenbo]"
+				)) {
+			assertThat(handler.handle(cmd, null, userData))
+				.isNotNull()
+				.isInstanceOf(GameChatResponse.Success.class);
+		}
 	}
 
 	@Test
