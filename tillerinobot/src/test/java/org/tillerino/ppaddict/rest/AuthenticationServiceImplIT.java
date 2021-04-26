@@ -26,7 +26,7 @@ public class AuthenticationServiceImplIT{
 
 	@Before
 	public void before() {
-		mockServer.mockJsonGet("/auth/authorization", "{ }", "api-key", "regular");
+		mockServer.mockJsonGet("/auth/authorization", "{ \"unknownProperty\": true }", "api-key", "regular");
 		mockServer.mockJsonGet("/auth/authorization", "{ \"admin\": true }", "api-key", "adminKey");
 		mockServer.mockStatusCodeGet("/auth/authorization", 401, "api-key", "garbage");
 	}

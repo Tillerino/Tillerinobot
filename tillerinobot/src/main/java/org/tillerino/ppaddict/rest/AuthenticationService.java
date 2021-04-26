@@ -10,6 +10,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,7 @@ public interface AuthenticationService {
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	static class Authorization {
 		private boolean admin;
 	}

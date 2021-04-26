@@ -4,16 +4,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.client.ResponseProcessingException;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 
 import com.google.inject.AbstractModule;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Implements the {@link AuthenticationService} against an internal HTTP API.
  */
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
 	private final AuthenticationService remoteService;
 
@@ -25,7 +30,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public Authorization getAuthorization(String key) {
-		return remoteService.getAuthorization(key);
+		try {
+			return remoteService.getAuthorization(key);
+		} catch (ResponseProcessingException e) {
+			log.error("Error getting authorization", e);
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@Override
