@@ -371,7 +371,9 @@ public class TestBackend implements BotBackend {
 		@Override
 		public void reset() throws Exception {
 			database = new Database();
-			Mockito.reset(backend);
+			if (backend != null) {
+				Mockito.reset(backend);
+			}
 		}
 	}
 }

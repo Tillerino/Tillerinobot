@@ -30,7 +30,14 @@ import tillerino.tillerinobot.lang.Language;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NPHandler implements CommandHandler {
 	static final Pattern npPattern = Pattern
-			.compile("(?:is listening to|is watching|is playing|is editing) \\[https?://osu.ppy.sh/(?<idtype>b|s)/(?<id>\\d+).*\\](?<mods>(?: "
+			.compile("(?:is listening to|is watching|is playing|is editing)"
+					+ " \\[https?://osu.ppy.sh"
+					// new style
+					+ "(/beatmapsets/\\d+(#(?<mode>[a-z]+))?"
+					// old style
+					+ "|/(?<idtype>b|s))"
+					+ "(/(?<id>\\d+))?.*\\]"
+					+ "(?<mods>(?: "
 					+ "(?:"
 					+ "-Easy|-NoFail|-HalfTime"
 					+ "|\\+HardRock|\\+SuddenDeath|\\+Perfect|\\+DoubleTime|\\+Nightcore|\\+Hidden|\\+Flashlight"
@@ -80,9 +87,13 @@ public class NPHandler implements CommandHandler {
 		if (!m.matches()) {
 			return null;
 		}
-		
-		if(m.group("idtype").equals("s")) {
+
+		if(m.group("id") == null || "s".equals(m.group("idtype"))) {
 			throw new UserException(lang.isSetId());
+		}
+
+		if (m.group("mode") != null && !m.group("mode").equals("osu")) {
+			throw new UserException("where osu");
 		}
 
 		int beatmapid = Integer.parseInt(m.group("id"));

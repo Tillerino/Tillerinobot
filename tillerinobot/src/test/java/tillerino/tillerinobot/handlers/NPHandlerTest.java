@@ -28,12 +28,17 @@ public class NPHandlerTest {
 
 	@Test
 	public void testMatcher() throws Exception {
+		// old style
 		assertTrue(NPHandler.npPattern.matcher("is listening to [https://osu.ppy.sh/b/123 title]").find());
 		assertTrue(NPHandler.npPattern.matcher("is editing [https://osu.ppy.sh/s/123 title]").find());
+
+		// new style
+		assertTrue(NPHandler.npPattern.matcher("is listening to [https://osu.ppy.sh/beatmapsets/361035#osu/955737 title]").find());
+		assertTrue(NPHandler.npPattern.matcher("is editing [https://osu.ppy.sh/beatmapsets/361035#osu/955737 title]").find());
 	}
 
 	@Test
-	public void testNp() throws Exception {
+	public void testOldStyle() throws Exception {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(new Default());
 		assertThat(handler.handle("is editing [https://osu.ppy.sh/b/123 title]", null, userData))
@@ -42,11 +47,29 @@ public class NPHandlerTest {
 	}
 
 	@Test
-	public void testSetId() throws Exception {
+	public void testNewStyle() throws Exception {
+		UserData userData = mock(UserData.class);
+		when(userData.getLanguage()).thenReturn(new Default());
+		assertThat(handler.handle("is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]", null, userData))
+			.isNotNull()
+			.isInstanceOf(GameChatResponse.Success.class);
+	}
+
+	@Test
+	public void testSetIdOldStyle() throws Exception {
 		UserData userData = mock(UserData.class);
 		when(userData.getLanguage()).thenReturn(new Default());
 		assertThatThrownBy(() -> handler.handle("is editing [https://osu.ppy.sh/s/123 title]", null, userData))
 			.isInstanceOf(UserException.class)
 			.hasMessage(new Default().isSetId());
+	}
+
+	@Test
+	public void testSetIdNewStyle() throws Exception {
+		UserData userData = mock(UserData.class);
+		when(userData.getLanguage()).thenReturn(new Default());
+		assertThatThrownBy(() -> handler.handle("is editing [https://osu.ppy.sh/beatmapsets/361035 title]", null, userData))
+		.isInstanceOf(UserException.class)
+		.hasMessage(new Default().isSetId());
 	}
 }
