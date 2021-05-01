@@ -24,7 +24,7 @@
 		<jackson.version>2.12.3</jackson.version>
 		<testcontainers.version>1.15.3</testcontainers.version>
 		<!-- determined by container -->
-		<mockserver.version>5.5.4</mockserver.version>
+		<mockserver.version>5.11.2</mockserver.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
 		<guice.version>5.0.1</guice.version>
@@ -34,6 +34,7 @@
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
 		<mockito.version>3.9.0</mockito.version>
 		<hsqldb.version>2.6.0</hsqldb.version>
+		<rabbitmq.version>5.10.0</rabbitmq.version>
 	</properties>
 
 	<build>
@@ -400,6 +401,11 @@
 				<artifactId>mapstruct-processor</artifactId>
 				<version>${mapstruct.version}</version>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.rabbitmq</groupId>
+				<artifactId>amqp-client</artifactId>
+				<version>${rabbitmq.version}</version>
 			</dependency>
 
 			<!-- HTTP -->

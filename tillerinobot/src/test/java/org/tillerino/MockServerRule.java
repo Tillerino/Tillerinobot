@@ -9,6 +9,8 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.testcontainers.containers.MockServerContainer;
+import org.testcontainers.utility.DockerImageName;
+import org.tillerino.ppaddict.util.DockerNetwork;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -21,7 +23,10 @@ import com.google.inject.name.Names;
  * Use with MockServerModule to inject mocked URLs.
  */
 public class MockServerRule extends TestWatcher {
-	private static final MockServerContainer MOCK_SERVER = new MockServerContainer();
+	private static final DockerImageName IMAGE = DockerImageName.parse("jamesdbloom/mockserver").withTag("mockserver-5.11.2");
+	private static final MockServerContainer MOCK_SERVER = new MockServerContainer(IMAGE)
+			.withNetwork(DockerNetwork.NETWORK)
+			.withNetworkAliases("mockserver");
 	private static final MockServerClient CLIENT;
 
 	static {
@@ -78,5 +83,9 @@ public class MockServerRule extends TestWatcher {
 		protected void configure() {
 			bind(String.class).annotatedWith(Names.named("ppaddict.auth.url")).toInstance(getExternalMockServerAddress() + "/auth");
 		}
+	}
+
+	public static MockServerClient mockServer() {
+		return CLIENT;
 	}
 }
