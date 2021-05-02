@@ -5,6 +5,8 @@ public interface DifficultyProperties {
 
 	int getCircleCount();
 
+	int getSpinnerCount();
+
 	double getSpeed();
 
 	double getAim();

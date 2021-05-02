@@ -23,7 +23,7 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
  * to compute the pp for given play, aim and speed values of a osu standard
  * score: 
  * 
- * https://github.com/ppy/osu-performance/blob/a7e98ebea5bcb51c7f3463d8cc45ab15256f636e/src/performance/osu/OsuScore.cpp
+ * https://github.com/ppy/osu-performance/blob/9778df07653608ef648a3485bf3a9db3d1ead7de/src/performance/osu/OsuScore.cpp
  * 
  * This file violates all Java coding standards to be as easily comparable to
  * the original as possible.
@@ -66,7 +66,7 @@ public double getPP(Beatmap beatmap){
 	computeSpeedValue(beatmap);
 	computeAccValue(beatmap);
 
-	computeTotalValue();
+	computeTotalValue(beatmap);
 
 	return TotalValue();
 }
@@ -96,7 +96,7 @@ int TotalSuccessfulHits()
 	return _num50 + _num100 + _num300;
 }
 
-void computeTotalValue()
+void computeTotalValue(Beatmap beatmap)
 {
 	// Don't count scores made with supposedly unranked mods
 	if (Relax.is(_mods) ||
@@ -111,10 +111,11 @@ void computeTotalValue()
 	double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
 	if (NoFail.is(_mods))
-		multiplier *= 0.90f;
+		multiplier *= max(0.9f, 1.0f - 0.02f * _numMiss);
 
+	int numTotalHits = TotalHits();
 	if (SpunOut.is(_mods))
-		multiplier *= 0.95f;
+		multiplier *= 1.0f - pow(beatmap.NumSpinners() / static_cast(numTotalHits), 0.85f);
 
 	_totalValue =
 		pow(
@@ -137,12 +138,13 @@ void computeAimValue(Beatmap beatmap)
 
 	// Longer maps are worth more
 	double LengthBonus = 0.95f + 0.4f * min(1.0f, static_cast(numTotalHits) / 2000.0f) +
-		(numTotalHits > 2000 ? log10(static_cast(numTotalHits) / 2000.0f) * 0.5f : 0.0f);
+					  (numTotalHits > 2000 ? log10(static_cast(numTotalHits) / 2000.0f) * 0.5f : 0.0f);
 
 	_aimValue *= LengthBonus;
 
-	// Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-	_aimValue *= pow(0.97f, _numMiss);
+	// Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+	if (_numMiss > 0)
+		_aimValue *= 0.97f * pow(1.0f - pow(_numMiss / static_cast(numTotalHits), 0.775f), _numMiss);
 
 	// Combo scaling
 	double maxCombo = beatmap.DifficultyAttribute(_mods, Beatmap.MaxCombo);
@@ -150,20 +152,18 @@ void computeAimValue(Beatmap beatmap)
 		_aimValue *= min(static_cast(pow(_maxCombo, 0.8f) / pow(maxCombo, 0.8f)), 1.0f);
 
 	double approachRate = beatmap.DifficultyAttribute(_mods, Beatmap.AR);
-	double approachRateFactor = 1.0f;
+	double approachRateFactor = 0.0f;
 	if (approachRate > 10.33f)
-		approachRateFactor += 0.3f * (approachRate - 10.33f);
+		approachRateFactor += 0.4f * (approachRate - 10.33f);
 	else if (approachRate < 8.0f)
-	{
 		approachRateFactor += 0.01f * (8.0f - approachRate);
-	}
 
-	_aimValue *= approachRateFactor;
+	_aimValue *= 1.0f + min(approachRateFactor, approachRateFactor * (static_cast(numTotalHits) / 1000.0f));
 
 	// We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
 	if (Hidden.is(_mods))
 		_aimValue *= 1.0f + 0.04f * (12.0f - approachRate);
-	
+
 	if (Flashlight.is(_mods))
 		// Apply object-based bonus for flashlight.
 		_aimValue *= 1.0f + 0.35f * min(1.0f, static_cast(numTotalHits) / 200.0f) +
@@ -182,34 +182,35 @@ void computeSpeedValue(Beatmap beatmap)
 
 	int numTotalHits = TotalHits();
 
-	double approachRate = beatmap.DifficultyAttribute(_mods, Beatmap.AR);
-	double approachRateFactor = 1.0f;
-	if (approachRate > 10.33f)
-		approachRateFactor += 0.3f * (approachRate - 10.33f);
-
-	_speedValue *= approachRateFactor;
-	
 	// Longer maps are worth more
-	_speedValue *=
-		0.95f + 0.4f * min(1.0f, static_cast(numTotalHits) / 2000.0f) +
-		(numTotalHits > 2000 ? log10(static_cast(numTotalHits) / 2000.0f) * 0.5f : 0.0f);
+	double lengthBonus = 0.95f + 0.4f * min(1.0f, static_cast(numTotalHits) / 2000.0f) +
+					  (numTotalHits > 2000 ? log10(static_cast(numTotalHits) / 2000.0f) * 0.5f : 0.0f);
+	_speedValue *= lengthBonus;
 
-	// Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-	_speedValue *= pow(0.97f, _numMiss);
+	// Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+	if (_numMiss > 0)
+		_speedValue *= 0.97f * pow(1.0f - pow(_numMiss / static_cast(numTotalHits), 0.775f), pow(static_cast(_numMiss), 0.875f));
 
 	// Combo scaling
 	double maxCombo = beatmap.DifficultyAttribute(_mods, Beatmap.MaxCombo);
 	if (maxCombo > 0)
 		_speedValue *= min(static_cast(pow(_maxCombo, 0.8f) / pow(maxCombo, 0.8f)), 1.0f);
 
+	double approachRate = beatmap.DifficultyAttribute(_mods, Beatmap.AR);
+	double approachRateFactor = 0.0f;
+	if (approachRate > 10.33f)
+		approachRateFactor += 0.4f * (approachRate - 10.33f);
+
+	_speedValue *= 1.0f + min(approachRateFactor, approachRateFactor * (static_cast(numTotalHits) / 1000.0f));
+
 	// We want to give more reward for lower AR when it comes to speed and HD. This nerfs high AR and buffs lower AR.
 	if (Hidden.is(_mods))
 		_speedValue *= 1.0f + 0.04f * (12.0f - approachRate);
 
-	// Scale the speed value with accuracy _slightly_
-	_speedValue *= 0.02f + Accuracy();
-	// It is important to also consider accuracy difficulty when doing that
-	_speedValue *= 0.96f + (pow(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 2) / 1600);
+	// Scale the speed value with accuracy and OD
+	_speedValue *= (0.95f + pow(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 2) / 750) * pow(Accuracy(), (14.5f - max(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 8.0f)) / 2);
+	// Scale the speed value with # of 50s to punish doubletapping.
+	_speedValue *= pow(0.98f, _num50 < numTotalHits / 500.0f ? 0.0f : _num50 - numTotalHits / 500.0f);
 }
 
 void computeAccValue(Beatmap beatmap)

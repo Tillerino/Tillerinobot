@@ -18,6 +18,7 @@ public class BeatmapImpl implements Beatmap {
 	private double aim;
 	private int circleCount;
 	private int objectCount;
+	private int spinnerCount;
 	private boolean oppaiOnly;
 	private boolean shaky;
 	private boolean stable;
@@ -54,5 +55,10 @@ public class BeatmapImpl implements Beatmap {
 			return beatmap.getStarDifficulty();
 		}
 		return getAim() + getSpeed() + .5 * Math.abs(getAim() - getSpeed());
+	}
+
+	@Override
+	public int NumSpinners() {
+		return spinnerCount;
 	}
 }

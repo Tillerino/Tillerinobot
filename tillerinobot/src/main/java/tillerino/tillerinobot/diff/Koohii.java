@@ -23,6 +23,8 @@ public class Koohii implements DifficultyCalculator {
 
 		int circleCount;
 
+		int spinnerCount;
+
 		double speed;
 
 		double aim;
@@ -36,6 +38,6 @@ public class Koohii implements DifficultyCalculator {
 		Parser parser = new Parser();
 		Map map = parser.map(new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)));
 		DiffCalc diff = new DiffCalc().calc(map, (int) Mods.getMask(mods));
-		return new KoohiiDifficulty(map.objects.size(), map.ncircles, diff.speed, diff.aim, map.max_combo());
+		return new KoohiiDifficulty(map.objects.size(), map.ncircles, map.nspinners, diff.speed, diff.aim, map.max_combo());
 	}
 }

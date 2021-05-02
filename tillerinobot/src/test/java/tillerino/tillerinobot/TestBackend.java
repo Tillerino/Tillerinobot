@@ -153,7 +153,7 @@ public class TestBackend implements BotBackend {
 		if (estimates == null) {
 			BeatmapImpl cBeatmap = new BeatmapImpl(OsuApiBeatmapForDiff.Mapper.INSTANCE.shrink(beatmap),
 					beatmap.getStarDifficulty() / 2,
-					beatmap.getStarDifficulty() / 2, 200, 250, false, false, true);
+					beatmap.getStarDifficulty() / 2, 200, 250, 10, false, false, true);
 			estimates = new PercentageEstimatesImpl(cBeatmap, mods);
 		}
 

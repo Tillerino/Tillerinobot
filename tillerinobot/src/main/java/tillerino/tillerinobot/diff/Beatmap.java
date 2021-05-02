@@ -30,4 +30,6 @@ public interface Beatmap {
 		return null;
 	}
 
+	int NumSpinners();
+
 }
