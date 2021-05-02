@@ -36,6 +36,7 @@
 		<hsqldb.version>2.6.0</hsqldb.version>
 		<rabbitmq.version>5.12.0</rabbitmq.version>
 		<lombok.version>1.18.12</lombok.version>
+		<koohii.version>2.1.0</koohii.version>
 	</properties>
 
 	<build>
@@ -407,6 +408,11 @@
 				<groupId>com.rabbitmq</groupId>
 				<artifactId>amqp-client</artifactId>
 				<version>${rabbitmq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.francesco149</groupId>
+				<artifactId>koohii</artifactId>
+				<version>${koohii.version}</version>
 			</dependency>
 
 			<!-- HTTP -->
