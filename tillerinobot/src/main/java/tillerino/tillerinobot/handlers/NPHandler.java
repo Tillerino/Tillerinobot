@@ -34,7 +34,7 @@ public class NPHandler implements CommandHandler {
 			.compile("(?:is listening to|is watching|is playing|is editing)"
 					+ " \\[https?://osu.ppy.sh"
 					// new style: mode is optional, set urls have no beatmap id.
-					+ "(/beatmapsets/\\d+(#((?<mode>[a-z]+)/)?(?<newid>\\d+))?"
+					+ "(/beatmapsets/\\d+(#(?<mode>[a-z]+)?/?(?<newid>\\d+))?"
 					// old style
 					+ "|/(?<idtype>b|s)/(?<oldid>\\d+))"
 					+ ".*\\]"
