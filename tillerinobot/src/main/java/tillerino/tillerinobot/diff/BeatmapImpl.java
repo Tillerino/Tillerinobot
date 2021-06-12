@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(onConstructor = @__(@Deprecated))
 // suppress warning about case-insensitive field collision, because we cannot change the names in CBeatmap
 @SuppressWarnings("squid:S1845")
+@SuppressFBWarnings("NM")
 public class BeatmapImpl implements Beatmap {
 	private OsuApiBeatmapForDiff beatmap;
 	private double speed;
@@ -24,7 +25,6 @@ public class BeatmapImpl implements Beatmap {
 	private boolean stable;
 
 	@Override
-	@SuppressFBWarnings("NM")
 	public double DifficultyAttribute(@BitwiseMods long mods, int kind) {
 		switch (kind) {
 		case Beatmap.OD:
@@ -43,7 +43,6 @@ public class BeatmapImpl implements Beatmap {
 	}
 
 	@Override
-	@SuppressFBWarnings("NM")
 	public int NumHitCircles() {
 		return getCircleCount();
 	}
