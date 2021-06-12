@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableConsumer;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,7 +78,7 @@ abstract class AbstractRemoteQueue<T> {
 	/**
 	 * Subscribe to this queue or exchange. You will be running on RabbitMQ's own thread pool until the VM is interrupted.
 	 */
-	public void subscribe(Consumer<T> consumer) throws IOException {
+	public void subscribe(FailableConsumer<T, InterruptedException> consumer) throws IOException {
 		ObjectReader reader = mapper.readerFor(cls);
 		String key;
 		if (StringUtils.isNotBlank(queue)) {
@@ -102,6 +103,9 @@ abstract class AbstractRemoteQueue<T> {
 			}
 			try {
 				consumer.accept(parsed);
+			} catch (InterruptedException e) {
+				log.warn("Interrupted. Ignoring message from {}", key);
+				Thread.currentThread().interrupt();
 			} catch (Exception e) {
 				log.error("Error handling payload from {}", key, e);
 			}
