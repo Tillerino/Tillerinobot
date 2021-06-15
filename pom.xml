@@ -20,7 +20,7 @@
 	<properties>
 		<jacoco.version>0.8.6</jacoco.version>
 		<jersey.version>3.0.2</jersey.version>
-		<jetty.version>9.4.40.v20210413</jetty.version>
+		<jetty.version>9.4.42.v20210604</jetty.version>
 		<jackson.version>2.12.3</jackson.version>
 		<testcontainers.version>1.15.3</testcontainers.version>
 		<!-- determined by container -->
@@ -32,11 +32,15 @@
 		<eclipselink.version>2.7.8</eclipselink.version>
 		<spotbugs.version>4.2.3</spotbugs.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<mockito.version>3.9.0</mockito.version>
+		<mockito.version>3.11.1</mockito.version>
 		<hsqldb.version>2.6.0</hsqldb.version>
 		<rabbitmq.version>5.12.0</rabbitmq.version>
 		<lombok.version>1.18.12</lombok.version>
 		<koohii.version>2.1.0</koohii.version>
+		<spring-data-jpa.version>2.5.1</spring-data-jpa.version>
+		<mysql-connector-java.version>8.0.25</mysql-connector-java.version>
+		<rest-assured.version>4.4.0</rest-assured.version>
+		<awaitility.version>4.0.3</awaitility.version>
 	</properties>
 
 	<build>
@@ -482,7 +486,7 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>8.0.24</version>
+				<version>${mysql-connector-java.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.persistence</groupId>
@@ -492,7 +496,7 @@
 			<dependency>
 				<groupId>org.springframework.data</groupId>
 				<artifactId>spring-data-jpa</artifactId>
-				<version>2.5.0</version>
+				<version>${spring-data-jpa.version}</version>
 			</dependency>
 
 			<!-- Containers -->
@@ -542,7 +546,7 @@
 			<dependency>
 				<groupId>io.rest-assured</groupId>
 				<artifactId>rest-assured</artifactId>
-				<version>4.3.3</version>
+				<version>${rest-assured.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -607,7 +611,7 @@
 		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
-			<version>4.0.3</version>
+			<version>${awaitility.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
