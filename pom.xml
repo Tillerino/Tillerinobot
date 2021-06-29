@@ -32,7 +32,7 @@
 		<eclipselink.version>2.7.8</eclipselink.version>
 		<spotbugs.version>4.2.3</spotbugs.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<mockito.version>3.11.1</mockito.version>
+		<mockito.version>3.11.2</mockito.version>
 		<hsqldb.version>2.6.0</hsqldb.version>
 		<rabbitmq.version>5.12.0</rabbitmq.version>
 		<lombok.version>1.18.12</lombok.version>
@@ -40,7 +40,8 @@
 		<spring-data-jpa.version>2.5.1</spring-data-jpa.version>
 		<mysql-connector-java.version>8.0.25</mysql-connector-java.version>
 		<rest-assured.version>4.4.0</rest-assured.version>
-		<awaitility.version>4.0.3</awaitility.version>
+		<awaitility.version>4.1.0</awaitility.version>
+		<log4j.version>2.14.1</log4j.version>
 	</properties>
 
 	<build>
@@ -361,7 +362,12 @@
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-slf4j-impl</artifactId>
-				<version>2.14.1</version>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
