@@ -15,10 +15,10 @@ import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
 
 /**
- * Will connect to an actual IRC server with completely fake data. Use system
- * properties to configure: -Dtillerinobot.irc.server=localhost
- * -Dtillerinobot.irc.port=6667 -Dtillerinobot.irc.nickname=Tillerinobot
- * -Dtillerinobot.irc.password=secret -Dtillerinobot.irc.autojoin=#osu 
+ * Will connect to an actual IRC server with completely fake data. Use environment variables
+ * to configure: TILLERINOBOT_IRC_SERVER=localhost
+ * TILLERINOBOT_IRC_PORT=6667 TILLERINOBOT_IRC_NICKNAME=Tillerinobot
+ * TILLERINOBOT_IRC_PASSWORD=secret TILLERINOBOT_IRC_AUTOJOIN=#osu
  */
 public class IrcTillerinobot extends AbstractModule {
 
