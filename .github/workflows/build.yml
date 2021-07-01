@@ -14,3 +14,4 @@ jobs:
           distribution: 'adopt'
       - name: Build with Maven
         run: mvn -B -V -C verify -Dmaven.javadoc.skip=true
+      - uses: codecov/codecov-action@v1
