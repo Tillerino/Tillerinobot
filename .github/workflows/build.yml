@@ -8,7 +8,39 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        name: "Cache"
+        with:
+          path: |
+            ${{ github.workspace }}/.cargo-home
+            ${{ github.workspace }}/tillerinobot-live/target/release
+            ~/.m2
+          key: cache-${{ github.sha }}
+          restore-keys: |
+            cache-
+      - name: Check cache
+        run: |
+          ls -la
+          ls -la ~
+      - uses: addnab/docker-run-action@v3
+        name: "Build live"
+        with:
+          image: rust:1.50-alpine
+          options: -v ${{ github.workspace }}:/work
+          run: |
+            apk add --no-cache musl-dev
+            addgroup -g 121 docker
+            adduser -u 1001 --disabled-password runner docker
+
+            cd /work
+            export CARGO_HOME=$(pwd)/.cargo-home
+            cd tillerinobot-live
+            cargo build --release
+
+            chown -R runner:docker target
+            chown -R runner:docker ../.cargo-home
       - uses: actions/setup-java@v2
+        name: "Install Java/Maven"
         with:
           java-version: '15'
           distribution: 'adopt'
