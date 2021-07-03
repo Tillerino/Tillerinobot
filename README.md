@@ -1,6 +1,6 @@
 # Tillerinobot
 
-[![Build Status](https://travis-ci.org/Tillerino/Tillerinobot.svg?branch=master)](https://travis-ci.org/Tillerino/Tillerinobot)
+[![Build Status](https://github.com/Tillerino/Tillerinobot/actions/workflows/build.yml/badge.svg)](https://github.com/Tillerino/Tillerinobot/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/Tillerino/Tillerinobot/branch/master/graph/badge.svg)](https://codecov.io/gh/Tillerino/Tillerinobot)
 
 This project contains the IRC frontend and a growing part of the backend for ppaddict recommendations and similar services.
