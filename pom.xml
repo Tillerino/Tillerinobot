@@ -42,6 +42,8 @@
 		<rest-assured.version>4.4.0</rest-assured.version>
 		<awaitility.version>4.1.0</awaitility.version>
 		<log4j.version>2.14.1</log4j.version>
+		<assertj-core.version>3.20.2</assertj-core.version>
+		<json-unit-assertj.version>2.27.0</json-unit-assertj.version>
 	</properties>
 
 	<build>
@@ -561,6 +563,12 @@
 				<version>5.0.0</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>net.javacrumbs.json-unit</groupId>
+				<artifactId>json-unit-assertj</artifactId>
+				<version>${json-unit-assertj.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -611,7 +619,7 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.19.0</version>
+			<version>${assertj-core.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
