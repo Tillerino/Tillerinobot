@@ -137,12 +137,12 @@ public class Main extends Composite implements HasHelpElements {
     return null;
   }
 
-  public static final int VERSION = 3;
+  public static final int VERSION = 4;
   public static final String VERSION_MESSAGE =
       "You can now login with your osu! account."
-      + " At the same time, we removed the possibility to login with facebook."
-      + " If you used to log in with a facebook account which was linked your account to an osu! account, just login with the osu! account directly and all your settings and data will be right there."
-      + " Data and settings of unlinked facebook accounts are no longer available."
+      + " At the same time, we removed the possibility to login with Facebook or Google."
+      + " If you used to log in with a Facebook or Google account which was linked your account to an osu! account, just login with the osu! account directly and all your settings and data will be right there."
+      + " Data and settings of unlinked Facebook or Google accounts are no longer available."
       + " If you super urgently absolutely totally really need to recover your settings and data, please contact us and we'll figure something out.";
 
   @Override
