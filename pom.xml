@@ -20,12 +20,12 @@
 	<properties>
 		<jacoco.version>0.8.6</jacoco.version>
 		<jersey.version>3.0.2</jersey.version>
-		<jetty.version>9.4.42.v20210604</jetty.version>
-		<jackson.version>2.12.3</jackson.version>
+		<jetty.version>9.4.43.v20210629</jetty.version>
+		<jackson.version>2.12.4</jackson.version>
 		<testcontainers.version>1.15.3</testcontainers.version>
 		<!-- determined by container -->
 		<mockserver.version>5.11.2</mockserver.version>
-		<slf4j.version>1.7.30</slf4j.version>
+		<slf4j.version>1.7.31</slf4j.version>
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
 		<guice.version>5.0.1</guice.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
@@ -37,7 +37,7 @@
 		<rabbitmq.version>5.12.0</rabbitmq.version>
 		<lombok.version>1.18.12</lombok.version>
 		<koohii.version>2.1.0</koohii.version>
-		<spring-data-jpa.version>2.5.1</spring-data-jpa.version>
+		<spring-data-jpa.version>2.5.2</spring-data-jpa.version>
 		<mysql-connector-java.version>8.0.25</mysql-connector-java.version>
 		<rest-assured.version>4.4.0</rest-assured.version>
 		<awaitility.version>4.1.0</awaitility.version>
