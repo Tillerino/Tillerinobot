@@ -5,7 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /*
  * 20 bytes
@@ -16,12 +20,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * saving the seed for shuffling the array and shuffling it every time a String
  * is requested instead of shuffling it once.
  */
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@Getter
 public class StringShuffler implements Serializable {
 	private static final long serialVersionUID = 1L;
 	/*
 	 * 8 bytes;
 	 */
-	final long seed;
+	private final long seed;
 
 	@SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE", justification = "false positive")
 	public StringShuffler(Random globalRandom) {
@@ -31,7 +37,7 @@ public class StringShuffler implements Serializable {
 	/*
 	 * 4 bytes
 	 */
-	int index = 0;
+	private int index = 0;
 
 	public String get(String... strings) {
 		Random random = new Random(seed);

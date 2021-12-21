@@ -19,6 +19,15 @@ import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -58,7 +67,7 @@ public class UserDataManager {
 
 		@Value
 		@Builder(toBuilder = true)
-		@AllArgsConstructor(access = AccessLevel.PUBLIC)
+		@AllArgsConstructor(access = AccessLevel.PUBLIC, onConstructor = @__(@JsonCreator))
 		public static class BeatmapWithMods implements Serializable {
 			private static final long serialVersionUID = 1L;
 
@@ -69,7 +78,7 @@ public class UserDataManager {
 			private long mods;
 		}
 
-		transient boolean changed = false;
+		private transient boolean changed = false;
 
 		public void setChanged(boolean changed) {
 			this.changed = changed;
@@ -84,7 +93,7 @@ public class UserDataManager {
 		}
 		
 		@Getter
-		boolean allowedToDebug = false;
+		private boolean allowedToDebug = false;
 		
 		public void setAllowedToDebug(boolean allowedToDebug) {
 			changed |= allowedToDebug != this.allowedToDebug;
@@ -93,7 +102,7 @@ public class UserDataManager {
 		}
 		
 		@Getter(onMethod = @__({ @Nonnull }))
-		LanguageIdentifier languageIdentifier = LanguageIdentifier.Default;
+		private LanguageIdentifier languageIdentifier = LanguageIdentifier.Default;
 		
 		public void setLanguage(@Nonnull LanguageIdentifier languagePack) {
 			if (this.languageIdentifier != languagePack) {
@@ -107,13 +116,16 @@ public class UserDataManager {
 		}
 		
 		@CheckForNull
-		transient Language language;
+		private transient Language language;
 		
 		public <T, E extends Exception> T usingLanguage(FailableFunction<Language, T, E> task) throws E {
 			if (language == null) {
 				if (serializedLanguage != null) {
-					language = gson.fromJson(serializedLanguage,
-							languageIdentifier.cls);
+					try {
+						language = JACKSON.treeToValue(serializedLanguage, languageIdentifier.cls);
+					} catch (JsonProcessingException e) {
+						throw new RuntimeException("Language data cannot be read", e);
+					}
 				} else {
 					try {
 						language = languageIdentifier.cls.getDeclaredConstructor().newInstance();
@@ -126,7 +138,7 @@ public class UserDataManager {
 		}
 
 		@Getter(onMethod = @__({ @CheckForNull }))
-		BeatmapWithMods lastSongInfo = null;
+		private BeatmapWithMods lastSongInfo = null;
 		
 		public void setLastSongInfo(BeatmapWithMods lastSongInfo) {
 			changed |= !Objects.equals(this.lastSongInfo, lastSongInfo);
@@ -135,7 +147,7 @@ public class UserDataManager {
 		}
 
 		@Getter(onMethod = @__({ @CheckForNull }))
-		String defaultRecommendationOptions = null;
+		private String defaultRecommendationOptions = null;
 
 		public void setDefaultRecommendationOptions(String defaultRecommendationOptions) {
 			changed |= !Objects.equals(this.defaultRecommendationOptions, defaultRecommendationOptions);
@@ -150,19 +162,19 @@ public class UserDataManager {
 		 */
 		@SuppressWarnings("squid:S1948")
 		@SuppressFBWarnings("SE_BAD_FIELD")
-		JsonObject serializedLanguage;
+		private JsonNode serializedLanguage;
 
-		transient UserDataManager manager;
+		private transient UserDataManager manager;
 
 		@UserId
-		transient int userid;
+		private transient int userid;
 
 		public int getHearts() throws SQLException, IOException {
 			return manager.backend.getDonator(userid);
 		}
 
 		@Getter
-		boolean showWelcomeMessage = true;
+		private boolean showWelcomeMessage = true;
 
 		public void setShowWelcomeMessage(boolean welcomeMessage) {
 			changed |= welcomeMessage != this.showWelcomeMessage;
@@ -170,7 +182,7 @@ public class UserDataManager {
 		}
 
 		@Getter
-		boolean osuTrackWelcomeEnabled = false;
+		private boolean osuTrackWelcomeEnabled = false;
 
 		public void setOsuTrackWelcomeEnabled(boolean doOsuTrackUpdateOnWelcome) {
 			changed |= doOsuTrackUpdateOnWelcome != this.osuTrackWelcomeEnabled;
@@ -205,6 +217,18 @@ public class UserDataManager {
 	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
 			.create();
 
+	/**
+	 * This is a very specially JSON de-/serializer which we use for the weird way we set up serialization.
+	 * We always serialize fields, never via getters and setters.
+	 */
+	private static final ObjectMapper JACKSON = new ObjectMapper()
+			.setSerializationInclusion(Include.ALWAYS)
+			.enable(SerializationFeature.INDENT_OUTPUT)
+			.setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
+			.setVisibility(PropertyAccessor.GETTER, Visibility.NONE)
+			.setVisibility(PropertyAccessor.SETTER, Visibility.NONE)
+			.registerModule(new ParameterNamesModule());
+
 	public UserData getData(@UserId int userid) {
 		BotUserData data = repository.findByUserId(userid);
 
@@ -212,7 +236,11 @@ public class UserDataManager {
 		if(data == null || StringUtils.isEmpty(data.getUserdata())) {
 			options = new UserData();
 		} else {
-			options = gson.fromJson(data.getUserdata(), UserData.class);
+			try {
+				options = JACKSON.readValue(data.getUserdata(), UserData.class);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Can't read user data", e);
+			}
 		}
 
 		options.manager = this;
@@ -226,8 +254,13 @@ public class UserDataManager {
 			return;
 		}
 
-		options.serializedLanguage = (JsonObject) options.usingLanguage(lang -> gson.toJsonTree(lang));
-		String serialized = gson.toJson(options);
+		options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
+		String serialized;
+		try {
+			serialized = JACKSON.writeValueAsString(options);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Cannot serialize options", e);
+		}
 
 		BotUserData data = new BotUserData();
 		data.setUserId(userid);
