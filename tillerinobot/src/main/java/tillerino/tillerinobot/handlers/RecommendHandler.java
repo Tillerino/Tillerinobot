@@ -38,11 +38,9 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 	}
 
 	@Override
-	public GameChatResponse handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handleArgument(String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData, Language lang)
 			throws UserException, IOException, SQLException, InterruptedException {
 		MDC.put(MdcUtils.MDC_HANDLER, MdcUtils.MDC_HANDLER_RECOMMEND);
-
-		Language lang = userData.getLanguage();
 
 		if (remaining.isEmpty()) {
 			remaining = userData.getDefaultRecommendationOptions();

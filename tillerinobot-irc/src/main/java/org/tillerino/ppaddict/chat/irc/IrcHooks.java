@@ -55,6 +55,7 @@ public class IrcHooks extends CoreHooks {
 
 	private final Queue<ServerResponseEvent> userListEvents = new LinkedList<>();
 
+	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
 	public IrcHooks(@Named("messagePreprocessor") GameChatEventConsumer downStream,
 			GameChatMetrics botInfo,

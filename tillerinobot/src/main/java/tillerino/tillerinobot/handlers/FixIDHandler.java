@@ -16,6 +16,7 @@ import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.lang.Language;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FixIDHandler implements CommandHandler {
@@ -23,7 +24,7 @@ public class FixIDHandler implements CommandHandler {
     private final IrcNameResolver resolver;
 
 	@Override
-	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
 					throws UserException, IOException, SQLException {
 
         if (!command.toLowerCase().startsWith(COMMAND)) {

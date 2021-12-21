@@ -12,17 +12,18 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.lang.Language;
 
 public class HelpHandler implements CommandHandler {
 
 	@Override
-	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
 			throws UserException, IOException, SQLException,
 			InterruptedException {
 		if (getLevenshteinDistance(command.toLowerCase(), "help") <= 1) {
-			return new Success(userData.getLanguage().help());
+			return new Success(lang.help());
 		} else if (getLevenshteinDistance(command.toLowerCase(), "faq") <= 1) {
-			return new Success(userData.getLanguage().faq());
+			return new Success(lang.faq());
 		}
 		return null;
 	}

@@ -13,8 +13,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 	private @BitwiseMods long mods;
 
 	public PercentageEstimatesImpl(BeatmapImpl beatmap, @BitwiseMods long mods) {
-		super();
-		this.beatmap = beatmap;
+		this.beatmap = beatmap.toBuilder().build(); // makes a copy
 		this.mods = mods;
 	}
 

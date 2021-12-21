@@ -31,16 +31,14 @@ public class WithHandler implements CommandHandler {
 
 	@Override
 	public GameChatResponse handle(String originalMessage, OsuApiUser apiUser,
-			UserData userData) throws UserException,
+			UserData userData, Language lang) throws UserException,
 			IOException, SQLException, InterruptedException {
 		if (!originalMessage.toLowerCase().startsWith("with")) {
 			return null;
 		}
 
 		MDC.put(MdcUtils.MDC_HANDLER, "with");
-		
-		Language lang = userData.getLanguage();
-		
+
 		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
 		if(lastSongInfo == null) {
 			throw new UserException(lang.noLastSongInfo());

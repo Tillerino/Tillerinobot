@@ -7,18 +7,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
-import tillerino.tillerinobot.lang.Language;
+import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 
@@ -31,11 +30,6 @@ public class OptionsHandlerTest {
 
 	@Mock
 	UserData userData;
-
-	@Before
-	public void setUp() {
-      when(userData.getLanguage()).thenReturn(mock(Language.class));
-	}
 
 	@Test
 	public void test() throws Exception {
@@ -61,7 +55,7 @@ public class OptionsHandlerTest {
 	public void testSetLanguage() throws Exception {
 		OptionsHandler handler = new OptionsHandler(null);
 		
-		handler.handle("set languge tsundre", null, userData);
+		handler.handle("set languge tsundre", null, userData, new Default());
 		
 		verify(userData).setLanguage(LanguageIdentifier.Tsundere);
 	}
@@ -70,13 +64,13 @@ public class OptionsHandlerTest {
 	public void testGetTsundere() throws Exception {
 		when(userData.getLanguageIdentifier()).thenReturn(LanguageIdentifier.Tsundere);
 
-		assertThat(new OptionsHandler(null).handle("get language", null, userData))
+		assertThat(new OptionsHandler(null).handle("get language", null, userData, new Default()))
 			.isEqualTo(new Message("Language: Tsundere"));
 	}
 
 	@Test
 	public void testSetVietnamese() throws Exception {
-		new OptionsHandler(null).handle("set languge Tiếng Việt", null, userData);
+		new OptionsHandler(null).handle("set languge Tiếng Việt", null, userData, new Default());
 
 		verify(userData).setLanguage(LanguageIdentifier.Vietnamese);
 	}
@@ -85,14 +79,14 @@ public class OptionsHandlerTest {
 	public void testGetVietnamese() throws Exception {
 		when(userData.getLanguageIdentifier()).thenReturn(LanguageIdentifier.Vietnamese);
 
-		assertThat(new OptionsHandler(null).handle("get language", null, userData))
+		assertThat(new OptionsHandler(null).handle("get language", null, userData, new Default()))
 			.isEqualTo(new Message("Language: Tiếng Việt"));
 	}
 
 	public void testSetUnknownLanguage() throws Exception {
 		OptionsHandler handler = new OptionsHandler(null);
 		
-		assertThatThrownBy(() -> handler.handle("set language defflt", null, userData))
+		assertThatThrownBy(() -> handler.handle("set language defflt", null, userData, new Default()))
 			.isInstanceOf(UserException.class)
 			.hasMessageContaining("Tiếng Việt");
 	}
@@ -101,7 +95,7 @@ public class OptionsHandlerTest {
     public void testDefaultSettings() throws Exception {
       OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
 
-      handler.handle("set default hd hr", null, userData);
+      handler.handle("set default hd hr", null, userData, new Default());
 
       verify(userData).setDefaultRecommendationOptions("hd hr");
     }
@@ -110,7 +104,7 @@ public class OptionsHandlerTest {
     public void testClearDefaultSettings() throws Exception {
       OptionsHandler handler = new OptionsHandler(null);
 
-      handler.handle("set default", null, userData);
+      handler.handle("set default", null, userData, new Default());
 
       verify(userData).setDefaultRecommendationOptions(null);
     }
@@ -121,7 +115,7 @@ public class OptionsHandlerTest {
 
       OsuApiUser user = new OsuApiUser();
       user.setUserId(1);
-      handler.handle("set default invalid", user , userData);
+      handler.handle("set default invalid", user , userData, new Default());
     }
 
     @Test

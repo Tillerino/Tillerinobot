@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Application;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
 
 /**
@@ -41,6 +42,7 @@ public class BotApiDefinition extends Application {
 		});
 	}
 
+	@SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "We intentionally modify this externally. Sorry :D")
 	@Override
 	public Set<Object> getSingletons() {
 		return resourceInstances;

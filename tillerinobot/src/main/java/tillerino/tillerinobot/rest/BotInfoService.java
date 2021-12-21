@@ -23,7 +23,7 @@ public class BotInfoService implements BotStatus {
 	@Override
 	public LocalGameChatMetrics botinfo() {
 		botInfo.setConnected(bot.isConnected());
-		return botInfo;
+		return botInfo.toBuilder().build(); // make a copy
 	}
 
 	/*

@@ -18,6 +18,7 @@ import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.lang.Language;
 
 @Value
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -31,7 +32,7 @@ public class DebugHandler implements CommandHandler {
 
 	@Override
 	public GameChatResponse handle(String debugCommand, OsuApiUser debugApiUser,
-			UserData debugUserData) throws UserException, IOException,
+			UserData debugUserData, Language lang) throws UserException, IOException,
 			SQLException, InterruptedException {
 		if (!debugCommand.startsWith(DEBUG)
 				|| !debugUserData.isAllowedToDebug()) {
@@ -41,29 +42,28 @@ public class DebugHandler implements CommandHandler {
 			CommandHandler commands = CommandHandler
 					.alwaysHandling(
 							"resolve ",
-							(command, apiUser, userData) -> new Success(command
+							(command, apiUser, userData, l) -> new Success(command
 									+ " resolves to "
 									+ resolver.resolveIRCName(command)))
 					.or(CommandHandler.alwaysHandling(
 							"getUserByIdCached ",
-							(command, apiUser, userData) -> new Success(command
+							(command, apiUser, userData, l) -> new Success(command
 									+ " is "
 									+ backend.getUser(
 											Integer.parseInt(command), 0l))))
 					.or(CommandHandler.alwaysHandling(
 							"getUserByIdFresh ",
-							(command, apiUser, userData) -> new Success(command
+							(command, apiUser, userData, l) -> new Success(command
 									+ " is "
 									+ backend.getUser(
 											Integer.parseInt(command), 1l))));
 			GameChatResponse response = commands.handle(
 					debugCommand.substring(DEBUG.length()), debugApiUser,
-					debugUserData);
+					debugUserData, lang);
 			if (response != null) {
 				return response;
 			}
-			throw new UserException(debugUserData.getLanguage().invalidChoice(
-					debugCommand, DEBUG + commands.getChoices()));
+			throw new UserException(lang.invalidChoice(debugCommand, DEBUG + commands.getChoices()));
 		} catch (UserException e) {
 			throw e;
 		} catch (Exception e) {

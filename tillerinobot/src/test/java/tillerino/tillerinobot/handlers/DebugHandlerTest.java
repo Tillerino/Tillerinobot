@@ -32,8 +32,8 @@ public class DebugHandlerTest {
 	
 	@Test
 	public void testIfHandles() throws Exception {
-		assertNotNull(handler.handle("debug resolve bla", null, userData));
-		assertNotNull(handler.handle("debug getUserByIdFresh 1", null, userData));
-		assertNotNull(handler.handle("debug getUserByIdCached 1", null, userData));
+		assertNotNull(handler.handle("debug resolve bla", null, userData, null));
+		assertNotNull(handler.handle("debug getUserByIdFresh 1", null, userData, null));
+		assertNotNull(handler.handle("debug getUserByIdCached 1", null, userData, null));
 	}
 }

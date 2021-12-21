@@ -46,7 +46,7 @@ public class LinkPpaddictHandlerTest {
 
 	@Test
 	public void testHandle() throws Exception {
-		assertThatThrownBy(() -> handler.handle("12345678901234567890123456789012", user(12345, "usr"), null))
+		assertThatThrownBy(() -> handler.handle("12345678901234567890123456789012", user(12345, "usr"), null, null))
 				.hasMessage("nothing happened.");
 		verify(ppaddictService).tryLinkToPpaddict("12345678901234567890123456789012", 12345);
 		verify(backend).tryLinkToPatreon(eq("12345678901234567890123456789012"), argThat(u -> u.getUserId() == 12345));
@@ -55,7 +55,7 @@ public class LinkPpaddictHandlerTest {
 	@Test
 	public void testPpaddict() throws Exception {
 		doReturn(Optional.of("yeah")).when(ppaddictService).tryLinkToPpaddict("12345678901234567890123456789012", 12345);
-		assertThat(handler.handle("12345678901234567890123456789012", user(12345, "usr"), null))
+		assertThat(handler.handle("12345678901234567890123456789012", user(12345, "usr"), null, null))
 				.isInstanceOfSatisfying(Success.class, s -> assertThat((Object) s).hasFieldOrPropertyWithValue("content", "linked to yeah"));
 		verify(ppaddictService).tryLinkToPpaddict("12345678901234567890123456789012", 12345);
 	}
@@ -63,14 +63,14 @@ public class LinkPpaddictHandlerTest {
 	@Test
 	public void testPatreon() throws Exception {
 		doReturn("yeah").when(backend).tryLinkToPatreon("12345678901234567890123456789012", user(12345, "usr"));
-		assertThat(handler.handle("12345678901234567890123456789012", user(12345, "usr"), null))
+		assertThat(handler.handle("12345678901234567890123456789012", user(12345, "usr"), null, null))
 		.isInstanceOfSatisfying(Success.class, s -> assertThat((Object) s).hasFieldOrPropertyWithValue("content", "linked to yeah"));
 		verify(backend).tryLinkToPatreon(eq("12345678901234567890123456789012"), argThat(u -> u.getUserId() == 12345));
 	}
 
 	@Test
 	public void noMatch() throws Exception {
-		assertThat(handler.handle("fgds", null, null)).isNull();
+		assertThat(handler.handle("fgds", null, null, null)).isNull();
 	}
 
 	OsuApiUser user(@UserId int id, @OsuName String name) {

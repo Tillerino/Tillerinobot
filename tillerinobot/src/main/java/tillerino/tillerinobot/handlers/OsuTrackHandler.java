@@ -17,6 +17,7 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.osutrack.Highscore;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.osutrack.UpdateResult;
@@ -31,7 +32,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
     }
 
     @Override
-    public GameChatResponse handleArgument(String originalCommand, String remaining, OsuApiUser apiUser, UserDataManager.UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+    public GameChatResponse handleArgument(String originalCommand, String remaining, OsuApiUser apiUser, UserDataManager.UserData userData, Language lang) throws UserException, IOException, SQLException, InterruptedException {
         MDC.put(MdcUtils.MDC_HANDLER, "u");
 
         String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();

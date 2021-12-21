@@ -1,12 +1,11 @@
 package tillerino.tillerinobot.lang;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -14,7 +13,6 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.TestBackend;
-import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
@@ -33,14 +31,10 @@ public class TsundereTest {
 				new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader()),
 				mock(LiveActivity.class));
 
-		// mock a user data object and make it return the tsundere object that we're spying on
-		UserData userData = mock(UserData.class);
-		when(userData.getLanguage()).thenReturn(tsundere);
-		
 		// make a bullshit call to the handler four times
 		for (int i = 0; i < 4; i++) {
 			try {
-				handler.handle("r bullshit", mock(OsuApiUser.class), userData);
+				handler.handle("r bullshit", mock(OsuApiUser.class), null, tsundere);
 				// we should not get this far because we're expecting an exception
 				fail("there should be an exception");
 			} catch (UserException e) {

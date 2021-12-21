@@ -17,6 +17,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.lang.Language;
 
 @Value
 @AllArgsConstructor(onConstructor=@__({@Inject}))
@@ -27,7 +28,7 @@ public class LinkPpaddictHandler implements CommandHandler {
 	private final AbstractPpaddictUserDataService<?> ppaddictUserDataService;
 
 	@Override
-	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
 			throws UserException, IOException, SQLException {
 		if(!TOKEN_PATTERN.matcher(command).matches()) {
 			return null;

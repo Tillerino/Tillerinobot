@@ -28,10 +28,9 @@ public class RecommendHandlerTest {
 		when(manager.getRecommendation(any(), any(), any())).thenReturn(
 				new Recommendation(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)), mock(BareRecommendation.class)));
 		UserData userData = mock(UserData.class);
-		when(userData.getLanguage()).thenReturn(new Default());
 
 		when(userData.getDefaultRecommendationOptions()).thenReturn("dt");
-		new RecommendHandler(manager, mock(LiveActivity.class)).handle("r", mock(OsuApiUser.class), userData);
+		new RecommendHandler(manager, mock(LiveActivity.class)).handle("r", mock(OsuApiUser.class), userData, new Default());
 		verify(manager).getRecommendation(any(), eq("dt"), any());
 	}
 }

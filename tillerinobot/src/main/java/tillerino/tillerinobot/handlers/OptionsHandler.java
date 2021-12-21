@@ -31,7 +31,7 @@ public class OptionsHandler implements CommandHandler {
 
 	@Override
 	public GameChatResponse handle(String command, OsuApiUser apiUser,
-			UserData userData) throws UserException,
+			UserData userData, Language lang) throws UserException,
 			IOException, SQLException {
 		boolean set = false;
 		
@@ -68,24 +68,24 @@ public class OptionsHandler implements CommandHandler {
 							.map(i -> i.token)
 							.sorted()
 							.collect(joining(", "));
-					throw new UserException(userData.getLanguage().invalidChoice(value, choices));
+					throw new UserException(lang.invalidChoice(value, choices));
 				}
 
 				userData.setLanguage(ident);
 
-				return userData.getLanguage().optionalCommentOnLanguage(apiUser);
+				return lang.optionalCommentOnLanguage(apiUser);
 			} else {
 				return new Message("Language: " + userData.getLanguageIdentifier().token);
 			}
 		} else if (getLevenshteinDistance(option, "welcome") <= 1 && userData.getHearts() > 0) {
 			if (set) {
-				userData.setShowWelcomeMessage(parseBoolean(value, userData.getLanguage()));
+				userData.setShowWelcomeMessage(parseBoolean(value, lang));
 			} else {
 				return new Message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
 			}
 		} else if (getLevenshteinDistance(option, "osutrack-welcome") <= 1 && userData.getHearts() > 0) {
 			if (set) {
-				userData.setOsuTrackWelcomeEnabled(parseBoolean(value, userData.getLanguage()));
+				userData.setOsuTrackWelcomeEnabled(parseBoolean(value, lang));
 			} else {
 				return new Message("osu!track on welcome: " + (userData.isOsuTrackWelcomeEnabled() ? "ON" : "OFF"));
 			}
@@ -94,7 +94,7 @@ public class OptionsHandler implements CommandHandler {
 				if (value.isEmpty()) {
 					userData.setDefaultRecommendationOptions(null);
 				} else {
-					requestParser.parseSamplerSettings(apiUser, value, userData.getLanguage());
+					requestParser.parseSamplerSettings(apiUser, value, lang);
 					userData.setDefaultRecommendationOptions(value);
 				}
 			} else {
@@ -103,7 +103,7 @@ public class OptionsHandler implements CommandHandler {
 								? userData.getDefaultRecommendationOptions() : "-"));
 			}
 		} else {
-			throw new UserException(userData.getLanguage().invalidChoice(option,
+			throw new UserException(lang.invalidChoice(option,
 					"Language, Default" + (userData.getHearts() > 0 ? ", Welcome" : "")));
 		}
 

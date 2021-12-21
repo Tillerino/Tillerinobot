@@ -1,10 +1,9 @@
 package tillerino.tillerinobot.handlers;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -23,7 +22,6 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
@@ -51,23 +49,17 @@ public class AccHandlerTest {
 		
 		UserData userData = mock(UserData.class);
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
-		assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData)).getContent(), containsString("800x"));
+		assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).getContent()).contains("800x");
 	}
 	
-	@Test(expected=UserException.class)
 	public void testLargeNumber() throws Exception {
 		UserData userData = mock(UserData.class);
-		when(userData.getLanguage()).thenReturn(new Default());
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
 
 		BotBackend backend = mock(BotBackend.class);
 		when(backend.loadBeatmap(anyInt(), anyLong(), any())).thenReturn(new BeatmapMeta(null, null, null));
-		try {
-			new AccHandler(backend, mock(LiveActivity.class)).handle("acc 99 80000000000000000000x 1m", null, userData);
-			fail();
-		} catch (Exception e) {
-			assertThat(e.getMessage(), containsString("800000000000"));
-			throw e;
-		}
+		assertThatThrownBy(() -> new AccHandler(backend, mock(LiveActivity.class))
+				.handle("acc 99 80000000000000000000x 1m", null, userData, new Default()))
+						.hasMessageContaining("800000000000");
 	}
 }

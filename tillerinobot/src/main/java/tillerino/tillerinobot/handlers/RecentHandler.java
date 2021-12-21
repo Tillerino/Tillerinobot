@@ -22,7 +22,7 @@ public class RecentHandler implements CommandHandler {
 	BotBackend backend;
 
 	@Override
-	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData)
+	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language language)
 			throws UserException, IOException, SQLException, InterruptedException {
 		if (!command.equalsIgnoreCase("now")) {
 			return null;
@@ -31,8 +31,6 @@ public class RecentHandler implements CommandHandler {
 		if(userData.getHearts() <= 0) {
 			return null;
 		}
-		
-		final Language language = userData.getLanguage();
 
 		List<OsuApiScore> recentPlays = backend.getRecentPlays(apiUser.getUserId());
 		if (recentPlays.isEmpty()) {

@@ -3,6 +3,7 @@ package tillerino.tillerinobot;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -13,6 +14,7 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableFunction;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
@@ -22,9 +24,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.Value;
 import tillerino.tillerinobot.data.BotUserData;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
@@ -52,16 +56,17 @@ public class UserDataManager {
 	public static class UserData implements Serializable, Closeable {
 		private static final long serialVersionUID = 1L;
 
-		@Data
-		@AllArgsConstructor
+		@Value
+		@Builder(toBuilder = true)
+		@AllArgsConstructor(access = AccessLevel.PUBLIC)
 		public static class BeatmapWithMods implements Serializable {
 			private static final long serialVersionUID = 1L;
 
 			@BeatmapId
-			int beatmap;
+			private int beatmap;
 
 			@BitwiseMods
-			long mods;
+			private long mods;
 		}
 
 		transient boolean changed = false;
@@ -69,13 +74,13 @@ public class UserDataManager {
 		public void setChanged(boolean changed) {
 			this.changed = changed;
 			
-			if(!changed && (getLanguage() instanceof IsMutable)) {
-				((IsMutable) getLanguage()).clearModified();
+			if(!changed && (language instanceof IsMutable)) {
+				((IsMutable) language).clearModified();
 			}
 		}
 		
 		public boolean isChanged() {
-			return changed || (getLanguage() instanceof IsMutable) && ((IsMutable) getLanguage()).isModified();
+			return changed || (language instanceof IsMutable) && ((IsMutable) language).isModified();
 		}
 		
 		@Getter
@@ -104,21 +109,20 @@ public class UserDataManager {
 		@CheckForNull
 		transient Language language;
 		
-		public Language getLanguage() {
+		public <T, E extends Exception> T usingLanguage(FailableFunction<Language, T, E> task) throws E {
 			if (language == null) {
 				if (serializedLanguage != null) {
 					language = gson.fromJson(serializedLanguage,
 							languageIdentifier.cls);
 				} else {
 					try {
-						language = languageIdentifier.cls.newInstance();
-					} catch (InstantiationException | IllegalAccessException e) {
-						throw new RuntimeException(languageIdentifier.cls
-								+ " needs an accessible no-arg constructor", e);
+						language = languageIdentifier.cls.getDeclaredConstructor().newInstance();
+					} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+						throw new RuntimeException(languageIdentifier.cls + " needs an accessible no-arg constructor", e);
 					}
 				}
 			}
-			return language;
+			return task.apply(language);
 		}
 
 		@Getter(onMethod = @__({ @CheckForNull }))
@@ -187,6 +191,7 @@ public class UserDataManager {
 	
 	final BotUserDataRepository repository;
 
+	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
 	public UserDataManager(BotBackend backend, EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em,
 			BotUserDataRepository repository) {
@@ -221,7 +226,7 @@ public class UserDataManager {
 			return;
 		}
 
-		options.serializedLanguage = (JsonObject) gson.toJsonTree(options.getLanguage());
+		options.serializedLanguage = (JsonObject) options.usingLanguage(lang -> gson.toJsonTree(lang));
 		String serialized = gson.toJson(options);
 
 		BotUserData data = new BotUserData();

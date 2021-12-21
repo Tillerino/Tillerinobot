@@ -12,9 +12,12 @@ import org.tillerino.osuApiModel.Downloader;
 
 import com.google.gson.JsonElement;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class RateLimitingOsuApiDownloader extends Downloader {
 	private final RateLimiter limiter;
 
+	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
 	public RateLimitingOsuApiDownloader(@Named("osuapi.url") URL baseUrl,
 			@Named("osuapi.key") String key, RateLimiter limiter) {

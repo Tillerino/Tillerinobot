@@ -35,7 +35,7 @@ public class AccHandler implements CommandHandler {
 
 	@Override
 	public GameChatResponse handle(String originalMessage, OsuApiUser apiUser,
-			UserData userData) throws UserException,
+			UserData userData, Language lang) throws UserException,
 			IOException, SQLException, InterruptedException {
 		if (!originalMessage.toLowerCase().startsWith("acc")) {
 			return null;
@@ -44,7 +44,6 @@ public class AccHandler implements CommandHandler {
 		MDC.put(MdcUtils.MDC_HANDLER, "acc");
 		
 		BeatmapWithMods lastSongInfo = userData.getLastSongInfo();
-		Language lang = userData.getLanguage();
 		if (lastSongInfo == null) {
 			throw new UserException(lang.noLastSongInfo());
 		}

@@ -4,12 +4,14 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(onConstructor = @__(@Deprecated))
+@Builder(toBuilder = true)
 // suppress warning about case-insensitive field collision, because we cannot change the names in CBeatmap
 @SuppressWarnings("squid:S1845")
 @SuppressFBWarnings("NM")

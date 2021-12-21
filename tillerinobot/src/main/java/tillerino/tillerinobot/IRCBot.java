@@ -38,6 +38,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
@@ -80,7 +81,8 @@ public class IRCBot implements GameChatEventConsumer {
 	private final GameChatResponseQueue queue;
 	private final NPHandler npHandler;
 	private final AbstractPpaddictUserDataService<?> ppaddictUserDataService;
-	
+
+	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
 			UserDataManager userDataManager, ThreadLocalAutoCommittingEntityManager em,
@@ -111,19 +113,21 @@ public class IRCBot implements GameChatEventConsumer {
 	}
 
 	private GameChatResponse processPrivateAction(PrivateAction action) throws InterruptedException {
-		Language lang = new Default();
 		GameChatResponse versionInfo = GameChatResponse.none();
 		try {
+			versionInfo = checkVersionInfo(action);
 			OsuApiUser apiUser = getUserOrThrow(action.getNick());
 			try (UserData userData = userDataManager.getData(apiUser.getUserId())) {
-				lang = userData.getLanguage();
-
-				versionInfo = checkVersionInfo(action);
-
-				return versionInfo.then(npHandler.handle(action.getAction(), apiUser, userData));
+				return versionInfo.then(userData.usingLanguage((Language lang) -> { 
+					try {
+						return npHandler.handle(action.getAction(), apiUser, userData, lang);
+					} catch (RuntimeException | Error | UserException | IOException | SQLException e) {
+						return handleException(e, lang);
+					}
+				}));
 			}
 		} catch (RuntimeException | Error | UserException | IOException | SQLException e) {
-			return versionInfo.then(handleException(e, lang));
+			return versionInfo.then(handleException(e, new Default()));
 		}
 	}
 
@@ -206,52 +210,60 @@ public class IRCBot implements GameChatEventConsumer {
 	}
 
 	private GameChatResponse processPrivateMessage(final PrivateMessage message) throws InterruptedException {
-		Language lang = new Default();
-		GameChatResponse prelimResponse = GameChatResponse.none();
 		try {
-			prelimResponse = prelimResponse.then(new FixIDHandler(resolver).handle(message.getMessage(), null, null));
-			if (!prelimResponse.isNone()) {
-				return prelimResponse;
+			{
+				GameChatResponse fixIdResponse = new FixIDHandler(resolver).handle(message.getMessage(), null, null, new Default());
+				if (fixIdResponse != null) {
+					return fixIdResponse;
+				}
 			}
 			OsuApiUser apiUser = getUserOrThrow(message.getNick());
 			try (UserData userData = userDataManager.getData(apiUser.getUserId())) {
-				lang = userData.getLanguage();
+				return userData.usingLanguage((Language lang) -> {
+					GameChatResponse prelimResponse = GameChatResponse.none();
 
-				Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
+					try {
+						Pattern hugPattern = Pattern.compile("\\bhugs?\\b", Pattern.CASE_INSENSITIVE);
 
-				if (hugPattern.matcher(message.getMessage()).find() && userData.getHearts() > 0) {
-					return lang.hug(apiUser);
-				}
+						if (hugPattern.matcher(message.getMessage()).find() && userData.getHearts() > 0) {
+							return lang.hug(apiUser);
+						}
 
-				prelimResponse = prelimResponse.then(
-						new LinkPpaddictHandler(backend, ppaddictUserDataService).handle(message.getMessage(), apiUser, userData));
-				if (!prelimResponse.isNone()) {
-					return prelimResponse;
-				}
+						{
+							GameChatResponse linkResponse = new LinkPpaddictHandler(backend, ppaddictUserDataService)
+									.handle(message.getMessage(), apiUser, userData, lang);
+							if (linkResponse != null) {
+								return linkResponse;
+							}
+						}
 
-				if (!message.getMessage().startsWith("!")) {
-					return GameChatResponse.none();
-				}
-				String originalMessage = message.getMessage().substring(1).trim();
+						if (!message.getMessage().startsWith("!")) {
+							return GameChatResponse.none();
+						}
+						String originalMessage = message.getMessage().substring(1).trim();
 
-				prelimResponse = checkVersionInfo(message);
+						prelimResponse = checkVersionInfo(message);
 
-				GameChatResponse response = null;
-				for (CommandHandler handler : commandHandlers) {
-					if ((response = handler.handle(originalMessage, apiUser, userData)) != null) {
-						break;
+						GameChatResponse response = null;
+						for (CommandHandler handler : commandHandlers) {
+							if ((response = handler.handle(originalMessage, apiUser, userData, lang)) != null) {
+								break;
+							}
+							// removes the current handler's label from the MDC since it didn't work and we
+							// don't want it around for the next one
+							MDC.remove(MdcUtils.MDC_HANDLER);
+						}
+						if (response == null) {
+							throw new UserException(lang.unknownCommand(originalMessage));
+						}
+						return prelimResponse.then(response);
+					} catch (RuntimeException | Error | UserException | IOException | SQLException e) {
+						return prelimResponse.then(handleException(e, lang));
 					}
-					// removes the current handler's label from the MDC since it didn't work and we
-					// don't want it around for the next one
-					MDC.remove(MdcUtils.MDC_HANDLER);
-				}
-				if (response == null) {
-					throw new UserException(lang.unknownCommand(originalMessage));
-				}
-				return prelimResponse.then(response);
+				});
 			}
 		} catch (RuntimeException | Error | UserException | IOException | SQLException e) {
-			return prelimResponse.then(handleException(e, lang));
+			return handleException(e, new Default());
 		}
 	}
 
@@ -363,8 +375,8 @@ public class IRCBot implements GameChatEventConsumer {
 
 			long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
 
-			GameChatResponse response = data.getLanguage().welcomeUser(apiUser,
-					inactiveTime);
+			GameChatResponse response = data.usingLanguage((Language lang) -> lang.welcomeUser(apiUser,
+					inactiveTime));
 
 			if (data.isOsuTrackWelcomeEnabled()) {
 				UpdateResult update = osutrackDownloader.getUpdate(user.getNick());

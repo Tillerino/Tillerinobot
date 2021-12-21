@@ -49,10 +49,8 @@ public class NPHandler implements CommandHandler {
 	private final LiveActivity live;
 
 	@Override
-	public GameChatResponse handle(String message, OsuApiUser apiUser, UserData userData) throws UserException, IOException, SQLException, InterruptedException {
+	public GameChatResponse handle(String message, OsuApiUser apiUser, UserData userData, Language lang) throws UserException, IOException, SQLException, InterruptedException {
 		MDC.put(MdcUtils.MDC_HANDLER, "np");
-		
-		Language lang = userData.getLanguage();
 
 		BeatmapWithMods pair = parseNP(message, lang);
 

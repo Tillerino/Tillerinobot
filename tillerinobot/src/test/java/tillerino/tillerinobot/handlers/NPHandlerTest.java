@@ -41,23 +41,19 @@ public class NPHandlerTest {
 
 	@Test
 	public void testOldStyle() throws Exception {
-		UserData userData = mock(UserData.class);
-		when(userData.getLanguage()).thenReturn(new Default());
-		assertThat(handler.handle("is editing [https://osu.ppy.sh/b/123 title]", null, userData))
+		assertThat(handler.handle("is editing [https://osu.ppy.sh/b/123 title]", null, mock(UserData.class), new Default()))
 			.isNotNull()
 			.isInstanceOf(GameChatResponse.Success.class);
 	}
 
 	@Test
 	public void testNewStyle() throws Exception {
-		UserData userData = mock(UserData.class);
-		when(userData.getLanguage()).thenReturn(new Default());
 		for (String cmd : Arrays.asList(
 				"is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]",
 				// game mode is optional?
 				"is listening to [https://osu.ppy.sh/beatmapsets/1158561#2419085 AliA - Kakurenbo]"
 				)) {
-			assertThat(handler.handle(cmd, null, userData))
+			assertThat(handler.handle(cmd, null, mock(UserData.class), new Default()))
 				.isNotNull()
 				.isInstanceOf(GameChatResponse.Success.class);
 		}
@@ -65,18 +61,14 @@ public class NPHandlerTest {
 
 	@Test
 	public void testSetIdOldStyle() throws Exception {
-		UserData userData = mock(UserData.class);
-		when(userData.getLanguage()).thenReturn(new Default());
-		assertThatThrownBy(() -> handler.handle("is editing [https://osu.ppy.sh/s/123 title]", null, userData))
+		assertThatThrownBy(() -> handler.handle("is editing [https://osu.ppy.sh/s/123 title]", null, null, new Default()))
 			.isInstanceOf(UserException.class)
 			.hasMessage(new Default().isSetId());
 	}
 
 	@Test
 	public void testSetIdNewStyle() throws Exception {
-		UserData userData = mock(UserData.class);
-		when(userData.getLanguage()).thenReturn(new Default());
-		assertThatThrownBy(() -> handler.handle("is editing [https://osu.ppy.sh/beatmapsets/361035 title]", null, userData))
+		assertThatThrownBy(() -> handler.handle("is editing [https://osu.ppy.sh/beatmapsets/361035 title]", null, null, new Default()))
 		.isInstanceOf(UserException.class)
 		.hasMessage(new Default().isSetId());
 	}
