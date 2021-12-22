@@ -254,7 +254,9 @@ public class UserDataManager {
 			return;
 		}
 
-		options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
+		if (options.usingLanguage(lang -> (lang instanceof IsMutable) && ((IsMutable) lang).isModified())) {
+			options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
+		}
 		String serialized;
 		try {
 			serialized = JACKSON.writeValueAsString(options);
