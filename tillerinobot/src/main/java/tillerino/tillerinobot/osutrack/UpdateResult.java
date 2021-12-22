@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.tillerino.osuApiModel.types.GameMode;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
@@ -15,21 +15,21 @@ public class UpdateResult {
     @GameMode
     private int mode;
 
-    @SerializedName("playcount")
+    @JsonProperty("playcount")
     private int playCount;
 
-    @SerializedName("pp_rank")
+    @JsonProperty("pp_rank")
     private int ppRank;
 
-    @SerializedName("pp_raw")
+    @JsonProperty("pp_raw")
     private float ppRaw;
 
     private float accuracy;
 
-    @SerializedName("total_score")
+    @JsonProperty("total_score")
     private long totalScore;
 
-    @SerializedName("ranked_score")
+    @JsonProperty("ranked_score")
     private long rankedScore;
 
     private int count300;
@@ -40,22 +40,22 @@ public class UpdateResult {
 
     private float level;
 
-    @SerializedName("count_rank_a")
+    @JsonProperty("count_rank_a")
     private int countRankA;
 
-    @SerializedName("count_rank_s")
+    @JsonProperty("count_rank_s")
     private int countRankS;
 
-    @SerializedName("count_rank_ss")
+    @JsonProperty("count_rank_ss")
     private int countRankSS;
 
-    @SerializedName("levelup")
+    @JsonProperty("levelup")
     private boolean levelUp;
 
     private boolean first;
 
     private boolean exists;
 
-    @SerializedName("newhs")
+    @JsonProperty("newhs")
     private List<Highscore> newHighscores;
 }

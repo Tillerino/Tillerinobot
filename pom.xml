@@ -270,7 +270,7 @@
 			<dependency>
 				<groupId>com.github.tillerino</groupId>
 				<artifactId>osu-api-connector</artifactId>
-				<version>0.15.0</version>
+				<version>0.16.2</version>
 				<exclusions>
 					<!-- replaced with spotbugs jar -->
 					<exclusion>

@@ -1,10 +1,11 @@
 package tillerino.tillerinobot.osutrack;
 
-import com.google.gson.Gson;
-import org.tillerino.osuApiModel.deserializer.CustomGson;
-
 import java.io.IOException;
 import java.net.URL;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class OsutrackDownloader {
     //  __________________________________________________________________________________________
@@ -15,10 +16,16 @@ public class OsutrackDownloader {
     //    \_/_______________________________________________________________________________________/
     private static final String OSUTRACK_ENDPOINT = "https://ameobea.me/osutrack/api/get_changes.php?user=%s&mode=0";
 
-    private final Gson gson = CustomGson.wrap(false, Highscore.class);
+    static final ObjectMapper JACKSON = new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     protected UpdateResult parseJson(String json) {
-        UpdateResult updateResult = gson.fromJson(json, UpdateResult.class);
+        UpdateResult updateResult;
+        try {
+            updateResult = JACKSON.readValue(json, UpdateResult.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         for (Highscore highscore : updateResult.getNewHighscores()) {
             highscore.setMode(0);
         }

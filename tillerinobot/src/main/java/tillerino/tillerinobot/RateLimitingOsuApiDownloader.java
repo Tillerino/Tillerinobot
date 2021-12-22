@@ -10,7 +10,7 @@ import jakarta.ws.rs.ServiceUnavailableException;
 
 import org.tillerino.osuApiModel.Downloader;
 
-import com.google.gson.JsonElement;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -26,7 +26,7 @@ public class RateLimitingOsuApiDownloader extends Downloader {
 	}
 
 	@Override
-	public JsonElement get(String command, String... parameters) throws IOException {
+	public JsonNode get(String command, String... parameters) throws IOException {
 		try {
 			limiter.limitRate();
 		} catch (InterruptedException e) {
