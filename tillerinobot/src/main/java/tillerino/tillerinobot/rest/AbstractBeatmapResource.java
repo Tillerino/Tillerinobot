@@ -5,7 +5,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -15,6 +21,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +35,29 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 		@Path("/osu/{beatmapid}")
 		@Produces(MediaType.TEXT_PLAIN)
 		String getActualBeatmap(@PathParam("beatmapid") int beatmapid);
+
+		/**
+		 * Creates a test implementation that loads beatmaps from the classpath.
+		 *
+		 * @param cls A class from the class loader that can load the resources. If you
+		 *            are creating this in a unit test where the resources are in the
+		 *            same module, getClass() will probably work just fine.
+		 * @return an implementation of {@link BeatmapDownloader} which will load
+		 *         beatmaps from the class path. It will load /beatmaps/|beatmapid|.osu
+		 *         as UTF-8 and throw JAX-RS exceptions on errors.
+		 */
+		public static BeatmapDownloader createTestLoader(Class<?> cls) {
+			return beatmapid -> {
+				try (InputStream is = cls.getResourceAsStream("/beatmaps/" + beatmapid + ".osu")) {
+					if (is == null) {
+						throw new NotFoundException("beatmap " + beatmapid);
+					}
+					return IOUtils.toString(is, StandardCharsets.UTF_8);
+				} catch (IOException e) {
+					throw new InternalServerErrorException(e);
+				}
+			};
+		}
 	}
 
 	protected final ActualBeatmapRepository repository;
