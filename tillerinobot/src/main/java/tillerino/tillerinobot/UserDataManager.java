@@ -28,9 +28,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
@@ -120,7 +117,7 @@ public class UserDataManager {
 		
 		public <T, E extends Exception> T usingLanguage(FailableFunction<Language, T, E> task) throws E {
 			if (language == null) {
-				if (serializedLanguage != null) {
+				if (serializedLanguage != null && !serializedLanguage.isNull()) {
 					try {
 						language = JACKSON.treeToValue(serializedLanguage, languageIdentifier.cls);
 					} catch (JsonProcessingException e) {
@@ -213,9 +210,6 @@ public class UserDataManager {
 		this.em = em;
 		this.repository = repository;
 	}
-
-	static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting()
-			.create();
 
 	/**
 	 * This is a very specially JSON de-/serializer which we use for the weird way we set up serialization.
