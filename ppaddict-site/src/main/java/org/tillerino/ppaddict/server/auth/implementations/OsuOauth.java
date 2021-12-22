@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict.server.auth.implementations;
 
-import com.google.gson.Gson;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthConstants;
@@ -12,6 +11,9 @@ import org.scribe.model.Verifier;
 import org.tillerino.ppaddict.server.auth.AbstractAuthenticatorService;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.server.auth.CredentialsWithOsu;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,11 +37,9 @@ public class OsuOauth extends AbstractAuthenticatorService {
             .build());
   }
 
-  Gson gson = new Gson();
-
   public static class OsuUserinfoBody {
-    int id;
-    String username;
+    public int id;
+    public String username;
   }
 
   @SuppressFBWarnings(value = "TQ", justification = "Producer")
@@ -56,7 +56,12 @@ public class OsuOauth extends AbstractAuthenticatorService {
 
     Response response = request.send();
 
-    OsuUserinfoBody fromJson = gson.fromJson(response.getBody(), OsuUserinfoBody.class);
+    OsuUserinfoBody fromJson;
+    try {
+      fromJson = new ObjectMapper().readValue(response.getBody(), OsuUserinfoBody.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
 
     return new CredentialsWithOsu(getIdentifier() + ":" + fromJson.id, fromJson.username, fromJson.id);
   }

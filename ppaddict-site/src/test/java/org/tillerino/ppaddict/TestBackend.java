@@ -26,8 +26,7 @@ import org.tillerino.ppaddict.server.PersistentUserData;
 import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.Credentials;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
@@ -45,15 +44,13 @@ import tillerino.tillerinobot.lang.Default;
 public class TestBackend implements PpaddictBackend {
   private final tillerino.tillerinobot.TestBackend botBackend;
 
-  Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-
   @Inject
   public TestBackend(tillerino.tillerinobot.TestBackend backend) {
     this.botBackend = backend;
 
     try (Reader reader =
         new InputStreamReader(new BufferedInputStream(new FileInputStream("ppaddict-db.json")))) {
-      database = gson.fromJson(reader, Database.class);
+      database = new ObjectMapper().readValue(reader, Database.class);
     } catch (IOException e) {
       // that's okay
     }
@@ -64,7 +61,7 @@ public class TestBackend implements PpaddictBackend {
     System.out.println(file.getAbsolutePath());
     try (Writer writer =
         new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(file)))) {
-      gson.toJson(database, writer);
+      new ObjectMapper().writeValue(writer, database);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
