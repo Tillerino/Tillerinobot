@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -218,6 +219,7 @@ public class UserDataManager {
 	private static final ObjectMapper JACKSON = new ObjectMapper()
 			.setSerializationInclusion(Include.ALWAYS)
 			.enable(SerializationFeature.INDENT_OUTPUT)
+			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 			.setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
 			.setVisibility(PropertyAccessor.GETTER, Visibility.NONE)
 			.setVisibility(PropertyAccessor.SETTER, Visibility.NONE)
