@@ -189,7 +189,15 @@ public class IRCBot implements GameChatEventConsumer {
 
 	public static boolean isTimeout(Throwable e) {
 		return (e instanceof SocketTimeoutException)
-				|| ((e instanceof IOException) && e.getMessage().startsWith("Premature EOF"));
+				|| ((e instanceof IOException) && (e.getMessage().startsWith("Premature EOF")
+						|| e.getMessage().startsWith("Remote host terminated the handshake for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("Error writing to server for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("Unexpected end of file from server for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("response code 502 for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("response code 503 for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("response code 520 for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("response code 525 for https://osu.ppy.sh/api/")
+						));
 	}
 
 	public static String logException(Throwable e, Logger logger) {
@@ -433,7 +441,7 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 		
 		String string = LoggingUtils.getRandomString(8);
-		log.error("bot user not resolvable " + string + " name: " + nick);
+		log.warn("bot user not resolvable " + string + " name: " + nick);
 		
 		// message not in language-files, since we cant possible know language atm
 		throw new UserException("Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
