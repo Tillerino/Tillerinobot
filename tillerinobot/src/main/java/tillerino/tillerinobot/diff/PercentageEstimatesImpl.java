@@ -46,15 +46,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 	}
 
 	@Override
-	public boolean isShaky() {
-		return beatmap.isShaky();
-	}
-
-	@Override
-	public Double getStarDiff() {
-		if (!beatmap.isStable()) {
-			return null;
-		}
+	public double getStarDiff() {
 		return beatmap.getStarDiff();
 	}
 

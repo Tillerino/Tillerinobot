@@ -23,8 +23,6 @@ public class BeatmapImpl implements Beatmap {
 	private int objectCount;
 	private int spinnerCount;
 	private boolean oppaiOnly;
-	private boolean shaky;
-	private boolean stable;
 
 	@Override
 	public double DifficultyAttribute(@BitwiseMods long mods, int kind) {

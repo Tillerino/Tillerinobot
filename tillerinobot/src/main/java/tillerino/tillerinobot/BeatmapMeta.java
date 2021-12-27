@@ -62,10 +62,6 @@ public class BeatmapMeta {
 
         estimateMessage += ppMessageBuilder.buildMessage(getEstimates());
 
-        if (getEstimates().isShaky()) {
-            estimateMessage += " (rough estimates)";
-        }
-
         estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(getMods()));
 
 		Double starDiff = null;
