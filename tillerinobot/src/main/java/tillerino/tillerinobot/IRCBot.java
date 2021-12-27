@@ -193,6 +193,7 @@ public class IRCBot implements GameChatEventConsumer {
 						|| e.getMessage().startsWith("Remote host terminated the handshake for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("Error writing to server for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("Unexpected end of file from server for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("Broken pipe for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("response code 502 for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("response code 503 for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("response code 520 for https://osu.ppy.sh/api/")
