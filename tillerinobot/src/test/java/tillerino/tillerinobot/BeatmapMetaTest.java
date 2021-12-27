@@ -36,7 +36,7 @@ public class BeatmapMetaTest {
 		beatmap.setBpm(420);
 		beatmap.setBeatmapId(69);
 		beatmap.setMaxCombo(100);
-		BeatmapImpl cBeatmap = new BeatmapImpl(OsuApiBeatmapForDiff.Mapper.INSTANCE.shrink(beatmap), 1.45, 1, 200, 250, 10, false, false, true);
+		BeatmapImpl cBeatmap = new BeatmapImpl(OsuApiBeatmapForDiff.Mapper.INSTANCE.shrink(beatmap), 1.45, 1, 200, 250, 10, false);
 		beatmap.setStarDifficulty(cBeatmap.getStarDiff());
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, Mods.getMask(Mods.DoubleTime));
 		return new BeatmapMeta(beatmap, personalPp, estimates);
