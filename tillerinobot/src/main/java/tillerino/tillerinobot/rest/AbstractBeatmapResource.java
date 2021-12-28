@@ -70,8 +70,12 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 	public String getFile() {
 		ActualBeatmap found = repository.findById(beatmap.getBeatmapId()).orElse(null);
 		if (found != null && (found.getHash() == null || found.getHash().isEmpty())) {
-			found.setHash(md5Hex(found.getContent()));
-			repository.save(found);
+			found.setHash(md5Hex(found.decompressedContent()));
+			found = repository.save(found);
+		}
+		if (found != null && found.getContent() != null) {
+			found.compressContent(found.getContent());
+			found = repository.save(found);
 		}
 		if (found == null || (!found.getHash().equals(beatmap.getFileMd5())
 				&& found.getDownloaded() < System.currentTimeMillis() - HOURS.toMillis(1))) {
@@ -80,10 +84,10 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 				found = new ActualBeatmap();
 				found.setBeatmapid(beatmap.getBeatmapId());
 			}
-			found.setContent(downloaded.getBytes(UTF_8));
+			found.compressContent(downloaded.getBytes(UTF_8));
 			found.setDownloaded(System.currentTimeMillis());
 			found.setHash(md5Hex(downloaded));
-			repository.save(found);
+			found = repository.save(found);
 		}
 		if (!found.getHash().equals(beatmap.getFileMd5())) {
 			throw new WebApplicationException(Response.status(Status.BAD_GATEWAY)
@@ -91,7 +95,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 							beatmap.getFileMd5(), found.getHash()))
 					.build());
 		}
-		return new String(found.getContent(), UTF_8);
+		return new String(found.decompressedContent(), UTF_8);
 	}
 
 	@Override
@@ -107,7 +111,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 			found = new ActualBeatmap();
 			found.setBeatmapid(beatmap.getBeatmapId());
 		}
-		found.setContent(content.getBytes(UTF_8));
+		found.compressContent(content.getBytes(UTF_8));
 		found.setDownloaded(System.currentTimeMillis());
 		found.setHash(hash);
 		repository.save(found);

@@ -1,6 +1,7 @@
 package tillerino.tillerinobot.rest;
 
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -44,21 +45,24 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
   }
 
   @Test
-  public void testCorrectHash() throws Exception {
+  public void testMigrations() throws Exception {
     String content = "hello";
     // save without hash for backwards compatibility
-    beatmapFilesRepo.save(new ActualBeatmap(12, content.getBytes(), 1, ""));
+    beatmapFilesRepo.save(new ActualBeatmap(12, content.getBytes(), null, 1, ""));
     beatmap.setBeatmapId(12);
     beatmap.setFileMd5(md5Hex(content));
     assertEquals(content, resource.getFile());
     verifyNoInteractions(downloader);
+    // data was compressed after the fact
+    assertThat(beatmapFilesRepo.findById(12)).hasValueSatisfying(ab ->
+        assertThat(ab).hasFieldOrPropertyWithValue("content", null));
   }
 
   @Test
   public void testRedownloadOnWrongHash() throws Exception {
     String oldContent = "hello";
     String newContent = "world";
-    beatmapFilesRepo.save(new ActualBeatmap(12, oldContent.getBytes(), 1, md5Hex(oldContent)));
+    beatmapFilesRepo.save(new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)));
     beatmap.setBeatmapId(12);
     beatmap.setFileMd5(md5Hex(newContent));
     when(downloader.getActualBeatmap(12)).thenReturn(newContent);
