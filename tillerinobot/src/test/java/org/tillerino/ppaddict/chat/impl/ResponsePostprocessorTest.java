@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.chat.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -19,12 +20,14 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
+import org.tillerino.ppaddict.util.RetryableException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResponsePostprocessorTest {
@@ -145,5 +148,27 @@ public class ResponsePostprocessorTest {
 		when(clock.currentTimeMillis()).thenReturn(123L);
 		responsePostprocessor.onResponse(new Message("yeah"), event);
 		verify(botInfo).setLastSentMessage(123L);
+	}
+
+	@Test
+	public void writingIsRetried() throws Exception {
+		Joined event = new Joined(1234, "nick", 0);
+		int[] count = { 0 };
+		doAnswer(x -> {
+			if (count[0]++ > 0) {
+				return null;
+			}
+			throw new RetryableException(0);
+		}).when(writer).message("abc", event);
+		responsePostprocessor.onResponse(new Message("abc"), event);
+		verify(writer, times(2)).message("abc", event);
+	}
+
+	@Test
+	public void retryingStops() throws Exception {
+		Joined event = new Joined(1234, "nick", 0);
+		doThrow(new RetryableException(0)).when(writer).message("abc", event);
+		responsePostprocessor.onResponse(new Message("abc"), event);
+		verify(writer, times(10)).message("abc", event);
 	}
 }

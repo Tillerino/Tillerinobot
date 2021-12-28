@@ -18,6 +18,7 @@ import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
+import org.tillerino.ppaddict.util.RetryableException;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,15 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	public void onResponse(GameChatResponse response, GameChatEvent event) throws InterruptedException {
 		try {
 			for (GameChatResponse r : response.flatten()) {
-				handleResponse(r, event);
+				for (int i = 0; i < 10; i++) { // arbitrary retry limit greater than zero
+					try {
+						handleResponse(r, event);
+						break;
+					} catch (RetryableException e) {
+						log.warn("Bot not connected. Retrying.");
+						e.waitBeforeRetry();
+					}
+				}
 			}
 		} catch (IOException e) {
 			log.warn("Error while sending chat message", e);

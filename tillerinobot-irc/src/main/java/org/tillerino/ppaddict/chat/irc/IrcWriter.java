@@ -11,6 +11,7 @@ import org.pircbotx.output.OutputUser;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
+import org.tillerino.ppaddict.util.RetryableException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +33,7 @@ public class IrcWriter implements GameChatWriter {
 	}
 
 	private void send(GameChatEvent event, Consumer<OutputUser> sender) throws IOException, InterruptedException {
-		pinger.ping((CloseableBot) waitForBot());
+		pinger.ping(waitForBot());
 
 		try {
 			sender.accept(waitForBot().getUserChannelDao().getUser(event.getNick()).send());
@@ -41,6 +42,11 @@ public class IrcWriter implements GameChatWriter {
 				// see org.pircbotx.output.OutputRaw.rawLine(String)
 				throw (InterruptedException) e.getCause();
 			}
+			if (e.getMessage().equals("Not connected to server")) {
+				// happens if the bot disconnects after waitForBot() finishes.
+				// since we wait for the connection in waitForBot(), we can retry immediately.
+				throw new RetryableException(0);
+			}
 			throw e;
 		}
 	}
@@ -48,7 +54,7 @@ public class IrcWriter implements GameChatWriter {
 	private CloseableBot waitForBot() throws InterruptedException {
 		for (;;) {
 			CloseableBot b = bot.get();
-			if (b != null) {
+			if (b != null && b.isConnected()) {
 				return b;
 			}
 			Thread.sleep(100);

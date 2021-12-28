@@ -1,7 +1,10 @@
 package org.tillerino.ppaddict.chat.irc;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyString;
 
 import java.util.concurrent.ExecutorService;
 
@@ -19,6 +22,7 @@ import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
+import org.tillerino.ppaddict.util.RetryableException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IrcWriterTest {
@@ -55,6 +59,7 @@ public class IrcWriterTest {
 		when(bot.getUserChannelDao()).thenReturn(userChannelDao);
 		when(userChannelDao.getUser("user")).thenReturn(pircBotXuser);
 		when(pircBotXuser.send()).thenReturn(outputUser);
+		when(bot.isConnected()).thenReturn(true);
 	}
 
 	@Test
@@ -67,5 +72,13 @@ public class IrcWriterTest {
 	public void testAction() throws Exception {
 		queue.action("abc", new PrivateMessage(6789, "user", 12345, "hello"));
 		verify(outputUser).action("abc");
+	}
+
+	@Test
+	public void botDisconnects() throws Exception {
+		// bot disconnects at a bad timing
+		doThrow(new RuntimeException("Not connected to server")).when(outputUser).message(anyString());
+		assertThatThrownBy(() -> queue.message("abc", new PrivateMessage(6789, "user", 12345, "hello")))
+			.isInstanceOf(RetryableException.class);
 	}
 }
