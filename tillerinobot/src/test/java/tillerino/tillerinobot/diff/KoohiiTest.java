@@ -39,4 +39,13 @@ public class KoohiiTest {
 			softly.assertThat(diff.getMaxCombo()).as("max max combo").isEqualTo(2385);
 		}
 	}
+
+	@Test
+	public void testEmptyMap() throws Exception {
+		try (InputStream is = getClass().getResourceAsStream(
+				"/MOSAIC.WAV - Magical Pants (Short Ver.) (Imaginative) [look at bg].osu")) {
+			DifficultyProperties diff = new Koohii().calculate(is, Collections.emptyList());
+			assertThat(diff.getAim()).isEqualTo(0D);
+		}
+	}
 }

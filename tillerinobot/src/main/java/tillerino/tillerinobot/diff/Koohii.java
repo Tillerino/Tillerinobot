@@ -37,6 +37,10 @@ public class Koohii implements DifficultyCalculator {
 			throws UserException, IOException {
 		Parser parser = new Parser();
 		Map map = parser.map(new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)));
+		if (map.objects.isEmpty()) {
+			// Koohii throws an IndexOutOfBoundsException in this case
+			return new KoohiiDifficulty(0, 0, 0, 0, 0, 0);
+		}
 		DiffCalc diff = new DiffCalc().calc(map, (int) Mods.getMask(mods));
 		return new KoohiiDifficulty(map.objects.size(), map.ncircles, map.nspinners, diff.speed, diff.aim, map.max_combo());
 	}
