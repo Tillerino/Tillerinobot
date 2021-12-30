@@ -115,7 +115,7 @@ public class BeatmapInfoService implements BeatmapDifficulties {
 			BeatmapInfo info = new BeatmapInfo();
 			info.beatmapid = beatmapid;
 			info.mods = estimates.getMods();
-			info.oppaiOnly = estimates.isOppaiOnly();
+			info.oppaiOnly = false;
 			info.starDiff = estimates.getStarDiff();
 
 			if(requestedAccs.isEmpty()) {

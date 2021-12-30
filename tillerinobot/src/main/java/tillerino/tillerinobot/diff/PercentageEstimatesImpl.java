@@ -49,14 +49,4 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 	public double getStarDiff() {
 		return beatmap.getStarDiff();
 	}
-
-	@Override
-	public boolean isOppaiOnly() {
-		return beatmap.isOppaiOnly();
-	}
-
-	@Override
-	public boolean isRanked() {
-		return beatmap.getBeatmap().getApproved() > 0 && beatmap.getBeatmap().getApproved() != 3;
-	}
 }

@@ -18,8 +18,4 @@ public interface PercentageEstimates {
 	long getMods();
 
 	double getStarDiff();
-
-	boolean isOppaiOnly();
-
-	boolean isRanked();
 }

@@ -37,7 +37,6 @@
 		<hsqldb.version>2.6.1</hsqldb.version>
 		<rabbitmq.version>5.14.0</rabbitmq.version>
 		<lombok.version>1.18.12</lombok.version>
-		<koohii.version>2.1.0</koohii.version>
 		<spring-data-jpa.version>2.6.0</spring-data-jpa.version>
 		<mysql-connector-java.version>8.0.27</mysql-connector-java.version>
 		<rest-assured.version>4.4.0</rest-assured.version>
@@ -428,11 +427,6 @@
 				<groupId>com.rabbitmq</groupId>
 				<artifactId>amqp-client</artifactId>
 				<version>${rabbitmq.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.github.francesco149</groupId>
-				<artifactId>koohii</artifactId>
-				<version>${koohii.version}</version>
 			</dependency>
 
 			<!-- HTTP -->
