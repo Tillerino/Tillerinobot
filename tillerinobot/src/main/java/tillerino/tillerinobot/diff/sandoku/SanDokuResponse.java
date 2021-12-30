@@ -36,17 +36,19 @@ public class SanDokuResponse {
 	public Beatmap toBeatmap() {
 		return new Beatmap() {
 			@Override
-			public double DifficultyAttribute(long mods, int kind) {
-				if (mods != modsUsed) {
+			public float DifficultyAttribute(long mods, int kind) {
+				if (Beatmap.getDiffMods(mods) != modsUsed) {
 					throw new IllegalArgumentException("Unexpected mods " + mods + ". Was loaded with " + modsUsed);
 				}
 
 				return switch (kind) {
-					case Beatmap.Aim -> diffCalcResult.aimStrain;
-					case Beatmap.AR -> diffCalcResult.approachRate;
+					case Beatmap.Aim -> (float) diffCalcResult.aimStrain;
+					case Beatmap.AR -> (float) diffCalcResult.approachRate;
+					case Beatmap.Flashlight -> (float) diffCalcResult.flashlightRating;
 					case Beatmap.MaxCombo -> diffCalcResult.maxCombo;
-					case Beatmap.OD -> diffCalcResult.overallDifficulty;
-					case Beatmap.Speed -> diffCalcResult.speedStrain;
+					case Beatmap.OD -> (float) diffCalcResult.overallDifficulty;
+					case Beatmap.SliderFactor -> (float) diffCalcResult.sliderFactor;
+					case Beatmap.Speed -> (float) diffCalcResult.speedStrain;
 					default -> throw new IllegalArgumentException("Unexpected kind: " + kind);
 				};
 			}
@@ -59,6 +61,11 @@ public class SanDokuResponse {
 			@Override
 			public int NumSpinners() {
 				return diffCalcResult.spinnerCount;
+			}
+
+			@Override
+			public int NumSliders() {
+				return diffCalcResult.sliderCount;
 			}
 		};
 	}

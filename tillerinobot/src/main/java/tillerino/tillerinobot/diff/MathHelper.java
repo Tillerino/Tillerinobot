@@ -9,15 +9,43 @@ public final class MathHelper {
 		// utility class
 	}
 
-	static double static_cast(int x) {
+	static float static_cast_f32(int x) {
 		return x;
 	}
 
-	static double static_cast(double x) {
-		return x;
+	static float static_cast_f32(double x) {
+		return (float) x;
 	}
 
-	static double Clamp(double x, double min, double max) {
+	static int static_cast_s32(double x) {
+		return (int) x;
+	}
+
+	static float std_pow(float b, float e) {
+		return (float) Math.pow(b, e);
+	}
+
+	static float pow(float b, float e) {
+		return (float) Math.pow(b, e);
+	}
+
+	static float Clamp(float x, float min, float max) {
 		return max(min, min(max, x));
+	}
+
+	static float log10(float x) {
+		return (float) Math.log10(x);
+	}
+
+	static float std_max(float x, float y) {
+		return Math.max(x, y);
+	}
+
+	static float std_min(float x, float y) {
+		return Math.min(x, y);
+	}
+
+	static int std_max(int x, int y) {
+		return Math.max(x, y);
 	}
 }
