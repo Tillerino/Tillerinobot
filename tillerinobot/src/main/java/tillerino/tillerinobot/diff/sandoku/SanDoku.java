@@ -19,6 +19,11 @@ import org.tillerino.osuApiModel.types.GameMode;
  * https://github.com/omkelderman/SanDoku
  */
 public interface SanDoku {
+	/**
+	 * Once changes in SanDoku have been deployed and values need to be recalculated, bump this version!
+	 */
+	final int VERSION = 1;
+
 	@POST
 	@Path("/diff")
 	@Produces(MediaType.APPLICATION_JSON)
