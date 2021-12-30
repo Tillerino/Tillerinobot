@@ -50,7 +50,7 @@ public interface Beatmap {
 		return mods;
 	}
 
-	float DifficultyAttribute(long mods, int kind);
+	float DifficultyAttribute(@BitwiseMods long mods, int kind);
 
 	/**
 	 * normal circles, not sliders or spinners

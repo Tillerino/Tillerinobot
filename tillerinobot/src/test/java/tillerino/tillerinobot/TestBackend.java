@@ -41,9 +41,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
 import lombok.Getter;
-import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.Beatmap;
 import tillerino.tillerinobot.diff.BeatmapImpl;
-import tillerino.tillerinobot.diff.OsuApiBeatmapForDiff;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 import tillerino.tillerinobot.lang.Language;
@@ -146,9 +145,18 @@ public class TestBackend implements BotBackend {
 			throws SQLException, IOException, UserException {
 		OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid);
 
-		BeatmapImpl cBeatmap = new BeatmapImpl(OsuApiBeatmapForDiff.Mapper.INSTANCE.shrink(beatmap),
-				beatmap.getStarDifficulty() / 2,
-				beatmap.getStarDifficulty() / 2, 200, 250, 10, false);
+		BeatmapImpl cBeatmap = BeatmapImpl.builder()
+				.modsUsed(Beatmap.getDiffMods(mods))
+				.starDiff((float) beatmap.getStarDifficulty())
+				.aim((float) beatmap.getStarDifficulty() / 2)
+				.speed((float) beatmap.getStarDifficulty() / 2)
+				.sliderFactor(1f)
+				.approachRate((float) beatmap.getApproachRate())
+				.overallDifficulty((float) beatmap.getOverallDifficulty())
+				.maxCombo(beatmap.getMaxCombo())
+				.circleCount(200)
+				.spinnerCount(10)
+				.build();
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, mods);
 
 		return new BeatmapMeta(beatmap, null, estimates);
