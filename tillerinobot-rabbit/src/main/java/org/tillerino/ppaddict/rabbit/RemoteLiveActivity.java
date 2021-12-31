@@ -1,10 +1,7 @@
 package org.tillerino.ppaddict.rabbit;
 
-import java.util.Optional;
-
 import javax.annotation.CheckForNull;
 
-import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.ReceivedMessage;
@@ -41,7 +38,7 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 		final SentMessage message = new SentMessage();
 		message.setIrcUserName(ircUserName);
 		message.setEventId(eventId);
-		Optional.ofNullable(MDC.get("ping")).map(Integer::valueOf).ifPresent(message::setPing);
+		MdcUtils.getInt(MdcUtils.MDC_PING).ifPresent(message::setPing);
 		send(message);
 	}
 

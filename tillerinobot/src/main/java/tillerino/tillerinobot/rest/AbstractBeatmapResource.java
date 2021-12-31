@@ -23,6 +23,7 @@ import jakarta.ws.rs.core.Response.Status;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.data.ActualBeatmap;
@@ -79,6 +80,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 		}
 		if (found == null || (!found.getHash().equals(beatmap.getFileMd5())
 				&& found.getDownloaded() < System.currentTimeMillis() - HOURS.toMillis(1))) {
+			MdcUtils.incrementCounter(MdcUtils.MDC_EXTERNAL_API_CALLS);
 			String downloaded = downloader.getActualBeatmap(beatmap.getBeatmapId());
 			if (found == null) {
 				found = new ActualBeatmap();

@@ -1,6 +1,7 @@
 package org.tillerino.ppaddict.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 
@@ -84,14 +85,28 @@ public class MdcUtilsTest {
 	@Test
 	public void eventIdCanBeRetrieved() throws Exception {
 		MDC.clear();
-		assertThat(MdcUtils.getEventId()).isEmpty();
+		assertThat(MdcUtils.getLong(MdcUtils.MDC_EVENT)).isEmpty();
 		MDC.put("event", "123");
-		assertThat(MdcUtils.getEventId()).isPresent().satisfies(o -> assertThat(o.getAsLong()).isEqualTo(123L));
+		assertThat(MdcUtils.getLong(MdcUtils.MDC_EVENT)).isPresent().satisfies(o -> assertThat(o.getAsLong()).isEqualTo(123L));
 	}
 
 	private MdcSnapshot serde(MdcSnapshot s) throws IOException {
 		final ObjectMapper mapper = new ObjectMapper();
 		final byte[] serialized = mapper.writeValueAsBytes(s);
 		return mapper.readerFor(MdcSnapshot.class).readValue(serialized);
+	}
+
+	@Test
+	public void testIncrementCounter() {
+		MDC.put("foo", "123");
+		MdcUtils.incrementCounter("foo");
+		assertThat(MDC.get("foo")).isEqualTo("124");
+
+		MDC.clear();
+		MdcUtils.incrementCounter("foo"); // adds automatically
+		assertThat(MDC.get("foo")).isEqualTo("1");
+
+		MDC.put("foo", "bar");
+		assertThatThrownBy(() -> MdcUtils.incrementCounter("foo")).isInstanceOf(NumberFormatException.class);
 	}
 }

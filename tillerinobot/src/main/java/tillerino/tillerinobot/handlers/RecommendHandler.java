@@ -56,7 +56,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 			 * the message making the message anonymous as can be.
 			 */
 			manager.parseSamplerSettings(apiUser, remaining, lang);
-			MdcUtils.getEventId().ifPresent(eventId -> liveActivity.propagateMessageDetails(eventId, "!" + originalCommand));
+			MdcUtils.getLong(MdcUtils.MDC_EVENT).ifPresent(eventId -> liveActivity.propagateMessageDetails(eventId, "!" + originalCommand));
 		}
 
 		Recommendation recommendation = manager.getRecommendation(apiUser,

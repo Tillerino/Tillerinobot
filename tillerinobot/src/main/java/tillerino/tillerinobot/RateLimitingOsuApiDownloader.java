@@ -9,6 +9,7 @@ import javax.inject.Named;
 import jakarta.ws.rs.ServiceUnavailableException;
 
 import org.tillerino.osuApiModel.Downloader;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -29,6 +30,7 @@ public class RateLimitingOsuApiDownloader extends Downloader {
 	public JsonNode get(String command, String... parameters) throws IOException {
 		try {
 			limiter.limitRate();
+			MdcUtils.incrementCounter(MdcUtils.MDC_EXTERNAL_API_CALLS);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new ServiceUnavailableException();

@@ -97,5 +97,10 @@ public class TestAppender extends AbstractAppender {
 		public String getMDC(String string) {
 			return wrapped.getContextData().getValue(string);
 		}
+
+		@Override
+		public String toString() {
+			return wrapped.toString();
+		}
 	}
 }

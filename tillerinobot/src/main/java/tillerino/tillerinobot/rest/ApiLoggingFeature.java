@@ -36,6 +36,7 @@ public class ApiLoggingFeature implements Feature {
 	public static class SetPath implements ContainerRequestFilter {
 		@Override
 		public void filter(ContainerRequestContext requestContext) throws IOException {
+			MDC.clear();
 			MDC.put(MdcUtils.MDC_API_PATH, requestContext.getUriInfo().getPath());
 		}
 	}
@@ -66,7 +67,7 @@ public class ApiLoggingFeature implements Feature {
 				mdc.add(MdcUtils.MDC_API_STATUS, responseContext.getStatus());
 				log.debug("API call finished");
 			}
-			MDC.clear(); // clear to remove path which is set in the pre filter
+			MDC.clear();
 		}
 	}
 

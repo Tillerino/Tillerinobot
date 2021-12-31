@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 import javax.annotation.CheckForNull;
@@ -127,17 +128,20 @@ public class MdcUtils {
 		return new MdcAttributes();
 	}
 
-	/**
-	 * I didn't want to rewrite the signature of
-	 * {@link CommandHandler#handle(String, org.tillerino.osuApiModel.OsuApiUser, tillerino.tillerinobot.UserDataManager.UserData)},
-	 * but we need the event ID in some of the handlers. So we're using this little hack, which uses the MDC to get the ID.
-	 */
-	public static OptionalLong getEventId() {
-		String asString = MDC.get(MDC_EVENT);
-		if (asString == null) {
-			return OptionalLong.empty();
-		}
-		return OptionalLong.of(Long.parseLong(asString));
+	public static OptionalLong getLong(String parameterName) throws NumberFormatException {
+		return Optional.ofNullable(MDC.get(parameterName))
+			.map(s -> OptionalLong.of(Long.parseLong(s)))
+			.orElseGet(OptionalLong::empty);
+	}
+
+	public static OptionalInt getInt(String parameterName) throws NumberFormatException {
+		return Optional.ofNullable(MDC.get(parameterName))
+				.map(s -> OptionalInt.of(Integer.parseInt(s)))
+				.orElseGet(OptionalInt::empty);
+	}
+
+	public static void incrementCounter(String parameterName) throws NumberFormatException {
+		MDC.put(parameterName, Long.toString(getLong(parameterName).orElse(0) + 1));
 	}
 
 	public static final String MDC_API_KEY = "apiKey";
@@ -153,6 +157,7 @@ public class MdcUtils {
 	public static final String MDC_SUCCESS = "success";
 	public static final String MDC_THREAD_PRIORITY = "threadPriority";
 	public static final String MDC_USER = "user";
+	public static final String MDC_EXTERNAL_API_CALLS = "externalApiCalls";
 
 	public static final String MDC_HANDLER_RECOMMEND = "r";
 

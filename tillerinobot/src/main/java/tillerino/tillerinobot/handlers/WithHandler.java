@@ -57,7 +57,7 @@ public class WithHandler implements CommandHandler {
 			throw new UserException(lang.noInformationForMods());
 		}
 
-		MdcUtils.getEventId().ifPresent(eventId -> live.propagateMessageDetails(eventId, "!" + originalMessage));
+		MdcUtils.getLong(MdcUtils.MDC_EVENT).ifPresent(eventId -> live.propagateMessageDetails(eventId, "!" + originalMessage));
 
 		userData.setLastSongInfo(new BeatmapWithMods(beatmap
 				.getBeatmap().getBeatmapId(), beatmap.getMods()));

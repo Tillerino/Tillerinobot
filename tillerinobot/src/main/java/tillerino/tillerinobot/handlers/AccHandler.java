@@ -52,7 +52,7 @@ public class AccHandler implements CommandHandler {
 			throw new RareUserException(lang.excuseForError());
 		}
 
-		MdcUtils.getEventId().ifPresent(eventId -> live.propagateMessageDetails(eventId, "!" + originalMessage));
+		MdcUtils.getLong(MdcUtils.MDC_EVENT).ifPresent(eventId -> live.propagateMessageDetails(eventId, "!" + originalMessage));
 
 		String message = originalMessage.substring(3).trim().replace(',', '.');
 		Matcher extendedMatcher = extended.matcher(message);
