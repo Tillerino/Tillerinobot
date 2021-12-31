@@ -20,6 +20,7 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
+import org.slf4j.MDC;
 import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatMetrics;
@@ -111,7 +112,7 @@ public class IrcHooks extends CoreHooks {
 		String nick = getNick(event);
 		if (event.getChannel() == null) {
 			downStream.onEvent(new PrivateAction(
-					MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
+					MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
 					nick, timestamp(event), event.getMessage()));
 		}
 	}
@@ -123,7 +124,7 @@ public class IrcHooks extends CoreHooks {
 			return;
 
 		downStream.onEvent(new PrivateMessage(
-				MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
+				MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
 				getNick(event), timestamp(event), event.getMessage()));
 	}
 
@@ -140,6 +141,7 @@ public class IrcHooks extends CoreHooks {
 	@Override
 	public void onEvent(Event event) throws Exception {
 		botInfo.setLastInteraction(timestamp(event));
+		MDC.clear();
 		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, lastSerial.getAndIncrement())) {
 			if (lastListTime.get() <= timestamp(event) - 60 * 60 * 1000) {
 				lastListTime.set(timestamp(event));
@@ -184,7 +186,7 @@ public class IrcHooks extends CoreHooks {
 			return;
 		}
 
-		downStream.onEvent(new Joined(MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
+		downStream.onEvent(new Joined(MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
 				getNick(event), timestamp(event)));
 	}
 
@@ -213,7 +215,7 @@ public class IrcHooks extends CoreHooks {
 				if (nick.startsWith("@") || nick.startsWith("+"))
 					nick = nick.substring(1);
 
-				downStream.onEvent(new Sighted(MdcUtils.getEventId().orElseThrow(IllegalStateException::new),
+				downStream.onEvent(new Sighted(MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
 						nick, timestamp(event)));
 			}
 		}
