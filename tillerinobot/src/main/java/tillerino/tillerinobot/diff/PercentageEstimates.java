@@ -18,4 +18,8 @@ public interface PercentageEstimates {
 	long getMods();
 
 	double getStarDiff();
+
+	double getApproachRate();
+
+	double getOverallDifficulty();
 }
