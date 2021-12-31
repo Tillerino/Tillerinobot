@@ -12,19 +12,20 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.slf4j.MDC;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import tillerino.tillerinobot.RateLimiter;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 
 @Singleton
-public class EntityManagerFilter implements Filter {
-  @Inject
-  public EntityManagerFilter(EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em) {
-    super();
-    this.emf = emf;
-    this.em = em;
-  }
-
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+@Slf4j
+public class PpaddictContextFilter implements Filter {
   private final EntityManagerFactory emf;
   private final ThreadLocalAutoCommittingEntityManager em;
+  private final RateLimiter rateLimiter;
 
   @Override
   public void destroy() {}
@@ -32,11 +33,21 @@ public class EntityManagerFilter implements Filter {
   @Override
   public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
       throws IOException, ServletException {
+    MDC.clear();
     try {
-      em.setThreadLocalEntityManager(emf.createEntityManager());
-      chain.doFilter(req, res);
+      try {
+        em.setThreadLocalEntityManager(emf.createEntityManager());
+        rateLimiter.setThreadPriority(RateLimiter.REQUEST);
+        chain.doFilter(req, res);
+      } finally {
+        rateLimiter.clearThreadPriority();
+        em.close();
+      }
+    } catch (Throwable e) {
+      log.error("Error serving request", e);
+      throw e;
     } finally {
-      em.close();
+      MDC.clear();
     }
   }
 
