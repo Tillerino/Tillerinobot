@@ -5,32 +5,32 @@ import org.tillerino.osuApiModel.types.GameMode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import lombok.Data;
+import lombok.Builder;
 import tillerino.tillerinobot.diff.BeatmapImpl;
 
-@Data
+@Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SanDokuResponse {
-	private @GameMode int beatmapGameMode;
-	private @GameMode int gameModeUsed;
-	private @BitwiseMods long modsUsed;
-	private SanDokuDiffCalcResult diffCalcResult;
+public record SanDokuResponse(
+		@GameMode int beatmapGameMode,
+		@GameMode int gameModeUsed,
+		@BitwiseMods long modsUsed,
+		SanDokuDiffCalcResult diffCalcResult) {
 
-	@Data
+	@Builder(toBuilder = true)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public static class SanDokuDiffCalcResult {
+	public static record SanDokuDiffCalcResult(
 		// removed fields which are not required for standard
-		private double starRating;
-		private int maxCombo;
-		private double aimStrain;
-		private double speedStrain;
-		private double flashlightRating;
-		private double sliderFactor;
-		private double approachRate;
-		private double overallDifficulty;
-		private int hitCircleCount;
-		private int sliderCount;
-		private int spinnerCount;
+		double starRating,
+		int maxCombo,
+		double aimStrain,
+		double speedStrain,
+		double flashlightRating,
+		double sliderFactor,
+		double approachRate,
+		double overallDifficulty,
+		int hitCircleCount,
+		int sliderCount,
+		int spinnerCount) {
 	}
 
 	public BeatmapImpl toBeatmap() {

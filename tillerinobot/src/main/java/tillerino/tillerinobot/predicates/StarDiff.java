@@ -22,8 +22,8 @@ public class StarDiff implements NumericBeatmapProperty {
 
     @Override
     public Optional<String> findNonPredicateContradiction(RecommendationRequest request, NumericPropertyPredicate<?> value) {
-        if (request.getRequestedMods() != 0L) {
-            return Optional.of(String.format("%s %s", Mods.toShortNamesContinuous(Mods.getMods(request.getRequestedMods())), value.getOriginalArgument()));
+        if (request.requestedMods() != 0L) {
+            return Optional.of(String.format("%s %s", Mods.toShortNamesContinuous(Mods.getMods(request.requestedMods())), value.getOriginalArgument()));
         }
         return Optional.empty();
     }

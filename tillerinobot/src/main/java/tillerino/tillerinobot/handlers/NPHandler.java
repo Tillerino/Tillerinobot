@@ -59,8 +59,8 @@ public class NPHandler implements CommandHandler {
 
 		MdcUtils.getLong(MdcUtils.MDC_EVENT).ifPresent(eventId -> live.propagateMessageDetails(eventId, "/np"));
 
-		BeatmapMeta beatmap = backend.loadBeatmap(pair.getBeatmap(),
-				pair.getMods(), lang);
+		BeatmapMeta beatmap = backend.loadBeatmap(pair.beatmap(),
+				pair.mods(), lang);
 
 		if (beatmap == null) {
 			throw new UserException(lang.unknownBeatmap());
@@ -69,11 +69,11 @@ public class NPHandler implements CommandHandler {
 		PercentageEstimates estimates = beatmap.getEstimates();
 
 		String addition = null;
-		if (estimates.getMods() != pair.getMods()) {
+		if (estimates.getMods() != pair.mods()) {
 			addition = "(" + lang.noInformationForModsShort() + ")";
 		}
 		userData.setLastSongInfo(new BeatmapWithMods(pair
-				.getBeatmap(), beatmap.getMods()));
+				.beatmap(), beatmap.getMods()));
 		return new Success(beatmap.formInfoMessage(false, addition, userData.getHearts(), null, null, null))
 				.then(lang.optionalCommentOnNP(apiUser, beatmap));
 	}

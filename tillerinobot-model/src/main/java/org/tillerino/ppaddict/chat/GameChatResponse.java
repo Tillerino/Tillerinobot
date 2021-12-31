@@ -68,13 +68,13 @@ public interface GameChatResponse {
 			return nextResponse;
 		}
 		ResponseList list = new ResponseList();
-		if (this instanceof ResponseList) {
-			list.responses.addAll(((ResponseList) this).responses);
+		if (this instanceof ResponseList thisList) {
+			list.responses.addAll(thisList.responses);
 		} else {
 			list.responses.add(this);
 		}
-		if (nextResponse instanceof ResponseList) {
-			list.responses.addAll(((ResponseList) nextResponse).responses);
+		if (nextResponse instanceof ResponseList nextList) {
+			list.responses.addAll(nextList.responses);
 		} else {
 			list.responses.add(nextResponse);
 		}

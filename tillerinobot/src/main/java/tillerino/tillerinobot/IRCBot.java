@@ -332,10 +332,10 @@ public class IRCBot implements GameChatEventConsumer {
 				// don't return the created response, because we don't want the user to get random error messages
 				return GameChatResponse.none();
 			}
-		} else if (event instanceof PrivateMessage) {
-			return processPrivateMessage((PrivateMessage) event);
-		} else if (event instanceof PrivateAction) {
-			return processPrivateAction((PrivateAction) event);
+		} else if (event instanceof PrivateMessage message) {
+			return processPrivateMessage(message);
+		} else if (event instanceof PrivateAction action) {
+			return processPrivateAction(action);
 		} else if (event instanceof Sighted) {
 			return GameChatResponse.none();
 		}

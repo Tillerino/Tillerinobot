@@ -65,8 +65,7 @@ public class InjectionRunner extends BlockJUnit4ClassRunner {
 		EachTestNotifier eachTestNotifier = new EachTestNotifier(notifier, describeChild(method));
 
 		for (AbstractModule module : context) {
-			if (module instanceof ResettableModule) {
-				ResettableModule resettable = (ResettableModule) module;
+			if (module instanceof ResettableModule resettable) {
 				try {
 					resettable.reset();
 				} catch (Exception e) {

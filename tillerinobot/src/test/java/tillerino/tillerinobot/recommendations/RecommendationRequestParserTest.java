@@ -2,7 +2,6 @@ package tillerino.tillerinobot.recommendations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +39,7 @@ public class RecommendationRequestParserTest {
 	public void testModContradiction() throws Exception {
 		when(backend.getDonator(anyInt())).thenReturn(1);
 		assertThat(parse("dt")).hasFieldOrPropertyWithValue("requestedMods", 64L);
-		assertThat(parse("-dt").getPredicates()).containsExactly(new ExcludeMod(Mods.DoubleTime));
+		assertThat(parse("-dt").predicates()).containsExactly(new ExcludeMod(Mods.DoubleTime));
 		assertThatThrownBy(() -> parse("dt -dt")).isInstanceOfAny(UserException.class).hasMessageContaining("DT -DT");
 	}
 
@@ -48,7 +47,7 @@ public class RecommendationRequestParserTest {
 	public void testModVsStar() throws Exception {
 		when(backend.getDonator(anyInt())).thenReturn(1);
 		assertThat(parse("dt")).hasFieldOrPropertyWithValue("requestedMods", 64L);
-		assertThat(parse("STAR=5").getPredicates()).containsExactly(new NumericPropertyPredicate<>("STAR=5", new StarDiff(), 5, true, 5, true));
+		assertThat(parse("STAR=5").predicates()).containsExactly(new NumericPropertyPredicate<>("STAR=5", new StarDiff(), 5, true, 5, true));
 		assertThatThrownBy(() -> parse("dt STAR=5")).isInstanceOfAny(UserException.class).hasMessageContaining("DT STAR");
 	}
 
@@ -65,7 +64,7 @@ public class RecommendationRequestParserTest {
 		RecommendationRequest request = parse("gamma5 LEN<=150");
 		assertThat(request)
 			.hasFieldOrPropertyWithValue("model", Model.GAMMA5);
-		assertThat(request.getPredicates())
+		assertThat(request.predicates())
 			.containsExactly(new NumericPropertyPredicate<>("LEN<=150", new MapLength(), Double.NEGATIVE_INFINITY, true, 150D, true));
 	}
 }

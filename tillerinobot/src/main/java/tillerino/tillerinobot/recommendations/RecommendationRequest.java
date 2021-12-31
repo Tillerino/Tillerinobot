@@ -7,19 +7,30 @@ import java.util.List;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import lombok.Getter;
-import lombok.Value;
 import lombok.Builder;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
 
-@Value
 @Builder
-public class RecommendationRequest {
+public record RecommendationRequest(
+		boolean nomod,
+		Model model,
+		@BitwiseMods long requestedMods,
+		List<RecommendationPredicate> predicates
+		) {
+	public RecommendationRequest {
+		predicates = new ArrayList<>(predicates);
+	}
+
+	public List<RecommendationPredicate> predicates() {
+		return Collections.unmodifiableList(predicates);
+	}
+
 	public static class RecommendationRequestBuilder {
 		@Getter
 		@BitwiseMods
 		private long requestedMods = 0L;
 
-		List<RecommendationPredicate> predicates = new ArrayList<>();
+		private List<RecommendationPredicate> predicates = new ArrayList<>();
 
 		public RecommendationRequestBuilder requestedMods(@BitwiseMods long requestedMods) {
 			this.requestedMods = requestedMods;
@@ -40,10 +51,4 @@ public class RecommendationRequest {
 		}
 	}
 
-	boolean nomod;
-	Model model;
-	@Getter
-	@BitwiseMods
-	long requestedMods;
-	List<RecommendationPredicate> predicates;
 }

@@ -53,7 +53,7 @@ public class ExcludeMod implements RecommendationPredicate {
 
 	@Override
 	public Optional<String> findNonPredicateContradiction(RecommendationRequest request) {
-		if (mod.is(request.getRequestedMods())) {
+		if (mod.is(request.requestedMods())) {
 			return Optional.of(String.format("%s -%s", mod.getShortName(), mod.getShortName()));
 		}
 		return Optional.empty();

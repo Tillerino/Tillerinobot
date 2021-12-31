@@ -110,14 +110,14 @@ public class RecommendationsManager {
 			if (sampler == null || !sampler.getSettings().equals(settings)) {
 				List<Integer> exclude = loadGivenRecommendations(userid)
 						.stream().map(GivenRecommendation::getBeatmapid)
-						.collect(Collectors.toList());
+						.toList();
 				Collection<BareRecommendation> recommendations = backend
-						.loadRecommendations(userid, exclude, settings.getModel(),
-								settings.isNomod(), settings.getRequestedMods());
+						.loadRecommendations(userid, exclude, settings.model(),
+								settings.nomod(), settings.requestedMods());
 
 				// only keep the 1k most probable recommendations to save some
 				// memory
-				recommendations = getTopRecommendations(recommendations, settings.getPredicates());
+				recommendations = getTopRecommendations(recommendations, settings.predicates());
 
 				sampler = new Sampler<>(recommendations, settings, BareRecommendation::getProbability);
 

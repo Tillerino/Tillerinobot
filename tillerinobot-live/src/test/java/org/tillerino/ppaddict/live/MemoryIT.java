@@ -51,7 +51,7 @@ public class MemoryIT {
 
 	private final List<WebSocketClient> webSocketClients = IntStream.range(0, numberOfClients)
 			.mapToObj(x -> new WebSocketClient())
-			.collect(Collectors.toList());
+			.toList();
 
 	@WebSocket
 	public class CollectingWebSocketClient {

@@ -31,30 +31,30 @@ public class SanDokuTestManual {
 	public void bestFriendsParameters() throws Exception {
 		byte[] beatmap = IOUtils.resourceToByteArray("/Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu");
 
-		assertThat(sanDoku.getDiff(0, 0, beatmap).getDiffCalcResult()).satisfies(result -> {
-			assertThat(result.getStarRating()).isCloseTo(4.70888, apiRounding);
-			assertThat(result.getAimStrain()).isCloseTo(2.53559, apiRounding);
-			assertThat(result.getSpeedStrain()).isCloseTo(1.89119, apiRounding);
+		assertThat(sanDoku.getDiff(0, 0, beatmap).diffCalcResult()).satisfies(result -> {
+			assertThat(result.starRating()).isCloseTo(4.70888, apiRounding);
+			assertThat(result.aimStrain()).isCloseTo(2.53559, apiRounding);
+			assertThat(result.speedStrain()).isCloseTo(1.89119, apiRounding);
 		});
 
 		// Flashlight
-		assertThat(sanDoku.getDiff(0, 1024, beatmap).getDiffCalcResult()).satisfies(result -> {
-			assertThat(result.getStarRating()).isCloseTo(5.23327, apiRounding); // star rating is different!
-			assertThat(result.getAimStrain()).isCloseTo(2.53559, apiRounding);
-			assertThat(result.getSpeedStrain()).isCloseTo(1.89119, apiRounding);
+		assertThat(sanDoku.getDiff(0, 1024, beatmap).diffCalcResult()).satisfies(result -> {
+			assertThat(result.starRating()).isCloseTo(5.23327, apiRounding); // star rating is different!
+			assertThat(result.aimStrain()).isCloseTo(2.53559, apiRounding);
+			assertThat(result.speedStrain()).isCloseTo(1.89119, apiRounding);
 		});
 
-		assertThat(sanDoku.getDiff(0, 64, beatmap).getDiffCalcResult()).satisfies(result -> {
-			assertThat(result.getStarRating()).isCloseTo(6.62106, apiRounding);
-			assertThat(result.getAimStrain()).isCloseTo(3.52118, apiRounding);
-			assertThat(result.getSpeedStrain()).isCloseTo(2.7438, apiRounding);
+		assertThat(sanDoku.getDiff(0, 64, beatmap).diffCalcResult()).satisfies(result -> {
+			assertThat(result.starRating()).isCloseTo(6.62106, apiRounding);
+			assertThat(result.aimStrain()).isCloseTo(3.52118, apiRounding);
+			assertThat(result.speedStrain()).isCloseTo(2.7438, apiRounding);
 		});
 
 		// now with HR DT
-		assertThat(sanDoku.getDiff(0, 80, beatmap).getDiffCalcResult()).satisfies(result -> {
-			assertThat(result.getStarRating()).isCloseTo(7.03281, apiRounding);
-			assertThat(result.getAimStrain()).isCloseTo(3.82381, apiRounding);
-			assertThat(result.getSpeedStrain()).isCloseTo(2.75015, apiRounding);
+		assertThat(sanDoku.getDiff(0, 80, beatmap).diffCalcResult()).satisfies(result -> {
+			assertThat(result.starRating()).isCloseTo(7.03281, apiRounding);
+			assertThat(result.aimStrain()).isCloseTo(3.82381, apiRounding);
+			assertThat(result.speedStrain()).isCloseTo(2.75015, apiRounding);
 		});
 	}
 
@@ -97,10 +97,10 @@ public class SanDokuTestManual {
 		byte[] beatmap = IOUtils.resourceToByteArray("/xi - FREEDOM DiVE (Nakagawa-Kanon) [FOUR DIMENSIONS].osu");
 		SanDokuResponse diff = sanDoku.getDiff(0, 0, beatmap);
 
-		assertThat(diff.getDiffCalcResult()).satisfies(result -> {
-			assertThat(result.getStarRating()).isCloseTo(7.52382, apiRounding);
-			assertThat(result.getAimStrain()).isCloseTo(3.45227, apiRounding);
-			assertThat(result.getSpeedStrain()).isCloseTo(3.77577, apiRounding);
+		assertThat(diff.diffCalcResult()).satisfies(result -> {
+			assertThat(result.starRating()).isCloseTo(7.52382, apiRounding);
+			assertThat(result.aimStrain()).isCloseTo(3.45227, apiRounding);
+			assertThat(result.speedStrain()).isCloseTo(3.77577, apiRounding);
 		});
 
 		OsuApiScore score = new OsuApiScore();

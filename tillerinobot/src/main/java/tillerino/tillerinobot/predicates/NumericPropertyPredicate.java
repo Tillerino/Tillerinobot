@@ -36,19 +36,16 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 
 	@Override
 	public boolean contradicts(RecommendationPredicate otherPredicate) {
-		if (otherPredicate instanceof NumericPropertyPredicate<?>) {
-			NumericPropertyPredicate<?> predicate = (NumericPropertyPredicate<?>) otherPredicate;
-
-			if (predicate.property.getClass() == property.getClass()) {
-				if (predicate.min > max || min > predicate.max) {
-					return true;
-				}
-				if(predicate.min >= max && predicate.includeMin != includeMax) {
-					return true;
-				}
-				if(min >= predicate.max && includeMin != predicate.includeMax) {
-					return true;
-				}
+		if (otherPredicate instanceof NumericPropertyPredicate<?> predicate
+				&& predicate.property.getClass() == property.getClass()) {
+			if (predicate.min > max || min > predicate.max) {
+				return true;
+			}
+			if(predicate.min >= max && predicate.includeMin != includeMax) {
+				return true;
+			}
+			if(min >= predicate.max && includeMin != predicate.includeMax) {
+				return true;
 			}
 		}
 

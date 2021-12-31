@@ -50,24 +50,24 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	public void testPredicateParser() throws Exception {
 		RecommendationRequest samplerSettings = manager.parseSamplerSettings(user, "gamma AR=9", new Default());
 
-		assertEquals(1, samplerSettings.getPredicates().size());
+		assertEquals(1, samplerSettings.predicates().size());
 
 		// Test "nc" alias for nightcore
 		// Gives double-time recommendations
 		samplerSettings = manager.parseSamplerSettings(user, "nc", new Default());
 
-		assertTrue(Mods.DoubleTime.is(samplerSettings.getRequestedMods()));
+		assertTrue(Mods.DoubleTime.is(samplerSettings.requestedMods()));
 	}
 
 	@Test
 	public void testContinuousMods() throws Exception {
 		RecommendationRequest samplerSettings = manager.parseSamplerSettings(user, "hdhr", new Default());
 
-		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock), samplerSettings.getRequestedMods());
+		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock), samplerSettings.requestedMods());
 
 		samplerSettings = manager.parseSamplerSettings(user, "hdhr dt", new Default());
 
-		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime), samplerSettings.getRequestedMods());
+		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime), samplerSettings.requestedMods());
 	}
 
 	@Test(expected = UserException.class)

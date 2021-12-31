@@ -59,11 +59,11 @@ public class RecommendationRequestParser {
 		 * verify the arguments
 		 */
 		
-		if(request.isNomod() && request.getRequestedMods() != 0) {
+		if(request.nomod() && request.requestedMods() != 0) {
 			throw new UserException(lang.mixedNomodAndMods());
 		}
 
-		for (RecommendationPredicate predicate : request.getPredicates()) {
+		for (RecommendationPredicate predicate : request.predicates()) {
 			Optional<String> contradiction = predicate.findNonPredicateContradiction(request);
 			if (contradiction.isPresent()) {
 				throw new UserException(lang.invalidChoice(contradiction.get(), STANDARD_SYNTAX));

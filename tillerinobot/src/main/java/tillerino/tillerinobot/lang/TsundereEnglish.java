@@ -144,44 +144,32 @@ public class TsundereEnglish extends TsundereBase {
 	@Nonnull
 	@Override
 	protected GameChatResponse getHugResponseForHugLevel(String username, int hugLevel) {
-		switch (hugLevel) {
-			default:
-				return new Action("completely ignores " + username + "'s request for a hug");
-			case 0:
-				return new Action("slaps " + username)
+		return switch (hugLevel) {
+			case 0 -> new Action("slaps " + username)
 					.then(new Message("Sorry, that was just a reflex."));
-			case 1:
-				return new Action("hugs " + username)
+			case 1 -> new Action("hugs " + username)
 					.then(new Message("Wow, you suck at hugs. Someone needs to teach you."));
-			case 2:
-				return new Message("There's something on your back, you slob. Here, let me get that.")
+			case 2 -> new Message("There's something on your back, you slob. Here, let me get that.")
 					.then(new Action("hugs " + username));
-			case 3:
-				return new Action("hugs " + username)
+			case 3 -> new Action("hugs " + username)
 					.then(new Message("I w-wasn't trying to hug you! I just lost my balance for a second and fell onto you."));
-			case 4:
-				return new Action("hugs " + username)
+			case 4 -> new Action("hugs " + username)
 					.then(new Message("The hardest part of hugging you is letting go. I think you sweat too much."));
-			case 5:
-				return new Action("slaps " + username)
+			case 5 -> new Action("slaps " + username)
 					.then(new Message("Whoops... well, you probably deserved it anyways."));
-			case 6:
-				return new Action("hugs " + username)
+			case 6 -> new Action("hugs " + username)
 					.then(new Message("Don't misunderstand, it's not like I like you or anything..."));
-			case 7:
-				return new Message("Clinginess is considered a bad thing, you idiot.")
+			case 7 -> new Message("Clinginess is considered a bad thing, you idiot.")
 					.then(new Action("hugs " + username));
-			case 8:
-				return new Message("S-stupid. It's l-like you enjoy hugging me or something.")
+			case 8 -> new Message("S-stupid. It's l-like you enjoy hugging me or something.")
 					.then(new Action("hugs " + username));
-			case 9:
-				return new Action("hugs " + username)
+			case 9 -> new Action("hugs " + username)
 					.then(new Message("Don't forget: you're here forever."));
-			case 10:
-				return new Action("slaps " + username + " hard")
+			case 10 -> new Action("slaps " + username + " hard")
 					.then(new Message("Hehe. You know you like it."))
 					.then(new Action("hugs " + username + " happily"));
-		}
+			default -> new Action("completely ignores " + username + "'s request for a hug");
+		};
 	}
 
 	@Override
@@ -247,20 +235,14 @@ public class TsundereEnglish extends TsundereBase {
 	
 	@Override
 	protected GameChatResponse getOptionalCommentOnRecommendationResponse(int recentRecommendations) {
-		switch (recentRecommendations) {
-			case 7:
-				return new Message("I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.");
-			case 17:
-				return new Message("You know, it's a privilege to talk to me this much, not a right.");
-			case 37:
-				return new Message("How would you even play this game if I wasn't telling you what to do?");
-			case 73:
-				return new Message("I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything.");
-			case 173:
-				return new Message("Just can't leave me alone, huh? I guess t-that's okay. But don't you dare tell anyone!");
-			default:
-				return GameChatResponse.none();
-		}
+		return switch (recentRecommendations) {
+			case 7 -> new Message("I have lots of free time. I would never pick out maps just because I liked you... h-h-hypothetically speaking.");
+			case 17 -> new Message("You know, it's a privilege to talk to me this much, not a right.");
+			case 37 -> new Message("How would you even play this game if I wasn't telling you what to do?");
+			case 73 -> new Message("I would have had you arrested for harassment a long time ago if I didn't lov... I wasn't saying anything.");
+			case 173 -> new Message("Just can't leave me alone, huh? I guess t-that's okay. But don't you dare tell anyone!");
+			default -> GameChatResponse.none();
+		};
 	}
 
 	@Override

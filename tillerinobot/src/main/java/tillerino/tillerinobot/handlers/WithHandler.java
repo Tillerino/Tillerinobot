@@ -49,7 +49,7 @@ public class WithHandler implements CommandHandler {
 		if (mods == null || mods == 0) {
 			throw new UserException(lang.malformattedMods(message));
 		}
-		BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.getBeatmap(), mods, lang);
+		BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.beatmap(), mods, lang);
 		if (beatmap == null) {
 			throw new RareUserException(lang.excuseForError());
 		}

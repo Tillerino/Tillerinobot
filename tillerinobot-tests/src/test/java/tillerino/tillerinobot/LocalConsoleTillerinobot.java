@@ -166,7 +166,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 				em.setThreadLocalEntityManager(emf.createEntityManager());
 				if (resolver.resolveIRCName(username) == null
-						&& backend instanceof TestBackend) {
+						&& backend instanceof TestBackend testBackend) {
 					System.out.println("you're new. I'll have to ask you a couple of questions.");
 
 					System.out.println("are you a donator? (anything for yes)");
@@ -178,8 +178,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 					System.out.println("how much pp do you have?");
 					final double pp = Double.parseDouble(scanner.nextLine());
 
-					((TestBackend) backend).hintUser(username, donator, rank,
-							pp);
+					testBackend.hintUser(username, donator, rank, pp);
 					resolver.resolveManually(backend.downloadUser(username).getUserId());
 				}
 				em.close();

@@ -65,12 +65,12 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	}
 
 	private void handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
-		if (response instanceof Message) {
-			message(((Message) response).getContent(), false, result);
-		} else if (response instanceof Success) {
-			message(((Success) response).getContent(), true, result);
-		} else if (response instanceof Action) {
-			String msg = ((Action) response).getContent();
+		if (response instanceof Message message) {
+			message(message.getContent(), false, result);
+		} else if (response instanceof Success success) {
+			message(success.getContent(), true, result);
+		} else if (response instanceof Action action) {
+			String msg = action.getContent();
 			writer.action(msg, result);
 
 			liveActivity.propagateSentMessage(result.getNick(), result.getEventId());

@@ -70,12 +70,10 @@ public class BeatmapInfoService implements BeatmapDifficulties {
 						public BeatmapMeta call() throws SQLException, InterruptedException {
 							em.setThreadLocalEntityManager(emf.createEntityManager());
 							try {
-								BeatmapMeta beatmap = backend.loadBeatmap(
-										key.getBeatmap(), key.getMods(),
-										new Default());
+								BeatmapMeta beatmap = backend.loadBeatmap(key.beatmap(), key.mods(), new Default());
 								
 								if(beatmap == null) {
-									throw new NotFoundException("Beatmap " + key.getBeatmap() + " not found.");
+									throw new NotFoundException("Beatmap " + key.beatmap() + " not found.");
 								}
 								
 								return beatmap;

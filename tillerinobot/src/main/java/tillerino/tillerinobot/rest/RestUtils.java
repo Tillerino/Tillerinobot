@@ -20,8 +20,8 @@ public final class RestUtils {
 	}
 
 	public static Throwable refreshWebApplicationException(Throwable t) {
-		if (t instanceof WebApplicationException) {
-			return new WebApplicationException(t.getCause(), Response.fromResponse(((WebApplicationException) t).getResponse()).build());
+		if (t instanceof WebApplicationException web) {
+			return new WebApplicationException(t.getCause(), Response.fromResponse(web.getResponse()).build());
 		}
 		return t;
 	}

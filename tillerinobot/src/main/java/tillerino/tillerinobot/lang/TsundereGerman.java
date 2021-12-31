@@ -145,44 +145,32 @@ public class TsundereGerman extends TsundereBase {
 	@Nonnull
 	@Override
 	protected GameChatResponse getHugResponseForHugLevel(String username, int hugLevel) {
-		switch (hugLevel) {
-			default:
-				return new Action("Ignoriert " + username + "s Versuch einer Umarmung komplett.");
-			case 0:
-				return new Action("*Schlägt " + username + "*")
+		return switch (hugLevel) {
+			case 0 -> new Action("*Schlägt " + username + "*")
 						.then(new Message("'tschuldige, Reflex."));
-			case 1:
-				return new Action("*Umarmt " + username + "*")
+			case 1 -> new Action("*Umarmt " + username + "*")
 						.then(new Message("Wow, du bist ziemlich schlecht im Umarmen. Jemand sollte dir das mal beibringen."));
-			case 2:
-				return new Message("Da ist was auf deinem Rücken, du Chaot. Warte, ich machs eben weg.")
+			case 2 -> new Message("Da ist was auf deinem Rücken, du Chaot. Warte, ich machs eben weg.")
 						.then(new Action("*Umarmt " + username + "*"));
-			case 3:
-				return new Action("*Umarmt " + username + "*")
+			case 3 -> new Action("*Umarmt " + username + "*")
 						.then(new Message("I-ich hab nicht versucht dich zu umarmen! Ich hab nur für 'ne Sekunde mein Gleichgewicht verloren und bin auf dich gefallen."));
-			case 4:
-				return new Action("*Umarmt " + username + "*")
+			case 4 -> new Action("*Umarmt " + username + "*")
 						.then(new Message("Das Schwerste beim Versuch dich zu umarmen, ist das Loslassen. Ich glaube du schwitzt zu viel."));
-			case 5:
-				return new Action("*Schlägt " + username + "*")
+			case 5 -> new Action("*Schlägt " + username + "*")
 						.then(new Message("Ups... nun, du hast es wahrscheinlich sowieso verdient."));
-			case 6:
-				return new Action("*Umarmt " + username + "*")
+			case 6 -> new Action("*Umarmt " + username + "*")
 						.then(new Message("Versteh mich nicht falsch, es ist nicht als würde ich dich mögen oder so..."));
-			case 7:
-				return new Message("Anhänglichkeit ist was schlechtes, Idiot.")
+			case 7 -> new Message("Anhänglichkeit ist was schlechtes, Idiot.")
 						.then(new Action("*Umarmt " + username + "*"));
-			case 8:
-				return new Message("I-idiot. Es i-ist so als würdest du Spaß daran haben mich zu umarmen.")
+			case 8 -> new Message("I-idiot. Es i-ist so als würdest du Spaß daran haben mich zu umarmen.")
 						.then(new Action("*Umarmt " + username + "*"));
-			case 9:
-				return new Action("*Umarmt " + username + "*")
+			case 9 -> new Action("*Umarmt " + username + "*")
 						.then(new Message("Vergiss nicht: du bist für immer hier."));	//Reference to an old meme
-			case 10:
-				return new Action("*Schlägt " + username + " hart*")
+			case 10 -> new Action("*Schlägt " + username + " hart*")
 						.then(new Message("Hehe. Gib's zu, du magst es!"))
 						.then(new Action("*Umarmt " + username + " glücklich*"));
-		}
+			default -> new Action("Ignoriert " + username + "s Versuch einer Umarmung komplett.");
+		};
 	}
 
 	@Override
@@ -248,20 +236,14 @@ public class TsundereGerman extends TsundereBase {
 	
 	@Override
 	protected GameChatResponse getOptionalCommentOnRecommendationResponse(int recentRecommendations) {
-		switch (recentRecommendations) {
-			case 7:
-				return new Message("Ich hab viel Freizeit. Ich würde nie Maps raussuchen weil ich dich mag... r-r-rein hypothetisch.");
-			case 17:
-				return new Message("Weißt du, es ist ein Privileg so viel mit mir zu reden, kein Recht.");
-			case 37:
-				return new Message("Wie würdest du eigentlich dieses Spiel spielen, wenn ich dir nicht die ganze Zeit sagen würde wie?");
-			case 73:
-				return new Message("Ich hätte dich schon längst für Belästigung angezeigt, wenn ich dich nicht lieb... Ich hab nichts gesagt.");
-			case 173:
-				return new Message("Kannst mich einfach nicht allein lassen, was? Ich d-denke das ist okay. Aber wag es nicht, das jemandem zu erzählen!");
-			default:
-				return GameChatResponse.none();
-		}
+		return switch (recentRecommendations) {
+			case 7 -> new Message("Ich hab viel Freizeit. Ich würde nie Maps raussuchen weil ich dich mag... r-r-rein hypothetisch.");
+			case 17 -> new Message("Weißt du, es ist ein Privileg so viel mit mir zu reden, kein Recht.");
+			case 37 -> new Message("Wie würdest du eigentlich dieses Spiel spielen, wenn ich dir nicht die ganze Zeit sagen würde wie?");
+			case 73 -> new Message("Ich hätte dich schon längst für Belästigung angezeigt, wenn ich dich nicht lieb... Ich hab nichts gesagt.");
+			case 173 -> new Message("Kannst mich einfach nicht allein lassen, was? Ich d-denke das ist okay. Aber wag es nicht, das jemandem zu erzählen!");
+			default -> GameChatResponse.none();
+		};
 	}
 
 	@Override

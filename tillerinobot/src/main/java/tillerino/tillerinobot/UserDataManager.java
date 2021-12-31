@@ -2,7 +2,6 @@ package tillerino.tillerinobot;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -20,7 +19,6 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,11 +29,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
 import tillerino.tillerinobot.data.BotUserData;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
@@ -60,34 +54,21 @@ public class UserDataManager {
 	 * 
 	 * @author Tillerino
 	 */
-	public static class UserData implements Serializable, Closeable {
-		private static final long serialVersionUID = 1L;
-
-		@Value
-		@Builder(toBuilder = true)
-		@AllArgsConstructor(access = AccessLevel.PUBLIC, onConstructor = @__(@JsonCreator))
-		public static class BeatmapWithMods implements Serializable {
-			private static final long serialVersionUID = 1L;
-
-			@BeatmapId
-			private int beatmap;
-
-			@BitwiseMods
-			private long mods;
-		}
+	public static class UserData implements Closeable {
+		public record BeatmapWithMods(@BeatmapId int beatmap, @BitwiseMods long mods) { }
 
 		private transient boolean changed = false;
 
 		public void setChanged(boolean changed) {
 			this.changed = changed;
 			
-			if(!changed && (language instanceof IsMutable)) {
-				((IsMutable) language).clearModified();
+			if(!changed && language instanceof IsMutable mutable) {
+				mutable.clearModified();
 			}
 		}
 		
 		public boolean isChanged() {
-			return changed || (language instanceof IsMutable) && ((IsMutable) language).isModified();
+			return changed || language instanceof IsMutable mutable && mutable.isModified();
 		}
 		
 		@Getter
@@ -250,7 +231,7 @@ public class UserDataManager {
 			return;
 		}
 
-		if (options.usingLanguage(lang -> (lang instanceof IsMutable) && ((IsMutable) lang).isModified())) {
+		if (options.usingLanguage(lang -> lang instanceof IsMutable mutable && mutable.isModified())) {
 			options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
 		}
 		String serialized;
