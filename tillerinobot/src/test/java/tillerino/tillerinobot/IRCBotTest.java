@@ -99,14 +99,20 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	AbstractPpaddictUserDataService<?> ppaddictUserDataService = mock(AbstractPpaddictUserDataService.class);
 
+	boolean printResponses = false;
+
 	@Before
 	public void initMocks() throws Exception {
-		makeQueuePrint();
+		mockQueuePrint();
 	}
 
-	void makeQueuePrint() throws InterruptedException {
-		doAnswer(x -> { System.out.printf("sending %s in response to %s%n", x.getArguments()[0], x.getArguments()[1]); return null; })
-			.when(queue).onResponse(any(), any());
+	void mockQueuePrint() throws InterruptedException {
+		doAnswer(x -> {
+			if (printResponses) {
+				System.out.printf("sending %s in response to %s%n", x.getArguments()[0], x.getArguments()[1]);
+			}
+			return null;
+		}).when(queue).onResponse(any(), any());
 	}
 
 	@After
@@ -466,7 +472,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	private void verifyResponse(IRCBot bot, GameChatEvent event, GameChatResponse response) throws InterruptedException {
 		verifyNoMoreInteractions(queue);
 		reset(queue);
-		makeQueuePrint();
+		mockQueuePrint();
 		bot.onEvent(event);
 		verify(queue).onResponse(response, event);
 	}

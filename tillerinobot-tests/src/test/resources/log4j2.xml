@@ -16,9 +16,14 @@
 		<Logger name="org.eclipse.jetty" level="info"/>
 		<Logger name="org.springframework" level="warn"/>
 		<Logger name="org.jboss.logging" level="info"/>
-		<Logger name="org.tillerino.irc" level="info"/>
 		<Logger name="com.github.dockerjava" level="info"/>
 		<Logger name="org.testcontainers" level="info"/>
+		<Logger name="jndi" level="info"/>
+		<Logger name="org.apache.http" level="info"/>
+		<Logger name="io.netty" level="info"/>
+		<Logger name="🐳 [mysql:5.7.34]" level="info"/>
+
+		<Logger name="org.tillerino.irc" level="info"/>
 		<Logger name="org.tillerino.ppaddict.FullBotTest" level="info"/>
 		<Logger name="org.tillerino.ppaddict.chat.impl.MessagePreprocessor" level="info"/>
 		<Logger name="org.tillerino.ppaddict.chat.impl.MessagePreprocessor" level="debug" additivity="false">
