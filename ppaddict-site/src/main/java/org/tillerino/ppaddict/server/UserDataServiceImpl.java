@@ -173,9 +173,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
       data.logoutURL = logoutService.getLogoutURL(referer);
       PersistentUserData persistent = getServerUserData(credentials);
 
-      if(persistent.getLinkedOsuId() == null && credentials instanceof CredentialsWithOsu) {
+      if(persistent.getLinkedOsuId() == null && credentials instanceof CredentialsWithOsu osuCred) {
         // we've logged in with osu! OAuth and can immediately link this account :)
-        CredentialsWithOsu osuCred = (CredentialsWithOsu) credentials;
         String token = ppaddictUserDataService.getLinkString(osuCred.identifier, osuCred.displayName);
         ppaddictUserDataService.tryLinkToPpaddict(token, osuCred.getOsuUserId());
 

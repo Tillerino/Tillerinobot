@@ -428,20 +428,14 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
   private static ToDoubleFunction<BeatmapData> getComparator(final Sort sortBy,
       final BeatmapFilterSettings settings) {
-    switch (sortBy) {
-      case EXPECTED:
-        return value -> value.getEstimates().getPP(settings.getLowAccuracy() / 100);
-      case PERFECT:
-        return value -> value.getEstimates().getPP(settings.getHighAccuracy() / 100);
-      case BPM:
-        return value -> value.getBeatmap().getBpm(value.getEstimates().getMods());
-      case LENGTH:
-        return value -> value.getBeatmap().getTotalLength(value.getEstimates().getMods());
-      case STAR_DIFF:
-        return value -> value.getEstimates().getStarDiff();
-      default:
-        return null;
-    }
+    return switch (sortBy) {
+      case EXPECTED -> value -> value.getEstimates().getPP(settings.getLowAccuracy() / 100);
+      case PERFECT -> value -> value.getEstimates().getPP(settings.getHighAccuracy() / 100);
+      case BPM -> value -> value.getBeatmap().getBpm(value.getEstimates().getMods());
+      case LENGTH -> value -> value.getBeatmap().getTotalLength(value.getEstimates().getMods());
+      case STAR_DIFF -> value -> value.getEstimates().getStarDiff();
+      default -> null;
+    };
   }
 
   public Beatmap makeBeatmap(PersistentUserData userData, final BeatmapMeta meta) {
