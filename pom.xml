@@ -18,7 +18,7 @@
 	</modules>
 
 	<properties>
-		<jacoco.version>0.8.6</jacoco.version>
+		<jacoco.version>0.8.7</jacoco.version>
 		<jersey.version>3.0.3</jersey.version>
 		<jetty.version>9.4.44.v20210927</jetty.version>
 		<jackson.version>2.13.1</jackson.version>
@@ -33,7 +33,7 @@
 		<spotbugs.version>4.5.2</spotbugs.version>
 		<spotbugs.plugin.version>4.5.0.0</spotbugs.plugin.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<mockito.version>3.11.2</mockito.version>
+		<mockito.version>4.2.0</mockito.version>
 		<hsqldb.version>2.6.1</hsqldb.version>
 		<rabbitmq.version>5.14.0</rabbitmq.version>
 		<lombok.version>1.18.22</lombok.version>
@@ -170,9 +170,9 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>15</source>
-					<target>15</target>
-					<release>15</release>
+					<source>16</source>
+					<target>16</target>
+					<release>16</release>
 					<encoding>UTF-8</encoding>
 					<compilerArgs>
 						<compilerArg>-parameters</compilerArg>
