@@ -36,7 +36,7 @@
 		<mockito.version>3.11.2</mockito.version>
 		<hsqldb.version>2.6.1</hsqldb.version>
 		<rabbitmq.version>5.14.0</rabbitmq.version>
-		<lombok.version>1.18.12</lombok.version>
+		<lombok.version>1.18.22</lombok.version>
 		<spring-data-jpa.version>2.6.0</spring-data-jpa.version>
 		<mysql-connector-java.version>8.0.27</mysql-connector-java.version>
 		<rest-assured.version>4.4.0</rest-assured.version>
