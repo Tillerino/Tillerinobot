@@ -207,19 +207,19 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
       if (useRangeFilters) {
         if (request.aR.min != null
-            && apiBeatmap.getApproachRate(estimate.getMods()) * 100 < request.aR.min) {
+            && data.getEstimates().getApproachRate() * 100 < request.aR.min) {
           continue;
         }
         if (request.aR.max != null
-            && apiBeatmap.getApproachRate(estimate.getMods()) * 100 > request.aR.max) {
+            && data.getEstimates().getApproachRate() * 100 > request.aR.max) {
           continue;
         }
         if (request.oD.min != null
-            && apiBeatmap.getOverallDifficulty(estimate.getMods()) * 100 < request.oD.min) {
+            && data.getEstimates().getOverallDifficulty() * 100 < request.oD.min) {
           continue;
         }
         if (request.oD.max != null
-            && apiBeatmap.getOverallDifficulty(estimate.getMods()) * 100 > request.oD.max) {
+            && data.getEstimates().getOverallDifficulty() * 100 > request.oD.max) {
           continue;
         }
         if (request.cS.min != null
@@ -260,17 +260,11 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
             && apiBeatmap.getTotalLength(estimate.getMods()) > request.mapLength.max) {
           continue;
         }
-        Double starDiff = estimate.getStarDiff();
-        if (starDiff == null && request.sortBy == Sort.STAR_DIFF) {
-          continue;
-        }
         // these are multiplied by 100 for fake decimals
-        if (request.starDiff.min != null
-            && (starDiff == null || starDiff * 100 < request.starDiff.min)) {
+        if (request.starDiff.min != null && (estimate.getStarDiff() * 100 < request.starDiff.min)) {
           continue;
         }
-        if (request.starDiff.max != null
-            && (starDiff == null || starDiff * 100 > request.starDiff.max)) {
+        if (request.starDiff.max != null && (estimate.getStarDiff() * 100 > request.starDiff.max)) {
           continue;
         }
       }
@@ -349,7 +343,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     long mods = estimates.getMods();
 
     Beatmap beatmap = new Beatmap();
-    beatmap.approachRate = apiBeatmap.getApproachRate(mods);
+    beatmap.approachRate = data.getEstimates().getApproachRate();
     beatmap.artist = apiBeatmap.getArtist();
     beatmap.beatmapid = apiBeatmap.getBeatmapId();
     beatmap.bpm = apiBeatmap.getBpm(mods);
@@ -366,10 +360,10 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         beatmap.personalization = pers;
       }
     }
-    beatmap.overallDiff = apiBeatmap.getOverallDifficulty(mods);
+    beatmap.overallDiff = data.getEstimates().getOverallDifficulty();
     beatmap.setid = apiBeatmap.getSetId();
     beatmap.starDifficulty =
-        mods == 0 ? (Double) data.getBeatmap().getStarDifficulty() : estimates.getStarDiff();
+        mods == 0 ? (Double) data.getEstimates().getStarDiff() : estimates.getStarDiff();
     beatmap.title = apiBeatmap.getTitle();
     beatmap.version = apiBeatmap.getVersion();
 

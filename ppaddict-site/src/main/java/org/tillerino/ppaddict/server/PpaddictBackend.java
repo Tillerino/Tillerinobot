@@ -16,7 +16,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.diff.OsuApiBeatmapForDiff;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 public interface PpaddictBackend {
@@ -26,12 +25,13 @@ public interface PpaddictBackend {
    * need and needlessly increases memory usage.
    */
   @Data
-  @EqualsAndHashCode(callSuper = true)
-  @ToString(callSuper = true)
-  class OsuApiBeatmapForPpaddict extends OsuApiBeatmapForDiff {
-    int beatmapId, setId, totalLength;
-    String artist, title, version;
-    double bpm, circleSize;
+  @EqualsAndHashCode
+  @ToString
+  class OsuApiBeatmapForPpaddict {
+    // we make these fields public because Mapstruct + Lombok in current combination is crap
+    public int beatmapId, setId, totalLength;
+    public String artist, title, version;
+    public double bpm, circleSize;
 
     public double getCircleSize(@BitwiseMods long mods) {
       return OsuApiBeatmap.calcCircleSize(getCircleSize(), mods);
