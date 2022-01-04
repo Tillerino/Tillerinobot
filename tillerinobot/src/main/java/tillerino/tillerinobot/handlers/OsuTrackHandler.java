@@ -14,6 +14,7 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.util.MdcUtils;
 
+import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
@@ -24,19 +25,31 @@ import tillerino.tillerinobot.osutrack.UpdateResult;
 
 public class OsuTrackHandler extends CommandHandler.WithShorthand {
     private final OsutrackDownloader osutrackDownloader;
+    private final BotBackend backend;
 
     @Inject
-    public OsuTrackHandler(OsutrackDownloader osutrackDownloader) {
+    public OsuTrackHandler(OsutrackDownloader osutrackDownloader, BotBackend backend) {
         super("update");
         this.osutrackDownloader = osutrackDownloader;
+        this.backend = backend;
     }
 
     @Override
     public GameChatResponse handleArgument(String originalCommand, String remaining, OsuApiUser apiUser, UserDataManager.UserData userData, Language lang) throws UserException, IOException, SQLException, InterruptedException {
         MDC.put(MdcUtils.MDC_HANDLER, "u");
 
-        String username = remaining.isEmpty() ? apiUser.getUserName() : remaining.trim();
-        UpdateResult update = osutrackDownloader.getUpdate(username);
+        int userId;
+        if (remaining.isEmpty()) {
+            userId = apiUser.getUserId();
+        } else {
+            // query someone else
+            OsuApiUser otherApiUser = backend.downloadUser(remaining);
+            if(otherApiUser == null) {
+                return new Success(String.format("User %s does not exist", remaining));
+            }
+            userId = otherApiUser.getUserId();
+        }
+        UpdateResult update = osutrackDownloader.getUpdate(userId);
 
         return updateResultToResponse(update);
     }

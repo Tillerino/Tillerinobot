@@ -105,7 +105,7 @@ public class IRCBot implements GameChatEventConsumer {
 		commandHandlers.add(new DebugHandler(backend, resolver));
 		commandHandlers.add(new HelpHandler());
 		commandHandlers.add(new ComplaintHandler(manager));
-		commandHandlers.add(new OsuTrackHandler(osutrackDownloader));
+		commandHandlers.add(new OsuTrackHandler(osutrackDownloader, backend));
 	}
 
 	private GameChatResponse processPrivateAction(PrivateAction action) throws InterruptedException {
@@ -382,7 +382,7 @@ public class IRCBot implements GameChatEventConsumer {
 					inactiveTime));
 
 			if (data.isOsuTrackWelcomeEnabled()) {
-				UpdateResult update = osutrackDownloader.getUpdate(user.getNick());
+				UpdateResult update = osutrackDownloader.getUpdate(apiUser.getUserId());
 				response = response.then(OsuTrackHandler.updateResultToResponse(update));
 			}
 

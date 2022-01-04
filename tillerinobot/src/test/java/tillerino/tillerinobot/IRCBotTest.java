@@ -311,25 +311,40 @@ public class IRCBotTest extends AbstractDatabaseTest {
 				eq(Model.GAMMA5), anyBoolean(), anyLong());
 	}
 
+    private static final GameChatResponse OSUTRACK_RESPONSE_OLIEBOL = new Success("Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/oliebol osu!track].");
+    private static final GameChatResponse OSUTRACK_RESPONSE_FARTOWNIK = new Success("Rank: -3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track].")
+            .then(new Message("2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.06pp; [https://osu.ppy.sh/b/693195 #89]: 331.89pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."));
+
+    private void hintOsutrackUsers() {
+        backend.hintUser("oliebol", false, 125000, 1000, 2756335);
+        backend.hintUser("fartownik", false, 125000, 1000, 56917);
+    }
+
+    @Test
+    public void testOsutrackOliebol() throws Exception {
+        IRCBot bot = getTestBot(backend);
+        turnOffVersionMessage();
+        hintOsutrackUsers();
+
+        verifyResponse(bot, message("oliebol", "!u"), OSUTRACK_RESPONSE_OLIEBOL);
+    }
+
+    @Test
+    public void testOsutrackOliebolQueryFartownik() throws Exception {
+        IRCBot bot = getTestBot(backend);
+        turnOffVersionMessage();
+        hintOsutrackUsers();
+
+        verifyResponse(bot, message("oliebol", "!u fartownik"), OSUTRACK_RESPONSE_FARTOWNIK);
+    }
+
 	@Test
-	public void testOsutrack1() throws Exception {
+	public void testOsutrackFartownik() throws Exception {
 		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
-		backend.hintUser("oliebol", false, 125000, 1000);
+        hintOsutrackUsers();
 
-		verifyResponse(bot, message("oliebol", "!u"), new Success(
-				"Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/oliebol osu!track]."));
-	}
-
-	@Test
-	public void testOsutrack2() throws Exception {
-		IRCBot bot = getTestBot(backend);
-		turnOffVersionMessage();
-		backend.hintUser("fartownik", false, 125000, 1000);
-
-		verifyResponse(bot, message("fartownik", "!u"),
-				new Success("Rank: -3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track].")
-				.then(new Message("2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.06pp; [https://osu.ppy.sh/b/693195 #89]: 331.89pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track].")));
+		verifyResponse(bot, message("fartownik", "!u"), OSUTRACK_RESPONSE_FARTOWNIK);
 	}
 
 	void turnOffVersionMessage() throws SQLException, UserException {
