@@ -13,6 +13,7 @@ import tillerino.tillerinobot.data.repos.BotConfigRepository;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -37,13 +38,10 @@ public class RepositoryModule extends AbstractModule {
 	@Singleton
 	public JpaRepositoryFactory getRepoFactory(EntityManagerFactory emf,
 			ThreadLocalAutoCommittingEntityManager em) {
-		em.setThreadLocalEntityManager(emf.createEntityManager());
-		try {
+		try(ResetEntityManagerCloseable cl = em.withNewEntityManager()) {
 			JpaRepositoryFactory factory = new JpaRepositoryFactory(em);
 			createRepositories(factory);
 			return factory;
-		} finally {
-			em.close();
 		}
 	}
 

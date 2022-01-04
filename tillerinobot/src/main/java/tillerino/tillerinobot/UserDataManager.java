@@ -10,7 +10,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
@@ -176,19 +175,14 @@ public class UserDataManager {
 	
 	final BotBackend backend;
 	
-	final EntityManagerFactory emf;
-	
 	final ThreadLocalAutoCommittingEntityManager em;
 	
 	final BotUserDataRepository repository;
 
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
-	public UserDataManager(BotBackend backend, EntityManagerFactory emf, ThreadLocalAutoCommittingEntityManager em,
-			BotUserDataRepository repository) {
-		super();
+	public UserDataManager(BotBackend backend, ThreadLocalAutoCommittingEntityManager em, BotUserDataRepository repository) {
 		this.backend = backend;
-		this.emf = emf;
 		this.em = em;
 		this.repository = repository;
 	}

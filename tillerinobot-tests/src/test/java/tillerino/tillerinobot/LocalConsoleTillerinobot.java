@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManagerFactory;
 
 import jakarta.ws.rs.core.UriBuilder;
 
@@ -56,6 +55,7 @@ import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
@@ -133,8 +133,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	@Provides
 	@Singleton
 	public GameChatClient getRunner(@Named("messagePreprocessor") GameChatEventConsumer preprocessor,
-			final BotBackend backend, final IrcNameResolver resolver, EntityManagerFactory emf,
-			ThreadLocalAutoCommittingEntityManager em) throws Exception {
+			final BotBackend backend, final IrcNameResolver resolver, ThreadLocalAutoCommittingEntityManager em) throws Exception {
 
 		final AtomicBoolean running = new AtomicBoolean(true);
 
@@ -164,24 +163,24 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 				System.out.println("please provide your name:");
 				username = scanner.nextLine();
 
-				em.setThreadLocalEntityManager(emf.createEntityManager());
-				if (resolver.resolveIRCName(username) == null
-						&& backend instanceof TestBackend testBackend) {
-					System.out.println("you're new. I'll have to ask you a couple of questions.");
-
-					System.out.println("are you a donator? (anything for yes)");
-					final boolean donator = scanner.nextLine().length() > 0;
-
-					System.out.println("what's your rank?");
-					final int rank = Integer.parseInt(scanner.nextLine());
-
-					System.out.println("how much pp do you have?");
-					final double pp = Double.parseDouble(scanner.nextLine());
-
-					testBackend.hintUser(username, donator, rank, pp);
-					resolver.resolveManually(backend.downloadUser(username).getUserId());
+				try(ResetEntityManagerCloseable cl = em.withNewEntityManager()) {
+					if (resolver.resolveIRCName(username) == null
+							&& backend instanceof TestBackend testBackend) {
+						System.out.println("you're new. I'll have to ask you a couple of questions.");
+	
+						System.out.println("are you a donator? (anything for yes)");
+						final boolean donator = scanner.nextLine().length() > 0;
+	
+						System.out.println("what's your rank?");
+						final int rank = Integer.parseInt(scanner.nextLine());
+	
+						System.out.println("how much pp do you have?");
+						final double pp = Double.parseDouble(scanner.nextLine());
+	
+						testBackend.hintUser(username, donator, rank, pp);
+						resolver.resolveManually(backend.downloadUser(username).getUserId());
+					}
 				}
-				em.close();
 
 				System.out.println("Welcome to the Tillerinobot simulator");
 				System.out.println("To quit, send /q");

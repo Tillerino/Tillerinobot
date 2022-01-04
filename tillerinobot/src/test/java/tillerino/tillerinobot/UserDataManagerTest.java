@@ -36,14 +36,13 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 	}
 
 	private void reloadManager() {
-		em.close();
-		em.setThreadLocalEntityManager(emf.createEntityManager());
-		manager = new UserDataManager(null, emf, em, userDataRepository);
+		reloadEntityManager();
+		manager = new UserDataManager(null, em, userDataRepository);
 	}
 
 	@Test
 	public void testLanguageMutability() throws Exception {
-		UserDataManager manager = new UserDataManager(null, emf, em, userDataRepository);
+		UserDataManager manager = new UserDataManager(null, em, userDataRepository);
 		List<String> answers = new ArrayList<>();
 		try(UserData data = manager.getData(534678)) {
 			data.usingLanguage(language -> {

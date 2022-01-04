@@ -132,9 +132,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
 					new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader()));
 		}
 
-		IRCBot ircBot = new IRCBot(backend, recMan, new UserDataManager(backend, emf, em, userDataRepository),
-				em, emf, resolver, new TestOsutrackDownloader(),
-				rateLimiter, liveActivity, queue, ppaddictUserDataService) {{
+		IRCBot ircBot = new IRCBot(backend, recMan, new UserDataManager(backend, em, userDataRepository),
+				em, resolver, new TestOsutrackDownloader(), rateLimiter,
+				liveActivity, queue, ppaddictUserDataService) {{
 		}};
 		return ircBot;
 	}

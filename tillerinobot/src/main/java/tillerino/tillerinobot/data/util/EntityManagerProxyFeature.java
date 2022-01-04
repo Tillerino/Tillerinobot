@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
 
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -17,6 +16,7 @@ import jakarta.ws.rs.core.FeatureContext;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 @Slf4j
 @AllArgsConstructor(onConstructor = @__(@Inject))
@@ -29,18 +29,15 @@ public class EntityManagerProxyFeature implements Feature {
 	@Priority(0)
 	@RequiredArgsConstructor(onConstructor = @__(@Inject))
 	public static class SetEntityManagerProxy implements ContainerRequestFilter {
-		private final EntityManagerFactory emf;
 		private final ThreadLocalAutoCommittingEntityManager em;
 
 		@Override
 		public void filter(ContainerRequestContext requestContext)
 				throws IOException {
 			try {
-				em.setThreadLocalEntityManager(emf.createEntityManager());
-				requestContext.setProperty(EMKEY, true);
+				requestContext.setProperty(EMKEY, em.withNewEntityManager());
 			} catch (Exception e) {
 				log.error("Error setting entity manager", e);
-				requestContext.removeProperty(EMKEY);
 				throw new InternalServerErrorException(e);
 			}
 		}
@@ -50,14 +47,13 @@ public class EntityManagerProxyFeature implements Feature {
 	@RequiredArgsConstructor(onConstructor = @__(@Inject))
 	public static class CloseEntityManagerProxy implements
 			ContainerResponseFilter {
-		private final ThreadLocalAutoCommittingEntityManager em;
-
 		@Override
 		public void filter(ContainerRequestContext requestContext,
 				ContainerResponseContext responseContext) throws IOException {
 			try {
-				if (requestContext.getProperty(EMKEY) != null) {
-					em.close();
+				ResetEntityManagerCloseable closeable = (ResetEntityManagerCloseable) requestContext.getProperty(EMKEY);
+				if (closeable != null) {
+					closeable.close();
 				}
 			} catch (Exception e) {
 				log.error("Error closing entity manager", e);

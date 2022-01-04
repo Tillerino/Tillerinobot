@@ -21,7 +21,6 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.persistence.EntityManagerFactory;
 
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
@@ -41,6 +40,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
@@ -49,7 +49,6 @@ import tillerino.tillerinobot.lang.Default;
 public class BeatmapInfoService implements BeatmapDifficulties {
 	private final BotBackend backend;
 	private final ThreadLocalAutoCommittingEntityManager em;
-	private final EntityManagerFactory emf;
 
 	private final ExecutorService executorService = createExec();
 	private static ExecutorService createExec() {
@@ -68,8 +67,7 @@ public class BeatmapInfoService implements BeatmapDifficulties {
 					return executorService.submit(new Callable<BeatmapMeta>() {
 						@Override
 						public BeatmapMeta call() throws SQLException, InterruptedException {
-							em.setThreadLocalEntityManager(emf.createEntityManager());
-							try {
+							try(ResetEntityManagerCloseable cl = em.withNewEntityManager()) {
 								BeatmapMeta beatmap = backend.loadBeatmap(key.beatmap(), key.mods(), new Default());
 								
 								if(beatmap == null) {
@@ -81,8 +79,6 @@ public class BeatmapInfoService implements BeatmapDifficulties {
 								throw RestUtils.getBadGateway(null);
 							} catch (UserException e) {
 								throw new NotFoundException(e.getMessage());
-							} finally {
-								em.close();
 							}
 						}
 					});

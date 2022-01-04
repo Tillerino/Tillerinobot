@@ -31,6 +31,7 @@ import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
 import tillerino.tillerinobot.data.util.RepositoryModule;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 /**
  * Creates an embedded HSQL database for tests.
@@ -91,10 +92,11 @@ public abstract class AbstractDatabaseTest {
 	protected BotConfigRepository botConfigRepository;
 	@Inject
 	protected GivenRecommendationRepository givenRecommendationRepository;
+	private ResetEntityManagerCloseable reset;
 
 	@Before
 	public void createEntityManager() {
-		em.setThreadLocalEntityManager(emf.createEntityManager());
+		reset = em.withNewEntityManager();
 	}
 
 	@After
@@ -103,6 +105,11 @@ public abstract class AbstractDatabaseTest {
 		ppaddictLinkKeyRepository.deleteAll();
 		botConfigRepository.deleteAll();
 		givenRecommendationRepository.deleteAll();
-		em.close();
+		reset.close();
+	}
+
+	protected void reloadEntityManager() {
+		reset.close();
+		reset = em.withNewEntityManager();
 	}
 }

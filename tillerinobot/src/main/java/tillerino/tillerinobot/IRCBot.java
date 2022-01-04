@@ -11,8 +11,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import jakarta.ws.rs.ServiceUnavailableException;
 import jakarta.ws.rs.WebApplicationException;
@@ -43,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.ComplaintHandler;
 import tillerino.tillerinobot.handlers.DebugHandler;
@@ -74,7 +73,6 @@ public class IRCBot implements GameChatEventConsumer {
 	private final UserDataManager userDataManager;
 	private final List<CommandHandler> commandHandlers = new ArrayList<>();
 	private final ThreadLocalAutoCommittingEntityManager em;
-	private final EntityManagerFactory emf;
 	private final IrcNameResolver resolver;
 	private final OsutrackDownloader osutrackDownloader;
 	private final RateLimiter rateLimiter;
@@ -86,13 +84,11 @@ public class IRCBot implements GameChatEventConsumer {
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
 			UserDataManager userDataManager, ThreadLocalAutoCommittingEntityManager em,
-			EntityManagerFactory emf, IrcNameResolver resolver, OsutrackDownloader osutrackDownloader,
-			RateLimiter rateLimiter, LiveActivity liveActivity, GameChatResponseQueue queue,
-			AbstractPpaddictUserDataService<?> ppaddictUserDataService) {
+			IrcNameResolver resolver, OsutrackDownloader osutrackDownloader, RateLimiter rateLimiter,
+			LiveActivity liveActivity, GameChatResponseQueue queue, AbstractPpaddictUserDataService<?> ppaddictUserDataService) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;
 		this.em = em;
-		this.emf = emf;
 		this.resolver = resolver;
 		this.osutrackDownloader = osutrackDownloader;
 		this.rateLimiter = rateLimiter;
@@ -287,8 +283,7 @@ public class IRCBot implements GameChatEventConsumer {
 
 	@Override
 	public void onEvent(GameChatEvent event) {
-		EntityManager oldEm = em.setThreadLocalEntityManager(emf.createEntityManager());
-		try {
+		try(ResetEntityManagerCloseable x = em.withNewEntityManager()) {
 			rateLimiter.setThreadPriority(event.isInteractive() ? RateLimiter.REQUEST : RateLimiter.EVENT);
 			// clear blocked time in case it wasn't cleared by the last thread
 			rateLimiter.blockedTime();
@@ -315,7 +310,6 @@ public class IRCBot implements GameChatEventConsumer {
 			Thread.currentThread().interrupt();
 			return;
 		} finally {
-			em.closeAndReplace(oldEm);
 			rateLimiter.clearThreadPriority();
 			// clear blocked time so it isn't carried over to the next request under any circumstances
 			rateLimiter.blockedTime();
