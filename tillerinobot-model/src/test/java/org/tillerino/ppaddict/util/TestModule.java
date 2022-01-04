@@ -15,4 +15,6 @@ public @interface TestModule {
 	Class<?>[] mocks() default { };
 
 	boolean cache() default true;
+
+	Bind[] binds() default { };
 }

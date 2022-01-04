@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -31,13 +30,19 @@ import lombok.RequiredArgsConstructor;
  * injected before each test method.
  */
 public class InjectionRunner extends BlockJUnit4ClassRunner {
-	private static final Map<Set<Class<?>>, List<AbstractModule>> cachedInjectors = new LinkedHashMap<>() {
+	private static final Map<ContextKey, List<AbstractModule>> cachedInjectors = new LinkedHashMap<>() {
 		private static final long serialVersionUID = 1L;
 
-		protected boolean removeEldestEntry(Map.Entry<Set<Class<?>>, List<AbstractModule>> eldest) {
+		protected boolean removeEldestEntry(Map.Entry<ContextKey, List<AbstractModule>> eldest) {
 			return size() > 10;
 		};
 	};
+
+	private record ContextKey(
+			Set<Class<? extends AbstractModule>> modules,
+			Set<Class<?>> mocks,
+			Set<Bind> binds
+			) { };
 
 	public InjectionRunner(Class<?> testClass) throws InitializationError {
 		super(testClass);
@@ -91,29 +96,28 @@ public class InjectionRunner extends BlockJUnit4ClassRunner {
 
 	private List<AbstractModule> createInjector(Set<Class<?>> hierarchy) {
 		boolean cache = true;
-		Set<Class<?>> key = new LinkedHashSet<>();
 		List<Class<? extends AbstractModule>> realModules = new ArrayList<>();
-		List<TestModule> forMocks = new ArrayList<>();
+		List<Class<?>> mocks = new ArrayList<>();
+		List<Bind> binds = new ArrayList<>();
+
 		for (Class<?> testClass : hierarchy) {
 			TestModule annotation = testClass.getAnnotation(TestModule.class);
-			List<Class<? extends AbstractModule>> modules = Arrays.asList(annotation.value());
-			realModules.addAll(modules);
-			key.addAll(modules);
-			if (annotation.mocks().length > 0) {
-				key.add(testClass);
-				forMocks.add(annotation);
-			}
+			realModules.addAll(Arrays.asList(annotation.value()));
+			mocks.addAll(Arrays.asList(annotation.mocks()));
+			binds.addAll(Arrays.asList(annotation.binds()));
 			cache &= annotation.cache();
 		}
+
+		ContextKey key = new ContextKey(new LinkedHashSet<>(realModules), new LinkedHashSet<>(mocks),
+				new LinkedHashSet<>(binds));
 		if (cache) {
-			return cachedInjectors.computeIfAbsent(key, k -> createInjectorForClasses(realModules, forMocks));
+			return cachedInjectors.computeIfAbsent(key, InjectionRunner::createInjectorForClasses);
 		}
-		return createInjectorForClasses(realModules, forMocks);
+		return createInjectorForClasses(key);
 	}
 
-	private static List<AbstractModule> createInjectorForClasses(List<Class<? extends AbstractModule>> cls,
-			List<TestModule> mocks) {
-		List<AbstractModule> modules = cls.stream().map(c -> {
+	private static List<AbstractModule> createInjectorForClasses(ContextKey key) {
+		List<AbstractModule> modules = key.modules().stream().map(c -> {
 			try {
 				return c.getConstructor().newInstance();
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException
@@ -121,17 +125,18 @@ public class InjectionRunner extends BlockJUnit4ClassRunner {
 				throw new RuntimeException(e);
 			}
 		}).collect(toList());
-		mocks.stream().map(MocksModule::new).forEach(modules::add);
+		modules.add(new MocksModule(key.mocks()));
+		modules.add(new BindsModule(key.binds()));
 		return modules;
 	}
 
 	@RequiredArgsConstructor
 	private static class MocksModule extends AbstractModule implements ResettableModule {
 		private final List<Object> mocks = new ArrayList<>();
-		private final TestModule declaration;
+		private final Set<Class<?>> declaration;
 
 		protected void configure() {
-			Stream.of(declaration.mocks()).forEach(this::mockOne);
+			declaration.stream().forEach(this::mockOne);
 		}
 
 		private <T> void mockOne(Class<T> toMock) {
@@ -142,6 +147,19 @@ public class InjectionRunner extends BlockJUnit4ClassRunner {
 
 		public void reset() {
 			mocks.forEach(Mockito::reset);
+		}
+	}
+
+	@RequiredArgsConstructor
+	private static class BindsModule extends AbstractModule {
+		private final Set<Bind> declaration;
+
+		protected void configure() {
+			declaration.stream().forEach(this::bindOne);
+		}
+
+		private void bindOne(Bind bind) {
+			bind((Class) bind.api()).to(bind.impl());
 		}
 	}
 }
