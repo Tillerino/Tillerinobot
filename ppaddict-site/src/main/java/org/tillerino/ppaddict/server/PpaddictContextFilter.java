@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.persistence.EntityManagerFactory;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -18,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.RateLimiter;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 @Slf4j
 public class PpaddictContextFilter implements Filter {
-  private final EntityManagerFactory emf;
   private final ThreadLocalAutoCommittingEntityManager em;
   private final RateLimiter rateLimiter;
 
@@ -35,13 +34,11 @@ public class PpaddictContextFilter implements Filter {
       throws IOException, ServletException {
     MDC.clear();
     try {
-      try {
-        em.setThreadLocalEntityManager(emf.createEntityManager());
+      try(ResetEntityManagerCloseable cl = em.withNewEntityManager();) {
         rateLimiter.setThreadPriority(RateLimiter.REQUEST);
         chain.doFilter(req, res);
       } finally {
         rateLimiter.clearThreadPriority();
-        em.close();
       }
     } catch (Throwable e) {
       log.error("Error serving request", e);

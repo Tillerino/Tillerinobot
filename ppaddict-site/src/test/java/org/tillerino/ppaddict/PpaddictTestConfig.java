@@ -3,7 +3,6 @@ package org.tillerino.ppaddict;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import javax.persistence.EntityManagerFactory;
 import javax.servlet.ServletContextEvent;
 
 import org.tillerino.ppaddict.server.PpaddictUserDataService;
@@ -16,6 +15,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
+import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
 
 
@@ -37,7 +37,6 @@ public class PpaddictTestConfig extends GuiceServletContextListener {
     TestBackend botBackend = (TestBackend) injector.getInstance(BotBackend.class);
     IrcNameResolver resolver = injector.getInstance(IrcNameResolver.class);
     PpaddictUserDataService userDataService = injector.getInstance(PpaddictUserDataService.class);
-    EntityManagerFactory emf = injector.getInstance(EntityManagerFactory.class);
     ThreadLocalAutoCommittingEntityManager em =
         injector.getInstance(ThreadLocalAutoCommittingEntityManager.class);
     new Thread(() -> {
@@ -51,13 +50,10 @@ public class PpaddictTestConfig extends GuiceServletContextListener {
           }
           System.out.println("Please tell me your osu name");
           String name = scanner.nextLine();
-          em.setThreadLocalEntityManager(emf.createEntityManager());
-          try {
+          try(ResetEntityManagerCloseable cl = em.withNewEntityManager()) {
             botBackend.hintUser(name, false, 100000, 1000);
             int osuId = resolver.resolveIRCName(name);
             System.out.println(userDataService.tryLinkToPpaddict(token, osuId));
-          } finally {
-            em.close();
           }
         } catch (NoSuchElementException e) {
           // no more lines. shutting down.
