@@ -329,14 +329,23 @@ public class IRCBotTest extends AbstractDatabaseTest {
         verifyResponse(bot, message("oliebol", "!u"), OSUTRACK_RESPONSE_OLIEBOL);
     }
 
-    @Test
-    public void testOsutrackOliebolQueryFartownik() throws Exception {
-        IRCBot bot = getTestBot(backend);
-        turnOffVersionMessage();
-        hintOsutrackUsers();
+	@Test
+	public void testOsutrackOliebolQueryFartownik() throws Exception {
+		IRCBot bot = getTestBot(backend);
+		turnOffVersionMessage();
+		hintOsutrackUsers();
 
-        verifyResponse(bot, message("oliebol", "!u fartownik"), OSUTRACK_RESPONSE_FARTOWNIK);
-    }
+		verifyResponse(bot, message("oliebol", "!u fartownik"), OSUTRACK_RESPONSE_FARTOWNIK);
+	}
+
+	@Test
+	public void testOsutrackOliebolQueryNonExistendUser() throws Exception {
+		IRCBot bot = getTestBot(backend);
+		turnOffVersionMessage();
+		hintOsutrackUsers();
+
+		verifyResponse(bot, message("oliebol", "!u doesnotexist"), new Success("User doesnotexist does not exist"));
+	}
 
 	@Test
 	public void testOsutrackFartownik() throws Exception {
