@@ -158,6 +158,7 @@ public class MdcUtils {
 	public static final String MDC_THREAD_PRIORITY = "threadPriority";
 	public static final String MDC_USER = "user";
 	public static final String MDC_EXTERNAL_API_CALLS = "externalApiCalls";
+	public static final String MDC_ENGINE = "engine";
 
 	public static final String MDC_HANDLER_RECOMMEND = "r";
 

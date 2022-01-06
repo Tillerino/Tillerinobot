@@ -8,18 +8,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.util.MdcUtils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -125,6 +126,8 @@ public class RecommendationsManager {
 			}
 		}
 
+		MDC.put(MdcUtils.MDC_ENGINE, sampler.getSettings().model().toString());
+
 		if (sampler.isEmpty()) {
 			samplers.invalidate(userid);
 			throw new UserException(lang.outOfRecommendations());
@@ -143,10 +146,10 @@ public class RecommendationsManager {
 			if (sample.getMods() < 0) {
 				loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
 			} else {
-				loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods(),
-						lang);
-				if (loadBeatmap == null)
+				loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods(), lang);
+				if (loadBeatmap == null) {
 					loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
+				}
 			}
 		} catch (NotRankedException e) {
 			throw new RareUserException(lang.excuseForError());

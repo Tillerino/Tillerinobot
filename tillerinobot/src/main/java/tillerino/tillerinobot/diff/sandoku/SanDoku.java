@@ -51,7 +51,7 @@ public interface SanDoku {
 				URL url = IOUtils.resourceToURL(String.format("/SanDoku/%s-%s-%s.json", md5, gameMode, mods));
 				return new ObjectMapper().readValue(url, SanDokuResponse.class);
 			} catch (IOException e) {
-				throw new RuntimeException();
+				throw new RuntimeException(e);
 			}
 		}
 	}

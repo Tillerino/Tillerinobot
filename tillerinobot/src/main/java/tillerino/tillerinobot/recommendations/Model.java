@@ -12,9 +12,10 @@ import lombok.RequiredArgsConstructor;
 public enum Model {
 	ALPHA(false),
 	BETA(false),
-	// gamma4
-	GAMMA(true),
-	GAMMA5(true);
+	GAMMA4(true),
+	GAMMA5(true),
+	GAMMA6(true),
+	;
 
 	@Getter
 	private final boolean modsCapable;

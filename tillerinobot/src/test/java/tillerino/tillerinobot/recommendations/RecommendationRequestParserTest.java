@@ -59,6 +59,15 @@ public class RecommendationRequestParserTest {
 	}
 
 	@Test
+	public void testGamma6Dt() throws Exception {
+		assertThatThrownBy(() -> parse("gamma6 dt")).isInstanceOf(UserException.class);
+		when(backend.getDonator(anyInt())).thenReturn(1);
+		assertThat(parse("gamma6 dt"))
+			.hasFieldOrPropertyWithValue("model", Model.GAMMA6)
+			.hasFieldOrPropertyWithValue("requestedMods", 64L);
+	}
+
+	@Test
 	public void testGamma5Len() throws Exception {
 		when(backend.getDonator(anyInt())).thenReturn(1);
 		RecommendationRequest request = parse("gamma5 LEN<=150");

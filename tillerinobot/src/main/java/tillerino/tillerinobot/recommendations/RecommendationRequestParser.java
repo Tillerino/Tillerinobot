@@ -84,12 +84,24 @@ public class RecommendationRequestParser {
 			settingsBuilder.model(Model.BETA);
 			return true;
 		}
+		if(getLevenshteinDistance(lowerCase, "gamma4") <= 2 && lowerCase.endsWith("4")) {
+			settingsBuilder.model(Model.GAMMA4);
+			return true;
+		}
 		if(getLevenshteinDistance(lowerCase, "gamma5") <= 2 && lowerCase.endsWith("5")) {
 			settingsBuilder.model(Model.GAMMA5);
 			return true;
 		}
+		if(getLevenshteinDistance(lowerCase, "gamma6") <= 2 && lowerCase.endsWith("6")) {
+			if (backend.getDonator(user.getUserId()) <= 0) {
+				return false;
+			}
+			settingsBuilder.model(Model.GAMMA6);
+			return true;
+		}
 		if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
-			settingsBuilder.model(Model.GAMMA);
+			// backwards compatibility
+			settingsBuilder.model(Model.GAMMA4);
 			return true;
 		}
 		return false;
