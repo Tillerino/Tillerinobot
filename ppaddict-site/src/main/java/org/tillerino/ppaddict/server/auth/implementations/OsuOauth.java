@@ -12,6 +12,7 @@ import org.tillerino.ppaddict.server.auth.AbstractAuthenticatorService;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.server.auth.CredentialsWithOsu;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,6 +38,7 @@ public class OsuOauth extends AbstractAuthenticatorService {
             .build());
   }
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class OsuUserinfoBody {
     public int id;
     public String username;
