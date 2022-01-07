@@ -10,10 +10,10 @@ public class OsutrackDownloader {
     //   |    --> PLEASE ask FIRST for permission from ameo (https://ameobea.me/osutrack/) <--    |
     //   |   _____________________________________________________________________________________|_
     //    \_/_______________________________________________________________________________________/
-    private static final String OSUTRACK_ENDPOINT = "https://osutrack-api.ameo.dev/update";
-    private static final OsutrackUpdate OSUTRACK_UPDATE = WebResourceFactory.newResource(OsutrackUpdate.class, ClientBuilder
+    private static final String OSUTRACK_API_BASE = "https://osutrack-api.ameo.dev/";
+    private static final OsutrackApi OSUTRACK_API = WebResourceFactory.newResource(OsutrackApi.class, ClientBuilder
             .newClient()
-            .target(OSUTRACK_ENDPOINT)
+            .target(OSUTRACK_API_BASE)
             .queryParam("mode", 0));
 
     protected void completeUpdateObject(UpdateResult updateResult) {
@@ -23,7 +23,7 @@ public class OsutrackDownloader {
     }
 
     public UpdateResult getUpdate(int osuUserId) {
-        UpdateResult updateResult = OSUTRACK_UPDATE.getUpdate(osuUserId);
+        UpdateResult updateResult = OSUTRACK_API.getUpdate(osuUserId);
         completeUpdateObject(updateResult);
         return updateResult;
     }
