@@ -14,6 +14,7 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.util.MdcUtils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager;
@@ -27,6 +28,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
     private final OsutrackDownloader osutrackDownloader;
     private final BotBackend backend;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "injection")
     @Inject
     public OsuTrackHandler(OsutrackDownloader osutrackDownloader, BotBackend backend) {
         super("update");

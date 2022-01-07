@@ -30,7 +30,7 @@
 		<guice.version>5.0.1</guice.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
 		<eclipselink.version>2.7.10</eclipselink.version>
-		<spotbugs.version>4.5.2</spotbugs.version>
+		<spotbugs.version>4.5.3</spotbugs.version>
 		<spotbugs.plugin.version>4.5.0.0</spotbugs.plugin.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
 		<mockito.version>4.2.0</mockito.version>
