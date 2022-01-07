@@ -1,8 +1,14 @@
 package tillerino.tillerinobot.diff.sandoku;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.ws.rs.BadRequestException;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.data.Offset;
@@ -112,5 +118,14 @@ public class SanDokuTestManual {
 		score.setMods(0);
 		OsuScore standardScore = new OsuScore(score);
 		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(612.754f, webRounding);
+	}
+
+	@Test
+	public void emptyBeatmap() throws Exception {
+		assertThatThrownBy(() -> sanDoku.getDiff(0, 0, new byte[0]))
+			.isInstanceOfSatisfying(BadRequestException.class, e -> assertThat(SanDoku.unwrapError(e))
+					.hasValueSatisfying(error -> assertThat(error)
+							.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
+							.hasFieldOrPropertyWithValue("errors", Map.of("beatmap", List.of("Empty input not valid")))));
 	}
 }

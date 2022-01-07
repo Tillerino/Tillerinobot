@@ -3,10 +3,13 @@ package tillerino.tillerinobot.diff.sandoku;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Optional;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
@@ -38,6 +41,14 @@ public interface SanDoku {
 
 	static SanDoku defaultClient(URI baseUri) {
 		return WebResourceFactory.newResource(SanDoku.class, JerseyClientBuilder.createClient().target(baseUri));
+	}
+
+	static Optional<SanDokuError> unwrapError(BadRequestException e) {
+		try {
+			return Optional.of(e.getResponse().readEntity(SanDokuError.class));
+		} catch (ProcessingException e1) {
+			return Optional.empty();
+		}
 	}
 
 	/**
