@@ -16,7 +16,7 @@ public class NumericPropertyPredicateTest {
 
 		OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
 		when(okayBeatmap.getTitle()).thenReturn("hai");
-		BareRecommendation rec = mock(BareRecommendation.class);
+		BareRecommendation rec = new BareRecommendation(0, 0, null, null, 0);
 
 		assertTrue(predicate.test(rec, okayBeatmap));
 
@@ -50,12 +50,11 @@ public class NumericPropertyPredicateTest {
 
 		OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
 		when(okayBeatmap.getTitle()).thenReturn("hai");
-		BareRecommendation okayRec = mock(BareRecommendation.class);
+		BareRecommendation okayRec = new BareRecommendation(0, 0, null, null, 0);
 
 		assertTrue(predicate.test(okayRec, okayBeatmap));
 
-		BareRecommendation moddedRec = mock(BareRecommendation.class);
-		when(moddedRec.getMods()).thenReturn(1l);
+		BareRecommendation moddedRec = new BareRecommendation(0, 1, null, null, 0);
 
 		assertFalse(predicate.test(moddedRec, okayBeatmap));
 	}

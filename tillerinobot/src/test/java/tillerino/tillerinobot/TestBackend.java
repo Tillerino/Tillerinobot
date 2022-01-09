@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.ResettableModule;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -41,6 +43,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.diff.Beatmap;
 import tillerino.tillerinobot.diff.BeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
@@ -48,6 +51,8 @@ import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
+import tillerino.tillerinobot.recommendations.Recommender;
+import tillerino.tillerinobot.recommendations.TopPlay;
 
 /**
  * <p>
@@ -142,7 +147,7 @@ public class TestBackend implements BotBackend {
 
 	@Override
 	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
-			throws SQLException, IOException, UserException {
+			throws SQLException, IOException {
 		OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid);
 
 		BeatmapImpl cBeatmap = BeatmapImpl.builder()
@@ -225,11 +230,8 @@ public class TestBackend implements BotBackend {
 		return database.users.get(user).isDonator ? 1 : 0;
 	}
 
-	@Override
-	public Collection<BareRecommendation> loadRecommendations(int userid,
-			Collection<Integer> exclude, Model model, boolean nomod,
-			long requestMods) throws SQLException, IOException, UserException {
-		List<BeatmapMeta> maps = new ArrayList<>();
+	private List<BeatmapMeta> findBeatmaps(final double equivalentPp, long requestMods, boolean nomod)
+			throws SQLException, IOException {
 		ArrayList<Long> mods = new ArrayList<>();
 		if(requestMods == 0) {
 			mods.add(0l);
@@ -243,47 +245,17 @@ public class TestBackend implements BotBackend {
 			mods.add(requestMods);
 			mods.add(requestMods | Mods.getMask(Mods.Hidden));
 		}
-		OsuApiUser user = getUser(userid, 0);
-		final double equivalent = user.getPp() / 20;
+		List<BeatmapMeta> maps = new ArrayList<>();
 		for (int i : setIds.keySet()) {
 			for(long m : mods) {
 				BeatmapMeta meta = loadBeatmap(i, m, null);
-				if(Math.abs(1 - meta.getEstimates().getPP(.98) / equivalent) < .15) {
+				if(Math.abs(1 - meta.getEstimates().getPP(.98) / equivalentPp) < .15) {
 					maps.add(meta);
 				}
+				meta.setPersonalPP((int) meta.getEstimates().getPP(.98));
 			}
 		}
-		Collection<BareRecommendation> recommendations = new ArrayList<>();
-		for (final BeatmapMeta meta : maps) {
-			double _98percentPp = meta.getEstimates().getPP(.98);
-			recommendations.add(new BareRecommendation() {
-				@Override
-				public double getProbability() {
-					return .15 - Math.abs(1 - _98percentPp / equivalent);
-				}
-				
-				@Override
-				public Integer getPersonalPP() {
-					return (int) Math.ceil((_98percentPp + equivalent) / 2);
-				}
-				
-				@Override
-				public long getMods() {
-					return meta.getMods();
-				}
-				
-				@Override
-				public long[] getCauses() {
-					return new long[0];
-				}
-				
-				@Override
-				public int getBeatmapId() {
-					return meta.getBeatmap().getBeatmapId();
-				}
-			});
-		}
-		return recommendations;
+		return maps;
 	}
 
 	@Override
@@ -343,12 +315,63 @@ public class TestBackend implements BotBackend {
 		}
 	}
 
+	@RequiredArgsConstructor(onConstructor = @__(@Inject))
+	public static class TestRecommender implements Recommender {
+		private final TestBackend backend;
+
+		@Override
+		public List<TopPlay> loadTopPlays(int userId) throws SQLException, MaintenanceException, IOException {
+			OsuApiUser user = backend.getUser(userId, 0);
+			final double equivalent = user.getPp() / 20;
+			List<BeatmapMeta> maps = backend.findBeatmaps(equivalent, 0, false);
+			List<TopPlay> plays = new ArrayList<>();
+			for (int i = 0; i < maps.size() && i < 50; i++) {
+				BeatmapMeta meta = maps.get(i);
+				plays.add(new TopPlay(userId, i, meta.getBeatmap().getBeatmapId(), meta.getMods(), meta.getPersonalPP()));
+			}
+			return plays;
+		}
+
+		@Override
+		public Collection<BareRecommendation> loadRecommendations(List<TopPlay> topPlays, Collection<Integer> exclude,
+				Model model, boolean nomod, long requestMods) throws SQLException, IOException, UserException {
+			double equivalent = equivalentPp(topPlays);
+			List<BeatmapMeta> maps = backend.findBeatmaps(equivalent, requestMods, nomod);
+			Collection<BareRecommendation> recommendations = new ArrayList<>();
+			for (final BeatmapMeta meta : maps) {
+				double _98percentPp = meta.getEstimates().getPP(.98);
+				recommendations.add(new BareRecommendation(
+						meta.getBeatmap().getBeatmapId(), meta.getMods(),
+						new long[0],
+						(int) Math.ceil((_98percentPp + equivalent) / 2),
+						.15 - Math.abs(1 - _98percentPp / equivalent)));
+			}
+			return recommendations;
+
+		}
+		
+		double equivalentPp(List<TopPlay> plays) {
+			Collections.sort(plays, Comparator.comparingDouble(TopPlay::getPp).reversed());
+			double ppSum = 0;
+			double partialSum = 0;
+			
+			for(int i = 0; i < plays.size(); i++) {
+				partialSum += Math.pow(.95, i);
+				ppSum += plays.get(i).getPp() * Math.pow(.95, i);
+			}
+			
+			return ppSum / partialSum;
+
+		}
+	}
+
 	public static class Module extends AbstractModule implements ResettableModule {
 		private TestBackend backend;
 
 		@Override
 		protected void configure() {
 			bind(BotBackend.class).to(TestBackend.class);
+			bind(BeatmapsLoader.class).to(TestBeatmapsLoader.class);
 		}
 
 		@Provides
@@ -359,12 +382,8 @@ public class TestBackend implements BotBackend {
 
 		@Provides
 		@Singleton
-		public BeatmapsLoader loader() {
-			return createLoader();
-		}
-
-		protected BeatmapsLoader createLoader() {
-			return new TestBackend.TestBeatmapsLoader();
+		public Recommender recommender(TestBackend backend) {
+			return spy(new TestRecommender(backend));
 		}
 
 		@Override

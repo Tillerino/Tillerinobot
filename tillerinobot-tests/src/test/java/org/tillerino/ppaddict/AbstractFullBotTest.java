@@ -82,6 +82,7 @@ import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
+import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
 import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 
@@ -171,6 +172,7 @@ public abstract class AbstractFullBotTest {
             bind(GameChatClient.class).to(BotRunnerImpl.class);
             bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore")).toInstance(false);
             bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
+            bind(Recommender.class).to(TestBackend.TestRecommender.class).in(Singleton.class);
             bind(GameChatWriter.class).to(IrcWriter.class);
             bind(Clock.class).toInstance(Clock.system());
             bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);

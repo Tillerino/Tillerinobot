@@ -37,6 +37,9 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	@Inject
 	RecommendationsManager manager;
 
+	@Inject
+	Recommender recommender;
+
 	OsuApiUser user;
 
 	@Before
@@ -135,13 +138,13 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	@Test
 	public void defaultSettings() throws Exception {
 		assertThat(manager.getRecommendation(user, "", new Default())).isNotNull();
-		verify(backend).loadRecommendations(user.getUserId(), Collections.emptyList(), Model.GAMMA5, false, 0L);
+		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA5), eq(false), eq(0L));
 	}
 
 	@Test
 	public void testGamma5() throws Exception {
 		assertThat(manager.getRecommendation(user, "gamma5", new Default())).isNotNull();
-		verify(backend).loadRecommendations(anyInt(), any(), eq(Model.GAMMA5), anyBoolean(), anyLong());
+		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA5), anyBoolean(), anyLong());
 	}
 
 	@Test

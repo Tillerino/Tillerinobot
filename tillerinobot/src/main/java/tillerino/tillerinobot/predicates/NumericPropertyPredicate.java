@@ -20,7 +20,7 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 
 	@Override
 	public boolean test(BareRecommendation r, OsuApiBeatmap beatmap) {
-		double value = property.getValue(beatmap, r.getMods());
+		double value = property.getValue(beatmap, r.mods());
 
 		if(value < min) {
 			return false;

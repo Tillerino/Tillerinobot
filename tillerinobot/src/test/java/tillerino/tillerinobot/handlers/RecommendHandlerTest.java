@@ -26,7 +26,7 @@ public class RecommendHandlerTest {
 		OsuApiBeatmap beatmap = new OsuApiBeatmap();
 		beatmap.setMaxCombo(100);
 		when(manager.getRecommendation(any(), any(), any())).thenReturn(
-				new Recommendation(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)), mock(BareRecommendation.class)));
+				new Recommendation(new BeatmapMeta(beatmap, null, mock(PercentageEstimates.class)), new BareRecommendation(0, 0, null, null, 0)));
 		UserData userData = mock(UserData.class);
 
 		when(userData.getDefaultRecommendationOptions()).thenReturn("dt");

@@ -35,7 +35,7 @@ public class ComplaintHandler implements CommandHandler {
 			Recommendation lastRecommendation = manager
 					.getLastRecommendation(apiUser.getUserId());
 			if(lastRecommendation != null && lastRecommendation.beatmap != null) {
-				log.debug("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getBeatmapId() + " mods: " + lastRecommendation.bareRecommendation.getMods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.getCauses())));
+				log.debug("COMPLAINT: " + lastRecommendation.beatmap.getBeatmap().getBeatmapId() + " mods: " + lastRecommendation.bareRecommendation.mods() + ". Recommendation source: " + Arrays.asList(ArrayUtils.toObject(lastRecommendation.bareRecommendation.causes())));
 				return new Success(lang.complaint());
 			}
 		}

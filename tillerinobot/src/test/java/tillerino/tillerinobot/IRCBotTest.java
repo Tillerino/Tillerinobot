@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -56,6 +57,8 @@ import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
+import tillerino.tillerinobot.recommendations.Recommender;
+import tillerino.tillerinobot.recommendations.TopPlay;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
 @TestModule(value = TestBackend.Module.class, mocks = { LiveActivity.class, GameChatResponseQueue.class })
@@ -89,6 +92,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Inject
 	LiveActivity liveActivity;
+
+	@Inject
+	Recommender rec;
 
 	/**
 	 * Contains the messages and actions sent by the bot. At the end of each
@@ -128,14 +134,14 @@ public class IRCBotTest extends AbstractDatabaseTest {
 			}
 			recMan = this.recommendationsManager;
 		} else {
+			rec = backend instanceof TestBackend t ? spy(new TestBackend.TestRecommender(t)) : mock(Recommender.class);
 			recMan = spy(new RecommendationsManager(backend, recommendationsRepo, em,
-					new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader()));
+					new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader(), rec));
 		}
 
 		IRCBot ircBot = new IRCBot(backend, recMan, new UserDataManager(backend, em, userDataRepository),
 				em, resolver, new TestOsutrackDownloader(), rateLimiter,
-				liveActivity, queue, ppaddictUserDataService) {{
-		}};
+				liveActivity, queue, ppaddictUserDataService);
 		return ircBot;
 	}
 	
@@ -249,27 +255,14 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testProperEmptySamplerHandling() throws Exception {
-		TestBackend backend = new TestBackend(false, new TestBackend.TestBeatmapsLoader()) {
-			@Override
-			public Collection<BareRecommendation> loadRecommendations(
-					int userid, Collection<Integer> exclude, Model model,
-					boolean nomod, long requestMods) throws SQLException,
-					IOException, UserException {
-				if (exclude.contains(1)) {
-					return Collections.emptyList();
-				}
+		doReturn(List.of(new BareRecommendation(1, 0, null, null, 0)))
+			.when(rec).loadRecommendations(any(), Mockito.argThat(Collection::isEmpty), any(), anyBoolean(), anyLong());
+		doReturn(Collections.emptyList())
+			.when(rec).loadRecommendations(any(), Mockito.argThat(l -> !l.isEmpty()), any(), anyBoolean(), anyLong());
+		doReturn(Collections.emptyList()).when(rec).loadTopPlays(1);
 
-				BareRecommendation bareRecommendation = mock(BareRecommendation.class);
-				when(bareRecommendation.getProbability()).thenReturn(1d);
-				when(bareRecommendation.getBeatmapId()).thenReturn(1);
-				return Arrays.asList(bareRecommendation);
-			}
+		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion("user");
 
-			@Override
-			public int getLastVisitedVersion(String nick) throws SQLException, UserException {
-				return IRCBot.CURRENT_VERSION;
-			}
-		};
 		IRCBot bot = getTestBot(backend);
 
 		backend.hintUser("user", false, 0, 1000);
@@ -293,21 +286,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		verifyResponse(bot, message("user", "!R"), anyResponse());
 
-		verify(backend).loadRecommendations(anyInt(),
-				any(),
-				eq(Model.GAMMA5), anyBoolean(), anyLong());
-	}
-
-	@Test
-	public void testGammaDefaultSub100k() throws Exception {
-		IRCBot bot = getTestBot(backend);
-		turnOffVersionMessage();
-		backend.hintUser("user", false, 125000, 1000);
-
-		verifyResponse(bot, message("user", "!R"), anyResponse());
-
-		verify(backend).loadRecommendations(anyInt(),
-				any(),
+		verify(rec).loadRecommendations(Mockito.anyList(), any(),
 				eq(Model.GAMMA5), anyBoolean(), anyLong());
 	}
 
@@ -404,7 +383,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@Test
 	public void maintenance() throws Exception {
 		IRCBot bot = getTestBot(backend);
-		doThrow(MaintenanceException.class).when(backend).loadRecommendations(anyInt(), any(), any(), anyBoolean(), anyLong());
+		doThrow(MaintenanceException.class).when(rec).loadTopPlays(1);
 		backend.hintUser("user", false, 1000, 1000);
 		turnOffVersionMessage();
 		verifyResponse(bot, message("user", "!r"), messageContaining("maintenance"));

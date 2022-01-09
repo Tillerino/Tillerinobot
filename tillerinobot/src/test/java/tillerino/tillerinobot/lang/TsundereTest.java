@@ -17,6 +17,7 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
+import tillerino.tillerinobot.recommendations.Recommender;
 
 public class TsundereTest {
 
@@ -28,7 +29,7 @@ public class TsundereTest {
 		// mock backend and create RecommendationsManager and RecommendHandler based on mocked backend
 		BotBackend backend = mock(BotBackend.class);
 		RecommendHandler handler = new RecommendHandler(new RecommendationsManager(backend, null, null,
-				new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader()),
+				new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader(), mock(Recommender.class)),
 				mock(LiveActivity.class));
 
 		// make a bullshit call to the handler four times

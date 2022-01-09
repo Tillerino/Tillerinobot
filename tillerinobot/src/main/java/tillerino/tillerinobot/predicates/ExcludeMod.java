@@ -19,7 +19,7 @@ public class ExcludeMod implements RecommendationPredicate {
 
 	@Override
 	public boolean test(BareRecommendation r, OsuApiBeatmap beatmap) {
-		return !mod.is(r.getMods());
+		return !mod.is(r.mods());
 	}
 
 	@Override

@@ -69,20 +69,20 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 			throw new RareUserException(lang.excuseForError());
 		}
 		String addition = null;
-		if (recommendation.bareRecommendation.getMods() < 0) {
+		if (recommendation.bareRecommendation.mods() < 0) {
 			addition = lang.tryWithMods();
 		}
-		if (recommendation.bareRecommendation.getMods() > 0
-				&& beatmap.getMods() != recommendation.bareRecommendation.getMods()) {
+		if (recommendation.bareRecommendation.mods() > 0
+				&& beatmap.getMods() != recommendation.bareRecommendation.mods()) {
 			addition = lang.tryWithMods(Mods
-					.getMods(recommendation.bareRecommendation.getMods()));
+					.getMods(recommendation.bareRecommendation.mods()));
 		}
 
 		userData.setLastSongInfo(new BeatmapWithMods(beatmap
 				.getBeatmap().getBeatmapId(), beatmap.getMods()));
 		manager.saveGivenRecommendation(apiUser.getUserId(),
 				beatmap.getBeatmap().getBeatmapId(),
-				recommendation.bareRecommendation.getMods());
+				recommendation.bareRecommendation.mods());
 		return new Success(beatmap.formInfoMessage(true, addition,
 						userData.getHearts(), null, null, null))
 				.then(lang.optionalCommentOnRecommendation(apiUser, recommendation));

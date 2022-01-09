@@ -56,6 +56,7 @@ import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
+import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
@@ -79,6 +80,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 		bind(LiveActivity.class).toInstance(mock(LiveActivity.class));
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
+		bind(Recommender.class).to(TestBackend.TestRecommender.class).in(Singleton.class);
 		bind(Boolean.class).annotatedWith(
 				Names.named("tillerinobot.test.persistentBackend")).toInstance(
 				true);
