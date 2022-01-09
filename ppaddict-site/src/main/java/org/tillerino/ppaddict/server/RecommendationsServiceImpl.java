@@ -97,8 +97,8 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
           }
 
           recommendationsManager.saveGivenRecommendation(osuId,
-              recommendation.bareRecommendation.getBeatmapId(),
-              recommendation.bareRecommendation.getMods());
+              recommendation.bareRecommendation.beatmapId(),
+              recommendation.bareRecommendation.mods());
 
           Beatmap beatmap = beatmapTableService.makeBeatmap(userData, meta);
 
@@ -141,8 +141,8 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
             "Could not get a recommendation. Pls contact @Tillerino or /u/Tillerino");
       }
       recommendationsManager.saveGivenRecommendation(osuId,
-          recommendation.bareRecommendation.getBeatmapId(),
-          recommendation.bareRecommendation.getMods());
+          recommendation.bareRecommendation.beatmapId(),
+          recommendation.bareRecommendation.mods());
       return beatmapTableService.makeBeatmap(linkedData, recommendation.beatmap);
     } catch (SQLException | UserException | IOException | InterruptedException e) {
       throw ExceptionsUtil.getLoggedWrappedException(log, e);

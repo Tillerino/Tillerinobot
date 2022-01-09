@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
 
 /**
@@ -94,13 +93,13 @@ public class TestBackend implements PpaddictBackend {
   public Map<BeatmapWithMods, BeatmapData> getBeatmaps() {
     HashMap<BeatmapWithMods, BeatmapData> ret = new HashMap<>();
 
-    for (Integer id : botBackend.getSetIds().keySet()) {
+    for (Integer id : tillerino.tillerinobot.TestBackend.getSetIds().keySet()) {
       for (long mods : new long[] {0, getMask(Hidden, HardRock), getMask(DoubleTime)}) {
         try {
           final BeatmapMeta meta = botBackend.loadBeatmap(id, mods, new Default());
           ret.put(new BeatmapWithMods(id, mods), new BeatmapData(meta.getEstimates(),
               OsuApiBeatmapForPpaddict.Mapper.INSTANCE.shrink(meta.getBeatmap())));
-        } catch (SQLException | IOException | UserException e) {
+        } catch (SQLException | IOException e) {
           throw new RuntimeException(e);
         }
       }
