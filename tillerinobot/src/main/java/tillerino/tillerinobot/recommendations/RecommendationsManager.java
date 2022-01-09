@@ -142,17 +142,13 @@ public class RecommendationsManager {
 		int beatmapid = sample.getBeatmapId();
 
 		BeatmapMeta loadBeatmap;
-		try {
-			if (sample.getMods() < 0) {
+		if (sample.getMods() < 0) {
+			loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
+		} else {
+			loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods(), lang);
+			if (loadBeatmap == null) {
 				loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
-			} else {
-				loadBeatmap = backend.loadBeatmap(beatmapid, sample.getMods(), lang);
-				if (loadBeatmap == null) {
-					loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
-				}
 			}
-		} catch (NotRankedException e) {
-			throw new RareUserException(lang.excuseForError());
 		}
 		if (loadBeatmap == null) {
 			throw new RareUserException(lang.excuseForError());

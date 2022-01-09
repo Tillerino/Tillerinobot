@@ -88,21 +88,6 @@ public interface BotBackend {
 	public int getDonator(@UserId int user) throws SQLException, IOException;
 
 	/**
-	 * will load a sampler
-	 * @param userid
-	 * @param exclude these maps will be excluded (give top50 and previously given recommendations)
-	 * @param model selected model
-	 * @param nomod don't recommend mods
-	 * @param requestMods request specific mods (these will be included, but this won't exclude other mods)
-	 * @return
-	 * @throws SQLException
-	 * @throws IOException
-	 * @throws UserException
-	 */
-	public Collection<BareRecommendation> loadRecommendations(@UserId int userid, @Nonnull Collection<Integer> exclude,
-			@Nonnull Model model, boolean nomod, @BitwiseMods long requestMods) throws SQLException, IOException, UserException;
-
-	/**
 	 * links the given user to a Patreon account using a token string.
 	 * 
 	 * @param token a token that was emailed to the Patron.
