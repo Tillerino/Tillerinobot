@@ -7,6 +7,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import jakarta.ws.rs.NotFoundException;
+
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
@@ -51,7 +53,13 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             }
             userId = otherApiUser.getUserId();
         }
-        UpdateResult update = osutrackDownloader.getUpdate(userId);
+
+        UpdateResult update;
+        try {
+            update = osutrackDownloader.getUpdate(userId);
+        } catch (NotFoundException e) {
+            throw new UserException("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/");
+        }
 
         return updateResultToResponse(update);
     }

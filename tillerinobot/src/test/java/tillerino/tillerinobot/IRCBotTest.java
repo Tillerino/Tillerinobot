@@ -297,6 +297,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
     private void hintOsutrackUsers() {
         backend.hintUser("oliebol", false, 125000, 1000, 2756335);
         backend.hintUser("fartownik", false, 125000, 1000, 56917);
+        backend.hintUser("unknown", false, 125000, 1000, 1234);
     }
 
     @Test
@@ -333,6 +334,15 @@ public class IRCBotTest extends AbstractDatabaseTest {
         hintOsutrackUsers();
 
 		verifyResponse(bot, message("fartownik", "!u"), OSUTRACK_RESPONSE_FARTOWNIK);
+	}
+
+	@Test
+	public void testOsutrackUnknown() throws Exception {
+		IRCBot bot = getTestBot(backend);
+		turnOffVersionMessage();
+		hintOsutrackUsers();
+
+		verifyResponse(bot, message("unknown", "!u"), new Message("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/"));
 	}
 
 	void turnOffVersionMessage() throws SQLException, UserException {
