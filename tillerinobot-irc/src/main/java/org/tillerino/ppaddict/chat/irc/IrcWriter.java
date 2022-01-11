@@ -1,12 +1,14 @@
 package org.tillerino.ppaddict.chat.irc;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.pircbotx.output.OutputUser;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatWriter;
@@ -42,7 +44,7 @@ public class IrcWriter implements GameChatWriter {
 				// see org.pircbotx.output.OutputRaw.rawLine(String)
 				throw (InterruptedException) e.getCause();
 			}
-			if (e.getMessage().equals("Not connected to server")) {
+			if (e.getMessage().equals("Not connected to server") || ExceptionUtils.getRootCause(e) instanceof SocketException) {
 				// happens if the bot disconnects after waitForBot() finishes.
 				// since we wait for the connection in waitForBot(), we can retry immediately.
 				throw new RetryableException(0);
