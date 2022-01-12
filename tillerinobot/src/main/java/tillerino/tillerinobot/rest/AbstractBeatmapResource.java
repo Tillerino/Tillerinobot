@@ -79,7 +79,9 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 			found = repository.save(found);
 		}
 		if (found == null || (!found.getHash().equals(beatmap.getFileMd5())
-				&& found.getDownloaded() < System.currentTimeMillis() - HOURS.toMillis(1))) {
+				&& (found.getDownloaded() < beatmap.getLastUpdate()
+						// at most once per hour in case there is a problem
+						|| found.getDownloaded() < System.currentTimeMillis() - HOURS.toMillis(1)))) {
 			MdcUtils.incrementCounter(MdcUtils.MDC_EXTERNAL_API_CALLS);
 			String downloaded = downloader.getActualBeatmap(beatmap.getBeatmapId());
 			if (found == null) {
