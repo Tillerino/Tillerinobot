@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import jakarta.ws.rs.NotFoundException;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
@@ -59,6 +60,12 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             update = osutrackDownloader.getUpdate(userId);
         } catch (NotFoundException e) {
             throw new UserException("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/");
+        } catch (Exception e) {
+            // i/o exceptions are generally retryable
+            if (ExceptionUtils.getRootCause(e) instanceof IOException) {
+                throw new UserException("I couldn't reach osu!track. Try again?");
+            }
+            throw e;
         }
 
         return updateResultToResponse(update);
