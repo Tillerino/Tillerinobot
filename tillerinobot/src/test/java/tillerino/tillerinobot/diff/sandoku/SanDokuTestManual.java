@@ -128,4 +128,24 @@ public class SanDokuTestManual {
 							.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
 							.hasFieldOrPropertyWithValue("errors", Map.of("beatmap", List.of("Empty input not valid")))));
 	}
+
+	@Test
+	public void invalidModsDTHT() throws Exception {
+		byte[] beatmap = IOUtils.resourceToByteArray("/xi - FREEDOM DiVE (Nakagawa-Kanon) [FOUR DIMENSIONS].osu");
+		assertThatThrownBy(() -> sanDoku.getDiff(0, Mods.getMask(Mods.DoubleTime, Mods.HalfTime), beatmap))
+				.isInstanceOfSatisfying(BadRequestException.class, e -> assertThat(SanDoku.unwrapError(e))
+						.hasValueSatisfying(error -> assertThat(error)
+								.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
+								.hasFieldOrPropertyWithValue("errors", Map.of("mods", List.of("invalid mod combination: HT,DT")))));
+	}
+
+	@Test
+	public void invalidModsEZHR() throws Exception {
+		byte[] beatmap = IOUtils.resourceToByteArray("/xi - FREEDOM DiVE (Nakagawa-Kanon) [FOUR DIMENSIONS].osu");
+		assertThatThrownBy(() -> sanDoku.getDiff(0, Mods.getMask(Mods.Easy, Mods.HardRock), beatmap))
+				.isInstanceOfSatisfying(BadRequestException.class, e -> assertThat(SanDoku.unwrapError(e))
+						.hasValueSatisfying(error -> assertThat(error)
+								.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
+								.hasFieldOrPropertyWithValue("errors", Map.of("mods", List.of("invalid mod combination: HR,EZ")))));
+	}
 }
