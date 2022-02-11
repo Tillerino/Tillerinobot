@@ -36,7 +36,7 @@ public interface SanDoku {
 	@POST
 	@Path("/diff")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes("plain/osu")
+	@Consumes("text/osu")
 	SanDokuResponse getDiff(@GameMode @QueryParam("mode") int gameMode, @BitwiseMods @QueryParam("mods") long mods, byte[] beatmap);
 
 	static SanDoku defaultClient(URI baseUri) {
