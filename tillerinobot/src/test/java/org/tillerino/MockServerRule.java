@@ -2,6 +2,9 @@ package org.tillerino;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -15,6 +18,8 @@ import org.tillerino.ppaddict.util.DockerNetwork;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
+import lombok.SneakyThrows;
+
 /**
  * Shorthands for using a mock server in tests.
  * The mock server is not stopped by the rule, but kept alive until the VM exits.
@@ -23,7 +28,7 @@ import com.google.inject.name.Names;
  * Use with MockServerModule to inject mocked URLs.
  */
 public class MockServerRule extends TestWatcher {
-	private static final DockerImageName IMAGE = DockerImageName.parse("jamesdbloom/mockserver").withTag("mockserver-5.13.0");
+	private static final DockerImageName IMAGE = DockerImageName.parse("jamesdbloom/mockserver").withTag("mockserver-" + getMockServerVersion());
 	private static final MockServerContainer MOCK_SERVER = new MockServerContainer(IMAGE)
 			.withNetwork(DockerNetwork.NETWORK)
 			.withNetworkAliases("mockserver");
@@ -32,6 +37,15 @@ public class MockServerRule extends TestWatcher {
 	static {
 		MOCK_SERVER.start();
 		CLIENT = new MockServerClient(MOCK_SERVER.getContainerIpAddress(), MOCK_SERVER.getMappedPort(1080));
+	}
+
+	@SneakyThrows
+	private static String getMockServerVersion() {
+		try (InputStream is = MockServerRule.class.getResourceAsStream("/META-INF/maven/org.mock-server/mockserver-client-java/pom.properties")) {
+			Properties props = new Properties();
+			props.load(is);
+			return (String) props.get("version");
+		}
 	}
 
 	public static String getExternalMockServerAddress() {
@@ -48,7 +62,7 @@ public class MockServerRule extends TestWatcher {
 
 	private HttpRequest getRequest(String relativePath, String... headers) {
 		HttpRequest request = HttpRequest.request(relativePath).withMethod("GET");
-		assertThat(headers.length % 2).isEqualTo(0);
+		assertThat(headers.length % 2).isZero();
 		for (int i = 0; i < headers.length; i+=2) {
 			request = request.withHeader(headers[i], headers[i + 1]);
 		}
