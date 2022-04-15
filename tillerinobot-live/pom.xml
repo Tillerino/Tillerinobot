@@ -31,6 +31,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>rabbitmq</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.tillerino.osu</groupId>

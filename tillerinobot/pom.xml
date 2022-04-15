@@ -182,6 +182,7 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>mockserver</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mock-server</groupId>

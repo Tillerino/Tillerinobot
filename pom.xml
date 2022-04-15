@@ -370,13 +370,10 @@
 			<!-- Standard Libraries -->
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-slf4j-impl</artifactId>
+				<artifactId>log4j-bom</artifactId>
 				<version>${log4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-core</artifactId>
-				<version>${log4j.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -431,29 +428,11 @@
 
 			<!-- HTTP -->
 			<dependency>
-				<groupId>org.glassfish.jersey.containers</groupId>
-				<artifactId>jersey-container-jdk-http</artifactId>
+				<groupId>org.glassfish.jersey</groupId>
+				<artifactId>jersey-bom</artifactId>
 				<version>${jersey.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.glassfish.jersey.media</groupId>
-				<artifactId>jersey-media-json-jackson</artifactId>
-				<version>${jersey.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.glassfish.jersey.ext</groupId>
-				<artifactId>jersey-proxy-client</artifactId>
-				<version>${jersey.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.glassfish.jersey.core</groupId>
-				<artifactId>jersey-client</artifactId>
-				<version>${jersey.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.glassfish.jersey.inject</groupId>
-				<artifactId>jersey-hk2</artifactId>
-				<version>${jersey.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.jetty.websocket</groupId>
@@ -462,29 +441,11 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
+				<groupId>com.fasterxml.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
 				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-core</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-annotations</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.module</groupId>
-				<artifactId>jackson-module-parameter-names</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.module</groupId>
-				<artifactId>jackson-module-jaxb-annotations</artifactId>
-				<version>${jackson.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<!-- SQL -->
@@ -512,27 +473,10 @@
 			<!-- Containers -->
 			<dependency>
 				<groupId>org.testcontainers</groupId>
-				<artifactId>rabbitmq</artifactId>
+				<artifactId>testcontainers-bom</artifactId>
 				<version>${testcontainers.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>mysql</artifactId>
-				<version>${testcontainers.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>testcontainers</artifactId>
-				<version>${testcontainers.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>mockserver</artifactId>
-				<version>${testcontainers.version}</version>
-				<scope>test</scope>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mock-server</groupId>
