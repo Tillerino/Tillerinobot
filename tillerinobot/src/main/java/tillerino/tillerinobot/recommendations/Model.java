@@ -15,6 +15,10 @@ public enum Model {
 	GAMMA4(true),
 	GAMMA5(true),
 	GAMMA6(true),
+	/**
+	 * External model made by NamePendingApproval
+	 */
+	NAP(true)
 	;
 
 	@Getter

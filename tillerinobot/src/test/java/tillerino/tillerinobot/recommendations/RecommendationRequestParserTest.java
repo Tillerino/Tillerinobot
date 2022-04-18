@@ -76,4 +76,12 @@ public class RecommendationRequestParserTest {
 		assertThat(request.predicates())
 			.containsExactly(new NumericPropertyPredicate<>("LEN<=150", new MapLength(), Double.NEGATIVE_INFINITY, true, 150D, true));
 	}
+
+	@Test
+	public void parseNap() throws Exception {
+		RecommendationRequest request = parse("nap dt");
+		assertThat(request)
+			.hasFieldOrPropertyWithValue("model", Model.NAP)
+			.hasFieldOrPropertyWithValue("requestedMods", 64L);
+	}
 }

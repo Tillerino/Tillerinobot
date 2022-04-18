@@ -104,6 +104,10 @@ public class RecommendationRequestParser {
 			settingsBuilder.model(Model.GAMMA4);
 			return true;
 		}
+		if (lowerCase.equals("nap")) {
+			settingsBuilder.model(Model.NAP);
+			return true;
+		}
 		return false;
 	}
 
