@@ -156,7 +156,7 @@ public class Polish extends AbstractMutableLanguage {
 	}
 
 	@Override
-	public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+	public GameChatResponse adjustments(OsuApiUser apiUser) {
 		return new Message("[https://osu.ppy.sh/users/1698537 Pawwit] i [https://osu.ppy.sh/users/8488688 Lil Silv] nauczyli mnie mówić po polsku. Jeśli uważasz, że gdzieś się pomylili, napisz do nich na osu!");
 	}
 
