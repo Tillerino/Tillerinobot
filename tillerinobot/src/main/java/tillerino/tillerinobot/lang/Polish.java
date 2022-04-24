@@ -80,7 +80,7 @@ public class Polish extends AbstractMutableLanguage {
 
 	@Override
 	public String malformattedMods(String mods) {
-		return "Coś się nie zgadza. Mody mogą być dowolną kombinacją DT HR HD HT EZ NC FL SO NF. Łącz je nie używając spacji ani żadnych znaków. Przykład: !with HDHR, !with DTEZ";
+		return "Coś się nie zgadza. Mody mogą być dowolną kombinacją DT HR HD HT EZ NC FL SO NF. Łącz je nie używając spacji ani żadnych innych znaków. Przykład: !with HDHR, !with DTEZ";
 	}
 
 	@Override
@@ -176,7 +176,7 @@ public class Polish extends AbstractMutableLanguage {
 	@Override
 	public String apiTimeoutException() {
 		registerModification(); 
-		final String message = "Serwery osu! obecnie działają bardzo wolno, więc w tym momencie nie mogę nic dla Ciebie zrobić. ";
+		final String message = "Serwery osu! obecnie działają bardzo wolno, więc w tym momencie nie mogę Tobie pomóc. ";
 		return message + apiTimeoutShuffler.get(
                 "Powiedz... Kiedy był ostatni raz, gdy rozmawiałeś ze swoją babcią?",
                 "Może posprzątasz swój pokój, a potem zapytasz jeszcze raz?",
@@ -189,7 +189,7 @@ public class Polish extends AbstractMutableLanguage {
                 "Powinieneś mieć teraz wystarczająco dużo czasu na przeczytanie [https://github.com/Tillerino/Tillerinobot/wiki mojej instrukcji].",
                 "Nie martw się, te [https://www.reddit.com/r/osugame dank memy] powinny Ci pomóc zabić czas.",
                 "Jeśli się nudzisz, wypróbuj [http://gabrielecirulli.github.io/2048/ 2048]!",
-                "Zabawne pytanie: Jeśli twój dysk twardy by się teraz zepsuł, ile twoich osobistych danych przepadłoby na zawsze?",
+                "Takie tam pytanie: Jeśli twój dysk twardy by się teraz zepsuł, ile twoich osobistych danych przepadłoby na zawsze?",
                 "Więc... Próbowałeś kiedyś [https://www.google.pl/search?q=bring%20sally%20up%20push%20up%20challenge wyzwania sally up push up]?",
                 "Możesz iść robić coś innego, lub możemy gapić się na siebie nawzajem. W ciszy."
 				);
