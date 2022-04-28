@@ -13,8 +13,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Deardrops lness@qq.com https://github.com/Deardrops https://osu.ppy.sh/u/1735252
  */
 public class ChineseSimple extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "抱歉，现在没有这张图的信息。这张图可能是Unranked，太新或者太难，不是osu!主模式的图。";

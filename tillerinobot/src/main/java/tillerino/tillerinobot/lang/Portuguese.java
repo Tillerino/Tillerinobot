@@ -10,8 +10,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
 public class Portuguese extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Desculpe, não conheço este mapa. Ele pode ser muito novo, muito difícil, não ranqueado ou não é um mapa do modo osu!standard.";

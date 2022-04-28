@@ -24,7 +24,7 @@ public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 
 	@Override
 	protected String host() {
-		return LiveContainer.getLive().getContainerIpAddress();
+		return LiveContainer.getLive().getHost();
 	}
 
 	@Override

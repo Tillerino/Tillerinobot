@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Underforest https://osu.ppy.sh/u/6753180
  */
 public class Catalan extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Ho sento, no conec aquest mapa. Potser és molt recent, molt difícil, no està rankeado o l'modo de joc no és osu! estàndard.";

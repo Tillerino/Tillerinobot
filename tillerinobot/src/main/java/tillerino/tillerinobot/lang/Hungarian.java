@@ -13,8 +13,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author https://github.com/moriczgergo https://osu.ppy.sh/u/skiilaa
  */
 public class Hungarian extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Bocsi, de nem ismerem ezt a mapot. Lehet hogy nagyon új, nagyon nehéz, unranked, vagy nem osu!standard.";

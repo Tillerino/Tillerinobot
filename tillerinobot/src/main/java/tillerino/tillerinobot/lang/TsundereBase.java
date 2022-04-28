@@ -12,7 +12,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.recommendations.Recommendation;
 
 public abstract class TsundereBase extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
 	//random object
 	//Recent counters, reset if inactive for a while
 	private int recentRecommendations = 0;

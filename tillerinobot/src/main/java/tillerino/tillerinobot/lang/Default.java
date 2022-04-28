@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Tillerino tillmann.gaida@gmail.com https://github.com/Tillerino https://osu.ppy.sh/u/2070907
  */
 public class Default extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "I'm sorry, I don't know that map. It might be very new, very hard, unranked or not standard osu mode.";

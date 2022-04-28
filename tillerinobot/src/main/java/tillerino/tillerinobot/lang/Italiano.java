@@ -13,8 +13,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * https://osu.ppy.sh/u/marcostudios and https://osu.ppy.sh/u/Howl for this.
  */
 public class Italiano extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-		
 	@Override
 	public String unknownBeatmap() {
 		return "Mi spiace, Non conosco quella mappa. Potrebbe essere nuovissima, molto difficile, non rankata oppure potrebbe non essere per la modalità standard di osu.";

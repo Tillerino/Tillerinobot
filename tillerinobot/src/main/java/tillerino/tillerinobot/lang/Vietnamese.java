@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Xuân Hải Trần, fb.com/xuanhai.tran.184, BCraftMG, https://osu.ppy.sh/users/13456818
  */
 public class Vietnamese extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Xin lỗi, tôi không biết map này. Có thể do map quá mới, quá khó, chưa được xếp hạng hoặc không phải chế độ standard.";

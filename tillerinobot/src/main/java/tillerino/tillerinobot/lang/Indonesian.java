@@ -20,8 +20,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author "Rendyindo" rendyarya22@gmail.com https://github.com/Rendyindo https://osu.ppy.sh/u/3378391
  */
 public class Indonesian extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Maaf, saya tidak mengetahui map itu. Mungkin itu adalah map yang baru, terlalu sulit, tidak dalam status di rank atau bukan mode osu standar.";

@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Polarni tom.rivnac@gmail.com https://github.com/Polarni https://osu.ppy.sh/u/Polarni
  */
 public class Czech extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Omlouvám se, ale beatmapa není k dispozici. Možná je moc nová, těžká, nehodnocená nebo nepatří do osu! standard.";

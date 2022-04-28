@@ -13,8 +13,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Tomoka Rin leoyao321@gmail.com https://osu.ppy.sh/u/125308
  */
 public class ChineseTraditional extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "抱歉，查詢不到這個譜面的資料唷。這個譜面可能是尚未Rank、過新、太難或非標準模式用的譜面。";

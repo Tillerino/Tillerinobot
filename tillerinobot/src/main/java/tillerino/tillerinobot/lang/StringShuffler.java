@@ -1,6 +1,5 @@
 package tillerino.tillerinobot.lang;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
@@ -22,8 +21,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @Getter
-public class StringShuffler implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class StringShuffler {
 	/*
 	 * 8 bytes;
 	 */

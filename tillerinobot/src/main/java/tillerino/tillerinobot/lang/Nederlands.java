@@ -13,8 +13,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * Dutch language implementation by https://osu.ppy.sh/u/PudiPudi and https://github.com/notadecent and https://osu.ppy.sh/u/2756335
  */
 public class Nederlands extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Het spijt me, ik ken die map niet. Hij kan gloednieuw zijn, heel erg moeilijk of hij is niet voor osu standard mode.";

@@ -14,8 +14,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * Pawwit https://osu.ppy.sh/u/2070907 & LilSilv https://github.com/LilSilv https://osu.ppy.sh/users/8488688
  */
 public class Polish extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Przykro mi, nie rozpoznaję tej mapy. Możliwe że jest nowa, bardzo trudna, nierankingowa lub z innego trybu niż osu!standard";

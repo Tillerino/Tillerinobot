@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author rint0 matey_krastev2@hotmail.com https://osu.ppy.sh/u/6330087
  */
 public class Bulgarian extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return " Съжалявам, не познавам тази карта. Може да е нова, трудна, неодобрена или не направена за стандартен осу! мод. ";

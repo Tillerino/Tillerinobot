@@ -14,8 +14,6 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 public class TsundereGerman extends TsundereBase {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected String getInactiveShortGreeting(String username, long inactiveTime) {
 		return welcomeUserShortShuffler.get(

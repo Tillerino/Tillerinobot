@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Anze Jensterle hello@craftbyte.net https://github.com/CraftByte https://osu.ppy.sh/u/CraftByte
  */
 public class Slovenian extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Žal te mape ne poznam. Lahko, da je zelo nova, zelo težka, neocenjena ali pa ni navaden osu način.";

@@ -13,8 +13,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author https://osu.ppy.sh/u/3258429 SnickarN https://github.com/SnickarN-
  */
 public class Svenska extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Förlåt, Jag känner inte till denna map. Den kan vara väldigt ny, väldigt svår, orankad eller inte osu!standard.";

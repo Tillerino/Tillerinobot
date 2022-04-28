@@ -14,8 +14,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Zarkinox arichtermohr@gmail.com https://osu.ppy.sh/u/2743036 https://github.com/zarkinox
  */
 public class Spanish extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Lo siento, no conozco ese mapa. Tal vez es muy reciente, muy difícil, no está rankeado o el modo no es osu! estándar.";

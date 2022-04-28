@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author BramboraSK majojo992@gmail.com https://github.com/BramboraSK https://osu.ppy.sh/u/BramboraSK
  */
 public class Slovak extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Prepáč, ale mapa nie je k dispozícií. Možno je moc nová, ťažká, nehodnotená alebo nepatrí do osu standard.";

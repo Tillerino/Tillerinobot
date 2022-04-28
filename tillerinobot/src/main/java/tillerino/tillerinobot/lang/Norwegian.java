@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Akuma Kudasai aka _BibleThump diabloxx50@gmail.com https://git.blosu.net/Diabloxx osu account is restricted
  */
 public class Norwegian extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Beklager. Jeg kjenner ikke til mappet. Det kan være den er ny, veldig vanskelig, unranked eller ikke er en standard osu map.";

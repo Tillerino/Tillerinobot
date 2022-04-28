@@ -13,8 +13,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Haganenno https://osu.ppy.sh/u/4692344 https://github.com/peraz
  */
 public class Lithuanian extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-	
 	@Override
 	public String unknownBeatmap() {
 		return "Atsiprašau, bet tokio beatmapo nežinau. Galbūt jis yra naujas, labai sunkus, nepatvirtintas arba ne osu!standard.";

@@ -19,8 +19,6 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
  * @author Dddsasul ffrrtt223@gmail.com https://github.com/Dddsasul https://osu.ppy.sh/u/6579055
  */
 public class Romana extends AbstractMutableLanguage {
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public String unknownBeatmap() {
 		return "Îmi pare rău, nu cunosc acea hartă. S-ar putea să fie foarte nouă, foarte grea, mod necompetitiv sau să nu fie în modul osu standard.";

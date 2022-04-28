@@ -1,12 +1,8 @@
 package tillerino.tillerinobot.lang;
 
-import java.io.Serializable;
-
 import tillerino.tillerinobot.util.IsMutable;
 
-public abstract class AbstractMutableLanguage implements Language, IsMutable, Serializable {
-	private static final long serialVersionUID = 1L;
-
+public abstract class AbstractMutableLanguage implements Language, IsMutable {
 	private transient boolean modified;
 
 	@Override
