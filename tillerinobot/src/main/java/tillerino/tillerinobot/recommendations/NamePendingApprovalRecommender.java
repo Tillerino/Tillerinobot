@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.lang3.Validate;
 import org.tillerino.osuApiModel.types.BeatmapId;
@@ -22,7 +23,6 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.inject.Named;
 import jakarta.ws.rs.ServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
