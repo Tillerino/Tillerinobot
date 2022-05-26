@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -87,6 +88,14 @@ public class MockServerRule extends TestWatcher {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void failed(Throwable e, Description description) {
+		super.failed(e, description);
+		Stream.of(CLIENT.retrieveLogMessagesArray(null))
+			.filter(x -> x.contains("no expectation for"))
+			.forEach(System.err::println);
 	}
 
 	/**
