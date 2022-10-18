@@ -22,14 +22,12 @@ public class BeatmapImpl implements Beatmap {
 	private float starDiff;
 	private float aim;
 	private float speed;
-	private float flashlight;
-
-	private float sliderFactor;
-
-	private float approachRate;
 	private float overallDifficulty;
-
+	private float approachRate;
 	private int maxCombo;
+	private float sliderFactor;
+	private float flashlight;
+	private float speedNoteCount;
 
 	private int circleCount;
 	private int spinnerCount;
@@ -43,12 +41,13 @@ public class BeatmapImpl implements Beatmap {
 
 		return switch (kind) {
 			case Beatmap.Aim -> aim;
-			case Beatmap.AR -> approachRate;
-			case Beatmap.Flashlight -> flashlight;
-			case Beatmap.MaxCombo -> maxCombo;
-			case Beatmap.OD -> overallDifficulty;
-			case Beatmap.SliderFactor -> sliderFactor;
 			case Beatmap.Speed -> speed;
+			case Beatmap.OD -> overallDifficulty;
+			case Beatmap.AR -> approachRate;
+			case Beatmap.MaxCombo -> maxCombo;
+			case Beatmap.SliderFactor -> sliderFactor;
+			case Beatmap.Flashlight -> flashlight;
+			case Beatmap.SpeedNoteCount -> speedNoteCount;
 			default -> throw new IllegalArgumentException("Unexpected kind: " + kind);
 		};
 	}

@@ -29,6 +29,7 @@ public interface Beatmap {
 	public static final int MaxCombo = 4;
 	public static final int SliderFactor = 5;
 	public static final int Flashlight = 6;
+	public static final int SpeedNoteCount = 7;
 
 	@BitwiseMods
 	static long diffMods = getMask(HalfTime, DoubleTime, Easy, HardRock, Mods.Flashlight);
