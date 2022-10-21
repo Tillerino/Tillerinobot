@@ -43,7 +43,7 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 	private final Clock clock;
 
 	@Override
-	@SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "For the try-with. Looks like this is a Java 13 bug in Spotbugs 3.1.11")
+	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
 	public void onEvent(GameChatEvent event) throws InterruptedException {
 		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, event.getEventId())) {
 			mdc.add(MdcUtils.MDC_USER, event.getNick());

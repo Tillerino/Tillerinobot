@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Value
 public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 		implements RecommendationPredicate {
@@ -35,6 +37,7 @@ public class NumericPropertyPredicate<T extends NumericBeatmapProperty>
 	}
 
 	@Override
+	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
 	public boolean contradicts(RecommendationPredicate otherPredicate) {
 		if (otherPredicate instanceof NumericPropertyPredicate<?> predicate
 				&& predicate.property.getClass() == property.getClass()) {
