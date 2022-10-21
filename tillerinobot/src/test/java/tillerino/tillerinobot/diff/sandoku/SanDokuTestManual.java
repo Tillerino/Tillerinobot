@@ -3,7 +3,6 @@ package tillerino.tillerinobot.diff.sandoku;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,8 @@ import org.junit.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiScore;
 
+import org.tillerino.osuApiModel.types.BitwiseMods;
+import tillerino.tillerinobot.diff.Beatmap;
 import tillerino.tillerinobot.diff.OsuScore;
 
 /**
@@ -37,30 +38,57 @@ public class SanDokuTestManual {
 	public void bestFriendsParameters() throws Exception {
 		byte[] beatmap = IOUtils.resourceToByteArray("/Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu");
 
+		// NoMod
 		assertThat(sanDoku.getDiff(0, 0, beatmap).diffCalcResult()).satisfies(result -> {
-			assertThat(result.starRating()).isCloseTo(4.70888, apiRounding);
-			assertThat(result.aimStrain()).isCloseTo(2.53559, apiRounding);
-			assertThat(result.speedStrain()).isCloseTo(1.89119, apiRounding);
+			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=0
+			assertThat(result.starRating()).isCloseTo(4.73447, apiRounding);
+			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.maxCombo()).isEqualTo(404);
+		});
+
+		// Hidden, should not change anything
+		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.Hidden), beatmap).diffCalcResult()).satisfies(result -> {
+			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=0  ==> uses 0 as mods since HD doesn't give a result
+			assertThat(result.starRating()).isCloseTo(4.73447, apiRounding);
+			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
 		// Flashlight
-		assertThat(sanDoku.getDiff(0, 1024, beatmap).diffCalcResult()).satisfies(result -> {
-			assertThat(result.starRating()).isCloseTo(5.23327, apiRounding); // star rating is different!
-			assertThat(result.aimStrain()).isCloseTo(2.53559, apiRounding);
-			assertThat(result.speedStrain()).isCloseTo(1.89119, apiRounding);
+		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.Flashlight), beatmap).diffCalcResult()).satisfies(result -> {
+			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=1024
+			assertThat(result.starRating()).isCloseTo(5.28149, apiRounding); // star rating is different!
+			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
-		assertThat(sanDoku.getDiff(0, 64, beatmap).diffCalcResult()).satisfies(result -> {
-			assertThat(result.starRating()).isCloseTo(6.62106, apiRounding);
-			assertThat(result.aimStrain()).isCloseTo(3.52118, apiRounding);
-			assertThat(result.speedStrain()).isCloseTo(2.7438, apiRounding);
+		// and now Hidden & Flashlight, here Hidden actually does get taken into account, but only because it is combined with FL
+		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.Hidden, Mods.Flashlight), beatmap).diffCalcResult()).satisfies(result -> {
+			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=1032
+			assertThat(result.starRating()).isCloseTo(5.49584, apiRounding); // star rating is different!
+			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.maxCombo()).isEqualTo(404);
+		});
+
+		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.DoubleTime), beatmap).diffCalcResult()).satisfies(result -> {
+			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=64
+			assertThat(result.starRating()).isCloseTo(6.65472, apiRounding);
+			assertThat(result.aim()).isCloseTo(3.52504, apiRounding);
+			assertThat(result.speed()).isCloseTo(2.72927, apiRounding);
+			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
 		// now with HR DT
-		assertThat(sanDoku.getDiff(0, 80, beatmap).diffCalcResult()).satisfies(result -> {
-			assertThat(result.starRating()).isCloseTo(7.03281, apiRounding);
-			assertThat(result.aimStrain()).isCloseTo(3.82381, apiRounding);
-			assertThat(result.speedStrain()).isCloseTo(2.75015, apiRounding);
+		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.HardRock, Mods.DoubleTime), beatmap).diffCalcResult()).satisfies(result -> {
+			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=80
+			assertThat(result.starRating()).isCloseTo(7.06681, apiRounding);
+			assertThat(result.aim()).isCloseTo(3.82241, apiRounding);
+			assertThat(result.speed()).isCloseTo(2.74129, apiRounding);
+			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 	}
 
@@ -68,7 +96,8 @@ public class SanDokuTestManual {
 	public void testBestFriendsRafis() throws Exception {
 		// https://osu.ppy.sh/scores/osu/2111593239
 		byte[] beatmap = IOUtils.resourceToByteArray("/Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu");
-		SanDokuResponse diff = sanDoku.getDiff(0, Mods.getMask(Mods.HardRock, Mods.DoubleTime), beatmap);
+		@BitwiseMods long mods = Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime);
+		SanDokuResponse diff = sanDoku.getDiff(0, Beatmap.getDiffMods(mods), beatmap);
 
 		OsuApiScore score = new OsuApiScore();
 		score.setMaxCombo(404);
@@ -76,16 +105,17 @@ public class SanDokuTestManual {
 		score.setCount100(4);
 		score.setCount50(0);
 		score.setCountMiss(0);
-		score.setMods(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime));
+		score.setMods(mods);
 		OsuScore standardScore = new OsuScore(score);
-		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(552.222f, webRounding);
+		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(560.049f, webRounding);
 	}
 
 	@Test
-	public void testBestFriendsTemaZpro() throws Exception {
-		// https://osu.ppy.sh/scores/osu/2111593239
+	public void testBestFriendsLilily() throws Exception {
+		// https://osu.ppy.sh/scores/osu/2463800232
 		byte[] beatmap = IOUtils.resourceToByteArray("/Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu");
-		SanDokuResponse diff = sanDoku.getDiff(0, Mods.getMask(Mods.DoubleTime), beatmap);
+		@BitwiseMods long mods = Mods.getMask(Mods.Hidden, Mods.Flashlight);
+		SanDokuResponse diff = sanDoku.getDiff(0, Beatmap.getDiffMods(mods), beatmap);
 
 		OsuApiScore score = new OsuApiScore();
 		score.setMaxCombo(404);
@@ -93,9 +123,27 @@ public class SanDokuTestManual {
 		score.setCount100(0);
 		score.setCount50(0);
 		score.setCountMiss(0);
-		score.setMods(Mods.getMask(Mods.Hidden, Mods.Nightcore));
+		score.setMods(mods);
 		OsuScore standardScore = new OsuScore(score);
-		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(373.611f, webRounding);
+		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(190.343f, webRounding);
+	}
+
+	@Test
+	public void testBestFriendsTemaZpro() throws Exception {
+		// https://osu.ppy.sh/scores/osu/3939515677
+		byte[] beatmap = IOUtils.resourceToByteArray("/Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu");
+		@BitwiseMods long mods = Mods.getMask(Mods.Hidden, Mods.DoubleTime, Mods.Nightcore);
+		SanDokuResponse diff = sanDoku.getDiff(0, Beatmap.getDiffMods(mods), beatmap);
+
+		OsuApiScore score = new OsuApiScore();
+		score.setMaxCombo(404);
+		score.setCount300(313);
+		score.setCount100(0);
+		score.setCount50(0);
+		score.setCountMiss(0);
+		score.setMods(mods);
+		OsuScore standardScore = new OsuScore(score);
+		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(379.488f, webRounding);
 	}
 
 	@Test
@@ -104,11 +152,14 @@ public class SanDokuTestManual {
 		SanDokuResponse diff = sanDoku.getDiff(0, 0, beatmap);
 
 		assertThat(diff.diffCalcResult()).satisfies(result -> {
-			assertThat(result.starRating()).isCloseTo(7.52382, apiRounding);
-			assertThat(result.aimStrain()).isCloseTo(3.45227, apiRounding);
-			assertThat(result.speedStrain()).isCloseTo(3.77577, apiRounding);
+			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=129891&mods=0
+			assertThat(result.starRating()).isCloseTo(7.58325, apiRounding);
+			assertThat(result.aim()).isCloseTo(3.47299, apiRounding);
+			assertThat(result.speed()).isCloseTo(3.77182, apiRounding);
+			assertThat(result.maxCombo()).isEqualTo(2385);
 		});
 
+		// https://osu.ppy.sh/scores/osu/2355338302
 		OsuApiScore score = new OsuApiScore();
 		score.setMaxCombo(2385);
 		score.setCount300(1981);
@@ -117,7 +168,7 @@ public class SanDokuTestManual {
 		score.setCountMiss(0);
 		score.setMods(0);
 		OsuScore standardScore = new OsuScore(score);
-		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(612.754f, webRounding);
+		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(626.636f, webRounding);
 	}
 
 	@Test

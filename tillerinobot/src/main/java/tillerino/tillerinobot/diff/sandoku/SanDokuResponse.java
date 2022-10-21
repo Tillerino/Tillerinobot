@@ -19,15 +19,16 @@ public record SanDokuResponse(
 	@Builder(toBuilder = true)
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static record SanDokuDiffCalcResult(
-		// removed fields which are not required for standard
-		double starRating,
+		// only declare fields which are needed for std calc
 		int maxCombo,
-		double aimStrain,
-		double speedStrain,
-		double flashlightRating,
-		double sliderFactor,
-		double approachRate,
+		double starRating,
+		double aim,
+		double speed,
 		double overallDifficulty,
+		double approachRate,
+		double flashlight,
+		double sliderFactor,
+		double speedNoteCount,
 		int hitCircleCount,
 		int sliderCount,
 		int spinnerCount) {
@@ -35,17 +36,19 @@ public record SanDokuResponse(
 
 	public BeatmapImpl toBeatmap() {
 		return BeatmapImpl.builder()
-				.aim((float) diffCalcResult.aimStrain)
-				.approachRate((float) diffCalcResult.approachRate)
-				.circleCount(diffCalcResult.hitCircleCount)
-				.flashlight((float) diffCalcResult.flashlightRating)
-				.maxCombo(diffCalcResult.maxCombo)
 				.modsUsed(modsUsed)
-				.overallDifficulty((float) diffCalcResult.overallDifficulty)
-				.sliderCount(diffCalcResult.sliderCount)
-				.speed((float) diffCalcResult.speedStrain)
-				.spinnerCount(diffCalcResult.spinnerCount)
 				.starDiff((float) diffCalcResult.starRating)
+				.aim((float) diffCalcResult.aim)
+				.speed((float) diffCalcResult.speed)
+				.overallDifficulty((float) diffCalcResult.overallDifficulty)
+				.approachRate((float) diffCalcResult.approachRate)
+				.maxCombo(diffCalcResult.maxCombo)
+				.sliderFactor((float) diffCalcResult.sliderFactor)
+				.flashlight((float) diffCalcResult.flashlight)
+				.speedNoteCount((float) diffCalcResult.speedNoteCount)
+				.circleCount(diffCalcResult.hitCircleCount)
+				.spinnerCount(diffCalcResult.spinnerCount)
+				.sliderCount(diffCalcResult.sliderCount)
 				.build();
 	}
 }

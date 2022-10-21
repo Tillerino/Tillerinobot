@@ -320,6 +320,7 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 	}
 
+	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
 	private GameChatResponse visit(GameChatEvent event) throws SQLException, InterruptedException, IOException, UserException {
 		if (event instanceof Joined) {
 			try {

@@ -139,6 +139,7 @@ public class IrcHooks extends CoreHooks {
 	}
 
 	@Override
+	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "looks like a bug")
 	public void onEvent(Event event) throws Exception {
 		botInfo.setLastInteraction(timestamp(event));
 		MDC.clear();

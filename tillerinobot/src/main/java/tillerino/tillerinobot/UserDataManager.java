@@ -45,6 +45,7 @@ import tillerino.tillerinobot.util.IsMutable;
  * @author Tillerino
  */
 @Singleton
+@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
 public class UserDataManager {
 	/**
 	 * Bot-specific user data. It is only saved when changed and responsible for
@@ -53,6 +54,8 @@ public class UserDataManager {
 	 * 
 	 * @author Tillerino
 	 */
+
+	@SuppressFBWarnings(value = "SA_FIELD_SELF_COMPARISON", justification = "Looks like a bug")
 	public static class UserData implements Closeable {
 		public record BeatmapWithMods(@BeatmapId int beatmap, @BitwiseMods long mods) { }
 

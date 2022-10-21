@@ -1,6 +1,5 @@
 package tillerino.tillerinobot.diff;
 
-import static java.lang.Math.floor;
 import static org.tillerino.osuApiModel.Mods.Autoplay;
 import static org.tillerino.osuApiModel.Mods.Flashlight;
 import static org.tillerino.osuApiModel.Mods.Hidden;
@@ -8,12 +7,10 @@ import static org.tillerino.osuApiModel.Mods.NoFail;
 import static org.tillerino.osuApiModel.Mods.Relax;
 import static org.tillerino.osuApiModel.Mods.Relax2;
 import static org.tillerino.osuApiModel.Mods.SpunOut;
-import static org.tillerino.osuApiModel.Mods.TouchDevice;
 import static tillerino.tillerinobot.diff.MathHelper.Clamp;
 import static tillerino.tillerinobot.diff.MathHelper.log10;
 import static tillerino.tillerinobot.diff.MathHelper.pow;
 import static tillerino.tillerinobot.diff.MathHelper.static_cast_f32;
-import static tillerino.tillerinobot.diff.MathHelper.static_cast_s32;
 import static tillerino.tillerinobot.diff.MathHelper.std_pow;
 import static tillerino.tillerinobot.diff.MathHelper.std_min;
 import static tillerino.tillerinobot.diff.MathHelper.std_max;
@@ -23,16 +20,14 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 
 /**
  * This class is a direct translation of OsuScore.cpp, the original code
- * to compute the pp for given play, aim and speed values of a osu standard
- * score: 
- * 
- * https://github.com/ppy/osu-performance/blob/e8aeb911defaa5a187cb6778f1a3c95e9caa6c81/src/performance/osu/OsuScore.cpp
- * 
+ * to compute the pp for given play, aim and speed values of an osu standard
+ * score:
+ * https://github.com/ppy/osu-performance/blob/2022.929.0/src/performance/osu/OsuScore.cpp
+ * <hr>
  * This file violates all Java coding standards to be as easily comparable to
  * the original as possible.
- * 
  */
-// suppress all found Sonar warnings, since we are trying to copy C# code
+// suppress all found Sonar warnings, since we are trying to copy C++ code
 @SuppressWarnings({ "squid:S00116", "squid:S00117", "squid:ClassVariableVisibilityCheck", "squid:S00100" })
 public class OsuScore {
 	private final int _maxCombo;
@@ -64,7 +59,7 @@ public class OsuScore {
 	private float _accuracyValue;
 	private float _speedValue;
 	private float _flashlightValue;
-	private int _effectiveMissCount;
+	private float _effectiveMissCount;
 	
 public float getPP(Beatmap beatmap){
 	computeEffectiveMissCount(beatmap);
@@ -115,10 +110,10 @@ void computeEffectiveMissCount(Beatmap beatmap)
 			comboBasedMissCount = fullComboThreshold / std_max(1, _maxCombo);
 	}
 
-	// we're clamping misscount because since its derived from combo it can be higher than total hits and that breaks some calculations
-	comboBasedMissCount = std_min(comboBasedMissCount, static_cast_f32(TotalHits()));
+	// Clamp miss count to maximum amount of possible breaks
+	comboBasedMissCount = std_min(comboBasedMissCount, static_cast_f32(_num100 + _num50 + _numMiss));
 
-	_effectiveMissCount = std_max(_numMiss, static_cast_s32(floor(comboBasedMissCount)));
+	_effectiveMissCount = std_max(static_cast_f32(_numMiss), comboBasedMissCount);
 }
 
 void computeTotalValue(Beatmap beatmap)
@@ -132,7 +127,7 @@ void computeTotalValue(Beatmap beatmap)
 		return;
 	}
 
-	float multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
+	float multiplier = 1.14f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
 	if (NoFail.is(_mods))
 		multiplier *= std_max(0.9f, 1.0f - 0.02f * _effectiveMissCount);
@@ -153,12 +148,7 @@ void computeTotalValue(Beatmap beatmap)
 
 void computeAimValue(Beatmap beatmap)
 {
-	float rawAim = beatmap.DifficultyAttribute(_mods, Beatmap.Aim);
-
-	if (TouchDevice.is(_mods))
-		rawAim = pow(rawAim, 0.8f);
-
-	_aimValue = pow(5.0f * std_max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+	_aimValue = pow(5.0f * std_max(1.0f, beatmap.DifficultyAttribute(_mods, Beatmap.Aim) / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
 	int numTotalHits = TotalHits();
 
@@ -177,7 +167,7 @@ void computeAimValue(Beatmap beatmap)
 	if (approachRate > 10.33f)
 		approachRateFactor = 0.3f * (approachRate - 10.33f);
 	else if (approachRate < 8.0f)
-		approachRateFactor = 0.1f * (8.0f - approachRate);
+		approachRateFactor = 0.05f * (8.0f - approachRate);
 
 	_aimValue *= 1.0f + approachRateFactor * lengthBonus;
 
@@ -209,12 +199,12 @@ void computeSpeedValue(Beatmap beatmap)
 	int numTotalHits = TotalHits();
 
 	float lengthBonus = 0.95f + 0.4f * std_min(1.0f, static_cast_f32(numTotalHits) / 2000.0f) +
-					  (numTotalHits > 2000 ? log10(static_cast_f32(numTotalHits) / 2000.0f) * 0.5f : 0.0f);
+		(numTotalHits > 2000 ? log10(static_cast_f32(numTotalHits) / 2000.0f) * 0.5f : 0.0f);
 	_speedValue *= lengthBonus;
 
 	// Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
 	if (_effectiveMissCount > 0)
-		_speedValue *= 0.97f * std_pow(1.0f - std_pow(_effectiveMissCount / static_cast_f32(numTotalHits), 0.775f), std_pow(static_cast_f32(_effectiveMissCount), 0.875f));
+		_speedValue *= 0.97f * std_pow(1.0f - std_pow(_effectiveMissCount / static_cast_f32(numTotalHits), 0.775f), std_pow(_effectiveMissCount, 0.875f));
 
 	_speedValue *= getComboScalingFactor(beatmap);
 
@@ -229,10 +219,18 @@ void computeSpeedValue(Beatmap beatmap)
 	if (Hidden.is(_mods))
 		_speedValue *= 1.0f + 0.04f * (12.0f - approachRate);
 
+	// Calculate accuracy assuming the worst case scenario
+	float relevantTotalDiff = static_cast_f32(numTotalHits) - beatmap.DifficultyAttribute(_mods, Beatmap.SpeedNoteCount);
+	float relevantCountGreat = std_max(0.0f, _num300 - relevantTotalDiff);
+	float relevantCountOk = std_max(0.0f, _num100 - std_max(0.0f, relevantTotalDiff - _num300));
+	float relevantCountMeh = std_max(0.0f, _num50 - std_max(0.0f, relevantTotalDiff - _num300 - _num100));
+	float relevantAccuracy = beatmap.DifficultyAttribute(_mods, Beatmap.SpeedNoteCount) == 0.0f ? 0.0f : (relevantCountGreat * 6.0f + relevantCountOk * 2.0f + relevantCountMeh) / (beatmap.DifficultyAttribute(_mods, Beatmap.SpeedNoteCount) * 6.0f);
+
 	// Scale the speed value with accuracy and OD.
-	_speedValue *= (0.95f + std_pow(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 2) / 750) * std_pow(Accuracy(), (14.5f - std_max(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 8.0f)) / 2);
+	_speedValue *= (0.95f + std_pow(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 2) / 750) * std_pow((Accuracy() + relevantAccuracy) / 2.0f, (14.5f - std_max(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 8.0f)) / 2);
+
 	// Scale the speed value with # of 50s to punish doubletapping.
-	_speedValue *= std_pow(0.98f, _num50 < numTotalHits / 500.0f ? 0.0f : _num50 - numTotalHits / 500.0f);
+	_speedValue *= std_pow(0.99f, _num50 < numTotalHits / 500.0f ? 0.0f : _num50 - numTotalHits / 500.0f);
 }
 
 void computeAccuracyValue(Beatmap beatmap)
@@ -263,8 +261,8 @@ void computeAccuracyValue(Beatmap beatmap)
 	// Lots of arbitrary values from testing.
 	// Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
 	_accuracyValue =
-		pow(1.52163f, beatmap.DifficultyAttribute(_mods, Beatmap.OD)) * pow(betterAccuracyPercentage, 24) *
-		2.83f;
+			pow(1.52163f, beatmap.DifficultyAttribute(_mods, Beatmap.OD)) * pow(betterAccuracyPercentage, 24) *
+					2.83f;
 
 	// Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
 	_accuracyValue *= std_min(1.15f, static_cast_f32(pow(numHitObjectsWithAccuracy / 1000.0f, 0.3f)));
@@ -283,27 +281,19 @@ void computeFlashlightValue(Beatmap beatmap)
 	if (!Flashlight.is(_mods))
 		return;
 
-	float rawFlashlight = beatmap.DifficultyAttribute(_mods, Beatmap.Flashlight);
-
-	if (TouchDevice.is(_mods))
-		rawFlashlight = std_pow(rawFlashlight, 0.8f);
-
-	_flashlightValue = std_pow(rawFlashlight, 2.0f) * 25.0f;
-
-	if (Hidden.is(_mods))
-		_flashlightValue *= 1.3f;
+	_flashlightValue = std_pow(beatmap.DifficultyAttribute(_mods, Beatmap.Flashlight), 2.0f) * 25.0f;
 
 	int numTotalHits = TotalHits();
 
 	// Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-	if (_numMiss > 0)
-		_flashlightValue *= 0.97f * std_pow(1 - std_pow(_numMiss / static_cast_f32(numTotalHits), 0.775f), std_pow(_numMiss, 0.875f));
+	if (_effectiveMissCount > 0)
+		_flashlightValue *= 0.97f * std_pow(1 - std_pow(_effectiveMissCount / static_cast_f32(numTotalHits), 0.775f), std_pow(_effectiveMissCount, 0.875f));
 
 	_flashlightValue *= getComboScalingFactor(beatmap);
 
 	// Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
 	_flashlightValue *= 0.7f + 0.1f * std_min(1.0f, static_cast_f32(numTotalHits) / 200.0f) +
-						(numTotalHits > 200 ? 0.2f * std_min(1.0f, (static_cast_f32(numTotalHits) - 200) / 200.0f) : 0.0f);
+		(numTotalHits > 200 ? 0.2f * std_min(1.0f, (static_cast_f32(numTotalHits) - 200) / 200.0f) : 0.0f);
 
 	// Scale the flashlight value with accuracy _slightly_.
 	_flashlightValue *= 0.5f + Accuracy() / 2.0f;
@@ -315,7 +305,7 @@ float getComboScalingFactor(Beatmap beatmap)
 {
 	float maxCombo = beatmap.DifficultyAttribute(_mods, Beatmap.MaxCombo);
 	if (maxCombo > 0)
-		return std_min(static_cast_f32(std_pow(_maxCombo, 0.8f) / pow(maxCombo, 0.8f)), 1.0f);
+		return std_min(static_cast_f32(pow(_maxCombo, 0.8f) / pow(maxCombo, 0.8f)), 1.0f);
 	return 1.0f;
 }
 }

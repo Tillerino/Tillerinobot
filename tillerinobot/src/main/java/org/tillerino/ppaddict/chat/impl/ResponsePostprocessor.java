@@ -21,6 +21,7 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.RetryableException;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +65,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		}
 	}
 
+	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
 	private void handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
 		if (response instanceof Message message) {
 			message(message.getContent(), false, result);

@@ -60,6 +60,7 @@ public interface GameChatResponse {
 	/**
 	 * Adds another response to the current one.
 	 */
+	@SuppressFBWarnings("SA_LOCAL_SELF_COMPARISON")
 	default GameChatResponse then(@CheckForNull GameChatResponse nextResponse) {
 		if (nextResponse instanceof NoResponse || nextResponse == null) {
 			return this;
