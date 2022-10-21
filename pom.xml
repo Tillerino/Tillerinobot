@@ -21,7 +21,7 @@
 		<jacoco.version>0.8.7</jacoco.version>
 		<jersey.version>3.0.8</jersey.version>
 		<jetty.version>9.4.49.v20220914</jetty.version>
-		<jackson.version>2.13.4</jackson.version>
+		<jackson.version>2.13.4.20221013</jackson.version>
 		<testcontainers.version>1.17.5</testcontainers.version>
 		<!-- determined by container -->
 		<mockserver.version>5.13.2</mockserver.version>
