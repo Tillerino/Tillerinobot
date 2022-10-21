@@ -31,7 +31,7 @@ public interface SanDoku {
 	/**
 	 * Once changes in SanDoku have been deployed and values need to be recalculated, bump this version!
 	 */
-	final int VERSION = 1;
+	final int VERSION = 2;
 
 	@POST
 	@Path("/diff")
