@@ -198,4 +198,16 @@ public class SanDokuTestManual {
 								.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
 								.hasFieldOrPropertyWithValue("errors", Map.of("mods", List.of("invalid mod combination: HR,EZ")))));
 	}
+
+	@Test
+	public void invalidGameMode() throws Exception {
+		byte[] beatmap = IOUtils.resourceToByteArray("/Daniel Ingram - Awesome as I Want to Be (cagmcpe) [20(ni)% Cooler].osu");
+		int beatmapGameMode = 1; // above map is a taiko map
+		int gameMode = 0;
+		assertThatThrownBy(() -> sanDoku.getDiff(gameMode, 0, beatmap))
+				.isInstanceOfSatisfying(BadRequestException.class, e -> assertThat(SanDoku.unwrapError(e))
+						.hasValueSatisfying(error -> assertThat(error)
+								.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
+								.hasFieldOrPropertyWithValue("errors", Map.of("beatmap", List.of("Cannot convert beatmap game mode ("+beatmapGameMode+") to requested game mode ("+gameMode+")")))));
+	}
 }
