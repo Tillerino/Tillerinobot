@@ -45,6 +45,7 @@
 		<log4j.version>2.19.0</log4j.version>
 		<assertj-core.version>3.23.1</assertj-core.version>
 		<json-unit-assertj.version>2.36.0</json-unit-assertj.version>
+		<resilience4j.version>1.7.0</resilience4j.version>
 	</properties>
 
 	<build>
@@ -426,6 +427,14 @@
 				<artifactId>amqp-client</artifactId>
 				<version>${rabbitmq.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-bom</artifactId>
+				<version>${resilience4j.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 
 			<!-- HTTP -->
 			<dependency>
@@ -576,4 +585,40 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<!-- With this profile, you can enable a mirror of maven central with the environment variable MAVEN_CENTRAL_MIRROR.
+			     The profile will activate automatically when this environment variable is set.
+			     The environment variable replaces the value "https://repo.maven.apache.org/maven2". -->
+			<activation>
+				<property>
+					<name>env.MAVEN_CENTRAL_MIRROR</name>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<id>central</id>
+					<name>Mirror of Central Repository</name>
+					<url>${env.MAVEN_CENTRAL_MIRROR}</url>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<releases>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<id>central</id>
+					<name>Mirror of Central Repository</name>
+					<url>${env.MAVEN_CENTRAL_MIRROR}</url>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+	</profiles>
 </project>
