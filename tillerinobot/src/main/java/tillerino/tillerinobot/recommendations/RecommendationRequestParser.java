@@ -41,7 +41,7 @@ public class RecommendationRequestParser {
 		
 		RecommendationRequestBuilder settingsBuilder = RecommendationRequest.builder();
 		
-		settingsBuilder.model(Model.GAMMA5);
+		settingsBuilder.model(Model.GAMMA6);
 
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
@@ -93,10 +93,11 @@ public class RecommendationRequestParser {
 			return true;
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma6") <= 2 && lowerCase.endsWith("6")) {
-			if (backend.getDonator(user.getUserId()) <= 0) {
-				return false;
-			}
 			settingsBuilder.model(Model.GAMMA6);
+			return true;
+		}
+		if(getLevenshteinDistance(lowerCase, "gamma7") <= 2 && lowerCase.endsWith("7")) {
+			settingsBuilder.model(Model.GAMMA7);
 			return true;
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {

@@ -15,6 +15,7 @@ public enum Model {
 	GAMMA4(true),
 	GAMMA5(true),
 	GAMMA6(true),
+	GAMMA7(true),
 	/**
 	 * External model made by NamePendingApproval
 	 */

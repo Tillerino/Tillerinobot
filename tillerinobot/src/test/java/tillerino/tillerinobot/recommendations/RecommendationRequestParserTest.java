@@ -60,10 +60,8 @@ public class RecommendationRequestParserTest {
 
 	@Test
 	public void testGamma6Dt() throws Exception {
-		assertThatThrownBy(() -> parse("gamma6 dt")).isInstanceOf(UserException.class);
-		when(backend.getDonator(anyInt())).thenReturn(1);
-		assertThat(parse("gamma6 dt"))
-			.hasFieldOrPropertyWithValue("model", Model.GAMMA6)
+		assertThat(parse("gamma7 dt"))
+			.hasFieldOrPropertyWithValue("model", Model.GAMMA7)
 			.hasFieldOrPropertyWithValue("requestedMods", 64L);
 	}
 
