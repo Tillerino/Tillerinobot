@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.client.services.BeatmapTableService;
 import org.tillerino.ppaddict.server.PersistentUserData.Comment;
 import org.tillerino.ppaddict.server.PersistentUserData.Comments;
@@ -265,6 +266,9 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
           continue;
         }
         if (request.starDiff.max != null && (estimate.getStarDiff() * 100 > request.starDiff.max)) {
+          continue;
+        }
+        if (request.rankedOnly && apiBeatmap.approved != OsuApiBeatmap.RANKED && apiBeatmap.approved != OsuApiBeatmap.APPROVED) {
           continue;
         }
       }

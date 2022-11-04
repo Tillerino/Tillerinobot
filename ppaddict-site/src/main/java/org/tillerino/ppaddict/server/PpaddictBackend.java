@@ -20,9 +20,9 @@ import tillerino.tillerinobot.diff.PercentageEstimates;
 
 public interface PpaddictBackend {
   /**
-   * Extends {@link OsuApiBeatmapForDiff} with a few fields which we require in ppaddict. The goal
-   * it to not have to use the much larger {@link OsuApiBeatmap} which has a lot of fields we don't
-   * need and needlessly increases memory usage.
+   * A reduced version of {@link OsuApiBeatmap}. The goal is to not have to use the much larger
+   * {@link OsuApiBeatmap} which has a lot of fields we don't need and needlessly increases memory
+   * usage.
    */
   @Data
   @EqualsAndHashCode
@@ -32,6 +32,7 @@ public interface PpaddictBackend {
     public int beatmapId, setId, totalLength;
     public String artist, title, version;
     public double bpm, circleSize;
+    public int approved;
 
     public double getCircleSize(@BitwiseMods long mods) {
       return OsuApiBeatmap.calcCircleSize(getCircleSize(), mods);

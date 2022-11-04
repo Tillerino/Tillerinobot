@@ -57,7 +57,6 @@ public class MinMaxCell extends CompositeCell<MinMax> {
     private String value;
 
     HasFillerCell(String value) {
-      super();
       this.value = value;
     }
 
@@ -65,8 +64,7 @@ public class MinMaxCell extends CompositeCell<MinMax> {
     public Cell<String> getCell() {
       return new AbstractCell<String>() {
         @Override
-        public void render(com.google.gwt.cell.client.Cell.Context context, String value,
-            SafeHtmlBuilder sb) {
+        public void render(Context context, String value, SafeHtmlBuilder sb) {
           sb.appendHtmlConstant(value);
         }
       };
@@ -92,13 +90,11 @@ public class MinMaxCell extends CompositeCell<MinMax> {
 
   private static List<HasCell<MinMax, ?>> getList(final String styleClass, final String min,
       final String max, final NumberType numberType) {
-    List<HasCell<MinMax, ?>> subCells = new LinkedList<HasCell<MinMax, ?>>();
+    List<HasCell<MinMax, ?>> subCells = new LinkedList<>();
 
-    subCells.add(new HasFillerCell<MinMax>("&ge;"));
+    subCells.add(new HasFillerCell<>("&ge;"));
 
     subCells.add(new HasCell<MinMax, String>() {
-      // Cell<String> textCell =
-
       @Override
       public Cell<String> getCell() {
         return new MyTextCell(styleClass);

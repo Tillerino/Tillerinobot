@@ -2,6 +2,8 @@ package org.tillerino.ppaddict.client;
 
 
 
+import javax.annotation.CheckForNull;
+
 import org.tillerino.ppaddict.client.HelpElements.E;
 import org.tillerino.ppaddict.client.HelpElements.HasHelpElements;
 import org.tillerino.ppaddict.client.UserBox.UserDataHandler;
@@ -99,7 +101,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
     }
   }
 
-  protected Column<Beatmap, SafeHtml> addImageColumn(Header<String> footer) {
+  protected Column<Beatmap, SafeHtml> addImageColumn(@CheckForNull Header<?> footer) {
     Column<Beatmap, SafeHtml> column = new Column<Beatmap, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Beatmap object) {
@@ -116,11 +118,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     TextHeader header = new TextHeader("");
-    if (footer != null) {
-      table.addColumn(column, header, footer);
-    } else {
-      table.addColumn(column, header);
-    }
+    addColumn(column, header, footer);
     table.setColumnWidth(column, 115, Unit.PX);
     setAlignLeft(column);
     return column;
@@ -135,17 +133,13 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     Header<?> header = createHeader("length", buttonHeader);
-    if (footer != null) {
-      table.addColumn(column, header, footer);
-    } else {
-      table.addColumn(column, header);
-    }
+    addColumn(column, header, footer);
     setAlignRight(column);
     table.setColumnWidth(column, 90, Unit.PX);
     return column;
   }
 
-  protected TextColumn<Beatmap> addBPMColumn(boolean buttonHeader, Header<?> footer) {
+  protected TextColumn<Beatmap> addBPMColumn(boolean buttonHeader, @CheckForNull Header<?> footer) {
     TextColumn<Beatmap> column = new TextColumn<Beatmap>() {
 
       @Override
@@ -154,17 +148,13 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     Header<?> header = createHeader("BPM", buttonHeader);
-    if (footer != null) {
-      table.addColumn(column, header, footer);
-    } else {
-      table.addColumn(column, header);
-    }
+    addColumn(column, header, footer);
     setAlignRight(column);
     table.setColumnWidth(column, 55, Unit.PX);
     return column;
   }
 
-  protected TextColumn<Beatmap> addStarDiffColumn(boolean buttonHeader, Header<?> footer) {
+  protected TextColumn<Beatmap> addStarDiffColumn(boolean buttonHeader, @CheckForNull Header<?> footer) {
     TextColumn<Beatmap> column = new TextColumn<Beatmap>() {
 
       @Override
@@ -173,17 +163,13 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     Header<?> header = createHeader("diff", buttonHeader);
-    if (footer != null) {
-      table.addColumn(column, header, footer);
-    } else {
-      table.addColumn(column, header);
-    }
+    addColumn(column, header, footer);
     setAlignRight(column);
     table.setColumnWidth(column, 60, Unit.PX);
     return column;
   }
 
-  protected TextColumn<Beatmap> addCSColumn(Header<?> footer) {
+  protected TextColumn<Beatmap> addCSColumn(@CheckForNull Header<?> footer) {
     TextColumn<Beatmap> column = new TextColumn<Beatmap>() {
       @Override
       public String getValue(Beatmap object) {
@@ -191,17 +177,13 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     TextHeader header = new TextHeader("CS");
-    if (footer != null) {
-      table.addColumn(column, header, footer);
-    } else {
-      table.addColumn(column, header);
-    }
+    addColumn(column, header, footer);
     setAlignRight(column);
     table.setColumnWidth(column, 55, Unit.PX);
     return column;
   }
 
-  protected TextColumn<Beatmap> addARColumn(Header<?> footer) {
+  protected TextColumn<Beatmap> addARColumn(@CheckForNull Header<?> footer) {
     TextColumn<Beatmap> column = new TextColumn<Beatmap>() {
       @Override
       public String getValue(Beatmap object) {
@@ -209,17 +191,13 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     TextHeader header = new TextHeader("AR");
-    if (footer != null) {
-      table.addColumn(column, header, footer);
-    } else {
-      table.addColumn(column, header);
-    }
+    addColumn(column, header, footer);
     setAlignRight(column);
     table.setColumnWidth(column, 75, Unit.PX);
     return this.arColumn = column;
   }
 
-  protected TextColumn<Beatmap> addODColumn(Header<?> footer) {
+  protected TextColumn<Beatmap> addODColumn(@CheckForNull Header<?> footer) {
     TextColumn<Beatmap> column = new TextColumn<Beatmap>() {
       @Override
       public String getValue(Beatmap object) {
@@ -227,17 +205,13 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     TextHeader header = new TextHeader("OD");
-    if (footer != null) {
-      table.addColumn(column, header, footer);
-    } else {
-      table.addColumn(column, header);
-    }
+    addColumn(column, header, footer);
     setAlignRight(column);
     table.setColumnWidth(column, 75, Unit.PX);
     return this.arColumn = column;
   }
 
-  protected Column<Beatmap, SafeHtml> addNameColumn(Header<Searches> footer) {
+  protected Column<Beatmap, SafeHtml> addNameColumn(@CheckForNull Header<Searches> footer) {
     nameColumn = new Column<Beatmap, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Beatmap object) {
@@ -267,18 +241,14 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
       }
     };
     TextHeader header = new TextHeader("");
-    if (footer != null) {
-      table.addColumn(nameColumn, header, footer);
-    } else {
-      table.addColumn(nameColumn, header);
-    }
+    addColumn(nameColumn, header, footer);
     setAlignLeft(nameColumn);
     return nameColumn;
   }
 
   NumberFormat percentageFormat = NumberFormat.getFormat("#.#");
 
-  protected TextColumn<Beatmap> addHighPPColumn(boolean buttonHeader, Header<?> footer) {
+  protected TextColumn<Beatmap> addHighPPColumn(boolean buttonHeader, @CheckForNull Header<?> footer) {
     TextColumn<Beatmap> perfectPPColumn;
     perfectPPColumn = new TextColumn<Beatmap>() {
       @Override
@@ -293,17 +263,13 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
         return percentageFormat.format(settings.getHighAccuracy()) + "%";
       }
     };
-    if (footer != null) {
-      table.addColumn(perfectPPColumn, header, footer);
-    } else {
-      table.addColumn(perfectPPColumn, header);
-    }
+    addColumn(perfectPPColumn, header, footer);
     setAlignRight(perfectPPColumn);
     table.setColumnWidth(perfectPPColumn, 73, Unit.PX);
     return perfectPPColumn;
   }
 
-  protected TextColumn<Beatmap> addLowPPColumn(boolean buttonHeader, Header<?> footer) {
+  protected TextColumn<Beatmap> addLowPPColumn(boolean buttonHeader, @CheckForNull Header<?> footer) {
     TextColumn<Beatmap> expectedPPColumn = new TextColumn<Beatmap>() {
       @Override
       public String getValue(Beatmap object) {
@@ -317,11 +283,7 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
         return percentageFormat.format(settings.getLowAccuracy()) + "%";
       }
     };
-    if (footer != null) {
-      table.addColumn(expectedPPColumn, header, footer);
-    } else {
-      table.addColumn(expectedPPColumn, header);
-    }
+    addColumn(expectedPPColumn, header, footer);
     setAlignRight(expectedPPColumn);
     table.setColumnWidth(expectedPPColumn, 73, Unit.PX);
     return expectedPPColumn;
@@ -439,6 +401,14 @@ public abstract class AbstractBeatmapTable extends Composite implements UserData
 
   public static String directUrl(Beatmap object) {
     return "osu://b/" + object.beatmapid;
+  }
+
+  private void addColumn(Column<Beatmap, ?> column, Header<?> header, @CheckForNull Header<?> footer) {
+    if (footer != null) {
+      table.addColumn(column, header, footer);
+    } else {
+      table.addColumn(column, header);
+    }
   }
 
   @Override

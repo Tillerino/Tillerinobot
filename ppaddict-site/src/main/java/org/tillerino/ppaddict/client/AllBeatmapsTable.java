@@ -1,15 +1,19 @@
 package org.tillerino.ppaddict.client;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
 import org.tillerino.ppaddict.client.HelpElements.E;
 import org.tillerino.ppaddict.client.HelpElements.HasHelpElements;
+import org.tillerino.ppaddict.client.MinMaxCell.HasFillerCell;
 import org.tillerino.ppaddict.client.MinMaxCell.NumberType;
 import org.tillerino.ppaddict.client.SearchesCell.LoggedIn;
 import org.tillerino.ppaddict.client.dialogs.Side;
@@ -17,6 +21,7 @@ import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
 import org.tillerino.ppaddict.client.services.BeatmapTableService;
 import org.tillerino.ppaddict.client.services.BeatmapTableServiceAsync;
 import org.tillerino.ppaddict.client.theTable.MyPager;
+import org.tillerino.ppaddict.client.util.CellDecorator;
 import org.tillerino.ppaddict.shared.Beatmap;
 import org.tillerino.ppaddict.shared.BeatmapBundle;
 import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
@@ -30,7 +35,10 @@ import org.tillerino.ppaddict.shared.Settings;
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.Cell.Context;
-import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.CompositeCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -76,15 +84,6 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
     public String getValue() {
       return title;
     }
-  }
-
-  public static abstract class FooterValueUpdater<T> implements ValueUpdater<T> {
-    @Override
-    final public void update(T value) {
-      doUpdate(value);
-    }
-
-    protected abstract void doUpdate(T value);
   }
 
   public interface BundleHandler {
@@ -169,7 +168,7 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
   }
 
   MyPager pager;
-  MyDataProvider provider;
+  final MyDataProvider provider = new MyDataProvider();
   final Map<Sort, Column<?, ?>> sortToColumn = new HashMap<Sort, Column<?, ?>>();
   final Map<Column<?, ?>, Sort> columnToSort = new HashMap<Column<?, ?>, Sort>();
 
@@ -180,6 +179,9 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
   }
 
   public AllBeatmapsTable(InitialData initialData) {
+    System.out.println("initial request: " + initialData.request);
+    provider.setRequest(initialData.request);
+
     initWidget(uiBinder.createAndBindUi(this));
 
     createTable();
@@ -203,7 +205,6 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
 
     table.setRowCount(5000, false);
 
-    provider = new MyDataProvider();
     provider.setEnabled(false);
 
     table.addColumnSortHandler(new Handler() {
@@ -235,8 +236,6 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
     pager.getElement().getStyle().setProperty("marginRight", "auto");
     pager.getElement().getStyle().setPosition(Position.RELATIVE);
 
-    System.out.println("initial request: " + initialData.request);
-    provider.setRequest(initialData.request);
     if (initialData.request.sortBy != null) {
       table.getColumnSortList().push(sortToColumn.get(initialData.request.sortBy));
     }
@@ -255,226 +254,179 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
   }
 
   private TextColumn<Beatmap> addHighPPColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0", "999",
-            NumberType.INTEGER)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().perfectPP.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().perfectPP = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("threecharminmaxcell", "0", "999", NumberType.INTEGER),
+        () -> provider.getRequest().perfectPP.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().perfectPP = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    TextColumn<Beatmap> perfectPPColumn = addHighPPColumn(true, footer);
-    return perfectPPColumn;
+
+    return addHighPPColumn(true, footer);
   }
 
   private TextColumn<Beatmap> addLowPPColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0", "999",
-            NumberType.INTEGER)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().expectedPP.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().expectedPP = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("threecharminmaxcell", "0", "999", NumberType.INTEGER),
+        () -> provider.getRequest().expectedPP.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().expectedPP = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    TextColumn<Beatmap> expectedPPColumn = addLowPPColumn(true, footer);
-    return expectedPPColumn;
+
+    return addLowPPColumn(true, footer);
   }
 
-  static final String SHOW_FILTER = "show filters";
-  static final String HIDE_FILTER = "hide filters";
-  String filterState = SHOW_FILTER;
+  // these values are inverted since we use the _text_ of the button as a value
+  static final String HIDING_FILTER = "show filters";
+  static final String SHOWING_FILTER = "hide filters";
+  String filterState = HIDING_FILTER;
+
+  private class HideStateAndRankedOnly {
+    String filterState = AllBeatmapsTable.this.filterState;
+    boolean rankedOnly = AllBeatmapsTable.this.provider.getRequest().rankedOnly;
+  }
+
   protected final BeatmapTableServiceAsync beatmapService = GWT.create(BeatmapTableService.class);
 
   private Column<Beatmap, SafeHtml> addImageColumn() {
-    Header<String> footer = new Header<String>(new ButtonCell()) {
+    Header<HideStateAndRankedOnly> f = new Header<HideStateAndRankedOnly>(new CompositeCell<>(Arrays.asList(
+        hasCell(ButtonCell::new,
+            (index, object, value) -> object.filterState = value.equals(HIDING_FILTER) ? SHOWING_FILTER : HIDING_FILTER,
+            object -> object.filterState),
+          renderIfShowingFilter(new HasFillerCell<>("<br />")),
+          hasCell(() -> renderIfShowingFilter(new CheckboxCell()) , (index, object, value) -> {
+            object.rankedOnly = value;
+          }, object -> object.rankedOnly),
+          renderIfShowingFilter(new HasFillerCell<>("ranked only"))))) {
+      HideStateAndRankedOnly value = new HideStateAndRankedOnly();
       @Override
-      public String getValue() {
-        return filterState;
+      public HideStateAndRankedOnly getValue() {
+        return value;
       }
     };
-    footer.setUpdater(new ValueUpdater<String>() {
-      @Override
-      public void update(String value) {
-        System.out.println("something happened");
-        if (value.equals(SHOW_FILTER)) {
-          filterState = HIDE_FILTER;
-        }
-        if (value.equals(HIDE_FILTER)) {
-          filterState = SHOW_FILTER;
-        }
+
+    f.setUpdater(value -> {
+      if (!value.filterState.equals(filterState)) {
+        filterState = value.filterState;
         table.redrawFooters();
       }
+      if (value.rankedOnly != provider.getRequest().rankedOnly) {
+        provider.getRequest().rankedOnly = value.rankedOnly;
+        reloadTableWithChangedRequest(0);
+      }
     });
-    Column<Beatmap, SafeHtml> column = addImageColumn(footer);
-    return column;
+
+    return addImageColumn(f);
   }
 
   private Column<Beatmap, SafeHtml> addLengthColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("fivecharminmaxcell", "0:00", "99:59",
-            NumberType.TIME)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().mapLength.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().mapLength = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("fivecharminmaxcell", "0:00", "99:59", NumberType.TIME),
+        () -> provider.getRequest().mapLength.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().mapLength = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    Column<Beatmap, SafeHtml> column = addLengthColumn(true, footer);
-    return column;
+
+    return addLengthColumn(true, footer);
   }
 
   private TextColumn<Beatmap> addBPMColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0", "999",
-            NumberType.INTEGER)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().bpm.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().bpm = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("threecharminmaxcell", "0", "999", NumberType.INTEGER),
+        () -> provider.getRequest().bpm.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().bpm = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    TextColumn<Beatmap> column = addBPMColumn(true, footer);
-    return column;
+
+    return addBPMColumn(true, footer);
   }
 
   private TextColumn<Beatmap> addStarDiffColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0.0", "9.9",
-            NumberType.DECIMAL)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().starDiff.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().starDiff = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("threecharminmaxcell", "0.0", "9.9", NumberType.DECIMAL),
+        () -> provider.getRequest().starDiff.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().starDiff = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    TextColumn<Beatmap> column = addStarDiffColumn(true, footer);
-    return column;
+
+    return addStarDiffColumn(true, footer);
   }
 
   private TextColumn<Beatmap> addCSColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0.0", "10.0",
-            NumberType.DECIMAL)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().cS.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().cS = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("threecharminmaxcell", "0.0", "10.0", NumberType.DECIMAL),
+        () -> provider.getRequest().cS.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().cS = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    TextColumn<Beatmap> column = addCSColumn(footer);
-    return column;
+
+    return addCSColumn(footer);
   }
 
   private TextColumn<Beatmap> addARColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0.0", "12.0",
-            NumberType.DECIMAL)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().aR.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().aR = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("threecharminmaxcell", "0.0", "12.0", NumberType.DECIMAL),
+        () -> provider.getRequest().aR.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().aR = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    TextColumn<Beatmap> column = addARColumn(footer);
-    return column;
+
+    return addARColumn(footer);
   }
 
   private TextColumn<Beatmap> addODColumn() {
-    Header<MinMax> footer =
-        new FilterFooter<MinMax>(new MinMaxCell("threecharminmaxcell", "0.0", "12.0",
-            NumberType.DECIMAL)) {
-          @Override
-          public MinMax getValue() {
-            return provider.getRequest().oD.getCopy();
-          }
-        };
-    footer.setUpdater(new FooterValueUpdater<MinMax>() {
-      @Override
-      public void doUpdate(MinMax value) {
-        provider.getRequest().oD = value.getCopy();
-        reloadTableWithChangedRequest(0);
-      }
+    Header<MinMax> footer = new FilterFooter<>(
+        new MinMaxCell("threecharminmaxcell", "0.0", "12.0", NumberType.DECIMAL),
+        () -> provider.getRequest().oD.getCopy());
+
+    footer.setUpdater(value -> {
+      provider.getRequest().oD = value.getCopy();
+      reloadTableWithChangedRequest(0);
     });
-    TextColumn<Beatmap> column = addODColumn(footer);
-    return column;
+
+    return addODColumn(footer);
   }
 
   private Column<Beatmap, SafeHtml> addNameColumn() {
-    Header<Searches> footer = new FilterFooter<Searches>(new SearchesCell(new LoggedIn() {
+    Header<Searches> footer = new FilterFooter<>(new SearchesCell(new LoggedIn() {
       @Override
       public boolean isLoggedIn() {
         return loggedIn;
       }
-    })) {
-      @Override
-      public Searches getValue() {
-        return provider.getRequest().getSearches().getCopy();
-      }
-    };
-    footer.setUpdater(new FooterValueUpdater<Searches>() {
-      @Override
-      public void doUpdate(Searches value) {
-        if (value.getSearchComment().equals(provider.getRequest().getSearches().getSearchComment())
-            && value.getSearchText().equals(provider.getRequest().getSearches().getSearchText())) {
-          return;
-        }
+    }), () -> provider.getRequest().getSearches().getCopy());
 
-        provider.getRequest().setSearches(value);
-        reloadTableWithChangedRequest(0);
-        System.out.println("range changed");
+    footer.setUpdater(value -> {
+      if (value.getSearchComment().equals(provider.getRequest().getSearches().getSearchComment())
+          && value.getSearchText().equals(provider.getRequest().getSearches().getSearchText())) {
+        return;
       }
+
+      provider.getRequest().setSearches(value);
+      reloadTableWithChangedRequest(0);
     });
-    final Column<Beatmap, SafeHtml> column = addNameColumn(footer);
-    return column;
+
+    return addNameColumn(footer);
   }
 
-  abstract class FilterFooter<T> extends Header<T> {
-    public FilterFooter(Cell<T> cell) {
+  class FilterFooter<T> extends Header<T> {
+    private final Supplier<T> value;
+
+    FilterFooter(Cell<T> cell, Supplier<T> value) {
       super(cell);
+      this.value = value;
     }
 
     @Override
@@ -484,11 +436,16 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
 
     @Override
     public void render(Context context, SafeHtmlBuilder sb) {
-      if (filterState.equals(SHOW_FILTER)) {
+      if (filterState.equals(HIDING_FILTER)) {
 
       } else {
         super.render(context, sb);
       }
+    }
+
+    @Override
+    public T getValue() {
+      return value.get();
     }
   }
 
@@ -498,16 +455,16 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
 
     final CloseHandler<PopupPanel> closeHandler;
 
-    if (filterState.equals(SHOW_FILTER)) {
+    if (filterState.equals(HIDING_FILTER)) {
       closeHandler = new CloseHandler<PopupPanel>() {
         @Override
         public void onClose(CloseEvent<PopupPanel> event) {
-          filterState = SHOW_FILTER;
+          filterState = HIDING_FILTER;
           table.redrawFooters();
         }
       };
 
-      filterState = HIDE_FILTER;
+      filterState = SHOWING_FILTER;
       table.redrawFooters();
     } else {
       closeHandler = null;
@@ -558,12 +515,39 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
   }
 
   protected void reloadTableWithChangedRequest(int start) {
-    // Range range = new Range(start, start + pageSize);
-    // if(range.equals(table.getVisibleRange())) {
-    // RangeChangeEvent.fire(table, table.getVisibleRange());
-    // } else {
-    // table.setVisibleRange(range);
-    // }
     table.setVisibleRangeAndClearData(new Range(start, PAGE_SIZE), true);
+  }
+
+  <C> Cell<C> renderIfShowingFilter(Cell<C> actual) {
+    return new CellDecorator<C>(actual) {
+      @Override
+      public void render(Context context, C value, SafeHtmlBuilder sb) {
+        if (filterState.equals(SHOWING_FILTER)) {
+          super.render(context, value, sb);
+        }
+      }
+    };
+  }
+
+  <T, C> HasCell<T, C> renderIfShowingFilter(HasCell<T, C> actual) {
+    return hasCell(() -> renderIfShowingFilter(actual.getCell()), actual.getFieldUpdater(), actual::getValue);
+  }
+
+  static <T, C> HasCell<T, C> hasCell(Supplier<Cell<C>> cell, FieldUpdater<T, C> fieldUpdater, Function<T, C> value) {
+    return new HasCell<T, C>() {
+      @Override
+      public Cell<C> getCell() {
+        return cell.get();
+      }
+
+      @Override
+      public FieldUpdater<T, C> getFieldUpdater() {
+        return fieldUpdater;
+      }
+
+      @Override
+      public C getValue(T object) {
+        return value.apply(object);
+      }};
   }
 }
