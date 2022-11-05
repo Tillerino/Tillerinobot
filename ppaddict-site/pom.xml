@@ -16,7 +16,7 @@
 	<artifactId>ppaddict-site</artifactId>
 
 	<properties>
-		<gwt-version>2.9.0</gwt-version>
+		<gwt-version>2.10.0</gwt-version>
 	</properties>
 
 	<dependencies>
@@ -36,13 +36,13 @@
 			<version>2.0.2</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.gwt</groupId>
+			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-user</artifactId>
 			<version>${gwt-version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.google.gwt</groupId>
+			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-servlet</artifactId>
 			<version>${gwt-version}</version>
 		</dependency>
