@@ -24,21 +24,21 @@
 		<jackson.version>2.13.4.20221013</jackson.version>
 		<testcontainers.version>1.17.5</testcontainers.version>
 		<!-- determined by container -->
-		<mockserver.version>5.13.2</mockserver.version>
+		<mockserver.version>5.14.0</mockserver.version>
 		<slf4j.version>1.7.36</slf4j.version>
-		<mapstruct.version>1.4.2.Final</mapstruct.version>
+		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<guice.version>5.1.0</guice.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
 		<eclipselink.version>2.7.10</eclipselink.version>
-		<spotbugs.version>4.7.2</spotbugs.version>
-		<spotbugs.plugin.version>4.5.0.0</spotbugs.plugin.version>
+		<spotbugs.version>4.7.3</spotbugs.version>
+		<spotbugs.plugin.version>4.7.2.1</spotbugs.plugin.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<mockito.version>4.8.0</mockito.version>
-		<hsqldb.version>2.7.0</hsqldb.version>
+		<mockito.version>4.8.1</mockito.version>
+		<hsqldb.version>2.7.1</hsqldb.version>
 		<rabbitmq.version>5.16.0</rabbitmq.version>
 		<lombok.version>1.18.24</lombok.version>
-		<spring-data-jpa.version>2.7.3</spring-data-jpa.version>
-		<mysql-connector-java.version>8.0.30</mysql-connector-java.version>
+		<spring-data-jpa.version>2.7.5</spring-data-jpa.version>
+		<mysql-connector-java.version>8.0.31</mysql-connector-java.version>
 		<jax-rs.version>3.1.0</jax-rs.version>
 		<rest-assured.version>5.2.0</rest-assured.version>
 		<awaitility.version>4.2.0</awaitility.version>

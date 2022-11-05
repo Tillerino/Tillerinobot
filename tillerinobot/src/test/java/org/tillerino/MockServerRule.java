@@ -29,7 +29,7 @@ import lombok.SneakyThrows;
  * Use with MockServerModule to inject mocked URLs.
  */
 public class MockServerRule extends TestWatcher {
-	private static final DockerImageName IMAGE = DockerImageName.parse("jamesdbloom/mockserver").withTag("mockserver-" + getMockServerVersion());
+	private static final DockerImageName IMAGE = DockerImageName.parse("mockserver/mockserver").withTag(getMockServerVersion());
 	private static final MockServerContainer MOCK_SERVER = new MockServerContainer(IMAGE)
 			.withNetwork(DockerNetwork.NETWORK)
 			.withNetworkAliases("mockserver");
