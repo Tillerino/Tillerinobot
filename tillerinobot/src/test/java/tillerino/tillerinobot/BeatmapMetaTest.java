@@ -15,12 +15,12 @@ public class BeatmapMetaTest {
 	public void testFuturePpSwitch() throws Exception {
 		BeatmapMeta meta = fakeBeatmapMeta(101);
 		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 100pp | 95%: 31pp | 98%: 60pp | 99%: 77pp | 100%: 101pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 100pp | 95%: 31pp | 98%: 62pp | 99%: 76pp | 100%: 101pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
 				meta.formInfoMessage(true, null, -1, null, null, null));
 
 		meta = fakeBeatmapMeta(110);
 		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 31pp | 98%: 60pp | 99%: 77pp | 100%: 101pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 31pp | 98%: 62pp | 99%: 76pp | 100%: 101pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
 				meta.formInfoMessage(true, null, -1, null, null, null));
 	}
 
