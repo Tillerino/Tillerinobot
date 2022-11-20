@@ -7,7 +7,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
+import org.tillerino.osuApiModel.OsuApiScore;
 
 @Value
 public class AccuracyDistribution {
@@ -16,7 +18,20 @@ public class AccuracyDistribution {
 	int x50;
 	int miss;
 
-	public static AccuracyDistribution get(int allObjects, int misses, double acc) {
+	/**
+	 * This will calculate the most precise approximation to hit the accuracy
+	 * target. I.e. if you calculate accuracy exactly based on 300s, 100s, 50s, and
+	 * misses, this method will reproduce the original values.
+	 *
+	 * Note that a user will most likely not input the precise accuracy value, but
+	 * rather a rounded value. This will often give an unexpected value for 50s.
+	 * Since 50s are directly (not just indirectly through accuracy) in the current
+	 * pp formulas, this can lead to unexpected pp values.
+	 *
+	 * Use {@link #model(int, int, double)} for a heuristic that will produce more
+	 * predictable 50s.
+	 */
+	public static AccuracyDistribution closest(int allObjects, int misses, double acc) {
 		Pair<Integer, Integer> best = getBest300s(allObjects, misses, acc);
 		int best300s = best.getLeft();
 		int best100s = best.getRight();
@@ -55,5 +70,40 @@ public class AccuracyDistribution {
 			}
 		}
 		return Pair.of(best300s, best100s);
+	}
+
+	/**
+	 * Since 50s are punished directly in pp calculation (not just indirectly through accuracy),
+	 * it is important that we get a realistic number of 50s when turning an accuracy value into
+	 * an {@link AccuracyDistribution}.
+	 *
+	 * We fitted a polynomial to model the number of 50s based on the relative accuracy, which
+	 * is the accuracy when removing misses from the play.
+	 *
+	 * Once the number of 50s has been determined, the 300s and 100s are chosen such that the
+	 * accuracy is matched. The accuracy that we can guarantee is +- 1/allObjects / 3, e.g.
+	 * for 500 objects it is +- 0.0006 or 0.06%.
+	 */
+	public static AccuracyDistribution model(int allObjects, int misses, final double acc) {
+		Validate.inclusiveBetween(1, Integer.MAX_VALUE, allObjects);
+		Validate.inclusiveBetween(0, allObjects, misses);
+		Validate.inclusiveBetween(OsuApiScore.getAccuracy(0, 0, allObjects - misses, misses),
+				OsuApiScore.getAccuracy(allObjects - misses, 0, 0, misses), acc);
+		// relative accuracy free of misses
+		double racc = acc * (allObjects / ((double) allObjects - misses));
+
+		double f50 = model50s(racc);
+		int x50 = (int) Math.round(f50 * (allObjects - misses));
+		int x300 = (int) Math.round((3 * racc / 2D + f50 / 4D - .5) * (allObjects - misses));
+		int x100 = allObjects - misses - x300 - x50;
+		assert x300 >= 0;
+		assert x50 >= 0;
+		assert x100 >= 0;
+		return new AccuracyDistribution(x300, x100, x50, misses);
+	}
+
+	private static double model50s(double x) {
+		return ((((-5.845461042897 * x + 24.1586850677877) * x - 38.565985189941) * x + 30.3957245438448) * x
+				- 12.5511536341837) * x + 2.4081902553891;
 	}
 }

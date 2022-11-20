@@ -17,7 +17,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 
 	@Override
 	public double getPP(double acc) {
-		AccuracyDistribution dist = AccuracyDistribution.get(beatmap.getObjectCount(), 0, acc);
+		AccuracyDistribution dist = AccuracyDistribution.model(beatmap.getObjectCount(), 0, acc);
 
 		OsuScore score = new OsuScore((int) beatmap.DifficultyAttribute(getMods(), Beatmap.MaxCombo),
 				dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(), getMods());
@@ -27,7 +27,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 
 	@Override
 	public double getPP(double acc, int combo, int misses) {
-		AccuracyDistribution dist = AccuracyDistribution.get(beatmap.getObjectCount(), misses, acc);
+		AccuracyDistribution dist = AccuracyDistribution.model(beatmap.getObjectCount(), misses, acc);
 
 		OsuScore score = new OsuScore(combo, dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(),
 				getMods());
