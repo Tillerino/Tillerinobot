@@ -216,6 +216,9 @@ public class RecommendationsManager {
 				if (beatmap == null) {
 					beatmap = beatmapsLoader.getBeatmap(bareRecommendation.beatmapId());
 				}
+				if (beatmap == null) {
+					continue recommendationsLoop;
+				}
 				if (!predicate.test(bareRecommendation, beatmap)) {
 					continue recommendationsLoop;
 				}
