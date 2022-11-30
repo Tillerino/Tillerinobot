@@ -21,7 +21,7 @@
 		<jacoco.version>0.8.7</jacoco.version>
 		<jersey.version>3.0.8</jersey.version>
 		<jetty.version>9.4.49.v20220914</jetty.version>
-		<jackson.version>2.14.0</jackson.version>
+		<jackson.version>2.14.1</jackson.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
 		<!-- determined by container -->
 		<mockserver.version>5.14.0</mockserver.version>
@@ -45,7 +45,7 @@
 		<log4j.version>2.19.0</log4j.version>
 		<assertj-core.version>3.23.1</assertj-core.version>
 		<json-unit-assertj.version>2.36.0</json-unit-assertj.version>
-		<resilience4j.version>1.7.0</resilience4j.version>
+		<resilience4j.version>2.0.0</resilience4j.version>
 	</properties>
 
 	<build>
