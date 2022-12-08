@@ -290,7 +290,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 				eq(Model.GAMMA7), anyBoolean(), anyLong());
 	}
 
-    private static final GameChatResponse OSUTRACK_RESPONSE_OLIEBOL = new Success("Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/oliebol osu!track].");
+    private static final GameChatResponse OSUTRACK_RESPONSE_WITH_SPACE = new Success("Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/has+space osu!track].");
     private static final GameChatResponse OSUTRACK_RESPONSE_FARTOWNIK = new Success("Rank: -3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track].")
             .then(new Message("2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.06pp; [https://osu.ppy.sh/b/693195 #89]: 331.89pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."));
 
@@ -298,15 +298,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
         backend.hintUser("oliebol", false, 125000, 1000, 2756335);
         backend.hintUser("fartownik", false, 125000, 1000, 56917);
         backend.hintUser("unknown", false, 125000, 1000, 1234);
+        backend.hintUser("has space", false, 125000, 1000, 2345);
     }
 
     @Test
-    public void testOsutrackOliebol() throws Exception {
+    public void testOsutrackWithSpace() throws Exception {
         IRCBot bot = getTestBot(backend);
         turnOffVersionMessage();
         hintOsutrackUsers();
 
-        verifyResponse(bot, message("oliebol", "!u"), OSUTRACK_RESPONSE_OLIEBOL);
+        verifyResponse(bot, message("has space", "!u"), OSUTRACK_RESPONSE_WITH_SPACE);
     }
 
 	@Test

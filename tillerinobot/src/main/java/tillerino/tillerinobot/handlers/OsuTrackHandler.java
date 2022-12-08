@@ -1,6 +1,8 @@
 package tillerino.tillerinobot.handlers;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
@@ -84,7 +86,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
                 update.getPpRank()*-1,
                 update.getPpRaw(),
                 update.getPlayCount(),
-                update.getUsername()
+                URLEncoder.encode(update.getUsername(), StandardCharsets.UTF_8)
         );
         GameChatResponse response = new Success(mainMessage);
         if (update.getNewHighscores() != null && !update.getNewHighscores().isEmpty()) {
