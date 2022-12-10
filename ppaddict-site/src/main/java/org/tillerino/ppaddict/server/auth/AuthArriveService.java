@@ -11,11 +11,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.scribe.model.Token;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
-import org.tillerino.ppaddict.shared.PpaddictException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Singleton
+@Slf4j
 public class AuthArriveService extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
@@ -43,21 +46,26 @@ public class AuthArriveService extends HttpServlet {
     req.getSession().removeAttribute(AUTH_REQUEST_TOKEN_SESSION_KEY);
     req.getSession().removeAttribute(AUTH_SERVICE_SESSION_KEY);
 
+    if (requestToken == null) {
+      resp.sendError(400, "Missing session. ");
+      return;
+    }
+
     Optional<AuthenticatorService> service = services.stream().filter(s -> s.getIdentifier().equals(serviceKey)).findAny();
     if(service.isEmpty()) {
-      resp.sendError(500);
+      resp.sendError(400, "Could not find service.");
       return;
     }
-
-    Credentials credentials = service.get().createUser(req, requestToken);
 
     try {
+      Credentials credentials = service.get().createUser(req, requestToken);
       userDataService.rememberCredentials(req, resp, credentials);
-    } catch (PpaddictException e) {
+    } catch (Exception e) {
+      log.error("Error while processing auth token", e);
       resp.sendError(500);
       return;
     }
 
-    resp.sendRedirect(returnTo);
+    resp.sendRedirect(StringUtils.defaultString(returnTo, "/"));
   }
 }

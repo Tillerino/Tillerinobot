@@ -38,7 +38,7 @@ public class AuthLeaveService extends HttpServlet {
     Optional<AuthenticatorService> authService = services.stream().filter(s -> s.getIdentifier().equals(serviceKey)).findAny();
     if(authService.isEmpty()) {
       // send 400, its a user error, serviceKey is user-input
-      resp.sendError(400);
+      resp.sendError(400, "Could not find service.");
       return;
     }
 
