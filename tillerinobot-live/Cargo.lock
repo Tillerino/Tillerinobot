@@ -741,6 +741,7 @@ version = "0.1.0"
 dependencies = [
  "futures-macro",
  "futures-util",
+ "hyper",
  "lapin",
  "lazy_static",
  "rand_chacha",

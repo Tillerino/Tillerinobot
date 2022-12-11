@@ -5,10 +5,12 @@ use rand_chacha::ChaChaRng;
 use rand_core::{RngCore, SeedableRng};
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
-use warp::{Filter, http::StatusCode};
+use warp::{Filter, http::StatusCode, Error};
 use warp::ws::Message;
 
 use crate::rabbit::READY;
+
+use std::convert::Infallible;
 
 lazy_static! {
     static ref RND: Mutex<ChaChaRng> = Mutex::new(ChaChaRng::from_entropy());
@@ -20,7 +22,7 @@ pub struct Conn {
     pub salt: u64,
 }
 
-pub async fn run_http() {
+pub async fn run_http() -> hyper::Result<()> {
     let websocket = warp::path!("live" / "v0")
         .and(warp::ws())
         .map(|ws: warp::ws::Ws| {
@@ -70,5 +72,15 @@ pub async fn run_http() {
             }
         });
 
-    warp::serve(websocket.or(liveness).or(readiness)).run(([0, 0, 0, 0], 8080)).await;
+    let all_routes = websocket.or(liveness).or(readiness);
+    let svc = warp::service(all_routes);
+
+    let make_svc = hyper::service::make_service_fn(move |_| async move {
+        Ok::<_, Infallible>(svc)
+    });
+
+    hyper::Server::bind(&([0, 0, 0, 0], 8080).into())
+        .http1_max_buf_size(8192)
+        .serve(make_svc)
+        .await
 }
