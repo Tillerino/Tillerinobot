@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.scribe.model.Token;
+import org.scribe.oauth.OAuth10aServiceImpl;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,19 +47,20 @@ public class AuthArriveService extends HttpServlet {
     req.getSession().removeAttribute(AUTH_REQUEST_TOKEN_SESSION_KEY);
     req.getSession().removeAttribute(AUTH_SERVICE_SESSION_KEY);
 
-    if (requestToken == null) {
+    Optional<AuthenticatorService> serviceMaybe = services.stream().filter(s -> s.getIdentifier().equals(serviceKey)).findAny();
+    if(serviceMaybe.isEmpty()) {
+      resp.sendError(400, "Could not find service.");
+      return;
+    }
+    AuthenticatorService service = serviceMaybe.get();
+
+    if (service instanceof OAuth10aServiceImpl && requestToken == null) {
       resp.sendError(400, "Missing session. ");
       return;
     }
 
-    Optional<AuthenticatorService> service = services.stream().filter(s -> s.getIdentifier().equals(serviceKey)).findAny();
-    if(service.isEmpty()) {
-      resp.sendError(400, "Could not find service.");
-      return;
-    }
-
     try {
-      Credentials credentials = service.get().createUser(req, requestToken);
+      Credentials credentials = service.createUser(req, requestToken);
       userDataService.rememberCredentials(req, resp, credentials);
     } catch (Exception e) {
       log.error("Error while processing auth token", e);
