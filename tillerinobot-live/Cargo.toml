@@ -8,14 +8,14 @@ authors = ["Tillerino <tillmann.gaida@gmail.com>"]
 edition = '2018'
 
 [dependencies]
-tokio-amqp = { version = "1.0", default-features = false }
-lapin = { version = "1.6", default-features = false }
+tokio-amqp = { version = "2", default-features = false }
+lapin = { version = "2", default-features = false }
 tokio = { version = "1.8", features = [ "rt-multi-thread", "macros" ] }
 tokio-stream = { version = "0.1", default-features = false }
 serde_derive = { version = "1.0" }
 serde_json = { version = "1.0" }
 serde = { version = "1.0" }
-sha2 = "0.9"
+sha2 = "0.10"
 rand_chacha = "0.3"
 rand_core = "0.6"
 lazy_static = "1.4"

@@ -5,7 +5,7 @@ use rand_chacha::ChaChaRng;
 use rand_core::{RngCore, SeedableRng};
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
-use warp::{Filter, http::StatusCode, Error};
+use warp::{Filter, http::StatusCode};
 use warp::ws::Message;
 
 use crate::rabbit::READY;
