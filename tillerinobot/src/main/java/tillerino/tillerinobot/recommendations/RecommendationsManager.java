@@ -175,10 +175,10 @@ public class RecommendationsManager {
 	private Sampler<BareRecommendation, RecommendationRequest> loadSampler(@UserId int userid, RecommendationRequest settings)
 			throws SQLException, IOException, UserException {
 		Sampler<BareRecommendation, RecommendationRequest> sampler;
+		List<TopPlay> topPlays = recommender.loadTopPlays(userid);
 		Set<Integer> exclude = loadGivenRecommendations(userid)
 				.stream().map(GivenRecommendation::getBeatmapid)
 				.collect(toSet());
-		List<TopPlay> topPlays = recommender.loadTopPlays(userid);
 
 		for (TopPlay play : topPlays) {
 			LinkedList<Mods> effectiveMods = getEffectiveMods(getMods(play.getMods()));
