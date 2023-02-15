@@ -3,7 +3,7 @@ ArrayList texts = new ArrayList();
 ArrayList pings = new ArrayList();
 Ping previousPing = null;
 // the age at which you hit the screen edge
-float maxAge = (Math.E - 1) * 30000;
+float maxAge = 300000;
 abstract class Drawable {
 	int age = 0;
 
@@ -378,7 +378,7 @@ void drawQueue(ArrayList queue, boolean backward) {
 
 Number ageToDist(clockAge)
 {
-	return Math.log1p(clockAge / 30000) * (width / 2);
+	return (1 - Math.pow(0.5, clockAge / 25000)) * (width / 2) + clockAge / 300000 * 6
 }
 
 void drawTail(lane, age, v1, v2, v3, sign)
