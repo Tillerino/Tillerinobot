@@ -9,6 +9,7 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
+import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
 import org.tillerino.ppaddict.rabbit.RemoteResponseQueue;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
@@ -44,6 +45,8 @@ public class RabbitQueuesModule extends AbstractModule {
 
 	@Provides
 	LiveActivity liveActicity(Connection connection) throws IOException {
-		return RabbitMqConfiguration.liveActivity(connection);
+		RemoteLiveActivity liveActivity = RabbitMqConfiguration.liveActivity(connection);
+		liveActivity.setup();
+		return liveActivity;
 	}
 }

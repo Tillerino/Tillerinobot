@@ -33,18 +33,18 @@
 		<spotbugs.version>4.7.3</spotbugs.version>
 		<spotbugs.plugin.version>4.7.2.1</spotbugs.plugin.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<mockito.version>4.9.0</mockito.version>
+		<mockito.version>5.2.0</mockito.version>
 		<hsqldb.version>2.7.1</hsqldb.version>
-		<rabbitmq.version>5.16.0</rabbitmq.version>
+		<rabbitmq.version>5.17.0</rabbitmq.version>
 		<lombok.version>1.18.26</lombok.version>
 		<spring-data-jpa.version>2.7.5</spring-data-jpa.version>
-		<mysql-connector-java.version>8.0.31</mysql-connector-java.version>
+		<mysql-connector-java.version>8.0.32</mysql-connector-java.version>
 		<jax-rs.version>3.1.0</jax-rs.version>
 		<rest-assured.version>5.3.0</rest-assured.version>
 		<awaitility.version>4.2.0</awaitility.version>
-		<log4j.version>2.19.0</log4j.version>
+		<log4j.version>2.20.0</log4j.version>
 		<assertj-core.version>3.24.2</assertj-core.version>
-		<json-unit-assertj.version>2.36.1</json-unit-assertj.version>
+		<json-unit-assertj.version>2.37.0</json-unit-assertj.version>
 		<resilience4j.version>2.0.2</resilience4j.version>
 	</properties>
 
