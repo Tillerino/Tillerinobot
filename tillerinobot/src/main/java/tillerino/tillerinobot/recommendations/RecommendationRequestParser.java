@@ -41,7 +41,7 @@ public class RecommendationRequestParser {
 		
 		RecommendationRequestBuilder settingsBuilder = RecommendationRequest.builder();
 		
-		settingsBuilder.model(Model.GAMMA7);
+		settingsBuilder.model(Model.GAMMA8);
 
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
@@ -98,6 +98,10 @@ public class RecommendationRequestParser {
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma7") <= 2 && lowerCase.endsWith("7")) {
 			settingsBuilder.model(Model.GAMMA7);
+			return true;
+		}
+		if(getLevenshteinDistance(lowerCase, "gamma8") <= 2 && lowerCase.endsWith("8")) {
+			settingsBuilder.model(Model.GAMMA8);
 			return true;
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {

@@ -138,7 +138,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	@Test
 	public void defaultSettings() throws Exception {
 		assertThat(manager.getRecommendation(user, "", new Default())).isNotNull();
-		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA7), eq(false), eq(0L));
+		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA8), eq(false), eq(0L));
 	}
 
 	@Test
