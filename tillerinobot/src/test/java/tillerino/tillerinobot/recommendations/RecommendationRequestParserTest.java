@@ -3,6 +3,7 @@ package tillerino.tillerinobot.recommendations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
@@ -20,6 +21,7 @@ import tillerino.tillerinobot.predicates.ExcludeMod;
 import tillerino.tillerinobot.predicates.MapLength;
 import tillerino.tillerinobot.predicates.NumericPropertyPredicate;
 import tillerino.tillerinobot.predicates.StarDiff;
+import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RecommendationRequestParserTest {
@@ -33,6 +35,12 @@ public class RecommendationRequestParserTest {
 		OsuApiUser user = new OsuApiUser();
 		user.setUserId(1);
 		return recommendationRequestParser.parseSamplerSettings(user, settings, new Default());
+	}
+
+	@Test
+	public void defaultSettings() throws Exception {
+		RecommendationRequest request = parse("");
+		assertThat(request).returns(Shift.NONE, RecommendationRequest::difficultyShift);
 	}
 
 	@Test
@@ -81,5 +89,16 @@ public class RecommendationRequestParserTest {
 		assertThat(request)
 			.hasFieldOrPropertyWithValue("model", Model.NAP)
 			.hasFieldOrPropertyWithValue("requestedMods", 64L);
+	}
+
+	@Test
+	public void testSucc() throws Exception {
+		assertThatThrownBy(() -> parse("succ")).isInstanceOf(UserException.class);
+
+		doReturn(1).when(backend).getDonator(1);
+		assertThat(parse("succ")).returns(Shift.SUCC, RecommendationRequest::difficultyShift);
+		assertThat(parse("succer")).returns(Shift.SUCCER, RecommendationRequest::difficultyShift);
+		// typo; long word
+		assertThat(parse("sucerberg")).returns(Shift.SUCCERBERG, RecommendationRequest::difficultyShift);
 	}
 }

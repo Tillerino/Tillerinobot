@@ -1,5 +1,6 @@
 package tillerino.tillerinobot.recommendations;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.tillerino.osuApiModel.Mods.Nightcore;
 import static org.tillerino.osuApiModel.Mods.getEffectiveMods;
@@ -47,6 +48,7 @@ import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
+import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 
 /**
  * Communicates with the backend and creates recommendations samplers as well as caching information.
@@ -186,6 +188,16 @@ public class RecommendationsManager {
 			play.setMods(getMask(effectiveMods));
 
 			exclude.add(play.getBeatmapid());
+		}
+
+		if (settings.difficultyShift() != Shift.NONE) {
+			int limit = switch (settings.difficultyShift()) {
+				case SUCC -> topPlays.size() / 2;
+				case SUCCER -> topPlays.size() / 4;
+				case SUCCERBERG -> 5;
+				default -> throw new IllegalStateException();
+			};
+			topPlays = topPlays.stream().sorted(Comparator.comparingDouble(TopPlay::getPp)).limit(limit).collect(toList());
 		}
 
 		Collection<BareRecommendation> recommendations = recommender.loadRecommendations(topPlays, exclude,

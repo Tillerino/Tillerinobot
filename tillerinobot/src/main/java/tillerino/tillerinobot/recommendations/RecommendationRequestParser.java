@@ -19,6 +19,7 @@ import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
 import tillerino.tillerinobot.recommendations.RecommendationRequest.RecommendationRequestBuilder;
+import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RecommendationRequestParser {
@@ -49,7 +50,8 @@ public class RecommendationRequestParser {
 				continue;
 			if (!parseEngines(param, settingsBuilder, apiUser)
 					&& !parseMods(param, settingsBuilder)
-					&& !parsePredicates(param, settingsBuilder, apiUser, lang)) {
+					&& !parsePredicates(param, settingsBuilder, apiUser, lang)
+					&& !parseOther(param, settingsBuilder, apiUser)) {
 				throw new UserException(lang.invalidChoice(param, STANDARD_SYNTAX));
 			}
 		}
@@ -152,6 +154,26 @@ public class RecommendationRequestParser {
 					}
 				}
 				settingsBuilder.predicate(predicate);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean parseOther(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser apiUser)
+			throws SQLException, IOException {
+		String lowerCase = param.toLowerCase();
+		if (backend.getDonator(apiUser.getUserId()) > 0) {
+			switch (lowerCase) {
+			case "succ":
+				settingsBuilder.difficultyShift(Shift.SUCC);
+				return true;
+			case "succer":
+				settingsBuilder.difficultyShift(Shift.SUCCER);
+				return true;
+			}
+			if (getLevenshteinDistance(lowerCase, "succerberg") <= 2) {
+				settingsBuilder.difficultyShift(Shift.SUCCERBERG);
 				return true;
 			}
 		}

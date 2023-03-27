@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
-import lombok.Getter;
 import lombok.Builder;
+import lombok.Getter;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
 
 @Builder
@@ -15,7 +15,8 @@ public record RecommendationRequest(
 		boolean nomod,
 		Model model,
 		@BitwiseMods long requestedMods,
-		List<RecommendationPredicate> predicates
+		List<RecommendationPredicate> predicates,
+		Shift difficultyShift
 		) {
 	public RecommendationRequest {
 		predicates = new ArrayList<>(predicates);
@@ -31,6 +32,8 @@ public record RecommendationRequest(
 		private long requestedMods = 0L;
 
 		private List<RecommendationPredicate> predicates = new ArrayList<>();
+
+		private Shift difficultyShift = Shift.NONE;
 
 		public RecommendationRequestBuilder requestedMods(@BitwiseMods long requestedMods) {
 			this.requestedMods = requestedMods;
@@ -51,4 +54,25 @@ public record RecommendationRequest(
 		}
 	}
 
+	/**
+	 * Modifies the difficulty of recommendations.
+	 */
+	static enum Shift {
+		/**
+		 * Regular strength.
+		 */
+		NONE,
+		/**
+		 * The player is weak compared to their top scores. Recommendations are easier.
+		 */
+		SUCC,
+		/**
+		 * Even weaker than {@link #SUCC}
+		 */
+		SUCCER,
+		/**
+		 * Even weaker than {@link #SUCCERBERG}
+		 */
+		SUCCERBERG
+	}
 }

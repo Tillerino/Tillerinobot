@@ -1,18 +1,18 @@
 package tillerino.tillerinobot.recommendations;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -152,5 +152,32 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 		backend.hintUser("guy", false, 123, 123);
 		user = backend.downloadUser("guy");
 		assertThat(manager.getRecommendation(user, "gamma5", new Default())).isNotNull();
+	}
+
+	@Test
+	public void succ() throws Exception {
+		runShift("succ", 25);
+	}
+
+	@Test
+	public void succer() throws Exception {
+		runShift("succer", 12);
+	}
+
+	@Test
+	public void succerberg() throws Exception {
+		runShift("succerberg", 5);
+	}
+
+	private void runShift(String mode, int limit) throws IOException, SQLException, UserException, InterruptedException {
+		backend.hintUser("guy", true, 123, 1000);
+		user = backend.downloadUser("guy");
+
+		List<TopPlay> topPlays = new ArrayList<>(recommender.loadTopPlays(user.getUserId()));
+		assertThat(topPlays).hasSize(50);
+		topPlays.sort(Comparator.comparingDouble(TopPlay::getPp));
+
+		assertThat(manager.getRecommendation(user, mode, new Default())).isNotNull();
+		verify(recommender).loadRecommendations(argThat(l -> l.equals(topPlays.subList(0, limit))), any(), eq(Model.GAMMA8), anyBoolean(), anyLong());
 	}
 }

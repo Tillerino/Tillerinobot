@@ -351,6 +351,7 @@ public class TestBackend implements BotBackend {
 		}
 		
 		double equivalentPp(List<TopPlay> plays) {
+			plays = new ArrayList<>(plays);
 			Collections.sort(plays, Comparator.comparingDouble(TopPlay::getPp).reversed());
 			double ppSum = 0;
 			double partialSum = 0;
