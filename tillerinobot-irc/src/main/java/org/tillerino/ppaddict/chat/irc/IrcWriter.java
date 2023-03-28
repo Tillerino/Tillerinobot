@@ -12,6 +12,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.pircbotx.output.OutputUser;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatWriter;
+import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.RetryableException;
 
@@ -25,20 +26,20 @@ public class IrcWriter implements GameChatWriter {
 	private final AtomicReference<CloseableBot> bot = new AtomicReference<>();
 
 	@Override
-	public void message(String msg, GameChatEvent result) throws InterruptedException, IOException {
-		send(result, output -> output.message(msg));
+	public void message(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+		send(recipient, output -> output.message(msg));
 	}
 
 	@Override
-	public void action(String msg, GameChatEvent result) throws InterruptedException, IOException {
-		send(result, output -> output.action(msg));
+	public void action(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+		send(recipient, output -> output.action(msg));
 	}
 
-	private void send(GameChatEvent event, Consumer<OutputUser> sender) throws IOException, InterruptedException {
+	private void send(@IRCName String recipient, Consumer<OutputUser> sender) throws IOException, InterruptedException {
 		pinger.ping(waitForBot());
 
 		try {
-			sender.accept(waitForBot().getUserChannelDao().getUser(event.getNick()).send());
+			sender.accept(waitForBot().getUserChannelDao().getUser(recipient).send());
 		} catch (RuntimeException e) {
 			if (e.getCause() instanceof InterruptedException) {
 				// see org.pircbotx.output.OutputRaw.rawLine(String)

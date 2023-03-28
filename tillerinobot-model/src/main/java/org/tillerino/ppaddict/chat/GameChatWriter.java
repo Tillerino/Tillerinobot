@@ -10,15 +10,15 @@ public interface GameChatWriter {
 	 * Responds with a direct message.
 	 *
 	 * @param response the message to send
-	 * @param cause the event that caused the reaction
+	 * @param recipient the recipient of the message
 	 */
-	void message(String response, GameChatEvent cause) throws InterruptedException, IOException;
+	void message(String response, @IRCName String recipient) throws InterruptedException, IOException;
 
 	/**
 	 * Responds with an "action", a special kind of direct message.
 	 *
 	 * @param response the action to send
-	 * @param cause the event that caused the reaction
+	 * @param recipient the recipient of the action
 	 */
-	void action(String response, GameChatEvent cause) throws InterruptedException, IOException;
+	void action(String response, @IRCName String recipient) throws InterruptedException, IOException;
 }

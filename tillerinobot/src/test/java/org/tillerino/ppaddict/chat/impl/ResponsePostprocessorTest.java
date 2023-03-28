@@ -53,7 +53,7 @@ public class ResponsePostprocessorTest {
 	public void testAction() throws Exception {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Action("xyz"), event);
-		verify(writer).action("xyz", event);
+		verify(writer).action("xyz", "nick");
 		verify(liveActivity).propagateSentMessage("nick", 1);
 		verify(bouncer).exit("nick", 1);
 	}
@@ -62,7 +62,7 @@ public class ResponsePostprocessorTest {
 	public void testMessage() throws Exception {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Message("xyz"), event);
-		verify(writer).message("xyz", event);
+		verify(writer).message("xyz", "nick");
 		verify(liveActivity).propagateSentMessage("nick", 1);
 		verify(bouncer).exit("nick", 1);
 		
@@ -72,7 +72,7 @@ public class ResponsePostprocessorTest {
 	public void testSuccess() throws Exception {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Success("xyz"), event);
-		verify(writer).message("xyz", event);
+		verify(writer).message("xyz", "nick");
 		verify(liveActivity).propagateSentMessage("nick", 1);
 		verify(bouncer).exit("nick", 1);
 	}
@@ -81,8 +81,8 @@ public class ResponsePostprocessorTest {
 	public void testList() throws Exception {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Message("xyz").then(new Action("abc")), event);
-		verify(writer).message("xyz", event);
-		verify(writer).action("abc", event);
+		verify(writer).message("xyz", "nick");
+		verify(writer).action("abc", "nick");
 		verify(liveActivity, times(2)).propagateSentMessage("nick", 1);
 		verify(bouncer, times(1)).exit("nick", 1);
 	}
@@ -110,7 +110,7 @@ public class ResponsePostprocessorTest {
 	public void testNoBouncerForNonInteractiveEvents() throws Exception {
 		Sighted event = new Sighted(1, "nick", 2);
 		responsePostprocessor.onResponse(new Success("hai"), event);
-		verify(writer).message("hai", event);
+		verify(writer).message("hai", "nick");
 		verifyNoInteractions(bouncer);
 	}
 
@@ -159,16 +159,16 @@ public class ResponsePostprocessorTest {
 				return null;
 			}
 			throw new RetryableException(0);
-		}).when(writer).message("abc", event);
+		}).when(writer).message("abc", "nick");
 		responsePostprocessor.onResponse(new Message("abc"), event);
-		verify(writer, times(2)).message("abc", event);
+		verify(writer, times(2)).message("abc", "nick");
 	}
 
 	@Test
 	public void retryingStops() throws Exception {
 		Joined event = new Joined(1234, "nick", 0);
-		doThrow(new RetryableException(0)).when(writer).message("abc", event);
+		doThrow(new RetryableException(0)).when(writer).message("abc", "nick");
 		responsePostprocessor.onResponse(new Message("abc"), event);
-		verify(writer, times(10)).message("abc", event);
+		verify(writer, times(10)).message("abc", "nick");
 	}
 }

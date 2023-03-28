@@ -182,7 +182,7 @@ public class LoggingTest {
 		clock.advanceBy(15);
 		in.onEvent(event);
 
-		verify(out, timeout(1000)).message(anyString(), eq(event));
+		verify(out, timeout(1000)).message(anyString(), eq(user));
 
 		assertThatOurLog()
 			.allSatisfy(mdc("event", "123"))
@@ -195,7 +195,7 @@ public class LoggingTest {
 		clock.advanceBy(25);
 		in.onEvent(event);
 
-		verify(out, timeout(1000)).message(anyString(), eq(event));
+		verify(out, timeout(1000)).message(anyString(), eq(user));
 
 		assertThatOurLog()
 			.allSatisfy(mdc("event", "123"))

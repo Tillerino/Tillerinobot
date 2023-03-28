@@ -64,13 +64,13 @@ public class IrcWriterTest {
 
 	@Test
 	public void testMessage() throws Exception {
-		queue.message("abc", new PrivateMessage(6789, "user", 12345, "hello"));
+		queue.message("abc", "user");
 		verify(outputUser).message("abc");
 	}
 
 	@Test
 	public void testAction() throws Exception {
-		queue.action("abc", new PrivateMessage(6789, "user", 12345, "hello"));
+		queue.action("abc", "user");
 		verify(outputUser).action("abc");
 	}
 
@@ -78,7 +78,7 @@ public class IrcWriterTest {
 	public void botDisconnects() throws Exception {
 		// bot disconnects at a bad timing
 		doThrow(new RuntimeException("Not connected to server")).when(outputUser).message(anyString());
-		assertThatThrownBy(() -> queue.message("abc", new PrivateMessage(6789, "user", 12345, "hello")))
+		assertThatThrownBy(() -> queue.message("abc", "user"))
 			.isInstanceOf(RetryableException.class);
 	}
 }

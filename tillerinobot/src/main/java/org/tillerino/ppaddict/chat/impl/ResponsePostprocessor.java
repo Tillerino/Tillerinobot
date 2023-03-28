@@ -73,7 +73,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 			message(success.getContent(), true, result);
 		} else if (response instanceof Action action) {
 			String msg = action.getContent();
-			writer.action(msg, result);
+			writer.action(msg, result.getNick());
 
 			liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
@@ -88,7 +88,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	}
 
 	private void message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
-		writer.message(msg, result);
+		writer.message(msg, result.getNick());
 		liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
 			if (success) {
