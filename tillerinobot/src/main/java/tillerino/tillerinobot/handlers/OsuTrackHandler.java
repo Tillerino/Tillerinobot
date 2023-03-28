@@ -10,6 +10,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ServerErrorException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.MDC;
@@ -62,6 +63,8 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             update = osutrackDownloader.getUpdate(userId);
         } catch (NotFoundException e) {
             throw new UserException("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/");
+        } catch (ServerErrorException e) {
+            throw new UserException("osu!track doesn't seem to be working right now. Maybe try your luck on the website: https://ameobea.me/osutrack/");
         } catch (Exception e) {
             // i/o exceptions are generally retryable
             if (ExceptionUtils.getRootCause(e) instanceof IOException) {

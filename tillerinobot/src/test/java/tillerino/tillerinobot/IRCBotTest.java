@@ -48,6 +48,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.TestModule;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
+import jakarta.ws.rs.InternalServerErrorException;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
@@ -90,6 +91,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@Inject
 	Recommender rec;
 
+	TestOsutrackDownloader osuTrackDownloader = spy(new TestOsutrackDownloader());
+
 	/**
 	 * Contains the messages and actions sent by the bot. At the end of each
 	 * test, it must be empty or the test fails.
@@ -110,7 +113,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		this.recommendationsManager = spy(recommendationsManager);
 		this.resolver = spy(this.resolver);
 		this.bot = new IRCBot(this.backend, recommendationsManager, new UserDataManager(this.backend, em, userDataRepository),
-				em, resolver, spy(new TestOsutrackDownloader()), rateLimiter,
+				em, resolver, osuTrackDownloader, rateLimiter,
 				liveActivity, queue, ppaddictUserDataService);
 	}
 
@@ -313,8 +316,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	public void testOsutrackServerError() throws Exception {
 		turnOffVersionMessage();
 		backend.hintUser("unknown", false, 125000, 1000, 1234);
+		doThrow(new InternalServerErrorException()).when(osuTrackDownloader).getUpdate(1234);
 
-		verifyResponse(bot, message("unknown", "!u"), new Message("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/"));
+		verifyResponse(bot, message("unknown", "!u"), new Message("osu!track doesn't seem to be working right now. Maybe try your luck on the website: https://ameobea.me/osutrack/"));
 	}
 
 	void turnOffVersionMessage() throws SQLException, UserException {
