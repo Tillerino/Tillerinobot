@@ -3,7 +3,6 @@ package tillerino.tillerinobot;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -17,11 +16,8 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -55,10 +51,8 @@ import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
-import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.recommendations.Recommender;
-import tillerino.tillerinobot.recommendations.TopPlay;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
 @TestModule(value = TestBackend.Module.class, mocks = { LiveActivity.class, GameChatResponseQueue.class })
@@ -107,9 +101,17 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	boolean printResponses = false;
 
+	private IRCBot bot;
+
 	@Before
 	public void initMocks() throws Exception {
 		mockQueuePrint();
+
+		this.recommendationsManager = spy(recommendationsManager);
+		this.resolver = spy(this.resolver);
+		this.bot = new IRCBot(this.backend, recommendationsManager, new UserDataManager(this.backend, em, userDataRepository),
+				em, resolver, spy(new TestOsutrackDownloader()), rateLimiter,
+				liveActivity, queue, ppaddictUserDataService);
 	}
 
 	void mockQueuePrint() throws InterruptedException {
@@ -126,29 +128,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		verifyNoMoreInteractions(queue);
 	}
 	
-	IRCBot getTestBot(BotBackend backend) {
-		RecommendationsManager recMan;
-		if (backend == this.backend) {
-			if (!Mockito.mockingDetails(this.recommendationsManager).isSpy()) {
-				this.recommendationsManager = spy(recommendationsManager);
-			}
-			recMan = this.recommendationsManager;
-		} else {
-			rec = backend instanceof TestBackend t ? spy(new TestBackend.TestRecommender(t)) : mock(Recommender.class);
-			recMan = spy(new RecommendationsManager(backend, recommendationsRepo, em,
-					new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader(), rec));
-		}
-
-		IRCBot ircBot = new IRCBot(backend, recMan, new UserDataManager(backend, em, userDataRepository),
-				em, resolver, new TestOsutrackDownloader(), rateLimiter,
-				liveActivity, queue, ppaddictUserDataService);
-		return ircBot;
-	}
-	
 	@Test
 	public void testVersionMessage() throws Exception {
-		IRCBot bot = getTestBot(backend);
-		
 		backend.hintUser("user", false, 0, 0);
 		backend.setLastVisitedVersion("user", 0);
 		
@@ -160,8 +141,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	
 	@Test
 	public void testWrongStrings() throws Exception {
-		IRCBot bot = getTestBot(backend);
-		
 		backend.hintUser("user", false, 100, 1000);
 		turnOffVersionMessage();
 
@@ -177,8 +156,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	 */
 	@Test
 	public void testNoCommand() throws Exception {
-		IRCBot bot = getTestBot(backend);
-		
 		backend.hintUser("user", false, 100, 1000);
 		turnOffVersionMessage();
 
@@ -187,38 +164,34 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testWelcomeIfDonator() throws Exception {
-		BotBackend backend = mock(BotBackend.class);
 		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
 		
 		this.backend.hintUser("TheDonator", true, 1, 1);
 		int userid = resolver.getIDByUserName("TheDonator");
 
 		OsuApiUser osuApiUser = mock(OsuApiUser.class);
-		when(osuApiUser.getUserName()).thenReturn("TheDonator");
-		when(osuApiUser.getUserId()).thenReturn(userid);
+		doReturn("TheDonator").when(osuApiUser).getUserName();
+		doReturn(userid).when(osuApiUser).getUserId();
 
-		when(backend.getUser(eq(userid), anyLong())).thenReturn(osuApiUser);
-		when(backend.getDonator(userid)).thenReturn(1);
+		doReturn(osuApiUser).when(backend).getUser(eq(userid), anyLong());
+		doReturn(1).when(backend).getDonator(userid);
 
-		IRCBot bot = getTestBot(backend);
-		
-		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 1000);
+		doReturn(System.currentTimeMillis() - 1000).when(backend).getLastActivity(any(OsuApiUser.class));
 		verifyResponse(bot, join("TheDonator"), new Message("beep boop"));
 
-		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 10 * 60 * 1000);
+		doReturn(System.currentTimeMillis() - 10 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
 		verifyResponse(bot, join("TheDonator"), new Message("Welcome back, TheDonator."));
 
-		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000);
+		doReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
 		verifyResponse(bot, join("TheDonator"), messageContaining("TheDonator, "));
 
-		when(backend.getLastActivity(any(OsuApiUser.class))).thenReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000);
+		doReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
 		verifyResponse(bot, join("TheDonator"), messageContaining("TheDonator")
 				.then(messageContaining("so long").then(messageContaining("back"))));
 	}
 
 	@Test
 	public void testHugs() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
 
 		backend.hintUser("donator", true, 0, 0);
@@ -229,7 +202,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	
 	@Test
 	public void testComplaint() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
 
 		backend.hintUser("user", false, 0, 1000);
@@ -241,7 +213,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testResetHandler() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
 
 		backend.hintUser("user", false, 0, 1000);
@@ -263,8 +234,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion("user");
 
-		IRCBot bot = getTestBot(backend);
-
 		backend.hintUser("user", false, 0, 1000);
 
 		verifyResponse(bot, message("user", "!r"), successContaining("/b/1"));
@@ -280,7 +249,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testGammaDefault() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
 		backend.hintUser("user", false, 75000, 1000);
 
@@ -303,7 +271,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
     @Test
     public void testOsutrackWithSpace() throws Exception {
-        IRCBot bot = getTestBot(backend);
         turnOffVersionMessage();
         hintOsutrackUsers();
 
@@ -312,7 +279,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testOsutrackOliebolQueryFartownik() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
 		hintOsutrackUsers();
 
@@ -321,7 +287,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testOsutrackOliebolQueryNonExistendUser() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
 		hintOsutrackUsers();
 
@@ -330,7 +295,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testOsutrackFartownik() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
         hintOsutrackUsers();
 
@@ -339,9 +303,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testOsutrackUnknown() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		turnOffVersionMessage();
 		hintOsutrackUsers();
+
+		verifyResponse(bot, message("unknown", "!u"), new Message("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/"));
+	}
+
+	@Test
+	public void testOsutrackServerError() throws Exception {
+		turnOffVersionMessage();
+		backend.hintUser("unknown", false, 125000, 1000, 1234);
 
 		verifyResponse(bot, message("unknown", "!u"), new Message("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/"));
 	}
@@ -352,19 +323,14 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testAutomaticNameChangeRemapping() throws Exception {
-		// override test backend because we need more control
-		BotBackend backend = mock(BotBackend.class);
-		resolver = new IrcNameResolver(userNameMappingRepo, backend);
-		IRCBot bot = getTestBot(backend);
-
-		when(backend.downloadUser("user1_old")).thenReturn(user(1, "user1 old"));
-		when(backend.getUser(eq(1), anyLong())).thenReturn(user(1, "user1 old"));
+		doReturn(user(1, "user1 old")).when(backend).downloadUser("user1_old");
+		doReturn(user(1, "user1 old")).when(backend).getUser(eq(1), anyLong());
 		assertEquals(1, (int) bot.getUserOrThrow("user1_old").getUserId());
 
 		// meanwhile, user 1 changed her name
-		when(backend.getUser(eq(1), anyLong())).thenReturn(user(1, "user1 new"));
+		doReturn(user(1, "user1 new")).when(backend).getUser(eq(1), anyLong());
 		// and user 2 hijacked her old name
-		when(backend.downloadUser("user1_old")).thenReturn(user(2, "user1 old"));
+		doReturn(user(2, "user1 old")).when(backend).downloadUser("user1_old");
 
 		assertEquals(2, (int) bot.getUserOrThrow("user1_old").getUserId());
 		assertEquals(1, (int) bot.getUserOrThrow("user1_new").getUserId());
@@ -372,10 +338,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testMaintenanceOnSight() throws Exception {
-		BotBackend backend = mock(BotBackend.class);
-		resolver = mock(IrcNameResolver.class);
-		when(resolver.resolveIRCName("aRareUserAppears")).thenReturn(18);
-		IRCBot bot = getTestBot(backend);
+		doReturn(18).when(resolver).resolveIRCName("aRareUserAppears");
 
 		Sighted event = new Sighted(12, "aRareUserAppears", 15);
 		bot.onEvent(event);
@@ -385,7 +348,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testNp() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		backend.hintUser("user", false, 1000, 1000);
 		turnOffVersionMessage();
 		verifyResponse(bot, action("user", "is listening to [https://osu.ppy.sh/b/125 map]"), successContaining("pp"));
@@ -393,7 +355,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	@Test
 	public void maintenance() throws Exception {
-		IRCBot bot = getTestBot(backend);
 		doThrow(MaintenanceException.class).when(rec).loadTopPlays(1);
 		backend.hintUser("user", false, 1000, 1000);
 		turnOffVersionMessage();
