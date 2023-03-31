@@ -10,7 +10,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.pircbotx.output.OutputUser;
-import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
