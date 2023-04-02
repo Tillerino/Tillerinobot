@@ -9,8 +9,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.Sighted;
-import org.tillerino.ppaddict.live.RabbitMqContainerConnection;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 
 public class MessageQueueIT {

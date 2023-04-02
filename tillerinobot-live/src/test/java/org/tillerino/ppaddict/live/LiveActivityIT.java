@@ -3,6 +3,7 @@ package org.tillerino.ppaddict.live;
 import org.junit.ClassRule;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
 
 public class LiveActivityIT extends AbstractLiveActivityEndpointTest {

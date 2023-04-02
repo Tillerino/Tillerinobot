@@ -1,4 +1,4 @@
-package tillerino.tillerinobot.testutil;
+package org.tillerino.ppaddict.util;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

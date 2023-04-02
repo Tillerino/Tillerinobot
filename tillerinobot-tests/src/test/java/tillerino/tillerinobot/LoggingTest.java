@@ -33,6 +33,7 @@ import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogEventWithMdc;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
@@ -44,7 +45,6 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import tillerino.tillerinobot.lang.Default;
-import tillerino.tillerinobot.testutil.ExecutorServiceRule;
 
 /**
  * Tests that all the logging (specifically the MDC) actually works as expected.

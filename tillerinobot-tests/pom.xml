@@ -23,6 +23,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-rabbit</artifactId>
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot</artifactId>
 			<scope>test</scope>
 		</dependency>

@@ -292,12 +292,19 @@
 			</dependency>
 			<dependency>
 				<groupId>org.tillerino.osu</groupId>
+				<artifactId>tillerinobot-live</artifactId>
+				<classifier>tests</classifier>
+				<version>0.20.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.tillerino.osu</groupId>
 				<artifactId>tillerinobot-rabbit</artifactId>
 				<version>0.20.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.tillerino.osu</groupId>
-				<artifactId>tillerinobot-live</artifactId>
+				<artifactId>tillerinobot-rabbit</artifactId>
 				<classifier>tests</classifier>
 				<version>0.20.0</version>
 				<scope>test</scope>

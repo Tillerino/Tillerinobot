@@ -14,8 +14,8 @@ import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
-import org.tillerino.ppaddict.live.RabbitMqContainer;
-import org.tillerino.ppaddict.live.RabbitMqContainerConnection;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

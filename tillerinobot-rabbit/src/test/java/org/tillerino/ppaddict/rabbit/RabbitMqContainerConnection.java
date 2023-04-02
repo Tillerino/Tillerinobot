@@ -1,7 +1,6 @@
-package org.tillerino.ppaddict.live;
+package org.tillerino.ppaddict.rabbit;
 
 import org.junit.rules.ExternalResource;
-import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 
 import com.rabbitmq.client.Connection;
 

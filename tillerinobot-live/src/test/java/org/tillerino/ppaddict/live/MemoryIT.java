@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 
 import lombok.extern.slf4j.Slf4j;
 

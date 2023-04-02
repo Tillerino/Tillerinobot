@@ -1,4 +1,4 @@
-package org.tillerino.ppaddict.live;
+package org.tillerino.ppaddict.rabbit;
 
 import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
