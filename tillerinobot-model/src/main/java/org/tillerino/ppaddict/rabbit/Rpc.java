@@ -9,10 +9,11 @@ import java.lang.annotation.Target;
 import org.tillerino.ppaddict.util.Result;
 
 /**
- * Marks a method as an RPC. This method can then be called across processes connected by RabbitMQ.
- * The annotated method must return a {@link Result} and must not throw any exceptions.
- * The RPC transmits the MDC back and forth:
- * the caller's MDC is set as the callee's MDC and the callee's MDC is added to the caller's MDC.
+ * Marks a method as an RPC. This method can then be called across processes
+ * connected by RabbitMQ. The annotated method must return a {@link Result} and
+ * must not throw any exceptions. The RPC transmits the MDC back and forth: the
+ * caller's MDC is set as the callee's MDC and the callee's MDC is added to the
+ * caller's MDC.
  *
  * See also {@link RabbitRpc}.
  */
@@ -25,8 +26,8 @@ public @interface Rpc {
 	 */
 	String queue();
 
-    /**
-     * @return milliseconds.
-     */
+	/**
+	 * @return milliseconds.
+	 */
 	int timeout();
 }
