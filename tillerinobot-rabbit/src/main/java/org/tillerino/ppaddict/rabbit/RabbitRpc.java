@@ -67,7 +67,9 @@ public class RabbitRpc {
 			RpcClient rpcClient = methodProps.rpcClient(connection);
 			String response;
 			try {
-				response = rpcClient.stringCall(methodProps.writeJsonRequest(args));
+				// when there are no args, the proxy gets null instead of an empty array :(
+				String request = methodProps.writeJsonRequest(args != null ? args : new Object[0]);
+				response = rpcClient.stringCall(request);
 			} catch (TimeoutException e) {
 				return timeoutResult;
 			}
@@ -146,7 +148,7 @@ public class RabbitRpc {
 			JsonNode argsJson = Validate.notNull(tree.get("args"), "Missing field args. Fields: %s", fieldNames);
 			Validate.isTrue(argsJson.isArray());
 			Validate.isTrue(argsJson.size() == method.argTypes.size());
-			
+
 			Object[] args = new Object[method.argTypes.size()];
 			for (int i = 0; i < args.length; i++) {
 				args[i] = objectMapper.treeToValue(argsJson.get(i), method.argTypes.get(i));
@@ -236,7 +238,7 @@ public class RabbitRpc {
 				channel.queueDeclareNoWait(config.queue(), true, false, false, args);
 			}
 
-			String writeJsonRequest(Object[] args) throws JsonProcessingException {
+			String writeJsonRequest(@NonNull Object[] args) throws JsonProcessingException {
 				ObjectNode tree = objectMapper.createObjectNode();
 				tree.put("method", method.getName());
 				tree.putPOJO("args", args);

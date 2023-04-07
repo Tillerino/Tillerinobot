@@ -196,6 +196,20 @@ public class RabbitRpcTest {
 	}
 
 	@Test
+	public void testNoArgs() throws Exception {
+		interface NoArgs {
+			@Rpc(queue = "producer", timeout = 1000)
+			Result<String, String> produceSomething();
+		}
+
+		NoArgs proxy = RabbitRpc.remoteCallProxy(rabbit.getConnection(), NoArgs.class, "Timeout");
+		RpcServer rpcServer = RabbitRpc.handleRemoteCalls(rabbit.getConnection(), NoArgs.class, () -> ok("x"), "Error");
+		exec.submit(rpcServer::mainloop);
+
+		assertThat(proxy.produceSomething()).isEqualTo(ok("x"));
+	}
+
+	@Test
 	@Ignore
 	public void sequentialThroughput() throws Exception {
 		MyRpcInterface proxy = RabbitRpc.remoteCallProxy(rabbit.getConnection(), MyRpcInterface.class, "Timeout");
