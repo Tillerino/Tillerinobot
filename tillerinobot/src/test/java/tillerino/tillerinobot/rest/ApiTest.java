@@ -3,6 +3,8 @@ package tillerino.tillerinobot.rest;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOError;
@@ -32,9 +34,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.util.Result;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogEventWithMdc;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
@@ -120,7 +124,8 @@ public class ApiTest {
 	 * API-internal object
 	 */
 	private LocalGameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
-	
+	private GameChatClientMetrics remoteMetrics = new GameChatClientMetrics();
+
 	/**
 	 * Endpoint which goes through the started HTTP API
 	 */
@@ -140,6 +145,7 @@ public class ApiTest {
 		WebTarget target = client.target("http://localhost:" + server.getPort());
 		botStatus = WebResourceFactory.newResource(BotStatus.class, target);
 		beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
+		when(injector.getInstance(GameChatClient.class).getMetrics()).thenReturn(ok(remoteMetrics));
 	}
 
 	@After
@@ -150,14 +156,14 @@ public class ApiTest {
 	@Test
 	public void testIsReceiving() throws Exception {
 		clock.advanceBy(60 * 60 * 1000); // one hour
-		botInfo.setLastReceivedMessage(60 * 60 * 1000 - 11000); // eleven seconds ago
+		remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 11000); // eleven seconds ago
 		assertThatThrownBy(() -> botStatus.isReceiving()).isInstanceOf(NotFoundException.class);
 		assertThatOurLogs().hasOnlyOneElementSatisfying(
 			mdc("apiPath", "botinfo/isReceiving")
 				.andThen(mdc("apiStatus", "404"))
 				.andThen(mdc("osuApiRateBlockedTime", "0")));
 		log.clear();
-		botInfo.setLastReceivedMessage(60 * 60 * 1000 - 10000); // ten seconds ago
+		remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 10000); // ten seconds ago
 		assertTrue(botStatus.isReceiving());
 		assertThatOurLogs().hasOnlyOneElementSatisfying(
 				mdc("apiPath", "botinfo/isReceiving")
