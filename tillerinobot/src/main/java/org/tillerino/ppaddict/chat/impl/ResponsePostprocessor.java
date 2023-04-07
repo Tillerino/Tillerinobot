@@ -22,7 +22,6 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.Result;
 import org.tillerino.ppaddict.util.Result.Err;
-import org.tillerino.ppaddict.util.RetryableException;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +55,8 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 							log.warn("Bot not connected. Retrying.");
 							Thread.sleep(retry.millis());
 							continue;
+						} else if (err.e() instanceof Error.Timeout) {
+							log.warn("Timed out while trying to send to IRC");
 						} else {
 							log.error("Unknown error while sending response");
 						}

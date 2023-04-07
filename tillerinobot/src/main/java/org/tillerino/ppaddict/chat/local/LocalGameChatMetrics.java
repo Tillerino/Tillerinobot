@@ -15,6 +15,8 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class LocalGameChatMetrics extends GameChatClientMetrics {
+	private long lastSentMessage;
+	private long lastRecommendation;
 	private long responseQueueSize;
 	private long eventQueueSize;
 

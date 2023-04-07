@@ -12,6 +12,4 @@ public class GameChatClientMetrics {
 	private long lastPingDeath;
 	private long lastInteraction;
 	private long lastReceivedMessage;
-	private long lastSentMessage;
-	private long lastRecommendation;
 }
