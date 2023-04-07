@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatClient;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
@@ -120,7 +119,7 @@ public class ApiTest {
 	/**
 	 * API-internal object
 	 */
-	private GameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
+	private LocalGameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
 	
 	/**
 	 * Endpoint which goes through the started HTTP API

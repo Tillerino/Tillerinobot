@@ -5,13 +5,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.slf4j.MDC;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.LoggingUtils;
@@ -21,13 +18,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
+@RequiredArgsConstructor
 public class Pinger {
 	volatile String pingMessage = null;
 	volatile CountDownLatch pingLatch = null;
 
-	final GameChatMetrics botInfo;
+	final GameChatClientMetrics botInfo;
 
 	final Clock clock;
 

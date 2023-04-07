@@ -1,20 +1,24 @@
 package org.tillerino.ppaddict.chat.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.tillerino.ppaddict.util.Result.err;
+import static org.tillerino.ppaddict.util.Result.ok;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
@@ -24,15 +28,15 @@ import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
+import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
-import org.tillerino.ppaddict.util.RetryableException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResponsePostprocessorTest {
-	@Mock
-	private GameChatMetrics botInfo;
+	@Spy
+	private LocalGameChatMetrics botInfo = new LocalGameChatMetrics();
 
 	@Mock
 	private Bouncer bouncer;
@@ -48,6 +52,12 @@ public class ResponsePostprocessorTest {
 
 	@InjectMocks
 	private ResponsePostprocessor responsePostprocessor;
+
+	@Before
+	public void setUp() throws Exception {
+		when(writer.action(any(), any())).thenReturn(ok(""));
+		when(writer.message(any(), any())).thenReturn(ok(""));
+	}
 
 	@Test
 	public void testAction() throws Exception {
@@ -156,9 +166,9 @@ public class ResponsePostprocessorTest {
 		int[] count = { 0 };
 		doAnswer(x -> {
 			if (count[0]++ > 0) {
-				return null;
+				return ok("");
 			}
-			throw new RetryableException(0);
+			return err(new GameChatWriter.Error.Retry(0));
 		}).when(writer).message("abc", "nick");
 		responsePostprocessor.onResponse(new Message("abc"), event);
 		verify(writer, times(2)).message("abc", "nick");
@@ -167,7 +177,7 @@ public class ResponsePostprocessorTest {
 	@Test
 	public void retryingStops() throws Exception {
 		Joined event = new Joined(1234, "nick", 0);
-		doThrow(new RetryableException(0)).when(writer).message("abc", "nick");
+		doReturn(err(new GameChatWriter.Error.Retry(0))).when(writer).message("abc", "nick");
 		responsePostprocessor.onResponse(new Message("abc"), event);
 		verify(writer, times(10)).message("abc", "nick");
 	}

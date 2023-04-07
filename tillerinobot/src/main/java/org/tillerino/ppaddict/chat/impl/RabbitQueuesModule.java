@@ -2,12 +2,13 @@ package org.tillerino.ppaddict.chat.impl;
 
 import java.io.IOException;
 
+import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.GameChatResponseQueue;
+import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.LiveActivity;
-import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
+import org.tillerino.ppaddict.rabbit.RabbitRpc;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
 import org.tillerino.ppaddict.rabbit.RemoteResponseQueue;
@@ -20,7 +21,6 @@ import com.rabbitmq.client.Connection;
 public class RabbitQueuesModule extends AbstractModule {
 	@Override
 	protected void configure() {
-		bind(GameChatMetrics.class).to(LocalGameChatMetrics.class);
 	}
 
 	@Provides
@@ -48,5 +48,17 @@ public class RabbitQueuesModule extends AbstractModule {
 		RemoteLiveActivity liveActivity = RabbitMqConfiguration.liveActivity(connection);
 		liveActivity.setup();
 		return liveActivity;
+	}
+
+	@Provides
+	GameChatWriter gameChatWriter(Connection connection) throws IOException {
+		// !!! This module doesn't automatically start the server side !!!
+		return RabbitRpc.remoteCallProxy(connection, GameChatWriter.class, new GameChatWriter.Error.Timeout());
+	}
+
+	@Provides
+	GameChatClient gameChatClient(Connection connection) throws IOException {
+		// !!! This module doesn't automatically start the server side !!!
+		return RabbitRpc.remoteCallProxy(connection, GameChatClient.class, new GameChatClient.Error.Timeout());
 	}
 }

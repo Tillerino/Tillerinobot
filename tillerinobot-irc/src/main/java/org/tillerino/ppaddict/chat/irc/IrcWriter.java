@@ -1,55 +1,66 @@
 package org.tillerino.ppaddict.chat.irc;
 
+import static org.tillerino.ppaddict.util.Result.err;
+import static org.tillerino.ppaddict.util.Result.ok;
+
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.pircbotx.output.OutputUser;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
-import org.tillerino.ppaddict.util.RetryableException;
+import org.tillerino.ppaddict.util.Result;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
+@Slf4j
+@RequiredArgsConstructor
 public class IrcWriter implements GameChatWriter {
 	private final Pinger pinger;
 
 	private final AtomicReference<CloseableBot> bot = new AtomicReference<>();
 
 	@Override
-	public void message(String msg, @IRCName String recipient) throws InterruptedException, IOException {
-		send(recipient, output -> output.message(msg));
+	public Result<String, Error> message(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+		return send(recipient, output -> output.message(msg));
 	}
 
 	@Override
-	public void action(String msg, @IRCName String recipient) throws InterruptedException, IOException {
-		send(recipient, output -> output.action(msg));
+	public Result<String, Error> action(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+		return send(recipient, output -> output.action(msg));
 	}
 
-	private void send(@IRCName String recipient, Consumer<OutputUser> sender) throws IOException, InterruptedException {
-		pinger.ping(waitForBot());
+	private Result<String, Error> send(@IRCName String recipient, Consumer<OutputUser> sender) {
 
 		try {
+			pinger.ping(waitForBot());
+
 			sender.accept(waitForBot().getUserChannelDao().getUser(recipient).send());
+			return ok("");
 		} catch (RuntimeException e) {
 			if (e.getCause() instanceof InterruptedException) {
+				Thread.currentThread().interrupt();
 				// see org.pircbotx.output.OutputRaw.rawLine(String)
-				throw (InterruptedException) e.getCause();
+				return err(new Error.Retry(10000)); // wait for reboot
 			}
 			if (e.getMessage().equals("Not connected to server") || ExceptionUtils.getRootCause(e) instanceof SocketException) {
 				// happens if the bot disconnects after waitForBot() finishes.
 				// since we wait for the connection in waitForBot(), we can retry immediately.
-				throw new RetryableException(0);
+				return err(new Error.Retry(0));
 			}
 			throw e;
+		} catch (IOException e) {
+			log.warn("Error while sending chat message", e);
+			// since we wait for the connection in waitForBot(), we can retry immediately.
+			return err(new Error.Retry(0));
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return err(new Error.Retry(10000)); // wait for reboot
 		}
 	}
 

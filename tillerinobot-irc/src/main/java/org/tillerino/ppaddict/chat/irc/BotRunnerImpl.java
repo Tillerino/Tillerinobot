@@ -1,5 +1,7 @@
 package org.tillerino.ppaddict.chat.irc;
 
+import static org.tillerino.ppaddict.util.Result.ok;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +12,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.factory.Mappers;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.Configuration.BotFactory;
@@ -26,16 +29,20 @@ import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.snapshot.UserChannelDaoSnapshot;
 import org.pircbotx.snapshot.UserSnapshot;
 import org.tillerino.ppaddict.chat.GameChatClient;
-import org.tillerino.ppaddict.util.TidyObject;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
+import org.tillerino.ppaddict.chat.GameChatEventConsumer;
+import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.util.Result;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-public class BotRunnerImpl implements GameChatClient, TidyObject {
+public class BotRunnerImpl implements GameChatClient, Runnable {
 	public static final int DEFAULT_MESSAGE_DELAY = 250;
 	@SuppressFBWarnings(value = "MS", justification = "We're modifying this in tests")
 	public static int MESSAGE_DELAY = DEFAULT_MESSAGE_DELAY;
@@ -160,15 +167,19 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 	
 	volatile CloseableBot bot = null;
 
+	@SuppressFBWarnings("EI_EXPOSE_REP2")
 	@Inject
-	public BotRunnerImpl(IrcHooks tillerinoBot,
-			@Named("tillerinobot.irc.server") String server,
+	public BotRunnerImpl(@Named("tillerinobot.irc.server") String server,
 			@Named("tillerinobot.irc.port") int port,
 			@Named("tillerinobot.irc.nickname") String nickname,
 			@Named("tillerinobot.irc.password") String password,
-			@Named("tillerinobot.irc.autojoin") String autojoinChannel) {
-		super();
-		this.listener = tillerinoBot;
+			@Named("tillerinobot.irc.autojoin") String autojoinChannel,
+			@Named("tillerinobot.ignore") boolean silent,
+			@Named("messagePreprocessor") GameChatEventConsumer downStream,
+			Clock clock) {
+		Pinger pinger = new Pinger(metrics, clock);
+		this.writer = new IrcWriter(pinger);
+		this.listener = new IrcHooks(downStream, metrics, pinger, silent, writer, clock);
 		this.server = server.split(",");
 		this.port = port;
 		this.nickname = nickname;
@@ -177,12 +188,16 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 	}
 
 	private final IrcHooks listener;
+	@Getter // we use this to hack local tests
+	private final IrcWriter writer;
 
 	private final String[] server;
 	private final int port;
 	private final String nickname;
 	private final String password;
 	private final String autojoinChannel;
+
+	private final GameChatClientMetrics metrics = new GameChatClientMetrics();
 
 	private volatile boolean reconnect = true;
 	private int reconnectTimeout = 10000;
@@ -235,8 +250,7 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 		}
 		log.info("Exiting");
 	}
-	
-	@Override
+
 	public void tidyUp(boolean fromShutdownHook) {
 		log.info("tidyUp({})", fromShutdownHook);
 		
@@ -254,12 +268,12 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 	}
 
 	@Override
-	public boolean isConnected() {
+	public Result<GameChatClientMetrics, Error> getMetrics() {
 		CloseableBot bot = this.bot;
-		return bot != null && bot.isConnected();
+		metrics.setConnected(bot != null && bot.isConnected());
+		return ok(Mapper.INSTANCE.copy(metrics));
 	}
 
-	@Override
 	public void disconnectSoftly() {
 		CloseableBot bot = this.bot;
 		if (bot != null) {
@@ -269,5 +283,12 @@ public class BotRunnerImpl implements GameChatClient, TidyObject {
 
 	public void stopReconnecting() {
 		reconnect = false;
+	}
+
+	@org.mapstruct.Mapper
+	public interface Mapper {
+		public static final Mapper INSTANCE = Mappers.getMapper(Mapper.class);
+
+		GameChatClientMetrics copy(GameChatClientMetrics m);
 	}
 }

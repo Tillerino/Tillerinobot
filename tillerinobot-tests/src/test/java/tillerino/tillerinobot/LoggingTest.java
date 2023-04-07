@@ -7,8 +7,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOException;
@@ -89,8 +91,9 @@ public class LoggingTest {
 
 		doAnswer(x -> {
 			MDC.put("ping", "14");
-			return null;
+			return ok("");
 		}).when(out).message(anyString(), any());
+		doReturn(ok("")).when(out).action(any(), any());
 	}
 
 	@After

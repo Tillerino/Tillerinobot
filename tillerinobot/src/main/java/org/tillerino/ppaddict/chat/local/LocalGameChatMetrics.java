@@ -2,27 +2,28 @@ package org.tillerino.ppaddict.chat.local;
 
 import javax.inject.Singleton;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import org.tillerino.ppaddict.chat.GameChatMetrics;
-
-@Data
-@NoArgsConstructor
-@Builder(toBuilder = true) // so we can copy
-@AllArgsConstructor(access = AccessLevel.PRIVATE) // for the builder
 @Singleton
-public class LocalGameChatMetrics implements GameChatMetrics {
-	private boolean isConnected;
-	private long runningSince;
-	private long lastPingDeath;
-	private long lastInteraction;
-	private long lastReceivedMessage;
-	private long lastSentMessage;
-	private long lastRecommendation;
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class LocalGameChatMetrics extends GameChatClientMetrics {
 	private long responseQueueSize;
 	private long eventQueueSize;
+
+	@org.mapstruct.Mapper
+	public interface Mapper {
+		static final Mapper INSTANCE = Mappers.getMapper(Mapper.class);
+
+		void loadFromBot(GameChatClientMetrics source, @MappingTarget GameChatClientMetrics target);
+
+		LocalGameChatMetrics copy(LocalGameChatMetrics l);
+	}
 }

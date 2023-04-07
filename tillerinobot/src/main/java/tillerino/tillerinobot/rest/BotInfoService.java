@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import jakarta.ws.rs.NotFoundException;
 
 import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 
@@ -22,8 +23,13 @@ public class BotInfoService implements BotStatus {
 
 	@Override
 	public LocalGameChatMetrics botinfo() {
-		botInfo.setConnected(bot.isConnected());
-		return botInfo.toBuilder().build(); // make a copy
+		GameChatClientMetrics botMetrics = bot.getMetrics().unwrapOrElse(__ -> {
+			GameChatClientMetrics metrics = new GameChatClientMetrics();
+			metrics.setLastInteraction(-1); // as a marker
+			return metrics;
+		});
+		LocalGameChatMetrics.Mapper.INSTANCE.loadFromBot(botMetrics, botInfo);
+		return LocalGameChatMetrics.Mapper.INSTANCE.copy(botInfo);
 	}
 
 	/*

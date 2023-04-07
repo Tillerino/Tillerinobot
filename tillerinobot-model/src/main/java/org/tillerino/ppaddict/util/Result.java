@@ -1,6 +1,8 @@
 package org.tillerino.ppaddict.util;
 
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -47,6 +49,27 @@ public sealed interface Result<T, E> {
 			return Optional.of(err.e);
 		}
 		return Optional.empty();
+	}
+
+	default Result<T, E> inspect(Consumer<T> f) {
+		if (this instanceof Ok<T, E> ok) {
+			f.accept(ok.t);
+		}
+		return this;
+	}
+
+	default T unwrapOrElse(Function<E, T> op) {
+		if (this instanceof Ok<T, E> ok) {
+			return ok.t;
+		}
+		else return op.apply(((Err<T, E>) this).e);
+	}
+
+	default <U> Result<U, E> map(Function<T, U> op) {
+		if (this instanceof Ok<T, E> ok) {
+			return ok(op.apply(ok.t));
+		}
+		else return (Result<U, E>) this;
 	}
 
 	@JsonValue

@@ -5,9 +5,6 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.pircbotx.User;
 import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.Event;
@@ -22,8 +19,8 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.types.MillisSinceEpoch;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.IRCName;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
@@ -46,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IrcHooks extends CoreHooks {
 	private final GameChatEventConsumer downStream;
-	private final GameChatMetrics botInfo;
+	private final GameChatClientMetrics botInfo;
 	private final IrcWriter queue;
 	private final boolean silent;
 	private final Pinger pinger;
@@ -56,12 +53,11 @@ public class IrcHooks extends CoreHooks {
 
 	private final Queue<ServerResponseEvent> userListEvents = new LinkedList<>();
 
-	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
-	@Inject
-	public IrcHooks(@Named("messagePreprocessor") GameChatEventConsumer downStream,
-			GameChatMetrics botInfo,
+	@SuppressFBWarnings(value = "EI_EXPOSE_REP2")
+	public IrcHooks(GameChatEventConsumer downStream,
+			GameChatClientMetrics botInfo,
 			Pinger pinger,
-			@Named("tillerinobot.ignore") boolean silent,
+			boolean silent,
 			IrcWriter queue,
 			Clock clock) {
 		this.downStream = downStream;

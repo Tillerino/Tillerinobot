@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.tillerino.ppaddict.util.Result.ok;
 
 import java.net.URI;
 import java.util.Scanner;
@@ -15,16 +16,17 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import jakarta.ws.rs.core.UriBuilder;
 
+import org.apache.commons.lang3.exception.ContextedRuntimeException;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
@@ -39,6 +41,7 @@ import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
+import org.tillerino.ppaddict.util.Result;
 import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 
@@ -50,6 +53,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.sun.net.httpserver.HttpServer;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
@@ -89,6 +93,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(1);
 		install(new MessageHandlerSchedulerModule());
 		bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
+		bind(GameChatClient.class).to(ConsoleRunner.class);
 	}
 
 	protected void installMore() {
@@ -123,121 +128,13 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		GameChatWriter writer = mock(GameChatWriter.class);
 		doAnswer(invocation -> {
 			System.out.println("*Tillerino " + invocation.getArguments()[0]);
-			return null;
+			return ok("");
 		}).when(writer).action(anyString(), any());
 		doAnswer(invocation -> {
 			System.out.println("Tillerino: " + invocation.getArguments()[0]);
-			return null;
+			return ok("");
 		}).when(writer).message(anyString(), any());
 		return writer;
-	}
-
-	@Provides
-	@Singleton
-	public GameChatClient getRunner(@Named("messagePreprocessor") GameChatEventConsumer preprocessor,
-			final BotBackend backend, final IrcNameResolver resolver, ThreadLocalAutoCommittingEntityManager em) throws Exception {
-
-		final AtomicBoolean running = new AtomicBoolean(true);
-
-		
-		GameChatClient runner = mock(GameChatClient.class);
-		doAnswer(new Answer<Void>() {
-			String username;
-
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				log.info("Starting Tillerinobot");
-
-				try (Scanner scanner = new Scanner(System.in)) {
-					while (running.get()) {
-						if (!userLoop(scanner)) {
-							break;
-						}
-					}
-					return null;
-				}
-			}
-
-			/**
-			 * @return true for a user change; false to shut down
-			 */
-			private boolean userLoop(Scanner scanner) throws Exception {
-				System.out.println("please provide your name:");
-				username = scanner.nextLine();
-
-				try(ResetEntityManagerCloseable cl = em.withNewEntityManager()) {
-					if (resolver.resolveIRCName(username) == null
-							&& backend instanceof TestBackend testBackend) {
-						System.out.println("you're new. I'll have to ask you a couple of questions.");
-	
-						System.out.println("are you a donator? (anything for yes)");
-						final boolean donator = scanner.nextLine().length() > 0;
-	
-						System.out.println("what's your rank?");
-						final int rank = Integer.parseInt(scanner.nextLine());
-	
-						System.out.println("how much pp do you have?");
-						final double pp = Double.parseDouble(scanner.nextLine());
-	
-						testBackend.hintUser(username, donator, rank, pp);
-						resolver.resolveManually(backend.downloadUser(username).getUserId());
-					}
-				}
-
-				System.out.println("Welcome to the Tillerinobot simulator");
-				System.out.println("To quit, send /q");
-				System.out.println("To change users, send /r");
-				System.out.println("To fake an /np command, type /np <beatmapid>");
-				System.out.println("Use /nps to send the np with an https url instead of an http url");
-				System.out.println("-----------------");
-
-				{
-					dispatch(new Joined(System.currentTimeMillis(), username, System.currentTimeMillis()));
-				}
-
-				return inputLoop(scanner);
-			}
-
-			/**
-			 * @return true for a user change; false to shut down
-			 */
-			private boolean inputLoop(Scanner scanner) throws Exception {
-				while (running.get()) {
-					String line = scanner.nextLine();
-					
-					if(line.startsWith("/np ")) {
-						dispatch(new PrivateAction(System.currentTimeMillis(), username, System.currentTimeMillis(), "is listening to [http://osu.ppy.sh/b/" + line.substring(4) + " title]"));
-					} else if(line.startsWith("/nps ")) {
-						dispatch(new PrivateAction(System.currentTimeMillis(), username, System.currentTimeMillis(), "is listening to [https://osu.ppy.sh/b/" + line.substring(4) + " title]"));
-					} else if(line.startsWith("/q")) {
-						runner.disconnectSoftly();
-					} else if(line.startsWith("/r")) {
-						return true;
-					} else {
-						dispatch(new PrivateMessage(System.currentTimeMillis(), username, System.currentTimeMillis(), line));
-					}
-				}
-				return false;
-			}
-
-			ExecutorService exec = singleThreadExecutor("bot event loop");
-
-			void dispatch(GameChatEvent event) {
-				exec.submit(() -> {
-					try {
-						preprocessor.onEvent(event);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				});
-			}
-		}).when(runner).run();
-		doAnswer(x -> {
-			running.set(false);
-			return null;
-		}).when(runner).disconnectSoftly();
-		doAnswer(x -> running.get()).when(runner).isConnected();
-		return runner;
 	}
 
 	static ExecutorService singleThreadExecutor(String name) {
@@ -263,8 +160,117 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 
 		singleThreadExecutor("event queue").submit(injector.getInstance(LocalGameChatEventQueue.class));
 		singleThreadExecutor("response queue").submit(injector.getInstance(LocalGameChatResponseQueue.class));
-		injector.getInstance(GameChatClient.class).run();
+		injector.getInstance(ConsoleRunner.class).run();
 
 		apiServer.stop(1);
+	}
+
+	@Singleton
+	@RequiredArgsConstructor(onConstructor = @__(@Inject))
+	static class ConsoleRunner implements GameChatClient, Runnable {
+		final @Named("messagePreprocessor") GameChatEventConsumer preprocessor;
+		final BotBackend backend;
+		final IrcNameResolver resolver;
+		final ThreadLocalAutoCommittingEntityManager em;
+
+		final AtomicBoolean running = new AtomicBoolean(true);
+		String username;
+
+		@Override
+		public void run() {
+			log.info("Starting Tillerinobot");
+
+			try (Scanner scanner = new Scanner(System.in)) {
+				while (running.get()) {
+					try {
+						if (!userLoop(scanner)) {
+							break;
+						}
+					} catch (Exception e) {
+						throw new ContextedRuntimeException(e);
+					}
+				}
+			}
+		}
+
+		/**
+		 * @return true for a user change; false to shut down
+		 */
+		private boolean userLoop(Scanner scanner) throws Exception {
+			System.out.println("please provide your name:");
+			username = scanner.nextLine();
+
+			try(ResetEntityManagerCloseable cl = em.withNewEntityManager()) {
+				if (resolver.resolveIRCName(username) == null
+						&& backend instanceof TestBackend testBackend) {
+					System.out.println("you're new. I'll have to ask you a couple of questions.");
+
+					System.out.println("are you a donator? (anything for yes)");
+					final boolean donator = scanner.nextLine().length() > 0;
+
+					System.out.println("what's your rank?");
+					final int rank = Integer.parseInt(scanner.nextLine());
+
+					System.out.println("how much pp do you have?");
+					final double pp = Double.parseDouble(scanner.nextLine());
+
+					testBackend.hintUser(username, donator, rank, pp);
+					resolver.resolveManually(backend.downloadUser(username).getUserId());
+				}
+			}
+
+			System.out.println("Welcome to the Tillerinobot simulator");
+			System.out.println("To quit, send /q");
+			System.out.println("To change users, send /r");
+			System.out.println("To fake an /np command, type /np <beatmapid>");
+			System.out.println("Use /nps to send the np with an https url instead of an http url");
+			System.out.println("-----------------");
+
+			{
+				dispatch(new Joined(System.currentTimeMillis(), username, System.currentTimeMillis()));
+			}
+
+			return inputLoop(scanner);
+		}
+
+		/**
+		 * @return true for a user change; false to shut down
+		 */
+		private boolean inputLoop(Scanner scanner) throws Exception {
+			while (running.get()) {
+				String line = scanner.nextLine();
+				
+				if(line.startsWith("/np ")) {
+					dispatch(new PrivateAction(System.currentTimeMillis(), username, System.currentTimeMillis(), "is listening to [http://osu.ppy.sh/b/" + line.substring(4) + " title]"));
+				} else if(line.startsWith("/nps ")) {
+					dispatch(new PrivateAction(System.currentTimeMillis(), username, System.currentTimeMillis(), "is listening to [https://osu.ppy.sh/b/" + line.substring(4) + " title]"));
+				} else if(line.startsWith("/q")) {
+					running.set(false);
+				} else if(line.startsWith("/r")) {
+					return true;
+				} else {
+					dispatch(new PrivateMessage(System.currentTimeMillis(), username, System.currentTimeMillis(), line));
+				}
+			}
+			return false;
+		}
+
+		ExecutorService exec = singleThreadExecutor("bot event loop");
+
+		void dispatch(GameChatEvent event) {
+			exec.submit(() -> {
+				try {
+					preprocessor.onEvent(event);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			});
+		}
+
+
+		@Override
+		public Result<GameChatClientMetrics, Error> getMetrics() {
+			return ok(new GameChatClientMetrics());
+		}
 	}
 }

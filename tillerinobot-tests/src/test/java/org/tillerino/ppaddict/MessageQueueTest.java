@@ -13,7 +13,7 @@ import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 
-public class MessageQueueIT {
+public class MessageQueueTest {
 	@ClassRule
 	public static final RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection();
 

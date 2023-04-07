@@ -35,8 +35,8 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
 import org.pircbotx.output.OutputRaw;
 import org.slf4j.MDC;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
-import org.tillerino.ppaddict.chat.GameChatMetrics;
 import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
@@ -52,8 +52,7 @@ public class IrcHooksTest {
 	@Mock
 	GameChatEventQueue eventHandler;
 
-	@Mock
-	GameChatMetrics botInfo;
+	GameChatClientMetrics botInfo = new GameChatClientMetrics();
 
 	@Mock
 	Pinger pinger;
@@ -99,7 +98,7 @@ public class IrcHooksTest {
 	@Test
 	public void testConnect() throws Exception {
 		irc.onEvent(mockEvent(ConnectEvent.class));
-		verify(botInfo).setRunningSince(123);
+		assertThat(botInfo.getRunningSince()).isEqualTo(123);
 		verify(queue).setBot(bot);
 	}
 
@@ -120,8 +119,8 @@ public class IrcHooksTest {
 	@Test
 	public void testMessage() throws Exception {
 		irc.onEvent(mockEvent(MessageEvent.class));
-		verify(botInfo).setLastInteraction(123);
-		verify(botInfo).setLastReceivedMessage(123);
+		assertThat(botInfo.getLastInteraction()).isEqualTo(123);
+		assertThat(botInfo.getLastReceivedMessage()).isEqualTo(123);
 		// plain (non-private) messages are not handled
 		verifyNoInteractions(eventHandler);
 	}
@@ -129,7 +128,7 @@ public class IrcHooksTest {
 	@Test
 	public void testPrivateMessage() throws Exception {
 		irc.onEvent(mockPrivateMessage("pm"));
-		verify(botInfo).setLastReceivedMessage(123);
+		assertThat(botInfo.getLastReceivedMessage()).isEqualTo(123);
 		verify(eventHandler).onEvent(new PrivateMessage(12_300, "userNick", 123, "pm"));
 
 		// check if the event ID increments
@@ -140,7 +139,7 @@ public class IrcHooksTest {
 	@Test
 	public void testPrivateAction() throws Exception {
 		irc.onEvent(mockPrivateAction("pa"));
-		verify(botInfo).setLastReceivedMessage(123);
+		assertThat(botInfo.getLastReceivedMessage()).isEqualTo(123);
 		verify(eventHandler).onEvent(new PrivateAction(12_300, "userNick", 123, "pa"));
 
 		// check if the event ID increments
