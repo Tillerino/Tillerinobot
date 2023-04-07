@@ -48,6 +48,7 @@ import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
+import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
@@ -86,6 +87,8 @@ import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.TillerinobotConfigurationModule;
 import tillerino.tillerinobot.recommendations.Recommender;
+import tillerino.tillerinobot.rest.BotInfoService;
+import tillerino.tillerinobot.rest.BotStatus;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
@@ -190,6 +193,7 @@ public class FullBotTest {
 					return dataSource;
 				}
 			});
+			bind(BotStatus.class).to(BotInfoService.class);
 		}
 	}
 
@@ -238,6 +242,8 @@ public class FullBotTest {
 
 	protected BotRunnerImpl botRunner;
 
+	private BotStatus botInfoApi;
+
 	@BeforeClass
 	public static void setMessageDelay() {
 		BotRunnerImpl.MESSAGE_DELAY = 1;
@@ -267,6 +273,9 @@ public class FullBotTest {
 		}
 		exec.submit(RabbitRpc.handleRemoteCalls(rabbit.getConnection(), GameChatWriter.class, botRunner.getWriter(),
 				new GameChatWriter.Error.Unknown())::mainloop);
+		exec.submit(RabbitRpc.handleRemoteCalls(rabbit.getConnection(), GameChatClient.class, botRunner,
+				new GameChatClient.Error.Unknown())::mainloop);
+		botInfoApi = injector.getInstance(BotStatus.class);
 		await().until(() -> botRunner.getMetrics().ok().get().getLastInteraction() > 0);
 	}
 
@@ -323,6 +332,10 @@ public class FullBotTest {
 
 		logRule.assertThat()
 				.anySatisfy(event -> assertThat(event.getContextData().toMap()).containsEntry("handler", "r"));
+
+		assertThat(botInfoApi.isReceiving()).isTrue();
+		assertThat(botInfoApi.isSending()).isTrue();
+		assertThat(botInfoApi.isRecommending()).isTrue();
 
 		log.info("Received {} recommendations. Quitting.", recommendationCount.get());
 	}

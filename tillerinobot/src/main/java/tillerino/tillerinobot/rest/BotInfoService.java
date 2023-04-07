@@ -38,7 +38,8 @@ public class BotInfoService implements BotStatus {
 	 */
 	@Override
 	public boolean isReceiving() {
-		if (botInfo.getLastReceivedMessage() < clock.currentTimeMillis() - 10000) {
+		// set remotely, so we need to call botinfo()
+		if (botinfo().getLastReceivedMessage() < clock.currentTimeMillis() - 10000) {
 			throw new NotFoundException();
 		}
 		return true;
@@ -46,6 +47,7 @@ public class BotInfoService implements BotStatus {
 
 	@Override
 	public boolean isSending() {
+		// set locally
 		if (botInfo.getLastSentMessage() < clock.currentTimeMillis() - 60000) {
 			throw new NotFoundException();
 		}
@@ -54,6 +56,7 @@ public class BotInfoService implements BotStatus {
 
 	@Override
 	public boolean isRecommending() {
+		// set locally
 		if (botInfo.getLastRecommendation() < clock.currentTimeMillis() - 60000) {
 			throw new NotFoundException();
 		}
