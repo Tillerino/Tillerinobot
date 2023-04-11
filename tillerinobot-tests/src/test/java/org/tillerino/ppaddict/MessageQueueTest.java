@@ -15,7 +15,7 @@ import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 
 public class MessageQueueTest {
 	@ClassRule
-	public static final RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection();
+	public static final RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
 
 	/**
 	 * The largest burst of messages is when the bot gets an overview of all online players.

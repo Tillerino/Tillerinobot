@@ -225,7 +225,7 @@ public class FullBotTest {
 
 	public final ExecutorServiceRule exec = new ExecutorServiceRule(() -> new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			1L, TimeUnit.SECONDS, new SynchronousQueue<>(), r -> new Thread(r, "aux")));
-	public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection();
+	public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(exec);
 	@Rule
 	public RuleChain chain = RuleChain.outerRule(exec).around(rabbit);
 

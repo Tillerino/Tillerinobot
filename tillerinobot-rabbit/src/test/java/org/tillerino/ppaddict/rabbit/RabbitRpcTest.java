@@ -2,7 +2,6 @@ package org.tillerino.ppaddict.rabbit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -28,7 +27,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.RpcServer;
 
 public class RabbitRpcTest {
-	public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection();
+	public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
 
 	public ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newCachedThreadPool);
 

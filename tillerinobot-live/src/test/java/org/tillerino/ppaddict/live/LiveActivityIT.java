@@ -9,7 +9,7 @@ import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
 public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 
 	@ClassRule
-	public static RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection();
+	public static RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
 
 	private RemoteLiveActivity push;
 
