@@ -54,6 +54,7 @@ import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSc
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl;
+import org.tillerino.ppaddict.chat.irc.NgircdContainer;
 import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
@@ -105,7 +106,7 @@ public class FullBotTest {
 		private boolean connected = false;
 
 		private Client(int botNumber) {
-			Builder<PircBotX> configurationBuilder = new Builder<>().setServer(NGIRCD.getHost(), NGIRCD.getMappedPort(6667))
+			Builder<PircBotX> configurationBuilder = new Builder<>().setServer(NgircdContainer.NGIRCD.getHost(), NgircdContainer.NGIRCD.getMappedPort(6667))
 					.setName("user" + botNumber).setEncoding(StandardCharsets.UTF_8).setAutoReconnect(false)
 					.setMessageDelay(50).setListenerManager(new ThreadedListenerManager<>(exec))
 					.addListener(new CoreHooks() {
@@ -199,18 +200,11 @@ public class FullBotTest {
 
 	private static final MySQLContainer MYSQL = new MySQLContainer<>();
 
-	private static final GenericContainer NGIRCD = new GenericContainer<>("linuxserver/ngircd:60428df3-ls19")
-			.withClasspathResourceMapping("/irc/ngircd.conf", "/config/ngircd.conf", BindMode.READ_ONLY)
-			.withClasspathResourceMapping("/irc/ngircd.motd", "/etc/ngircd/ngircd.motd", BindMode.READ_ONLY)
-			.withExposedPorts(6667);
-
 	static {
 		// these take a little longer to start, so we'll do that async
-		ForkJoinTask<?> ngircd = ForkJoinTask.adapt((Runnable) NGIRCD::start).fork();
 		ForkJoinTask<?> mysql = ForkJoinTask.adapt((Runnable) MYSQL::start).fork();
 		RabbitMqContainer.getRabbitMq(); // make sure it's started
 		getLive();
-		ngircd.join();
 		mysql.join();
 	}
 
@@ -256,7 +250,7 @@ public class FullBotTest {
 
 	@Before
 	public void startBot() throws Exception {
-		Injector injector = Guice.createInjector(new FullBotConfiguration(NGIRCD.getHost(), NGIRCD.getMappedPort(6667)));
+		Injector injector = Guice.createInjector(new FullBotConfiguration(NgircdContainer.NGIRCD.getHost(), NgircdContainer.NGIRCD.getMappedPort(6667)));
 
 		coreWorkerPool = injector.getInstance(Key.get(ThreadPoolExecutor.class, Names.named("core")));
 		webSocketClient.start();
