@@ -378,6 +378,11 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<!-- This overwrites pircbotx' version -->
@@ -492,18 +497,6 @@
 				<artifactId>mockserver-client-java</artifactId>
 				<version>${mockserver.version}</version>
 				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>com.github.tillerino.twirc</groupId>
-				<artifactId>twirc-server</artifactId>
-				<version>0.0.1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.checkerframework</groupId>
-						<artifactId>jdk8</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 
 			<dependency>
