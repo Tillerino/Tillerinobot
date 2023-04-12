@@ -7,9 +7,10 @@ import java.io.File;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
 
 public class IrcContainer {
-	private static final GenericContainer TILLERINOBOT_IRC = new GenericContainer<>(new ImageFromDockerfile()
+	public static final GenericContainer TILLERINOBOT_IRC = new GenericContainer<>(new ImageFromDockerfile()
 			.withFileFromFile("Dockerfile", new File("../tillerinobot-irc/Dockerfile"))
 			.withFileFromFile("target", new File("../tillerinobot-irc/target")))
 		// we set a fixed container name to make it more debuggable
@@ -17,9 +18,17 @@ public class IrcContainer {
 		.withNetwork(NETWORK)
 		.withExposedPorts(8080)
 		.waitingFor(new HttpWaitStrategy().forPort(8080).forPath("/ready"))
+		.withEnv("TILLERINOBOT_IRC_SERVER", "irc")
+		.withEnv("TILLERINOBOT_IRC_PORT", "6667")
+		.withEnv("TILLERINOBOT_IRC_NICKNAME", "tillerinobot")
+		.withEnv("TILLERINOBOT_IRC_PASSWORD", "")
+		.withEnv("TILLERINOBOT_IRC_AUTOJOIN", "#osu")
+		.withEnv("TILLERINOBOT_IGNORE", "false")
 		.withLogConsumer(frame -> System.out.println("IRC: " + frame.getUtf8String().trim()));
 
 	static {
+		NgircdContainer.NGIRCD.start();
+		RabbitMqContainer.getRabbitMq().start();
 		TILLERINOBOT_IRC.start();
 	}
 }

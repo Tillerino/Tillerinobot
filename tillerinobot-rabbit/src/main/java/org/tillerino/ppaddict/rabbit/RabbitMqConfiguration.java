@@ -21,7 +21,13 @@ public class RabbitMqConfiguration {
 		return new ObjectMapper().registerModule(new ParameterNamesModule());
 	}
 
-	public static RemoteEventQueue eventQueue(Connection connection) throws IOException {
+	public static RemoteEventQueue externalEventQueue(Connection connection) throws IOException {
+		Channel channel = connection.createChannel();
+		channel.basicQos(100); // completely uninformed value. adjust as needed.
+		return new RemoteEventQueue(mapper(), channel, "", "irc-reader");
+	}
+
+	public static RemoteEventQueue internalEventQueue(Connection connection) throws IOException {
 		Channel channel = connection.createChannel();
 		channel.basicQos(100); // completely uninformed value. adjust as needed.
 		return new RemoteEventQueue(mapper(), channel, "", "game-chat-events");

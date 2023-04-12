@@ -30,9 +30,7 @@ import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -45,21 +43,19 @@ import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
-import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
-import org.tillerino.ppaddict.chat.GameChatClient;
-import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
+import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
-import org.tillerino.ppaddict.chat.irc.BotRunnerImpl;
+import org.tillerino.ppaddict.chat.irc.IrcContainer;
 import org.tillerino.ppaddict.chat.irc.NgircdContainer;
 import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
+import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
-import org.tillerino.ppaddict.rabbit.RabbitRpc;
+import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
@@ -234,19 +230,7 @@ public class FullBotTest {
 	protected int users = 2;
 	protected int recommendationsPerUser = 10;
 
-	protected BotRunnerImpl botRunner;
-
 	private BotStatus botInfoApi;
-
-	@BeforeClass
-	public static void setMessageDelay() {
-		BotRunnerImpl.MESSAGE_DELAY = 1;
-	}
-
-	@AfterClass
-	public static void resetMessageDelay() {
-		BotRunnerImpl.MESSAGE_DELAY = BotRunnerImpl.DEFAULT_MESSAGE_DELAY;
-	}
 
 	@Before
 	public void startBot() throws Exception {
@@ -260,26 +244,19 @@ public class FullBotTest {
 		connect.get(10, TimeUnit.SECONDS);
 
 		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
-		botRunner = injector.getInstance(BotRunnerImpl.class);
-		started.add(exec.submit(botRunner));
 		for (int botNumber = 0; botNumber < users; botNumber++) {
 			backend.hintUser("user" + botNumber, false, 12, 1000);
 		}
-		exec.submit(RabbitRpc.handleRemoteCalls(rabbit.getConnection(), GameChatWriter.class, botRunner.getWriter(),
-				new GameChatWriter.Error.Unknown())::mainloop);
-		exec.submit(RabbitRpc.handleRemoteCalls(rabbit.getConnection(), GameChatClient.class, botRunner,
-				new GameChatClient.Error.Unknown())::mainloop);
 		botInfoApi = injector.getInstance(BotStatus.class);
-		await().until(() -> botRunner.getMetrics().ok().get().getLastInteraction() > 0);
+		RemoteEventQueue externalEventQueue = RabbitMqConfiguration.externalEventQueue(rabbit.getConnection());
+		externalEventQueue.setup();
+		externalEventQueue.subscribe(injector.getInstance(MessagePreprocessor.class)::onEvent);
+		IrcContainer.TILLERINOBOT_IRC.start();
 	}
 
 	@After
 	public void stopBot() throws Exception {
 		started.forEach(fut -> fut.cancel(true));
-		if (botRunner != null) {
-			botRunner.stopReconnecting();
-			botRunner.disconnectSoftly();
-		}
 		if (coreWorkerPool != null) {
 			coreWorkerPool.shutdownNow();
 		}

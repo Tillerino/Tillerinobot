@@ -21,6 +21,10 @@
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-rabbit</artifactId>
+		</dependency>
 
 		<!-- Specific dependencies -->
 		<dependency>
@@ -47,8 +51,18 @@
 			<classifier>tests</classifier>
 		</dependency>
 		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-rabbit</artifactId>
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>rabbitmq</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

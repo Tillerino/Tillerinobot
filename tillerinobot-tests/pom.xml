@@ -39,11 +39,6 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-irc</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.tillerino.osu</groupId>
-			<artifactId>tillerinobot-irc</artifactId>
 			<classifier>tests</classifier>
 		</dependency>
 		<dependency>

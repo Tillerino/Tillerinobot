@@ -24,8 +24,8 @@ public class RabbitQueuesModule extends AbstractModule {
 	}
 
 	@Provides
-	GameChatEventQueue remoteQueue(Connection connection, MessageHandlerScheduler scheduler) throws IOException {
-		RemoteEventQueue queue = RabbitMqConfiguration.eventQueue(connection);
+	GameChatEventQueue internalEventQueue(Connection connection, MessageHandlerScheduler scheduler) throws IOException {
+		RemoteEventQueue queue = RabbitMqConfiguration.internalEventQueue(connection);
 		queue.setup();
 		queue.subscribe(scheduler::onEvent);
 		return queue;

@@ -312,11 +312,6 @@
 			<dependency>
 				<groupId>org.tillerino.osu</groupId>
 				<artifactId>tillerinobot-irc</artifactId>
-				<version>0.20.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.tillerino.osu</groupId>
-				<artifactId>tillerinobot-irc</artifactId>
 				<classifier>tests</classifier>
 				<version>0.20.0</version>
 				<scope>test</scope>

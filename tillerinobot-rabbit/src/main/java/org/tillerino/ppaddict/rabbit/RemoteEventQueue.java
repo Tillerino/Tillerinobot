@@ -10,6 +10,11 @@ import com.rabbitmq.client.Channel;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * This is used twice:
+ * - to get events from the IRC module to the main module (queue "irc-reader")
+ * - to queue events internally (queue "game-chat-events")
+ */
 @Slf4j
 public class RemoteEventQueue extends AbstractRemoteQueue<GameChatEvent> implements GameChatEventQueue {
 
@@ -19,7 +24,9 @@ public class RemoteEventQueue extends AbstractRemoteQueue<GameChatEvent> impleme
 
 	@Override
 	public void onEvent(GameChatEvent event) {
-		event.getMeta().setMdc(MdcUtils.getSnapshot());
+		if (event.getMeta().getMdc() == null) {
+			event.getMeta().setMdc(MdcUtils.getSnapshot());
+		}
 		int priority = 1;
 		if (event.isInteractive()) {
 			priority = 3;

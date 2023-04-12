@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RabbitMqContainer {
-	private static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer()
+	public static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer()
 			.withNetwork(NETWORK)
 			.withNetworkAliases("rabbitmq");
 

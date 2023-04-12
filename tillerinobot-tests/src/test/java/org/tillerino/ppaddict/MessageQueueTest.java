@@ -23,7 +23,7 @@ public class MessageQueueTest {
 	 */
 	@Test
 	public void speed() throws Exception {
-		RemoteEventQueue eventQueue = RabbitMqConfiguration.eventQueue(rabbit.getConnection());
+		RemoteEventQueue eventQueue = RabbitMqConfiguration.internalEventQueue(rabbit.getConnection());
 		eventQueue.setup();
 
 		AtomicInteger received = new AtomicInteger();
