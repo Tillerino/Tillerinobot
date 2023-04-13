@@ -34,7 +34,6 @@ import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.LoggingUtils;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
-import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
@@ -78,14 +77,13 @@ public class IRCBot implements GameChatEventConsumer {
 	private final RateLimiter rateLimiter;
 	private final GameChatResponseQueue queue;
 	private final NPHandler npHandler;
-	private final AbstractPpaddictUserDataService<?> ppaddictUserDataService;
 
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
 			UserDataManager userDataManager, ThreadLocalAutoCommittingEntityManager em,
 			IrcNameResolver resolver, OsutrackDownloader osutrackDownloader, RateLimiter rateLimiter,
-			LiveActivity liveActivity, GameChatResponseQueue queue, AbstractPpaddictUserDataService<?> ppaddictUserDataService) {
+			LiveActivity liveActivity, GameChatResponseQueue queue) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;
 		this.em = em;
@@ -94,7 +92,6 @@ public class IRCBot implements GameChatEventConsumer {
 		this.rateLimiter = rateLimiter;
 		this.queue = queue;
 		this.npHandler = new NPHandler(backend, liveActivity);
-		this.ppaddictUserDataService = ppaddictUserDataService;
 
 		commandHandlers.add(new ResetHandler(manager));
 		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
@@ -235,7 +232,7 @@ public class IRCBot implements GameChatEventConsumer {
 						}
 
 						{
-							GameChatResponse linkResponse = new LinkPpaddictHandler(backend, ppaddictUserDataService)
+							GameChatResponse linkResponse = new LinkPpaddictHandler(backend)
 									.handle(message.getMessage(), apiUser, userData, lang);
 							if (linkResponse != null) {
 								return linkResponse;

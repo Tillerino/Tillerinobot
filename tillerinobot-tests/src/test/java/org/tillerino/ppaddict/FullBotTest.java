@@ -61,14 +61,11 @@ import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
-import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
-import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import com.rabbitmq.client.Connection;
@@ -176,8 +173,6 @@ public class FullBotTest {
 			install(new MessageHandlerSchedulerModule());
 			bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(4);
 			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
-			bind(new TypeLiteral<AbstractPpaddictUserDataService<?>>() {
-			}).to(BarePpaddictUserDataService.class);
 			bind(Connection.class).toInstance(rabbit.getConnection());
 			install(new RabbitQueuesModule());
 			install(new CreateInMemoryDatabaseModule() {

@@ -46,7 +46,6 @@ import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.TestModule;
-import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import jakarta.ws.rs.InternalServerErrorException;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
@@ -100,8 +99,6 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@Inject
 	GameChatResponseQueue queue;
 
-	AbstractPpaddictUserDataService<?> ppaddictUserDataService = mock(AbstractPpaddictUserDataService.class);
-
 	boolean printResponses = false;
 
 	private IRCBot bot;
@@ -114,7 +111,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		this.resolver = spy(this.resolver);
 		this.bot = new IRCBot(this.backend, recommendationsManager, new UserDataManager(this.backend, em, userDataRepository),
 				em, resolver, osuTrackDownloader, rateLimiter,
-				liveActivity, queue, ppaddictUserDataService);
+				liveActivity, queue);
 	}
 
 	void mockQueuePrint() throws InterruptedException {

@@ -42,14 +42,11 @@ import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.Result;
-import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
-import org.tillerino.ppaddict.web.BarePpaddictUserDataService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.sun.net.httpserver.HttpServer;
 
@@ -80,7 +77,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		install(new TillerinobotConfigurationModule());
 		install(new InMemoryQueuesModule());
 		install(new ProcessorsModule());
-		installMore();
 
 		bind(LiveActivity.class).toInstance(mock(LiveActivity.class));
 		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
@@ -94,11 +90,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		install(new MessageHandlerSchedulerModule());
 		bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 		bind(GameChatClient.class).to(ConsoleRunner.class);
-	}
-
-	protected void installMore() {
-		// should not be done when in ppaddict
-		bind(new TypeLiteral<AbstractPpaddictUserDataService<?>>() { }).to(BarePpaddictUserDataService.class);
 	}
 
 	protected Clock createClock() {

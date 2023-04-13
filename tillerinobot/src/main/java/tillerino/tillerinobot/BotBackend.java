@@ -3,7 +3,6 @@ package tillerino.tillerinobot;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -20,8 +19,6 @@ import org.tillerino.ppaddict.chat.IRCName;
 
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.recommendations.BareRecommendation;
-import tillerino.tillerinobot.recommendations.Model;
 
 public interface BotBackend {
 	/**
