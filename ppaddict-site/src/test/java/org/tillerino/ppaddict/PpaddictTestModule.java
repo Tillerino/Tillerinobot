@@ -36,12 +36,7 @@ public class PpaddictTestModule extends ServletModule {
 
     bind(PpaddictBackend.class).to(TestBackend.class).in(Singleton.class);
 
-    install(new LocalConsoleTillerinobot() {
-      @Override
-      protected void installMore() {
-        // don't call super
-      }
-    });
+    install(new LocalConsoleTillerinobot());
 
     serve(FakeAuthenticatorWebsite.PATH).with(FakeAuthenticatorWebsite.class);
 

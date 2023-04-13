@@ -8,17 +8,14 @@ import javax.inject.Singleton;
 
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.PpaddictContextFilter;
-import org.tillerino.ppaddict.server.PpaddictUserDataService;
 import org.tillerino.ppaddict.server.RecommendationsServiceImpl;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
 import org.tillerino.ppaddict.server.auth.AuthModule;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorServices;
 import org.tillerino.ppaddict.server.auth.implementations.OsuOauth;
-import org.tillerino.ppaddict.web.AbstractPpaddictUserDataService;
 
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import com.google.inject.servlet.ServletModule;
 
 public class PpaddictModule extends ServletModule {
@@ -29,7 +26,6 @@ public class PpaddictModule extends ServletModule {
     serve("/ppaddict/recommendations").with(RecommendationsServiceImpl.class);
     filter("/ppaddict/*").through(PpaddictContextFilter.class);
     install(new AuthModule());
-    bind(new TypeLiteral<AbstractPpaddictUserDataService<?>>() { }).to(PpaddictUserDataService.class);
   }
 
   @Provides

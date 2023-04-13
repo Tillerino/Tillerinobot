@@ -77,6 +77,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-model</artifactId>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot</artifactId>
 			<classifier>tests</classifier>
 			<scope>test</scope>
