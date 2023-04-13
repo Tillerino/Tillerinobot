@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.KeyGenerator;
@@ -17,14 +18,13 @@ import org.tillerino.ppaddict.web.types.PpaddictId;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public abstract class AbstractPpaddictUserDataService<U extends HasLinkedOsuId> extends TypeReference<U> {
+public abstract class AbstractPpaddictUserDataService<U extends HasLinkedOsuId> {
 	private final PpaddictUserRepository users;
 
 	private final PpaddictLinkKeyRepository linkKeys;
@@ -135,7 +135,8 @@ public abstract class AbstractPpaddictUserDataService<U extends HasLinkedOsuId> 
 	}
 
 	private Class<U> getUserDataClass() {
-		return (Class<U>) getType();
+		return (Class<U>) TypeUtils.getTypeArguments(getClass().getGenericSuperclass(), AbstractPpaddictUserDataService.class)
+				.get(AbstractPpaddictUserDataService.class.getTypeParameters()[0]);
 	}
 
 	private U newUserDataInstance() {
