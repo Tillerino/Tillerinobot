@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.scribe</groupId>
 			<artifactId>scribe</artifactId>
-			<version>1.3.2</version>
+			<version>1.3.7</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -69,15 +69,7 @@
 			<artifactId>guice-servlet</artifactId>
 			<version>${guice.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct-processor</artifactId>
-			<scope>provided</scope>
-		</dependency>
+
 		<!-- tests -->
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
