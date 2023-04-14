@@ -17,7 +17,7 @@ public class IrcContainer {
 		.withCreateContainerCmdModifier(cmd -> cmd.withName("tillerinobot-irc"))
 		.withNetwork(NETWORK)
 		.withExposedPorts(8080)
-		.waitingFor(new HttpWaitStrategy().forPort(8080).forPath("/ready"))
+		.waitingFor(new HttpWaitStrategy().forPort(8080).forPath("/live"))
 		.withEnv("TILLERINOBOT_IRC_SERVER", "irc")
 		.withEnv("TILLERINOBOT_IRC_PORT", "6667")
 		.withEnv("TILLERINOBOT_IRC_NICKNAME", "tillerinobot")

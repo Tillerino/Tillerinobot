@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @SuppressWarnings("rawtypes")
 @Slf4j
-public class IrcHooks extends CoreHooks {
+class IrcHooks extends CoreHooks {
 	private final GameChatEventConsumer downStream;
 	private final GameChatClientMetrics botInfo;
 	private final IrcWriter queue;

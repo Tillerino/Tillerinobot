@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class Pinger {
+class Pinger {
 	volatile String pingMessage = null;
 	volatile CountDownLatch pingLatch = null;
 

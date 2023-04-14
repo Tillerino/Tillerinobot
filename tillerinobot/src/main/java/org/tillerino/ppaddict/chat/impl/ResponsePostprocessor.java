@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  * enables us to switch out the implementation of {@link GameChatWriter}.
  */
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
+@RequiredArgsConstructor(onConstructor_ = {@Inject, @SuppressFBWarnings("EI_EXPOSE_REP2")})
 public class ResponsePostprocessor implements GameChatResponseConsumer {
 	private final Bouncer bouncer;
 

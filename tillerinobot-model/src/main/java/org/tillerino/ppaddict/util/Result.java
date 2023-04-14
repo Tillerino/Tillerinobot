@@ -65,6 +65,13 @@ public sealed interface Result<T, E> {
 		else return op.apply(((Err<T, E>) this).e);
 	}
 
+	default T unwrapOr(T def) {
+		if (this instanceof Ok<T, E> ok) {
+			return ok.t;
+		}
+		else return def;
+	}
+
 	default <U> Result<U, E> map(Function<T, U> op) {
 		if (this instanceof Ok<T, E> ok) {
 			return ok(op.apply(ok.t));

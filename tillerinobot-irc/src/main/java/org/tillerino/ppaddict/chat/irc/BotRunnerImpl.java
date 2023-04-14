@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-public class BotRunnerImpl implements GameChatClient, Runnable {
+class BotRunnerImpl implements GameChatClient, Runnable {
 	public static final int DEFAULT_MESSAGE_DELAY = 250;
 	@SuppressFBWarnings(value = "MS", justification = "We're modifying this in tests")
 	public static int MESSAGE_DELAY = DEFAULT_MESSAGE_DELAY;

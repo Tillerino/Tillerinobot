@@ -10,10 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
-import javax.annotation.CheckForNull;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RabbitRpc;
@@ -23,7 +21,9 @@ import org.tillerino.ppaddict.util.Clock;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.undertow.Undertow;
+import io.undertow.server.HttpHandler;
 import io.undertow.util.Headers;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,32 +35,41 @@ public class Main {
 		Bot bot = createBotRunner();
 		Undertow httpServer = Undertow.builder()
 			.addHttpListener(8080, "0.0.0.0")
-			.setHandler(exchange -> {
-				exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-				exchange.getResponseSender().send("Hello World");
-			})
+			.setHandler(probes(bot))
 			.setIoThreads(1)
 			.setWorkerThreads(1)
 			.build();
 		httpServer.start();
-		if (bot != null) {
-			ExecutorService exec = Executors.newCachedThreadPool();
-			exec.submit(RabbitRpc.handleRemoteCalls(bot.conn(), GameChatClient.class, bot.runner(), new GameChatClient.Error.Unknown())::mainloop);
-			exec.submit(RabbitRpc.handleRemoteCalls(bot.conn(), GameChatWriter.class, bot.runner().getWriter(), new GameChatWriter.Error.Unknown())::mainloop);
-			exec.submit(bot.runner());
-		} else {
-			log.info("IRC server not configured. Only starting HTTP.");
-		}
+		ExecutorService exec = Executors.newCachedThreadPool();
+		exec.submit(RabbitRpc.handleRemoteCalls(bot.conn(), GameChatClient.class, bot.runner(), new GameChatClient.Error.Unknown())::mainloop);
+		exec.submit(RabbitRpc.handleRemoteCalls(bot.conn(), GameChatWriter.class, bot.runner().getWriter(), new GameChatWriter.Error.Unknown())::mainloop);
+		exec.submit(bot.runner());
 	}
 
-	private static @CheckForNull Bot createBotRunner() throws IOException, TimeoutException {
-		String server = null;
-		try {
-			server = env("TILLERINOBOT_IRC_SERVER", identity(), null);
-		} catch (NoSuchElementException e) {
-			return null;
-		}
+	private static HttpHandler probes(Bot bot) {
+		return exchange -> {
+			exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+			// we don't have a service, so we don't need a readiness probe
+			if (exchange.getRequestPath().equals("/live")) {
+				if (bot.isLive()) {
+					exchange.setStatusCode(200);
+					exchange.getResponseSender().send("live");
+				} else {
+					exchange.setStatusCode(503);
+					exchange.getResponseSender().send("not live");
+				}
+			} else if (exchange.getRequestPath().equals("/hello")) {
+				exchange.setStatusCode(200);
+				exchange.getResponseSender().send("yes?");
+			} else {
+				exchange.setStatusCode(404);
+				exchange.getResponseSender().send("not found");
+			}
+		};
+	}
 
+	private static Bot createBotRunner() throws IOException, TimeoutException {
+		String server = env("TILLERINOBOT_IRC_SERVER", identity(), null);
 		int port = env("TILLERINOBOT_IRC_PORT", Integer::valueOf, null);
 		String nickname = env("TILLERINOBOT_IRC_NICKNAME", identity(), null);
 		String password = env("TILLERINOBOT_IRC_PASSWORD", identity(), null);
@@ -94,7 +103,15 @@ public class Main {
 		return optional.orElseThrow(() -> new NoSuchElementException("Need to configure environment variable " + name));
 	}
 
-	record Bot(Connection conn, BotRunnerImpl runner) { }
+	record Bot(Connection conn, BotRunnerImpl runner) {
+		public boolean isLive() {
+			return conn.isOpen()
+				&& runner.getMetrics().map(GameChatClientMetrics::isConnected).unwrapOr(false)
+				// The bot is considered live if it has received any event in the last 10 minutes.
+				// This is a last resort if the connection somehow gets stuck.
+				&& runner.getMetrics().map(metrics -> metrics.getLastInteraction() > Clock.system().currentTimeMillis() - 10 * 60 * 1000).unwrapOr(false);
+		}
+	}
 
 	record Rabbit(Connection conn, RemoteEventQueue queue) { }
 }

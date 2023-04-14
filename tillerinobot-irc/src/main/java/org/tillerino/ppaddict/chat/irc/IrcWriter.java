@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class IrcWriter implements GameChatWriter {
+class IrcWriter implements GameChatWriter {
 	private final Pinger pinger;
 
 	private final AtomicReference<CloseableBot> bot = new AtomicReference<>();
