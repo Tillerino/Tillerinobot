@@ -36,7 +36,7 @@ public class BotIT {
 	public final TestName testName = new TestName();
 
 	private Connection connection;
-	private List<GameChatEvent> incoming = Collections.synchronizedList(new ArrayList<>());
+	private final List<GameChatEvent> incoming = Collections.synchronizedList(new ArrayList<>());
 	private RemoteResponseQueue outgoingQueue;
 	private Client kitteh;
 
@@ -149,6 +149,8 @@ public class BotIT {
 			.singleElement()
 			.isInstanceOfSatisfying(Sighted.class, message -> {
 				assertThat(message.getNick()).isEqualTo("test");
+				assertThat(message.getMeta()).isNotNull().satisfies(meta ->
+						assertThat(meta.getMdc().mdcValues()).containsKey("event"));
 			}));
 	}
 }

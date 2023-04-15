@@ -21,9 +21,9 @@
 		<Logger name="jndi" level="info"/>
 		<Logger name="org.apache.http" level="info"/>
 		<Logger name="io.netty" level="info"/>
-		<Logger name="🐳 [mysql:5.7.34]" level="info"/>
+		<Logger name="tc" level="info"/>
+		<Logger name="tc.localhost" level="debug"/>
 
-		<Logger name="org.tillerino.irc" level="info"/>
 		<Logger name="org.tillerino.ppaddict.FullBotTest" level="info"/>
 		<Logger name="org.tillerino.ppaddict.chat.impl.MessagePreprocessor" level="info"/>
 		<Logger name="org.tillerino.ppaddict.chat.impl.MessagePreprocessor" level="debug" additivity="false">

@@ -31,4 +31,14 @@ public abstract class GameChatEvent {
 
 	@JsonIgnore
 	public abstract boolean isInteractive();
+
+	@JsonIgnore
+	public int getPriority() {
+		if (isInteractive()) {
+			return 3;
+		} else if (this instanceof Joined) {
+			return 2;
+		}
+		return 1;
+	}
 }

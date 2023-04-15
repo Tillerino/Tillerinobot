@@ -27,13 +27,7 @@ public class RemoteEventQueue extends AbstractRemoteQueue<GameChatEvent> impleme
 		if (event.getMeta().getMdc() == null) {
 			event.getMeta().setMdc(MdcUtils.getSnapshot());
 		}
-		int priority = 1;
-		if (event.isInteractive()) {
-			priority = 3;
-		} else if (event instanceof Joined) {
-			priority = 2;
-		}
-		send(event, priority);
+		send(event, event.getPriority());
 	}
 
 	@Override

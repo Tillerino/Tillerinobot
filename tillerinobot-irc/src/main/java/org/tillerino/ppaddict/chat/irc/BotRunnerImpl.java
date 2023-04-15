@@ -169,13 +169,13 @@ class BotRunnerImpl implements GameChatClient, Runnable {
 
 	@SuppressFBWarnings("EI_EXPOSE_REP2")
 	@Inject
-	public BotRunnerImpl(@Named("tillerinobot.irc.server") String server,
-			@Named("tillerinobot.irc.port") int port,
-			@Named("tillerinobot.irc.nickname") String nickname,
-			@Named("tillerinobot.irc.password") String password,
-			@Named("tillerinobot.irc.autojoin") String autojoinChannel,
-			@Named("tillerinobot.ignore") boolean silent,
-			@Named("messagePreprocessor") GameChatEventConsumer downStream,
+	public BotRunnerImpl(String server,
+			int port,
+			String nickname,
+			String password,
+			String autojoinChannel,
+			boolean silent,
+			GameChatEventConsumer downStream,
 			Clock clock) {
 		Pinger pinger = new Pinger(metrics, clock);
 		this.writer = new IrcWriter(pinger);
@@ -200,7 +200,7 @@ class BotRunnerImpl implements GameChatClient, Runnable {
 	private final GameChatClientMetrics metrics = new GameChatClientMetrics();
 
 	private volatile boolean reconnect = true;
-	private int reconnectTimeout = 10000;
+	private int reconnectTimeout = 1000;
 
 	@Override
 	public void run() {
@@ -211,7 +211,7 @@ class BotRunnerImpl implements GameChatClient, Runnable {
 					final CustomThreadedListenerManager listenerManager = new CustomThreadedListenerManager();
 					listenerManager.addListener(listener);
 					
-					Builder<PircBotX> configurationBuilder = new Configuration.Builder<PircBotX>()
+					Builder<PircBotX> configurationBuilder = new Configuration.Builder<>()
 							.setServer(server[i % server.length], port)
 							.setMessageDelay(MESSAGE_DELAY)
 							.setListenerManager(listenerManager)
@@ -287,7 +287,7 @@ class BotRunnerImpl implements GameChatClient, Runnable {
 
 	@org.mapstruct.Mapper
 	public interface Mapper {
-		public static final Mapper INSTANCE = Mappers.getMapper(Mapper.class);
+		Mapper INSTANCE = Mappers.getMapper(Mapper.class);
 
 		GameChatClientMetrics copy(GameChatClientMetrics m);
 	}
