@@ -3,16 +3,16 @@ package org.tillerino.ppaddict.chat.irc;
 import static java.util.function.Function.identity;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
-import org.tillerino.ppaddict.chat.*;
+import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.chat.GameChatClientMetrics;
+import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RabbitRpc;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
@@ -26,7 +26,6 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.util.Headers;
 import lombok.extern.slf4j.Slf4j;
-import org.tillerino.ppaddict.util.MdcUtils;
 
 @Slf4j
 public class Main {
@@ -34,38 +33,25 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		log.info("starting irc");
 		Bot bot = createBotRunner();
-		Rabbit rabbit = createRabbit();
 		Undertow httpServer = Undertow.builder()
-				.addHttpListener(8080, "0.0.0.0")
-				.setHandler(probes(bot.runner(), rabbit.conn()))
-				.setIoThreads(1)
-				.setWorkerThreads(1)
-				.build();
+			.addHttpListener(8080, "0.0.0.0")
+			.setHandler(probes(bot))
+			.setIoThreads(1)
+			.setWorkerThreads(1)
+			.build();
 		httpServer.start();
-		ExecutorService exec = Executors.newCachedThreadPool(r -> new Thread(r, "top"));
-		exec.submit(RabbitRpc.handleRemoteCalls(rabbit.conn(), GameChatClient.class, bot.runner(), new GameChatClient.Error.Unknown())::mainloop);
-		exec.submit(RabbitRpc.handleRemoteCalls(rabbit.conn(), GameChatWriter.class, bot.runner().getWriter(), new GameChatWriter.Error.Unknown())::mainloop);
+		ExecutorService exec = Executors.newCachedThreadPool();
+		exec.submit(RabbitRpc.handleRemoteCalls(bot.conn(), GameChatClient.class, bot.runner(), new GameChatClient.Error.Unknown())::mainloop);
+		exec.submit(RabbitRpc.handleRemoteCalls(bot.conn(), GameChatWriter.class, bot.runner().getWriter(), new GameChatWriter.Error.Unknown())::mainloop);
 		exec.submit(bot.runner());
-		exec.submit(() -> {
-			while (true) {
-				GameChatEvent event;
-				try {
-					event = bot.queue().take();
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					return;
-				}
-				rabbit.queue().onEvent(event);
-			}
-		});
 	}
 
-	private static HttpHandler probes(BotRunnerImpl runner, Connection conn) {
+	private static HttpHandler probes(Bot bot) {
 		return exchange -> {
 			exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
 			// we don't have a service, so we don't need a readiness probe
 			if (exchange.getRequestPath().equals("/live")) {
-				if (isLive(runner, conn)) {
+				if (bot.isLive()) {
 					exchange.setStatusCode(200);
 					exchange.getResponseSender().send("live");
 				} else {
@@ -82,15 +68,7 @@ public class Main {
 		};
 	}
 
-	private static boolean isLive(BotRunnerImpl runner, Connection conn) {
-		return conn.isOpen()
-				&& runner.getMetrics().map(GameChatClientMetrics::isConnected).unwrapOr(false)
-				// The bot is considered live if it has received any event in the last 10 minutes.
-				// This is a last resort if the connection somehow gets stuck.
-				&& runner.getMetrics().map(metrics -> metrics.getLastInteraction() > Clock.system().currentTimeMillis() - 10 * 60 * 1000).unwrapOr(false);
-	}
-
-	private static Bot createBotRunner() {
+	private static Bot createBotRunner() throws IOException, TimeoutException {
 		String server = env("TILLERINOBOT_IRC_SERVER", identity(), null);
 		int port = env("TILLERINOBOT_IRC_PORT", Integer::valueOf, null);
 		String nickname = env("TILLERINOBOT_IRC_NICKNAME", identity(), null);
@@ -98,14 +76,10 @@ public class Main {
 		String autojoinChannel = env("TILLERINOBOT_IRC_AUTOJOIN", identity(), null);
 		boolean silent = env("TILLERINOBOT_IGNORE", Boolean::valueOf, null);
 
-		// we get a lot of names when we first join the server, so we need a large queue
-		PriorityBlockingQueue<GameChatEvent> eventQueue = new PriorityBlockingQueue<>(20000, Comparator.comparingInt(GameChatEvent::getPriority).reversed());
-		GameChatEventConsumer downStream = e -> {
-			e.getMeta().setMdc(MdcUtils.getSnapshot());
-			eventQueue.add(e);
-		};
-		BotRunnerImpl botRunner = new BotRunnerImpl(server, port, nickname, password, autojoinChannel, silent, downStream, Clock.system());
-		return new Bot(eventQueue, botRunner);
+		Rabbit rabbit = createRabbit();
+
+		BotRunnerImpl botRunner = new BotRunnerImpl(server, port, nickname, password, autojoinChannel, silent, rabbit.queue(), Clock.system());
+		return new Bot(rabbit.conn(), botRunner);
 	}
 
 	private static Rabbit createRabbit() throws IOException, TimeoutException {
@@ -129,7 +103,14 @@ public class Main {
 		return optional.orElseThrow(() -> new NoSuchElementException("Need to configure environment variable " + name));
 	}
 
-	record Bot(PriorityBlockingQueue<GameChatEvent> queue, BotRunnerImpl runner) {
+	record Bot(Connection conn, BotRunnerImpl runner) {
+		public boolean isLive() {
+			return conn.isOpen()
+				&& runner.getMetrics().map(GameChatClientMetrics::isConnected).unwrapOr(false)
+				// The bot is considered live if it has received any event in the last 10 minutes.
+				// This is a last resort if the connection somehow gets stuck.
+				&& runner.getMetrics().map(metrics -> metrics.getLastInteraction() > Clock.system().currentTimeMillis() - 10 * 60 * 1000).unwrapOr(false);
+		}
 	}
 
 	record Rabbit(Connection conn, RemoteEventQueue queue) { }
