@@ -4,14 +4,10 @@ import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
 
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-
-import com.github.dockerjava.api.command.CreateContainerCmd;
+import org.tillerino.ppaddict.util.CustomTestContainer;
 
 public class LiveContainer {
 	private static final ImageFromDockerfile POTENTIALLY_PREBUILT = Files
@@ -20,7 +16,7 @@ public class LiveContainer {
 							Paths.get("../tillerinobot-live/target/release/main"))
 					: new ImageFromDockerfile();
 
-	private static final GenericContainer LIVE = new GenericContainer(POTENTIALLY_PREBUILT
+	private static final CustomTestContainer LIVE = new CustomTestContainer(POTENTIALLY_PREBUILT
 			// move to parent so we can use this in multiple modules
 			// make sure to keep this aligned with dockerignore
 			.withFileFromPath("Dockerfile", Paths.get("../tillerinobot-live/Dockerfile"))
@@ -31,17 +27,14 @@ public class LiveContainer {
 			.withNetwork(NETWORK)
 			.withExposedPorts(8080)
 			.waitingFor(Wait.forHttp("/ready").forStatusCode(200))
-			.withCreateContainerCmdModifier((Consumer<CreateContainerCmd>) cmd ->
-					cmd.withMemory(16 * 1024 * 1024L)
-							.withMemorySwap(16 * 1024 * 1024L))
-			.withLogConsumer((Consumer<OutputFrame>) frame -> System.out.printf("LIVE: %s%n", frame.getUtf8String().trim()))
-			;
+			.withCreateContainerCmdModifier(cmd -> cmd.withMemory(16 * 1024 * 1024L).withMemorySwap(16 * 1024 * 1024L))
+			.logging("LIVE");
 
 	static {
 		LIVE.start();
 	}
 
-	public static GenericContainer getLive() {
+	public static CustomTestContainer getLive() {
 		return LIVE;
 	}
 }

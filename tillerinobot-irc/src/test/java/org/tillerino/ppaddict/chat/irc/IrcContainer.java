@@ -4,13 +4,13 @@ import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
 import java.io.File;
 
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
+import org.tillerino.ppaddict.util.CustomTestContainer;
 
 public class IrcContainer {
-	public static final GenericContainer TILLERINOBOT_IRC = new GenericContainer<>(new ImageFromDockerfile()
+	public static final CustomTestContainer TILLERINOBOT_IRC = new CustomTestContainer(new ImageFromDockerfile()
 			.withFileFromFile("Dockerfile", new File("../tillerinobot-irc/Dockerfile"))
 			.withFileFromFile("target", new File("../tillerinobot-irc/target")))
 		// we set a fixed container name to make it more debuggable
@@ -24,7 +24,7 @@ public class IrcContainer {
 		.withEnv("TILLERINOBOT_IRC_PASSWORD", "")
 		.withEnv("TILLERINOBOT_IRC_AUTOJOIN", "#osu")
 		.withEnv("TILLERINOBOT_IGNORE", "false")
-		.withLogConsumer(frame -> System.out.println("IRC: " + frame.getUtf8String().trim()));
+		.logging("IRC");
 
 	static {
 		NgircdContainer.NGIRCD.start();

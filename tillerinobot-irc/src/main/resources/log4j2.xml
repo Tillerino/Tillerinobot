@@ -10,5 +10,6 @@
 		<Root level="debug">
 			<AppenderRef ref="Console" />
 		</Root>
+		<Logger name="io.undertow.request.error-response" level="info"/>
 	</Loggers>
 </Configuration>

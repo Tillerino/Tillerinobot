@@ -51,8 +51,6 @@ class IrcHooks extends CoreHooks {
 	private final AtomicLong lastSerial;
 	private final AtomicLong lastListTime;
 
-	private final Queue<ServerResponseEvent> userListEvents = new LinkedList<>();
-
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2")
 	public IrcHooks(GameChatEventConsumer downStream,
 			GameChatClientMetrics botInfo,
@@ -157,14 +155,6 @@ class IrcHooks extends CoreHooks {
 
 			super.onEvent(event);
 		}
-
-		if (event instanceof PrivateMessageEvent || event instanceof ActionEvent) {
-			// we want to process these on events which are regular but not too frequent to clog up things.
-			ServerResponseEvent listEvent = userListEvents.poll();
-			if (listEvent != null) {
-				processUserListEvent(listEvent);
-			}
-		}
 	}
 
 	@Override
@@ -190,17 +180,14 @@ class IrcHooks extends CoreHooks {
 	@Override
 	public void onServerResponse(ServerResponseEvent event) throws Exception {
 		if(event.getCode() == 353) {
-			// these come in bursts and we don't want them to clog up our processing pipeline.
-			// especially when going online, this is awkward since the bot doesn't answer for a while.
-			// since the original event is the most compact form for this, we store it for later processing.
-			userListEvents.add(event);
+			processUserListEvent(event);
 		} else {
 			super.onServerResponse(event);
 		}
 	}
 
 	@SuppressFBWarnings("TQ")
-	private void processUserListEvent(ServerResponseEvent event) throws InterruptedException {
+	private void processUserListEvent(ServerResponseEvent<?> event) throws InterruptedException {
 		ImmutableList<String> parsedResponse = event.getParsedResponse();
 
 		String[] usernames = parsedResponse.get(parsedResponse.size() - 1).split(" ");
@@ -208,16 +195,17 @@ class IrcHooks extends CoreHooks {
 		for (int i = 0; i < usernames.length; i++) {
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, lastSerial.getAndIncrement())) {
 				String nick = usernames[i];
-
-				if (nick.startsWith("@") || nick.startsWith("+"))
+				if (nick.startsWith("@") || nick.startsWith("+")) {
 					nick = nick.substring(1);
-
+				}
+				if (nick.equals(event.getBot().getNick())) {
+					continue;
+				}
+	
 				downStream.onEvent(new Sighted(MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
 						nick, timestamp(event)));
 			}
 		}
-
-		System.out.println("processed user list event " + userListEvents.size() + " remaining");
 	}
 
 	@SuppressFBWarnings("TQ")

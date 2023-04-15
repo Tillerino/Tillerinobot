@@ -1,36 +1,154 @@
 package org.tillerino.ppaddict.chat.irc;
 
-import org.awaitility.Awaitility;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.tillerino.ppaddict.chat.irc.IrcContainer.TILLERINOBOT_IRC;
+import static org.tillerino.ppaddict.chat.irc.NgircdContainer.NGIRCD;
+import static org.tillerino.ppaddict.rabbit.RabbitMqContainer.RABBIT_MQ;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
+import org.junit.rules.TestName;
+import org.kitteh.irc.client.library.Client;
+import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
+import org.kitteh.irc.client.library.exception.KittehNagException;
+import org.tillerino.ppaddict.chat.GameChatEvent;
+import org.tillerino.ppaddict.chat.Joined;
+import org.tillerino.ppaddict.chat.PrivateAction;
+import org.tillerino.ppaddict.chat.PrivateMessage;
+import org.tillerino.ppaddict.chat.Sighted;
+import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
+import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
+import org.tillerino.ppaddict.rabbit.RemoteResponseQueue;
+
+import com.rabbitmq.client.Connection;
 
 import io.restassured.RestAssured;
 
 public class BotIT {
+	@Rule
+	public final TestName testName = new TestName();
+
+	private Connection connection;
+	private List<GameChatEvent> incoming = Collections.synchronizedList(new ArrayList<>());
+	private RemoteResponseQueue outgoingQueue;
+	private Client kitteh;
+
 	@Before
 	public void setUp() throws Exception {
-		RabbitMqContainer.RABBIT_MQ.start();
-		NgircdContainer.NGIRCD.start();
-		IrcContainer.TILLERINOBOT_IRC.start();
-		RestAssured.baseURI = "http://" + IrcContainer.TILLERINOBOT_IRC.getHost() + ":"
-				+ IrcContainer.TILLERINOBOT_IRC.getMappedPort(8080) + "/";
-		Awaitility.await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+		System.out.println("Running " + testName.getMethodName());
+		RABBIT_MQ.start();
+		NGIRCD.start();
+		TILLERINOBOT_IRC.start();
+
+		RestAssured.baseURI = "http://" + TILLERINOBOT_IRC.getHost() + ":"
+				+ TILLERINOBOT_IRC.getMappedPort(8080) + "/";
+		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+
+		kitteh = Client.builder()
+			.nick("test")
+			.server()
+				.host(NGIRCD.getHost())
+				.port(NGIRCD.getMappedPort(6667), SecurityType.INSECURE)
+			.then().listeners()
+			.exception(e -> {
+				if (e instanceof KittehNagException) {
+					return;
+				}
+				e.printStackTrace();
+			})
+			.then().build();
+
+		connection = RabbitMqConfiguration.connectionFactory(RABBIT_MQ.getHost(), RABBIT_MQ.getAmqpPort())
+			.newConnection("test");
+		RemoteEventQueue incomingQueue = RabbitMqConfiguration.externalEventQueue(connection);
+		incomingQueue.setup();
+		incomingQueue.subscribe(incoming::add);
+		outgoingQueue = RabbitMqConfiguration.responseQueue(connection);
+		outgoingQueue.setup();
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		if (connection.isOpen()) {
+			connection.close();
+		}
+		kitteh.shutdown();
 	}
 
 	@Test
 	public void livenessReactsToRabbit() throws Exception {
-		RabbitMqContainer.RABBIT_MQ.stop();
-		Awaitility.await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
-		RabbitMqContainer.RABBIT_MQ.start();
-		Awaitility.await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+		RABBIT_MQ.stop();
+		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
+		RABBIT_MQ.start();
+		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
 	}
 
 	@Test
 	public void livenessReactsToNgircd() throws Exception {
-		NgircdContainer.NGIRCD.stop();
-		Awaitility.await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
-		NgircdContainer.NGIRCD.start();
-		Awaitility.await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+		NGIRCD.stop();
+		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
+		NGIRCD.start();
+		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+	}
+
+	@Test
+	public void incomingPrivateMessage() throws Exception {
+		kitteh.connect();
+		kitteh.sendMessage("tillerinobot", "hello");
+
+		await().untilAsserted(() -> assertThat(incoming)
+			.singleElement()
+			.isInstanceOfSatisfying(PrivateMessage.class, message -> {
+				assertThat(message.getNick()).isEqualTo("test");
+				assertThat(message.getMessage()).isEqualTo("hello");
+			}));
+	}
+
+	@Test
+	public void incomingPrivateAction() throws Exception {
+		kitteh.connect();
+		kitteh.sendMessage("tillerinobot", "\u0001ACTION hello\u0001");
+ 
+		await().untilAsserted(() -> assertThat(incoming)
+			.singleElement()
+			.isInstanceOfSatisfying(PrivateAction.class, message -> {
+				assertThat(message.getNick()).isEqualTo("test");
+				assertThat(message.getAction()).isEqualTo("hello");
+			}));
+	}
+
+	@Test
+	public void joiningChannelResultsInJoinedEvent() throws Exception {
+		kitteh.connect();
+		kitteh.addChannel("#osu");
+		await().untilAsserted(() -> assertThat(incoming)
+			.singleElement()
+			.isInstanceOfSatisfying(Joined.class, message -> {
+				assertThat(message.getNick()).isEqualTo("test");
+			}));
+	}
+
+	@Test
+	public void startingTillerinobotAfterJoiningServerResultsInSightedEvent() throws Exception {
+		TILLERINOBOT_IRC.stop();
+		NGIRCD.logs.clear();
+		kitteh.connect();
+		kitteh.addChannel("#osu");
+		await().untilAsserted(() -> assertThat(NGIRCD.logs).anySatisfy(message -> {
+			assertThat(message).contains("Kitteh");
+		}));
+		TILLERINOBOT_IRC.start();
+		await().untilAsserted(() -> assertThat(incoming)
+			.singleElement()
+			.isInstanceOfSatisfying(Sighted.class, message -> {
+				assertThat(message.getNick()).isEqualTo("test");
+			}));
 	}
 }
