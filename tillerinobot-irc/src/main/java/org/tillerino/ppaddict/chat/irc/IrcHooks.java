@@ -27,6 +27,7 @@ import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
+import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
@@ -37,7 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Feeds the {@link MessagePreprocessor} from an IRC client.
+ * Feeds the {@link RemoteEventQueue} from an IRC client.
  */
 @SuppressWarnings("rawtypes")
 @Slf4j

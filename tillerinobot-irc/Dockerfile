@@ -7,13 +7,9 @@ RUN groupadd -g 10001 appuser \
 
 USER appuser
 WORKDIR /app
+COPY --chown=appuser:appuser irc-run.sh /app/irc-run.sh
 COPY --chown=appuser:appuser target/*.jar /app/
 COPY --chown=appuser:appuser target/dependency/*.jar /app/dependency/
 
-ENV MALLOC_ARENA_MAX 4
-CMD [ "java", "-cp", "/app/*:/app/dependency/*", \
-	"-XX:+UseSerialGC", "-verbose:gc", \
-	"-XX:-TieredCompilation", \
-	"-Xms32m", "-Xmx32m", \
-	"org.tillerino.ppaddict.chat.irc.Main" ]
+CMD [ "sh", "irc-run.sh" ]
 EXPOSE 8080

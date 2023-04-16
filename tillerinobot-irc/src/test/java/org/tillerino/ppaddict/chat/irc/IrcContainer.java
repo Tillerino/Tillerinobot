@@ -12,6 +12,7 @@ import org.tillerino.ppaddict.util.CustomTestContainer;
 public class IrcContainer {
 	public static final CustomTestContainer TILLERINOBOT_IRC = new CustomTestContainer(new ImageFromDockerfile()
 			.withFileFromFile("Dockerfile", new File("../tillerinobot-irc/Dockerfile"))
+			.withFileFromFile("irc-run.sh", new File("../tillerinobot-irc/irc-run.sh"))
 			.withFileFromFile("target", new File("../tillerinobot-irc/target")))
 		// we set a fixed container name to make it more debuggable
 		.withCreateContainerCmdModifier(cmd -> cmd.withName("tillerinobot-irc"))

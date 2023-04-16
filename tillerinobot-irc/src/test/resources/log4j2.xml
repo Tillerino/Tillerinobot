@@ -10,6 +10,9 @@
 		<Root level="debug">
 			<AppenderRef ref="Console" />
 		</Root>
+		<!-- from main -->
+		<Logger name="io.undertow.request.error-response" level="info"/>
+
 		<Logger name="org.pircbotx" level="error"/>
 		<Logger name="org.eclipse.jetty" level="info"/>
 		<Logger name="org.springframework" level="warn"/>

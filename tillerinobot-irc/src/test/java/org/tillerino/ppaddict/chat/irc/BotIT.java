@@ -45,10 +45,8 @@ public class BotIT {
 		System.out.println("Running " + testName.getMethodName());
 		RABBIT_MQ.start();
 		NGIRCD.start();
-		TILLERINOBOT_IRC.start();
+		startBot();
 
-		RestAssured.baseURI = "http://" + TILLERINOBOT_IRC.getHost() + ":"
-				+ TILLERINOBOT_IRC.getMappedPort(8080) + "/";
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
 
 		kitteh = Client.builder()
@@ -74,9 +72,19 @@ public class BotIT {
 		outgoingQueue.setup();
 	}
 
+	protected void startBot() throws Exception {
+		TILLERINOBOT_IRC.start();
+		RestAssured.baseURI = "http://" + TILLERINOBOT_IRC.getHost() + ":"
+				+ TILLERINOBOT_IRC.getMappedPort(8080) + "/";
+	}
+
+	protected void stopBot() throws Exception {
+		TILLERINOBOT_IRC.stop();
+	}
+
 	@After
 	public void tearDown() throws Exception {
-		if (connection.isOpen()) {
+		if (connection != null && connection.isOpen()) {
 			connection.close();
 		}
 		kitteh.shutdown();
@@ -137,14 +145,14 @@ public class BotIT {
 
 	@Test
 	public void startingTillerinobotAfterJoiningServerResultsInSightedEvent() throws Exception {
-		TILLERINOBOT_IRC.stop();
+		stopBot();
 		NGIRCD.logs.clear();
 		kitteh.connect();
 		kitteh.addChannel("#osu");
 		await().untilAsserted(() -> assertThat(NGIRCD.logs).anySatisfy(message -> {
 			assertThat(message).contains("Kitteh");
 		}));
-		TILLERINOBOT_IRC.start();
+		startBot();
 		await().untilAsserted(() -> assertThat(incoming)
 			.singleElement()
 			.isInstanceOfSatisfying(Sighted.class, message -> {
