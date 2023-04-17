@@ -75,7 +75,7 @@ pub(crate) async fn run_rabbit() {
 }
 
 async fn consume_rabbit() -> lapin::Result<()> {
-    let channel_a = connect_rabbit_channel().await?;
+    let channel_a = connect_rabbit_channel(RabbitConfiguration::default()).await?;
     channel_a.basic_qos(100, BasicQosOptions::default()).await?;
     let mut consumer = create_rabbit_consumer(channel_a).await?;
     println!("Listening to events");
@@ -88,10 +88,28 @@ async fn consume_rabbit() -> lapin::Result<()> {
     Ok(())
 }
 
-async fn connect_rabbit_channel() -> lapin::Result<Channel> {
-    let rabbit_host = std::env::var("RABBIT_HOST").unwrap_or_else(|_| "rabbitmq".into());
-    let rabbit_port: u16 = std::env::var("RABBIT_PORT").ok().and_then(|s| str::parse(s.as_str()).ok()).unwrap_or(5672);
-    let addr = format!("amqp://{}:{}/%2f", rabbit_host, rabbit_port);
+struct RabbitConfiguration {
+    host: String,
+    port: u16
+}
+
+impl RabbitConfiguration {
+    fn connect_string(&self) -> String {
+        format!("amqp://{}:{}/%2f", self.host, self.port)
+    }
+}
+
+impl Default for RabbitConfiguration {
+    fn default() -> Self {
+        Self {
+            host: std::env::var("RABBIT_HOST").unwrap_or_else(|_| "rabbitmq".into()),
+            port: std::env::var("RABBIT_PORT").ok().and_then(|s| str::parse(s.as_str()).ok()).unwrap_or(5672)
+        }
+    }
+}
+
+async fn connect_rabbit_channel(configuration: RabbitConfiguration) -> lapin::Result<Channel> {
+    let addr = configuration.connect_string();
 
     println!("Connecting to {}", addr);
     let conn = Connection::connect(&addr, ConnectionProperties::default().with_tokio()).await?;
