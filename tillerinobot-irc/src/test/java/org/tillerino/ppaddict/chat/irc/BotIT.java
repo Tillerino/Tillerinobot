@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.chat.irc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.*;
 import static org.tillerino.ppaddict.chat.irc.IrcContainer.TILLERINOBOT_IRC;
 import static org.tillerino.ppaddict.chat.irc.NgircdContainer.NGIRCD;
 import static org.tillerino.ppaddict.rabbit.RabbitMqContainer.RABBIT_MQ;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.engio.mbassy.listener.Handler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,15 +19,17 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
+import org.kitteh.irc.client.library.event.client.ClientReceiveCommandEvent;
+import org.kitteh.irc.client.library.event.client.ClientReceiveNumericEvent;
+import org.kitteh.irc.client.library.event.helper.ClientEvent;
+import org.kitteh.irc.client.library.event.user.PrivateCtcpQueryEvent;
+import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
 import org.kitteh.irc.client.library.exception.KittehNagException;
-import org.tillerino.ppaddict.chat.GameChatEvent;
-import org.tillerino.ppaddict.chat.Joined;
-import org.tillerino.ppaddict.chat.PrivateAction;
-import org.tillerino.ppaddict.chat.PrivateMessage;
-import org.tillerino.ppaddict.chat.Sighted;
+import org.mockito.Mockito;
+import org.tillerino.ppaddict.chat.*;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
+import org.tillerino.ppaddict.rabbit.RabbitRpc;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
-import org.tillerino.ppaddict.rabbit.RemoteResponseQueue;
 
 import com.rabbitmq.client.Connection;
 
@@ -37,8 +41,11 @@ public class BotIT {
 
 	private Connection connection;
 	private final List<GameChatEvent> incoming = Collections.synchronizedList(new ArrayList<>());
-	private RemoteResponseQueue outgoingQueue;
 	private Client kitteh;
+	private GameChatWriter writer;
+	private GameChatClient gameChatClient;
+	private KittehListener listener = mock(KittehListener.class);
+	private List<ClientEvent> kittehEvents = Collections.synchronizedList(new ArrayList<>());
 
 	@Before
 	public void setUp() throws Exception {
@@ -62,14 +69,23 @@ public class BotIT {
 				e.printStackTrace();
 			})
 			.then().build();
+		kitteh.getEventManager().registerEventListener(listener);
+		doAnswer(invocation -> {
+			ClientEvent event = invocation.getArgument(0);
+			if (!(event instanceof ClientReceiveCommandEvent)) {
+				// all messages are somehow double by this kind of event
+				kittehEvents.add(event);
+			}
+			return null;
+		}).when(listener).onMessage(Mockito.any(ClientEvent.class));
 
 		connection = RabbitMqConfiguration.connectionFactory(RABBIT_MQ.getHost(), RABBIT_MQ.getAmqpPort())
 			.newConnection("test");
 		RemoteEventQueue incomingQueue = RabbitMqConfiguration.externalEventQueue(connection);
 		incomingQueue.setup();
 		incomingQueue.subscribe(incoming::add);
-		outgoingQueue = RabbitMqConfiguration.responseQueue(connection);
-		outgoingQueue.setup();
+		writer = RabbitRpc.remoteCallProxy(connection, GameChatWriter.class, new GameChatWriter.Error.Unknown());
+		gameChatClient = RabbitRpc.remoteCallProxy(connection, GameChatClient.class, new GameChatClient.Error.Unknown());
 	}
 
 	protected void startBot() throws Exception {
@@ -80,6 +96,15 @@ public class BotIT {
 
 	protected void stopBot() throws Exception {
 		TILLERINOBOT_IRC.stop();
+	}
+
+	protected void connectKitteh() {
+		kitteh.connect();
+		await().untilAsserted(() -> assertThat(kittehEvents).anySatisfy(event ->
+			assertThat(event).isInstanceOfSatisfying(ClientReceiveNumericEvent.class, message -> {
+			assertThat(message.getNumeric()).isEqualTo(318); // end of WHOIS
+		})));
+		kittehEvents.clear();
 	}
 
 	@After
@@ -108,7 +133,7 @@ public class BotIT {
 
 	@Test
 	public void incomingPrivateMessage() throws Exception {
-		kitteh.connect();
+		connectKitteh();
 		kitteh.sendMessage("tillerinobot", "hello");
 
 		await().untilAsserted(() -> assertThat(incoming)
@@ -121,7 +146,7 @@ public class BotIT {
 
 	@Test
 	public void incomingPrivateAction() throws Exception {
-		kitteh.connect();
+		connectKitteh();
 		kitteh.sendMessage("tillerinobot", "\u0001ACTION hello\u0001");
  
 		await().untilAsserted(() -> assertThat(incoming)
@@ -134,7 +159,7 @@ public class BotIT {
 
 	@Test
 	public void joiningChannelResultsInJoinedEvent() throws Exception {
-		kitteh.connect();
+		connectKitteh();
 		kitteh.addChannel("#osu");
 		await().untilAsserted(() -> assertThat(incoming)
 			.singleElement()
@@ -147,7 +172,7 @@ public class BotIT {
 	public void startingTillerinobotAfterJoiningServerResultsInSightedEvent() throws Exception {
 		stopBot();
 		NGIRCD.logs.clear();
-		kitteh.connect();
+		connectKitteh();
 		kitteh.addChannel("#osu");
 		await().untilAsserted(() -> assertThat(NGIRCD.logs).anySatisfy(message -> {
 			assertThat(message).contains("Kitteh");
@@ -160,5 +185,35 @@ public class BotIT {
 				assertThat(message.getMeta()).isNotNull().satisfies(meta ->
 						assertThat(meta.getMdc().mdcValues()).containsKey("event"));
 			}));
+	}
+
+	@Test
+	public void outgoingPrivateMessage() throws Exception {
+		connectKitteh();
+		writer.message("hello", "test");
+		await().untilAsserted(() -> assertThat(kittehEvents)
+			.singleElement()
+			.isInstanceOfSatisfying(PrivateMessageEvent.class, message -> {
+				assertThat(message.getTarget()).isEqualTo("test");
+				assertThat(message.getMessage()).isEqualTo("hello");
+			}));
+	}
+
+	@Test
+	public void outgoingPrivateAction() throws Exception {
+		connectKitteh();
+		writer.action("hello", "test");
+		await().untilAsserted(() -> assertThat(kittehEvents)
+			.singleElement()
+			.isInstanceOfSatisfying(PrivateCtcpQueryEvent.class, message -> {
+				assertThat(message.getTarget()).isEqualTo("test");
+				assertThat(message.getCommand()).isEqualTo("ACTION");
+				assertThat(message.getMessage()).isEqualTo("ACTION hello");
+			}));
+	}
+
+	interface KittehListener {
+		@Handler
+		void onMessage(ClientEvent event);
 	}
 }
