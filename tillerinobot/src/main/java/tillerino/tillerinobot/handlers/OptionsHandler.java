@@ -1,6 +1,5 @@
 package tillerino.tillerinobot.handlers;
 
-import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.getLevenshteinDistance;
 
 import java.io.IOException;
@@ -8,26 +7,35 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
-import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
-import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.handlers.options.DefaultOptionHandler;
+import tillerino.tillerinobot.handlers.options.LangOptionHandler;
+import tillerino.tillerinobot.handlers.options.OptionHandler;
+import tillerino.tillerinobot.handlers.options.OsutrackWelcomeOptionHandler;
+import tillerino.tillerinobot.handlers.options.WelcomeOptionHandler;
 import tillerino.tillerinobot.lang.Language;
-import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class OptionsHandler implements CommandHandler {
-	final RecommendationRequestParser requestParser;
+	private final List<OptionHandler> optionHandlers = new ArrayList<>();
+
+	@Inject
+	public OptionsHandler(RecommendationRequestParser requestParser) {
+		optionHandlers.add(new LangOptionHandler());
+		optionHandlers.add(new WelcomeOptionHandler());
+		optionHandlers.add(new OsutrackWelcomeOptionHandler());
+		optionHandlers.add(new DefaultOptionHandler(requestParser));
+	}
 
 	@Override
 	public GameChatResponse handle(String command, OsuApiUser apiUser,
@@ -58,69 +66,19 @@ public class OptionsHandler implements CommandHandler {
 			}
 		}
 
-		if (option.equals("lang") || getLevenshteinDistance(option, "language") <= 1) {
-			if (set) {
-				LanguageIdentifier ident;
-				try {
-					ident = find(LanguageIdentifier.values(), i -> i.token, value);
-				} catch (IllegalArgumentException e) {
-					String choices = Stream.of(LanguageIdentifier.values())
-							.map(i -> i.token)
-							.sorted()
-							.collect(joining(", "));
-					throw new UserException(lang.invalidChoice(value, choices));
-				}
-
-				userData.setLanguage(ident);
-
-				return userData.usingLanguage(newLang -> newLang.optionalCommentOnLanguage(apiUser));
-			} else {
-				return new Message("Language: " + userData.getLanguageIdentifier().token);
-			}
-		} else if (getLevenshteinDistance(option, "welcome") <= 1 && userData.getHearts() > 0) {
-			if (set) {
-				userData.setShowWelcomeMessage(parseBoolean(value, lang));
-			} else {
-				return new Message("Welcome Message: " + (userData.isShowWelcomeMessage() ? "ON" : "OFF"));
-			}
-		} else if (getLevenshteinDistance(option, "osutrack-welcome") <= 1 && userData.getHearts() > 0) {
-			if (set) {
-				userData.setOsuTrackWelcomeEnabled(parseBoolean(value, lang));
-			} else {
-				return new Message("osu!track on welcome: " + (userData.isOsuTrackWelcomeEnabled() ? "ON" : "OFF"));
-			}
-		} else if (getLevenshteinDistance(option, "default") <= 1) {
-			if (set) {
-				if (value.isEmpty()) {
-					userData.setDefaultRecommendationOptions(null);
-				} else {
-					requestParser.parseSamplerSettings(apiUser, value, lang);
-					userData.setDefaultRecommendationOptions(value);
-				}
-			} else {
-				return new Message(
-						"Default recommendation settings: " + (userData.getDefaultRecommendationOptions() != null
-								? userData.getDefaultRecommendationOptions() : "-"));
-			}
-		} else {
-			throw new UserException(lang.invalidChoice(option,
-					"Language, Default" + (userData.getHearts() > 0 ? ", Welcome" : "")));
+		for (OptionHandler optionHandler : optionHandlers) {
+			GameChatResponse resposne = optionHandler.handle(option, set, value, userData, apiUser, lang);
+			if(resposne != null) return resposne;
 		}
 
-		return GameChatResponse.none();
+		int userHearts = userData.getHearts();
+		String validOptions = optionHandlers.stream()
+				.filter(x -> userHearts >= x.getMinHearts())
+				.map(OptionHandler::getOptionName)
+				.collect(Collectors.joining(", "));
+		throw new UserException(lang.invalidChoice(option, validOptions));
 	}
 
-	public static boolean parseBoolean(final @Nonnull String original, Language lang) throws UserException {
-		String s = original.toLowerCase();
-		if(s.equals("on") || s.equals("true") || s.equals("yes") || s.equals("1")) {
-			return true;
-		}
-		if(s.equals("off") || s.equals("false") || s.equals("no") || s.equals("0")) {
-			return false;
-		}
-		throw new UserException(lang.invalidChoice(original, "on|true|yes|1|off|false|no|0"));
-	}
-	
 	public static @Nonnull <E extends Enum<E>> E find(@Nonnull E[] haystack, Function<E, String> token, @Nonnull String needle) {
 		needle = needle.toLowerCase();
 		
