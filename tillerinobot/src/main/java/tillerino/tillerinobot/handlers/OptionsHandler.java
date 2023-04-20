@@ -73,7 +73,7 @@ public class OptionsHandler implements CommandHandler {
 
 				userData.setLanguage(ident);
 
-				return lang.optionalCommentOnLanguage(apiUser);
+				return userData.usingLanguage(newLang -> newLang.optionalCommentOnLanguage(apiUser));
 			} else {
 				return new Message("Language: " + userData.getLanguageIdentifier().token);
 			}
