@@ -28,15 +28,15 @@ public class BeatmapMeta {
 
 	static DecimalFormat noDecimalsFormat = new DecimalFormat("#", new DecimalFormatSymbols(Locale.US));
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, Double acc, Integer combo, Integer misses) throws UserException {
-		return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(acc, combo, misses));
+	public String formInfoMessage(boolean formLink, boolean includeEstimateMessage, String addition, int hearts, Double acc, Integer combo, Integer misses) throws UserException {
+		return formInfoMessage(formLink, includeEstimateMessage, addition, hearts, PpMessageBuilder.getFor(acc, combo, misses));
 	}
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, int x100, int x50, int combo, int misses) throws UserException {
-		return formInfoMessage(formLink, addition, hearts, PpMessageBuilder.getFor(x100, x50, combo, misses));
+	public String formInfoMessage(boolean formLink, boolean includeEstimateMessage, String addition, int hearts, int x100, int x50, int combo, int misses) throws UserException {
+		return formInfoMessage(formLink, includeEstimateMessage, addition, hearts, PpMessageBuilder.getFor(x100, x50, combo, misses));
 	}
 
-	public String formInfoMessage(boolean formLink, String addition, int hearts, PpMessageBuilder ppMessageBuilder) throws UserException {
+	public String formInfoMessage(boolean formLink, boolean includeEstimateMessage, String addition, int hearts, PpMessageBuilder ppMessageBuilder) throws UserException {
 		if (beatmap.getMaxCombo() <= 0) {
 			// This is kind of an awkward place to warn about this, but we don't want to be throwing UserExceptions from the backend.
 			throw new UserException(
@@ -53,34 +53,36 @@ public class BeatmapMeta {
 		beatmapName += formModsSuffix();
 
 		String estimateMessage = "";
-		Integer future = getPersonalPP();
-		if (future != null && future >= getPpForAcc(.9)
-				&& future < getPpForAcc(1) * 1.05) {
-			future = (int) Math.floor(Math.min(future, getPpForAcc(1)));
-			estimateMessage += "future you: " + future + "pp | ";
+		if(includeEstimateMessage) {
+			estimateMessage += "   ";
+			Integer future = getPersonalPP();
+			if (future != null && future >= getPpForAcc(.9)
+					&& future < getPpForAcc(1) * 1.05) {
+				future = (int) Math.floor(Math.min(future, getPpForAcc(1)));
+				estimateMessage += "future you: " + future + "pp | ";
+			}
+
+			estimateMessage += ppMessageBuilder.buildMessage(getEstimates());
+
+			estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(getMods()));
+
+			Double starDiff = null;
+			if (getMods() == 0) {
+				starDiff = beatmap.getStarDifficulty();
+			} else {
+				starDiff = estimates.getStarDiff();
+			}
+			if (starDiff != null) {
+				estimateMessage += " ★ " + format.format(starDiff);
+			}
+
+			estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(getMods()));
+			estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(getMods()));
+			estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(getMods()));
 		}
 
-        estimateMessage += ppMessageBuilder.buildMessage(getEstimates());
-
-        estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(getMods()));
-
-		Double starDiff = null;
-		if (getMods() == 0) {
-			starDiff = beatmap.getStarDifficulty();
-		} else {
-			starDiff = estimates.getStarDiff();
-		}
-		if (starDiff != null) {
-			estimateMessage += " ★ " + format.format(starDiff);
-		}
-
-		estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(getMods()));
-		estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(getMods()));
-		estimateMessage += " OD" + format.format(getBeatmap().getOverallDifficulty(getMods()));
-		
 		String heartString = hearts > 0 ? " " + StringUtils.repeat('♥', hearts) : "";
-
-		return beatmapName + "   " + estimateMessage + (addition != null ? "   " + addition : "") + heartString;
+		return beatmapName + estimateMessage + (addition != null ? "   " + addition : "") + heartString;
 	}
 
 	public static String secondsToMinuteColonSecond(int length) {

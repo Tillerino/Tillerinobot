@@ -83,7 +83,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 		manager.saveGivenRecommendation(apiUser.getUserId(),
 				beatmap.getBeatmap().getBeatmapId(),
 				recommendation.bareRecommendation.mods());
-		return new Success(beatmap.formInfoMessage(true, addition,
+		return new Success(beatmap.formInfoMessage(true, userData.isShowMapMetaDataOnRecommendation(), addition,
 						userData.getHearts(), null, null, null))
 				.then(lang.optionalCommentOnRecommendation(apiUser, recommendation));
 	}

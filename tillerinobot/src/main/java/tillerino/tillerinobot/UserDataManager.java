@@ -170,6 +170,14 @@ public class UserDataManager {
 			this.osuTrackWelcomeEnabled = doOsuTrackUpdateOnWelcome;
 		}
 
+		@Getter
+		private boolean showMapMetaDataOnRecommendation = true;
+
+		public void setShowMapMetaDataOnRecommendation(boolean showMapMetaDataOnRecommendation) {
+			changed |= showMapMetaDataOnRecommendation != this.showMapMetaDataOnRecommendation;
+			this.showMapMetaDataOnRecommendation = showMapMetaDataOnRecommendation;
+		}
+
 		@Override
 		public void close() {
 			manager.saveOptions(userid, this);

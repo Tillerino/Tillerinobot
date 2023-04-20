@@ -20,6 +20,7 @@ import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.handlers.options.DefaultOptionHandler;
 import tillerino.tillerinobot.handlers.options.LangOptionHandler;
+import tillerino.tillerinobot.handlers.options.MapMetaDataOptionHandler;
 import tillerino.tillerinobot.handlers.options.OptionHandler;
 import tillerino.tillerinobot.handlers.options.OsutrackWelcomeOptionHandler;
 import tillerino.tillerinobot.handlers.options.WelcomeOptionHandler;
@@ -35,6 +36,7 @@ public class OptionsHandler implements CommandHandler {
 		optionHandlers.add(new WelcomeOptionHandler());
 		optionHandlers.add(new OsutrackWelcomeOptionHandler());
 		optionHandlers.add(new DefaultOptionHandler(requestParser));
+		optionHandlers.add(new MapMetaDataOptionHandler());
 	}
 
 	@Override

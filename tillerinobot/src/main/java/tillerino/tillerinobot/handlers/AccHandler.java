@@ -61,7 +61,7 @@ public class AccHandler implements CommandHandler {
 			double acc = parseAcc(extendedMatcher.group(1), lang);
 			int combo = parseInt(extendedMatcher.group(2), lang);
 			int misses = parseInt(extendedMatcher.group(3), lang);
-			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, combo, misses));
+			return new Success(beatmap.formInfoMessage(false, true, null, userData.getHearts(), acc, combo, misses));
 		} else if (superExtendedMatcher.matches()) {
 			// we're now in superExtended matching, aka drop % and add x100 and x50
 			int x100 = parseInt(superExtendedMatcher.group(1), lang);
@@ -69,13 +69,13 @@ public class AccHandler implements CommandHandler {
 			int x50 = group2 == null ? 0 : parseInt(group2, lang);
 			int combo = parseInt(superExtendedMatcher.group(3), lang);
 			int misses = parseInt(superExtendedMatcher.group(4), lang);
-			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), x100, x50, combo, misses));
+			return new Success(beatmap.formInfoMessage(false, true, null, userData.getHearts(), x100, x50, combo, misses));
 		} else {
 			if(message.endsWith("%")) {
 				message = message.substring(0, message.length() - 1);
 			}
 			double acc = parseAcc(message, lang);
-			return new Success(beatmap.formInfoMessage(false, null, userData.getHearts(), acc, null, null));
+			return new Success(beatmap.formInfoMessage(false, true, null, userData.getHearts(), acc, null, null));
 		}
 	}
 
