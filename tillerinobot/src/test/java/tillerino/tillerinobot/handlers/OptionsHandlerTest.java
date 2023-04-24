@@ -3,22 +3,29 @@ package tillerino.tillerinobot.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.commons.lang3.function.FailableFunction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
+import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
+import tillerino.tillerinobot.lang.Vietnamese;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -54,7 +61,7 @@ public class OptionsHandlerTest {
 	@Test
 	public void testSetLanguage() throws Exception {
 		OptionsHandler handler = new OptionsHandler(null);
-		
+
 		handler.handle("set languge tsundre", null, userData, new Default());
 		
 		verify(userData).setLanguage(LanguageIdentifier.Tsundere);
@@ -70,9 +77,15 @@ public class OptionsHandlerTest {
 
 	@Test
 	public void testSetVietnamese() throws Exception {
-		new OptionsHandler(null).handle("set languge Tiếng Việt", null, userData, new Default());
+		doAnswer(invocationOnMock -> {
+			FailableFunction<Language, GameChatResponse, RuntimeException> func = invocationOnMock.getArgument(0);
+			return func.apply(new Vietnamese());
+		}).when(userData).usingLanguage(any(FailableFunction.class));
+
+		GameChatResponse response = new OptionsHandler(null).handle("set languge Tiếng Việt", null, userData, new Default());
 
 		verify(userData).setLanguage(LanguageIdentifier.Vietnamese);
+		assertThat(response).isEqualTo(new Vietnamese().optionalCommentOnLanguage(null));
 	}
 
 	@Test
@@ -83,6 +96,7 @@ public class OptionsHandlerTest {
 			.isEqualTo(new Message("Language: Tiếng Việt"));
 	}
 
+	@Test
 	public void testSetUnknownLanguage() throws Exception {
 		OptionsHandler handler = new OptionsHandler(null);
 		
