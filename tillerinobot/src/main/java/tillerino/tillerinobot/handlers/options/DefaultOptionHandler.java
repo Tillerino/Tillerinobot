@@ -1,7 +1,7 @@
 package tillerino.tillerinobot.handlers.options;
 
+import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
-import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
@@ -32,6 +32,6 @@ public class DefaultOptionHandler extends OptionHandler {
     @Nonnull
     @Override
     protected String getCurrentValue(UserDataManager.UserData userData) {
-        return userData.getDefaultRecommendationOptions() != null ? userData.getDefaultRecommendationOptions() : "-";
+        return StringUtils.defaultString(userData.getDefaultRecommendationOptions(), "-");
     }
 }
