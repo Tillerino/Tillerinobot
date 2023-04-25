@@ -35,6 +35,13 @@ public class OptionsHandlerTest {
 		BB
 	}
 
+	private void mockUserDataUsingLanguage(LanguageIdentifier langIdent) {
+		doAnswer(invocationOnMock -> {
+			FailableFunction<Language, GameChatResponse, RuntimeException> func = invocationOnMock.getArgument(0);
+			return func.apply(langIdent.cls.getDeclaredConstructor().newInstance());
+		}).when(userData).usingLanguage(any(FailableFunction.class));
+	}
+
 	@Mock
 	UserData userData;
 
@@ -61,6 +68,7 @@ public class OptionsHandlerTest {
 	@Test
 	public void testSetLanguage() throws Exception {
 		OptionsHandler handler = new OptionsHandler(null);
+		mockUserDataUsingLanguage(LanguageIdentifier.Tsundere);
 
 		handler.handle("set languge tsundre", null, userData, new Default());
 		
@@ -77,10 +85,7 @@ public class OptionsHandlerTest {
 
 	@Test
 	public void testSetVietnamese() throws Exception {
-		doAnswer(invocationOnMock -> {
-			FailableFunction<Language, GameChatResponse, RuntimeException> func = invocationOnMock.getArgument(0);
-			return func.apply(new Vietnamese());
-		}).when(userData).usingLanguage(any(FailableFunction.class));
+		mockUserDataUsingLanguage(LanguageIdentifier.Vietnamese);
 
 		GameChatResponse response = new OptionsHandler(null).handle("set languge Tiếng Việt", null, userData, new Default());
 

@@ -49,7 +49,7 @@ public class RecentHandler implements CommandHandler {
 		}
 
 		userData.setLastSongInfo(estimates.getBeatmapWithMods());
-		return new Success(estimates.formInfoMessage(false, null,
+		return new Success(estimates.formInfoMessage(false, true, null,
 				userData.getHearts(), score.getAccuracy(), null, null));
 	}
 

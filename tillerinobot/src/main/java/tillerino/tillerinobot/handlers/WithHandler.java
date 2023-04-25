@@ -61,7 +61,7 @@ public class WithHandler implements CommandHandler {
 
 		userData.setLastSongInfo(new BeatmapWithMods(beatmap
 				.getBeatmap().getBeatmapId(), beatmap.getMods()));
-		return new Message(beatmap.formInfoMessage(false, null,
+		return new Message(beatmap.formInfoMessage(false, true, null,
 				userData.getHearts(), null, null, null))
 				.then(lang.optionalCommentOnWith(apiUser, beatmap));
 	}
