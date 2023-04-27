@@ -24,9 +24,6 @@ public class RemoteEventQueue extends AbstractRemoteQueue<GameChatEvent> impleme
 
 	@Override
 	public void onEvent(GameChatEvent event) {
-		if (event.getMeta().getMdc() == null) {
-			event.getMeta().setMdc(MdcUtils.getSnapshot());
-		}
 		send(event, event.getPriority());
 	}
 

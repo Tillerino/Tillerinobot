@@ -191,7 +191,7 @@ public class BotIT {
 			.isInstanceOfSatisfying(Sighted.class, message -> {
 				assertThat(message.getNick()).isEqualTo("test");
 				assertThat(message.getMeta()).isNotNull().satisfies(meta ->
-						assertThat(meta.getMdc().mdcValues()).containsKey("event"));
+						assertThat(meta.getMdc()).isNull());
 			}));
 	}
 

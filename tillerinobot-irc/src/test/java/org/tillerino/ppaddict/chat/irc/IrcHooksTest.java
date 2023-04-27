@@ -190,15 +190,6 @@ public class IrcHooksTest {
 	}
 
 	@Test
-	public void eventIdIsPutIntoMdc() throws Exception {
-		irc.onEvent(mockPrivateMessage(""));
-
-		verify(mdc).accept(ImmutableMap.of("event", "12300", "user", "userNick"));
-
-		assertThat(MDC.getCopyOfContextMap()).isNullOrEmpty();
-	}
-
-	@Test
 	public void unknownEventsAreForwardedToPinger() throws Exception {
 		UnknownEvent event = mockEvent(UnknownEvent.class);
 		irc.onEvent(event);

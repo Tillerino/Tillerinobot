@@ -1,11 +1,8 @@
 package org.tillerino.ppaddict.chat.irc;
 
-import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.pircbotx.User;
 import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.ActionEvent;
@@ -17,7 +14,6 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
-import org.slf4j.MDC;
 import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
@@ -29,8 +25,6 @@ import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 import org.tillerino.ppaddict.util.Clock;
-import org.tillerino.ppaddict.util.MdcUtils;
-import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,6 +45,8 @@ class IrcHooks extends CoreHooks {
 
 	private final AtomicLong lastSerial;
 	private final AtomicLong lastListTime;
+
+	private final ThreadLocal<Long> eventId = new ThreadLocal<>();
 
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2")
 	public IrcHooks(GameChatEventConsumer downStream,
@@ -106,9 +102,7 @@ class IrcHooks extends CoreHooks {
 
 		String nick = getNick(event);
 		if (event.getChannel() == null) {
-			downStream.onEvent(new PrivateAction(
-					MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
-					nick, timestamp(event), event.getMessage()));
+			downStream.onEvent(new PrivateAction(eventId.get(), nick, timestamp(event), event.getMessage()));
 		}
 	}
 
@@ -118,9 +112,7 @@ class IrcHooks extends CoreHooks {
 		if(silent)
 			return;
 
-		downStream.onEvent(new PrivateMessage(
-				MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
-				getNick(event), timestamp(event), event.getMessage()));
+		downStream.onEvent(new PrivateMessage(eventId.get(), getNick(event), timestamp(event), event.getMessage()));
 	}
 
 	@Override
@@ -137,25 +129,14 @@ class IrcHooks extends CoreHooks {
 	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "looks like a bug")
 	public void onEvent(Event event) throws Exception {
 		botInfo.setLastInteraction(timestamp(event));
-		MDC.clear();
-		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, lastSerial.getAndIncrement())) {
-			if (lastListTime.get() <= timestamp(event) - 60 * 60 * 1000) {
-				lastListTime.set(timestamp(event));
+		eventId.set(lastSerial.getAndIncrement());
+		if (lastListTime.get() <= timestamp(event) - 60 * 60 * 1000) {
+			lastListTime.set(timestamp(event));
 
-				event.getBot().sendRaw().rawLine("NAMES #osu");
-			}
-
-			User user = null;
-			if (event instanceof GenericUserEvent<?> generic) {
-				user = generic.getUser();
-				if (user != null) {
-					// looks like the mode event can have user == null ¯\_(ツ)_/¯
-					mdc.add(MdcUtils.MDC_USER, user.getNick());
-				}
-			}
-
-			super.onEvent(event);
+			event.getBot().sendRaw().rawLine("NAMES #osu");
 		}
+
+		super.onEvent(event);
 	}
 
 	@Override
@@ -174,8 +155,7 @@ class IrcHooks extends CoreHooks {
 			return;
 		}
 
-		downStream.onEvent(new Joined(MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
-				getNick(event), timestamp(event)));
+		downStream.onEvent(new Joined(eventId.get(), getNick(event), timestamp(event)));
 	}
 
 	@Override
@@ -193,19 +173,16 @@ class IrcHooks extends CoreHooks {
 
 		String[] usernames = parsedResponse.get(parsedResponse.size() - 1).split(" ");
 
-		for (int i = 0; i < usernames.length; i++) {
-			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, lastSerial.getAndIncrement())) {
-				String nick = usernames[i];
-				if (nick.startsWith("@") || nick.startsWith("+")) {
-					nick = nick.substring(1);
-				}
-				if (nick.equals(event.getBot().getNick())) {
-					continue;
-				}
-	
-				downStream.onEvent(new Sighted(MdcUtils.getLong(MdcUtils.MDC_EVENT).orElseThrow(IllegalStateException::new),
-						nick, timestamp(event)));
+		for (String username : usernames) {
+			String nick = username;
+			if (nick.startsWith("@") || nick.startsWith("+")) {
+				nick = nick.substring(1);
 			}
+			if (nick.equals(event.getBot().getNick())) {
+				continue;
+			}
+
+			downStream.onEvent(new Sighted(lastSerial.getAndIncrement(), nick, timestamp(event)));
 		}
 	}
 
