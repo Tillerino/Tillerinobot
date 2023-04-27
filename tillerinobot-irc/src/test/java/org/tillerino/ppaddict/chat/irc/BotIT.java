@@ -10,6 +10,7 @@ import static org.tillerino.ppaddict.rabbit.RabbitMqContainer.RABBIT_MQ;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.engio.mbassy.listener.Handler;
 import org.junit.After;
@@ -45,7 +46,7 @@ public class BotIT {
 	private GameChatWriter writer;
 	private GameChatClient gameChatClient;
 	private KittehListener listener = mock(KittehListener.class);
-	private List<ClientEvent> kittehEvents = Collections.synchronizedList(new ArrayList<>());
+	private final List<ClientEvent> kittehEvents = new ArrayList<>();
 
 	@Before
 	public void setUp() throws Exception {
@@ -74,7 +75,7 @@ public class BotIT {
 			ClientEvent event = invocation.getArgument(0);
 			if (!(event instanceof ClientReceiveCommandEvent)) {
 				// all messages are somehow double by this kind of event
-				kittehEvents.add(event);
+				withEvents(events -> events.add(event));
 			}
 			return null;
 		}).when(listener).onMessage(Mockito.any(ClientEvent.class));
@@ -100,11 +101,11 @@ public class BotIT {
 
 	protected void connectKitteh() {
 		kitteh.connect();
-		await().untilAsserted(() -> assertThat(kittehEvents).anySatisfy(event ->
+		await().untilAsserted(() -> withEvents(events -> assertThat(events).anySatisfy(event ->
 			assertThat(event).isInstanceOfSatisfying(ClientReceiveNumericEvent.class, message -> {
 			assertThat(message.getNumeric()).isEqualTo(318); // end of WHOIS
-		})));
-		kittehEvents.clear();
+		}))));
+		withEvents(List::clear);
 	}
 
 	@After
@@ -113,6 +114,13 @@ public class BotIT {
 			connection.close();
 		}
 		kitteh.shutdown();
+	}
+
+	void withEvents(Consumer<List<ClientEvent>> consumer) {
+		synchronized (kittehEvents) {
+			// since we iterate over the list, a simple synchronizedList is not sufficient
+			consumer.accept(kittehEvents);
+		}
 	}
 
 	@Test
@@ -191,25 +199,25 @@ public class BotIT {
 	public void outgoingPrivateMessage() throws Exception {
 		connectKitteh();
 		writer.message("hello", "test");
-		await().untilAsserted(() -> assertThat(kittehEvents)
+		await().untilAsserted(() -> withEvents(events -> assertThat(events)
 			.singleElement()
 			.isInstanceOfSatisfying(PrivateMessageEvent.class, message -> {
 				assertThat(message.getTarget()).isEqualTo("test");
 				assertThat(message.getMessage()).isEqualTo("hello");
-			}));
+			})));
 	}
 
 	@Test
 	public void outgoingPrivateAction() throws Exception {
 		connectKitteh();
 		writer.action("hello", "test");
-		await().untilAsserted(() -> assertThat(kittehEvents)
+		await().untilAsserted(() -> withEvents(events -> assertThat(events)
 			.singleElement()
 			.isInstanceOfSatisfying(PrivateCtcpQueryEvent.class, message -> {
 				assertThat(message.getTarget()).isEqualTo("test");
 				assertThat(message.getCommand()).isEqualTo("ACTION");
 				assertThat(message.getMessage()).isEqualTo("ACTION hello");
-			}));
+			})));
 	}
 
 	interface KittehListener {
