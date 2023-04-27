@@ -10,7 +10,6 @@
 	<Loggers>
 		<Root level="debug">
 			<AppenderRef ref="Console" />
-			<AppenderRef ref="Test" />
 		</Root>
 		<Logger name="org.pircbotx" level="error"/>
 		<Logger name="org.eclipse.jetty" level="info"/>

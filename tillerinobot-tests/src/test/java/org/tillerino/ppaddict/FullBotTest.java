@@ -297,7 +297,9 @@ public class FullBotTest {
 		verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\":")));
 
 		logRule.assertThat()
-				.anySatisfy(event -> assertThat(event.getContextData().toMap()).containsEntry("handler", "r"));
+			.anySatisfy(event -> assertThat(event.getContextData().toMap()).containsEntry("handler", "r"))
+			.allSatisfy(event -> assertThat(event.getContextData().toMap()).containsKey("event"))
+			.allSatisfy(event -> assertThat(event.getContextData().toMap()).containsKey("user"));
 
 		assertThat(botInfoApi.isReceiving()).isTrue();
 		assertThat(botInfoApi.isSending()).isTrue();

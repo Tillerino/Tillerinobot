@@ -47,7 +47,7 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 	public void onEvent(GameChatEvent event) throws InterruptedException {
 		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, event.getEventId())) {
 			mdc.add(MdcUtils.MDC_USER, event.getNick());
-			// these fields are also set by the IRC connector, but we'll make sure here
+			event.getMeta().setMdc(MdcUtils.getSnapshot());
 
 			if (event instanceof PrivateMessage || event instanceof PrivateAction) {
 				liveActivity.propagateReceivedMessage(event.getNick(), event.getEventId());
