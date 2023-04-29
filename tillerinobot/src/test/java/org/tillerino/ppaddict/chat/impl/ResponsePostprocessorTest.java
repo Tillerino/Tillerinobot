@@ -57,8 +57,8 @@ public class ResponsePostprocessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		when(writer.action(any(), any())).thenReturn(ok(Optional.of("")));
-		when(writer.message(any(), any())).thenReturn(ok(Optional.of("")));
+		when(writer.action(any(), any())).thenReturn(ok(Optional.empty()));
+		when(writer.message(any(), any())).thenReturn(ok(Optional.empty()));
 	}
 
 	@Test
@@ -168,7 +168,7 @@ public class ResponsePostprocessorTest {
 		int[] count = { 0 };
 		doAnswer(x -> {
 			if (count[0]++ > 0) {
-				return ok(Optional.of(""));
+				return ok(Optional.empty());
 			}
 			return err(new GameChatWriter.Error.Retry(0));
 		}).when(writer).message("abc", "nick");

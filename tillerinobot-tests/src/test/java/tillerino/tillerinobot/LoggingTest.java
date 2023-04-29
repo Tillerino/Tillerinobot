@@ -92,9 +92,9 @@ public class LoggingTest {
 
 		doAnswer(x -> {
 			MDC.put("ping", "14");
-			return ok(Optional.of(""));
+			return ok(Optional.empty());
 		}).when(out).message(anyString(), any());
-		doReturn(ok(Optional.of(""))).when(out).action(any(), any());
+		doReturn(ok(Optional.empty())).when(out).action(any(), any());
 	}
 
 	@After

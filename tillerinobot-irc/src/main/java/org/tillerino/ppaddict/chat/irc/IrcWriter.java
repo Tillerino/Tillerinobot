@@ -42,7 +42,7 @@ class IrcWriter implements GameChatWriter {
 			pinger.ping(waitForBot());
 
 			sender.accept(waitForBot().getUserChannelDao().getUser(recipient).send());
-			return ok(Optional.of(""));
+			return ok(Optional.empty());
 		} catch (RuntimeException e) {
 			if (e.getCause() instanceof InterruptedException) {
 				Thread.currentThread().interrupt();

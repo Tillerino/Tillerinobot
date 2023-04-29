@@ -51,7 +51,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		try {
 			for (GameChatResponse r : response.flatten()) {
 				for (int i = 0; i < 10; i++) { // arbitrary retry limit greater than zero
-					if (handleResponse(r, event) instanceof Err<Optional<String>, Error> err) {
+					if (handleResponse(r, event) instanceof Err<?, Error> err) {
 						if(err.e() instanceof Error.Retry retry) {
 							log.warn("Bot not connected. Retrying.");
 							Thread.sleep(retry.millis());
