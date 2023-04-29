@@ -5,6 +5,7 @@ import static org.tillerino.ppaddict.util.Result.ok;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -26,22 +27,22 @@ class IrcWriter implements GameChatWriter {
 	private final AtomicReference<CloseableBot> bot = new AtomicReference<>();
 
 	@Override
-	public Result<String, Error> message(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+	public Result<Optional<String>, Error> message(String msg, @IRCName String recipient) throws InterruptedException, IOException {
 		return send(recipient, output -> output.message(msg));
 	}
 
 	@Override
-	public Result<String, Error> action(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+	public Result<Optional<String>, Error> action(String msg, @IRCName String recipient) throws InterruptedException, IOException {
 		return send(recipient, output -> output.action(msg));
 	}
 
-	private Result<String, Error> send(@IRCName String recipient, Consumer<OutputUser> sender) {
+	private Result<Optional<String>, Error> send(@IRCName String recipient, Consumer<OutputUser> sender) {
 
 		try {
 			pinger.ping(waitForBot());
 
 			sender.accept(waitForBot().getUserChannelDao().getUser(recipient).send());
-			return ok("");
+			return ok(Optional.of(""));
 		} catch (RuntimeException e) {
 			if (e.getCause() instanceof InterruptedException) {
 				Thread.currentThread().interrupt();

@@ -18,6 +18,7 @@
 		<Logger name="org.springframework" level="warn"/>
 		<Logger name="org.jboss.logging" level="info"/>
 		<Logger name="com.github.dockerjava" level="info"/>
+		<Logger name="com.networknt" level="info"/>
 		<Logger name="org.testcontainers" level="info"/>
 		<Logger name="jndi" level="info"/>
 		<Logger name="org.apache.http" level="info"/>

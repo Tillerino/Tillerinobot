@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.err;
 import static org.tillerino.ppaddict.util.Result.ok;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,8 +57,8 @@ public class ResponsePostprocessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		when(writer.action(any(), any())).thenReturn(ok(""));
-		when(writer.message(any(), any())).thenReturn(ok(""));
+		when(writer.action(any(), any())).thenReturn(ok(Optional.of("")));
+		when(writer.message(any(), any())).thenReturn(ok(Optional.of("")));
 	}
 
 	@Test
@@ -166,7 +168,7 @@ public class ResponsePostprocessorTest {
 		int[] count = { 0 };
 		doAnswer(x -> {
 			if (count[0]++ > 0) {
-				return ok("");
+				return ok(Optional.of(""));
 			}
 			return err(new GameChatWriter.Error.Retry(0));
 		}).when(writer).message("abc", "nick");

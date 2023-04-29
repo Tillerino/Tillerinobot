@@ -3,6 +3,7 @@ package org.tillerino.ppaddict.rabbit;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -18,7 +19,9 @@ public class RabbitMqConfiguration {
 	}
 
 	public static ObjectMapper mapper() {
-		return new ObjectMapper().registerModule(new ParameterNamesModule());
+		return new ObjectMapper()
+			.registerModule(new ParameterNamesModule())
+			.registerModule(new Jdk8Module());
 	}
 
 	public static RemoteEventQueue externalEventQueue(Connection connection) throws IOException {

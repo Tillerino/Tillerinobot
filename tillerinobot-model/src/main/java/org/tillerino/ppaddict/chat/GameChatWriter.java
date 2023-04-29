@@ -1,6 +1,7 @@
 package org.tillerino.ppaddict.chat;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.tillerino.ppaddict.rabbit.Rpc;
 import org.tillerino.ppaddict.util.Result;
@@ -19,7 +20,7 @@ public interface GameChatWriter {
 	 * @param recipient the recipient of the message
 	 */
 	@Rpc(queue = "irc_writer", timeout = 12000)
-	Result<String, Error> message(String response, @IRCName String recipient) throws InterruptedException, IOException;
+	Result<Optional<String>, Error> message(String response, @IRCName String recipient) throws InterruptedException, IOException;
 
 	/**
 	 * Responds with an "action", a special kind of direct message.
@@ -28,7 +29,7 @@ public interface GameChatWriter {
 	 * @param recipient the recipient of the action
 	 */
 	@Rpc(queue = "irc_writer", timeout = 12000)
-	Result<String, Error> action(String response, @IRCName String recipient) throws InterruptedException, IOException;
+	Result<Optional<String>, Error> action(String response, @IRCName String recipient) throws InterruptedException, IOException;
 
 	@JsonTypeInfo(use = Id.MINIMAL_CLASS)
 	sealed interface Error {

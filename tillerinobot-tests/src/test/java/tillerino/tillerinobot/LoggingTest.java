@@ -14,6 +14,7 @@ import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -91,9 +92,9 @@ public class LoggingTest {
 
 		doAnswer(x -> {
 			MDC.put("ping", "14");
-			return ok("");
+			return ok(Optional.of(""));
 		}).when(out).message(anyString(), any());
-		doReturn(ok("")).when(out).action(any(), any());
+		doReturn(ok(Optional.of(""))).when(out).action(any(), any());
 	}
 
 	@After

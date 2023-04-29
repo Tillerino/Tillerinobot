@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.chat.impl;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -50,7 +51,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		try {
 			for (GameChatResponse r : response.flatten()) {
 				for (int i = 0; i < 10; i++) { // arbitrary retry limit greater than zero
-					if (handleResponse(r, event) instanceof Err<String, Error> err) {
+					if (handleResponse(r, event) instanceof Err<Optional<String>, Error> err) {
 						if(err.e() instanceof Error.Retry retry) {
 							log.warn("Bot not connected. Retrying.");
 							Thread.sleep(retry.millis());
@@ -73,7 +74,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	}
 
 	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
-	private Result<String, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
+	private Result<Optional<String>, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
 		if (response instanceof Message message) {
 			return message(message.getContent(), false, result);
 		} else if (response instanceof Success success) {
@@ -95,7 +96,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		}
 	}
 
-	private Result<String, Error> message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
+	private Result<Optional<String>, Error> message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
 		return writer.message(msg, result.getNick()).map(ok -> {
 			liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
