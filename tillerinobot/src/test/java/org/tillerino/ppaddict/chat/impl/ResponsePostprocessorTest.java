@@ -57,8 +57,8 @@ public class ResponsePostprocessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		when(writer.action(any(), any())).thenReturn(ok(Optional.empty()));
-		when(writer.message(any(), any())).thenReturn(ok(Optional.empty()));
+		when(writer.action(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
+		when(writer.message(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class ResponsePostprocessorTest {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Action("xyz"), event);
 		verify(writer).action("xyz", "nick");
-		verify(liveActivity).propagateSentMessage("nick", 1);
+		verify(liveActivity).propagateSentMessage("nick", 1, null);
 		verify(bouncer).exit("nick", 1);
 	}
 
@@ -75,7 +75,7 @@ public class ResponsePostprocessorTest {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Message("xyz"), event);
 		verify(writer).message("xyz", "nick");
-		verify(liveActivity).propagateSentMessage("nick", 1);
+		verify(liveActivity).propagateSentMessage("nick", 1, null);
 		verify(bouncer).exit("nick", 1);
 		
 	}
@@ -85,7 +85,7 @@ public class ResponsePostprocessorTest {
 		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Success("xyz"), event);
 		verify(writer).message("xyz", "nick");
-		verify(liveActivity).propagateSentMessage("nick", 1);
+		verify(liveActivity).propagateSentMessage("nick", 1, null);
 		verify(bouncer).exit("nick", 1);
 	}
 
@@ -95,7 +95,7 @@ public class ResponsePostprocessorTest {
 		responsePostprocessor.onResponse(new Message("xyz").then(new Action("abc")), event);
 		verify(writer).message("xyz", "nick");
 		verify(writer).action("abc", "nick");
-		verify(liveActivity, times(2)).propagateSentMessage("nick", 1);
+		verify(liveActivity, times(2)).propagateSentMessage("nick", 1, null);
 		verify(bouncer, times(1)).exit("nick", 1);
 	}
 
@@ -168,7 +168,7 @@ public class ResponsePostprocessorTest {
 		int[] count = { 0 };
 		doAnswer(x -> {
 			if (count[0]++ > 0) {
-				return ok(Optional.empty());
+				return ok(new GameChatWriter.Response(null));
 			}
 			return err(new GameChatWriter.Error.Retry(0));
 		}).when(writer).message("abc", "nick");

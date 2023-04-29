@@ -7,10 +7,10 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.ReceivedMessage;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.ReceivedMessageDetails;
 import org.tillerino.ppaddict.rabbit.RemoteLiveActivity.LiveActivityMessage.SentMessage;
-import org.tillerino.ppaddict.util.MdcUtils;
-import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
@@ -34,11 +34,11 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 	}
 
 	@Override
-	public void propagateSentMessage(String ircUserName, long eventId) {
+	public void propagateSentMessage(String ircUserName, long eventId, Long ping) {
 		final SentMessage message = new SentMessage();
 		message.setIrcUserName(ircUserName);
 		message.setEventId(eventId);
-		MdcUtils.getInt(MdcUtils.MDC_PING).ifPresent(message::setPing);
+		message.setPing(ping);
 		send(message);
 	}
 
@@ -50,10 +50,9 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 		send(message);
 	}
 
-	// older Java compiler needs the full qualifier :/
-	@lombok.Data
-	@com.fasterxml.jackson.annotation.JsonTypeInfo(use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME)
-	@com.fasterxml.jackson.annotation.JsonSubTypes({
+	@Data
+	@JsonTypeInfo(use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME)
+	@JsonSubTypes({
 			@Type(ReceivedMessage.class),
 			@Type(SentMessage.class),
 			@Type(ReceivedMessageDetails.class)
@@ -61,19 +60,12 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 	public static abstract class LiveActivityMessage {
 		private long eventId;
 
-		public abstract void visit(LiveActivity live);
-
 		@EqualsAndHashCode(callSuper = true)
 		@JsonTypeName("RECEIVED")
 		@Data
 		public static class ReceivedMessage extends LiveActivityMessage {
 			@IRCName
 			private String ircUserName;
-
-			@Override
-			public void visit(LiveActivity live) {
-				live.propagateReceivedMessage(getIrcUserName(), getEventId());
-			}
 		}
 
 		@EqualsAndHashCode(callSuper = true)
@@ -84,14 +76,7 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 			private String ircUserName;
 
 			@CheckForNull
-			private Integer ping;
-
-			@Override
-			public void visit(LiveActivity live) {
-				try(MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_PING, ping)) {
-					live.propagateSentMessage(getIrcUserName(), getEventId());
-				}
-			}
+			private Long ping;
 		}
 
 		@EqualsAndHashCode(callSuper = true)
@@ -99,11 +84,6 @@ public class RemoteLiveActivity extends AbstractRemoteQueue<RemoteLiveActivity.L
 		@Data
 		public static class ReceivedMessageDetails extends LiveActivityMessage {
 			private String text;
-
-			@Override
-			public void visit(LiveActivity live) {
-				live.propagateMessageDetails(getEventId(), getText());
-			}
 		}
 	}
 }

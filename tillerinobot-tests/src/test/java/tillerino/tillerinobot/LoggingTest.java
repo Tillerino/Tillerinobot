@@ -91,9 +91,9 @@ public class LoggingTest {
 		backend.setLastVisitedVersion("irc-guy", IRCBot.CURRENT_VERSION);
 
 		doAnswer(x -> {
-			return ok(Optional.of(new GameChatWriter.Response(14L)));
+			return ok(new GameChatWriter.Response(14L));
 		}).when(out).message(anyString(), any());
-		doReturn(ok(Optional.empty())).when(out).action(any(), any());
+		doReturn(ok(new GameChatWriter.Response(null))).when(out).action(any(), any());
 	}
 
 	@After

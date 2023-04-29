@@ -80,7 +80,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	}
 
 	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
-	private Result<Optional<Response>, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
+	private Result<Response, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
 		if (response instanceof Message message) {
 			return message(message.getContent(), false, result);
 		} else if (response instanceof Success success) {
@@ -89,16 +89,11 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 			String msg = action.getContent();
 			return writer.action(msg, result.getNick()).map(ok -> {
 				try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
-					ok.ifPresent(r -> {
-						if (r.ping() != null) {
-							mdc.add(MdcUtils.MDC_PING, r.ping());
-						}
-					});
-					liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
+					if (ok.ping() != null) {
+						mdc.add(MdcUtils.MDC_PING, ok.ping());
+					}
+					liveActivity.propagateSentMessage(result.getNick(), result.getEventId(), ok.ping());
 					log.debug("sent action: " + msg);
-				} finally {
-					// This is possibly set by the writer. If an exception occurs, it is cleared by the queue
-					MDC.remove(MdcUtils.MDC_PING);
 				}
 				return ok;
 			});
@@ -107,15 +102,13 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		}
 	}
 
-	private Result<Optional<Response>, Error> message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
+	private Result<Response, Error> message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
 		return writer.message(msg, result.getNick()).map(ok -> {
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
-				ok.ifPresent(r -> {
-					if (r.ping() != null) {
-						mdc.add(MdcUtils.MDC_PING, r.ping());
-					}
-				});
-				liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
+				if (ok.ping() != null) {
+					mdc.add(MdcUtils.MDC_PING, ok.ping());
+				}
+				liveActivity.propagateSentMessage(result.getNick(), result.getEventId(), ok.ping());
 				if (success) {
 					mdc.add(MdcUtils.MDC_DURATION, clock.currentTimeMillis() - result.getTimestamp());
 					mdc.add(MdcUtils.MDC_SUCCESS, true);
@@ -126,9 +119,6 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 				}
 				log.debug("sent: " + msg);
 				botInfo.setLastSentMessage(clock.currentTimeMillis());
-			} finally {
-				// This is possibly set by the writer. If an exception occurs, it is cleared by the queue
-				MDC.remove(MdcUtils.MDC_PING);
 			}
 			return ok;
 		});

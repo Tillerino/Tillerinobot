@@ -27,16 +27,16 @@ class IrcWriter implements GameChatWriter {
 	private final AtomicReference<CloseableBot> bot = new AtomicReference<>();
 
 	@Override
-	public Result<Optional<Response>, Error> message(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+	public Result<Response, Error> message(String msg, @IRCName String recipient) throws InterruptedException, IOException {
 		return send(recipient, output -> output.message(msg));
 	}
 
 	@Override
-	public Result<Optional<Response>, Error> action(String msg, @IRCName String recipient) throws InterruptedException, IOException {
+	public Result<Response, Error> action(String msg, @IRCName String recipient) throws InterruptedException, IOException {
 		return send(recipient, output -> output.action(msg));
 	}
 
-	private Result<Optional<Response>, Error> send(@IRCName String recipient, Consumer<OutputUser> sender) {
+	private Result<Response, Error> send(@IRCName String recipient, Consumer<OutputUser> sender) {
 
 		try {
 			Result<Optional<Long>, Error> pingResponse = pinger.ping(waitForBot());
@@ -45,7 +45,7 @@ class IrcWriter implements GameChatWriter {
 			}
 
 			sender.accept(waitForBot().getUserChannelDao().getUser(recipient).send());
-			return ok(Optional.of(new Response(pingResponse.ok().flatMap(x -> x).orElse(null))));
+			return ok(new Response(pingResponse.ok().flatMap(x -> x).orElse(null)));
 		} catch (RuntimeException e) {
 			if (e.getCause() instanceof InterruptedException) {
 				Thread.currentThread().interrupt();

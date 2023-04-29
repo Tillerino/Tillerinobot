@@ -82,7 +82,7 @@ public abstract class AbstractLiveActivityEndpointTest {
 
 	@Test
 	public void testPropagateMessageSent() {
-		push().propagateSentMessage("user", 15);
+		push().propagateSentMessage("user", 15, null);
 		Mockito.verify(client, Mockito.timeout(1000)).message(Mockito.argThat(s -> s.matches("\\{" +
 				"\"sent\":\\{" +
 				"\"eventId\":15," +
@@ -93,9 +93,7 @@ public abstract class AbstractLiveActivityEndpointTest {
 
 	@Test
 	public void testPropagateMessageSentWithPing() {
-		try (MdcAttributes with = MdcUtils.with(MdcUtils.MDC_PING, 12345)) {
-			push().propagateSentMessage("user", 15);
-		}
+		push().propagateSentMessage("user", 15, 12345L);
 		Mockito.verify(client, Mockito.timeout(1000)).message(Mockito.argThat(s -> s.matches("\\{" +
 				"\"sent\":\\{" +
 				"\"eventId\":15," +

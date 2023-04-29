@@ -1,7 +1,6 @@
 package org.tillerino.ppaddict.chat.irc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -11,9 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import java.util.Map;
-import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +30,6 @@ import org.pircbotx.hooks.events.ServerResponseEvent;
 import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.types.GenericUserEvent;
 import org.pircbotx.output.OutputRaw;
-import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
 import org.tillerino.ppaddict.chat.Joined;
@@ -45,7 +40,6 @@ import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.TestClock;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IrcHooksTest {
@@ -73,9 +67,6 @@ public class IrcHooksTest {
 	@Mock
 	OutputRaw outputRaw;
 
-	@Mock
-	Consumer<Map<String, String>> mdc;
-
 	@Before
 	public final void before() throws Exception {
 		clock.set(123);
@@ -85,10 +76,6 @@ public class IrcHooksTest {
 			System.out.println("Sending " + x.getArguments()[0]);
 			return null;
 		}).when(outputRaw).rawLine(anyString());
-		doAnswer(x -> {
-			mdc.accept(MDC.getCopyOfContextMap());
-			return null;
-		}).when(eventHandler).onEvent(any());
 		when(user.getNick()).thenReturn("userNick");
 		Configuration<PircBotX> configuration = mock(Configuration.class);
 		when(configuration.getName()).thenReturn("bot_name");
