@@ -12,8 +12,8 @@ import lombok.ToString;
 public class PrivateAction extends GameChatEvent {
 	private final String action;
 
-	public PrivateAction(long eventId, @IRCName String ircNick, @MillisSinceEpoch long timestamp, String action) {
-		super(eventId, ircNick, timestamp);
+	public PrivateAction(long eventId, @IRCName String nick, @MillisSinceEpoch long timestamp, String action) {
+		super(eventId, nick, timestamp);
 		this.action = action;
 	}
 

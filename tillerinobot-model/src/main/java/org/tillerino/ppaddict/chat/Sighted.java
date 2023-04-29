@@ -10,8 +10,8 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Sighted extends GameChatEvent {
-	public Sighted(long eventId, @IRCName String ircNick, @MillisSinceEpoch long timestamp) {
-		super(eventId, ircNick, timestamp);
+	public Sighted(long eventId, @IRCName String nick, @MillisSinceEpoch long timestamp) {
+		super(eventId, nick, timestamp);
 	}
 
 	@Override

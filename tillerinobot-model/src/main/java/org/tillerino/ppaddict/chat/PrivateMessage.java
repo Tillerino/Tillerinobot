@@ -12,8 +12,8 @@ import lombok.ToString;
 public class PrivateMessage extends GameChatEvent {
 	private final String message;
 
-	public PrivateMessage(long eventId, @IRCName String ircNick, @MillisSinceEpoch long timestamp, String message) {
-		super(eventId, ircNick, timestamp);
+	public PrivateMessage(long eventId, @IRCName String nick, @MillisSinceEpoch long timestamp, String message) {
+		super(eventId, nick, timestamp);
 		this.message = message;
 	}
 
