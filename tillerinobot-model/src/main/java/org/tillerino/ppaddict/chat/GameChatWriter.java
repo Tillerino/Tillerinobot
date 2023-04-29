@@ -20,7 +20,7 @@ public interface GameChatWriter {
 	 * @param recipient the recipient of the message
 	 */
 	@Rpc(queue = "irc_writer", timeout = 12000)
-	Result<Optional<String>, Error> message(String response, @IRCName String recipient) throws InterruptedException, IOException;
+	Result<Optional<Response>, Error> message(String response, @IRCName String recipient) throws InterruptedException, IOException;
 
 	/**
 	 * Responds with an "action", a special kind of direct message.
@@ -29,7 +29,7 @@ public interface GameChatWriter {
 	 * @param recipient the recipient of the action
 	 */
 	@Rpc(queue = "irc_writer", timeout = 12000)
-	Result<Optional<String>, Error> action(String response, @IRCName String recipient) throws InterruptedException, IOException;
+	Result<Optional<Response>, Error> action(String response, @IRCName String recipient) throws InterruptedException, IOException;
 
 	@JsonTypeInfo(use = Id.MINIMAL_CLASS)
 	sealed interface Error {
@@ -38,5 +38,9 @@ public interface GameChatWriter {
 		public record Unknown() implements Error { }
 
 		public record Retry(int millis) implements Error { }
+
+		public record PingDeath(long millis) implements Error { }
 	}
+
+	public record Response(Long ping) { }
 }

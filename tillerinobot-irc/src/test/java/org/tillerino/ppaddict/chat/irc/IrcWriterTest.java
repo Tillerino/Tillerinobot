@@ -1,12 +1,14 @@
 package org.tillerino.ppaddict.chat.irc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.err;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import org.junit.Before;
@@ -24,6 +26,7 @@ import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
+import org.tillerino.ppaddict.util.Result;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IrcWriterTest {
@@ -55,12 +58,13 @@ public class IrcWriterTest {
 	OutputUser outputUser;
 
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		writer.setBot(bot);
 		when(bot.getUserChannelDao()).thenReturn(userChannelDao);
 		when(userChannelDao.getUser("user")).thenReturn(pircBotXuser);
 		when(pircBotXuser.send()).thenReturn(outputUser);
 		when(bot.isConnected()).thenReturn(true);
+		when(pinger.ping(any())).thenReturn(Result.ok(Optional.empty()));
 	}
 
 	@Test

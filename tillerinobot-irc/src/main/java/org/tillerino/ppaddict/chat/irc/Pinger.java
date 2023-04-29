@@ -1,18 +1,21 @@
 package org.tillerino.ppaddict.chat.irc;
 
+import static org.tillerino.ppaddict.util.Result.ok;
+
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.UnknownEvent;
-import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatClientMetrics;
+import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.irc.BotRunnerImpl.CloseableBot;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.LoggingUtils;
-import org.tillerino.ppaddict.util.MdcUtils;
+import org.tillerino.ppaddict.util.Result;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +32,9 @@ class Pinger {
 
 	final AtomicInteger pingCalls = new AtomicInteger();
 
-	void ping(CloseableBot bot) throws IOException, InterruptedException {
+	Result<Optional<Long>, GameChatWriter.Error> ping(CloseableBot bot) throws IOException, InterruptedException {
 		if (pingCalls.incrementAndGet() % 10 != 0) {
-			return;
+			return ok(Optional.empty());
 		}
 
 		if(!bot.isConnected()) {
@@ -49,13 +52,12 @@ class Pinger {
 		Utils.sendRawLineToServer(bot, "PING " + pingMessage);
 
 		if(!pingLatch.await(10, TimeUnit.SECONDS)) {
-			MDC.put(MdcUtils.MDC_PING, 10000 + "");
 			botInfo.setLastPingDeath(clock.currentTimeMillis());
-			throw new IOException("ping timed out");
+			return Result.err(new GameChatWriter.Error.PingDeath(10000));
 		}
 
 		long ping = clock.currentTimeMillis() - time;
-		MDC.put(MdcUtils.MDC_PING, ping + "");
+		return ok(Optional.of(ping));
 	}
 
 	public void handleUnknownEvent(@SuppressWarnings("rawtypes") UnknownEvent event) {

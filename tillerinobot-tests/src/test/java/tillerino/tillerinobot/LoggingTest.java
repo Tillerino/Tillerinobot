@@ -91,8 +91,7 @@ public class LoggingTest {
 		backend.setLastVisitedVersion("irc-guy", IRCBot.CURRENT_VERSION);
 
 		doAnswer(x -> {
-			MDC.put("ping", "14");
-			return ok(Optional.empty());
+			return ok(Optional.of(new GameChatWriter.Response(14L)));
 		}).when(out).message(anyString(), any());
 		doReturn(ok(Optional.empty())).when(out).action(any(), any());
 	}

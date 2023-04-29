@@ -16,6 +16,7 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.GameChatResponseConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.GameChatWriter.Error;
+import org.tillerino.ppaddict.chat.GameChatWriter.Response;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
@@ -56,6 +57,11 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 							log.warn("Bot not connected. Retrying.");
 							Thread.sleep(retry.millis());
 							continue;
+						} else if (err.e() instanceof Error.PingDeath p) {
+							try(MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_PING, p.millis())) {
+								log.warn("ping timed out");
+							}
+							continue;
 						} else if (err.e() instanceof Error.Timeout) {
 							log.warn("Timed out while trying to send to IRC");
 						} else {
@@ -74,7 +80,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 	}
 
 	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
-	private Result<Optional<String>, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
+	private Result<Optional<Response>, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
 		if (response instanceof Message message) {
 			return message(message.getContent(), false, result);
 		} else if (response instanceof Success success) {
@@ -82,8 +88,13 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		} else if (response instanceof Action action) {
 			String msg = action.getContent();
 			return writer.action(msg, result.getNick()).map(ok -> {
-				liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 				try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
+					ok.ifPresent(r -> {
+						if (r.ping() != null) {
+							mdc.add(MdcUtils.MDC_PING, r.ping());
+						}
+					});
+					liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 					log.debug("sent action: " + msg);
 				} finally {
 					// This is possibly set by the writer. If an exception occurs, it is cleared by the queue
@@ -96,10 +107,15 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 		}
 	}
 
-	private Result<Optional<String>, Error> message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
+	private Result<Optional<Response>, Error> message(String msg, boolean success, GameChatEvent result) throws InterruptedException, IOException {
 		return writer.message(msg, result.getNick()).map(ok -> {
-			liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 			try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
+				ok.ifPresent(r -> {
+					if (r.ping() != null) {
+						mdc.add(MdcUtils.MDC_PING, r.ping());
+					}
+				});
+				liveActivity.propagateSentMessage(result.getNick(), result.getEventId());
 				if (success) {
 					mdc.add(MdcUtils.MDC_DURATION, clock.currentTimeMillis() - result.getTimestamp());
 					mdc.add(MdcUtils.MDC_SUCCESS, true);
