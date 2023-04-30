@@ -1,5 +1,2 @@
-*
-!irc-run.sh
-!target/*.jar
-!target/dependency/*.jar
-target/*-tests.jar
+target
+!target/release/main

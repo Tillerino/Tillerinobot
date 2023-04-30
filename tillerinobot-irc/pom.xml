@@ -12,49 +12,26 @@
 	<name>IRC</name>
 	<description>
 		IRC portion of Tillerinobot.
-		This is in its own module to limit the scope of the IRC dependencies.
+		The production stuff is written in Rust.
+		The tests are written on Java and are based on the running image.
 	</description>
 
 	<dependencies>
-		<!-- Internal -->
-		<dependency>
-			<groupId>org.tillerino.osu</groupId>
-			<artifactId>tillerinobot-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.tillerino.osu</groupId>
-			<artifactId>tillerinobot-rabbit</artifactId>
-		</dependency>
-
-		<!-- Specific dependencies -->
-		<dependency>
-			<groupId>org.pircbotx</groupId>
-			<artifactId>pircbotx</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>io.undertow</groupId>
-			<artifactId>undertow-core</artifactId>
-			<version>2.3.5.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-		<!-- These are transitive and managed, but PircbotX requires specific versions -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>20.0</version>
-		</dependency>
-
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
+			<scope>tests</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-model</artifactId>
 			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.tillerino.osu</groupId>
+			<artifactId>tillerinobot-rabbit</artifactId>
+			<scope>tests</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
@@ -83,24 +60,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<phase>package</phase>
-						<configuration>
-							<includeScope>runtime</includeScope>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>

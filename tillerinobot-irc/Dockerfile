@@ -1,15 +1,26 @@
-from openjdk:17
+# BUILD
+FROM rust:1.65-alpine
 
-RUN groupadd -g 10001 appuser \
-	&& useradd -u 10000 -g appuser appuser \
-	&& mkdir -p /app /app/dependency \
-	&& chown -R appuser:appuser /app
+# we need to install one library on alpine
+RUN apk add --no-cache musl-dev
 
-USER appuser
-WORKDIR /app
-COPY --chown=appuser:appuser irc-run.sh /app/irc-run.sh
-COPY --chown=appuser:appuser target/*.jar /app/
-COPY --chown=appuser:appuser target/dependency/*.jar /app/dependency/
+WORKDIR /build/
 
-CMD [ "sh", "irc-run.sh" ]
+# selection in .dockerignore
+ADD . .
+
+RUN (ldd target/release/main && echo "already built") || cargo build --release
+
+# RUN
+# curl image is based on alpine, so we're compatible
+FROM curlimages/curl
+
+USER root
+RUN apk add --no-cache musl-dev
+USER curl_user
+
+COPY --from=0 /build/target/release/main .
+
+CMD [ "./main" ]
+
 EXPOSE 8080

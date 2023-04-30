@@ -10,10 +10,15 @@ import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
 import org.tillerino.ppaddict.util.CustomTestContainer;
 
 public class IrcContainer {
-	public static final CustomTestContainer TILLERINOBOT_IRC = new CustomTestContainer(new ImageFromDockerfile()
+	private static final ImageFromDockerfile base = new ImageFromDockerfile()
 			.withFileFromFile("Dockerfile", new File("../tillerinobot-irc/Dockerfile"))
-			.withFileFromFile("irc-run.sh", new File("../tillerinobot-irc/irc-run.sh"))
-			.withFileFromFile("target", new File("../tillerinobot-irc/target")))
+			.withFileFromFile("Cargo.toml", new File("../tillerinobot-irc/Cargo.toml"))
+			.withFileFromFile("Cargo.lock", new File("../tillerinobot-irc/Cargo.lock"))
+			.withFileFromFile("src/main/rust", new File("../tillerinobot-irc/src/main/rust"));
+
+	public static final CustomTestContainer TILLERINOBOT_IRC = new CustomTestContainer(new File("../tillerinobot-irc/target/release/main").exists()
+			? base.withFileFromFile("target/release/main", new File("../tillerinobot-irc/target/release/main"))
+			: base)
 		// we set a fixed container name to make it more debuggable
 		.withCreateContainerCmdModifier(cmd -> cmd.withName("tillerinobot-irc"))
 		.withNetwork(NETWORK)

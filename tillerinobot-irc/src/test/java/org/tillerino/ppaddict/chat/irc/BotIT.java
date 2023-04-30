@@ -35,6 +35,7 @@ import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 import com.rabbitmq.client.Connection;
 
 import io.restassured.RestAssured;
+import org.tillerino.ppaddict.util.Result;
 
 public class BotIT {
 	@Rule
@@ -50,12 +51,24 @@ public class BotIT {
 
 	@Before
 	public void setUp() throws Exception {
+		System.out.println();
 		System.out.println("Running " + testName.getMethodName());
+
 		RABBIT_MQ.start();
+		connection = RabbitMqConfiguration.connectionFactory(RABBIT_MQ.getHost(), RABBIT_MQ.getAmqpPort())
+			.newConnection("test");
+		writer = RabbitRpc.remoteCallProxy(connection, GameChatWriter.class, new GameChatWriter.Error.Timeout());
+		gameChatClient = RabbitRpc.remoteCallProxy(connection, GameChatClient.class, new GameChatClient.Error.Timeout());
+		RemoteEventQueue incomingQueue = RabbitMqConfiguration.externalEventQueue(connection);
+		incomingQueue.setup();
+		incomingQueue.subscribe(incoming::add);
+
 		NGIRCD.start();
 		startBot();
 
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+		await().untilAsserted(() -> assertThat(gameChatClient.getMetrics().ok()).hasValueSatisfying(metrics ->
+			assertThat(metrics.isConnected()).isTrue()));
 
 		kitteh = Client.builder()
 			.nick("test")
@@ -79,14 +92,6 @@ public class BotIT {
 			}
 			return null;
 		}).when(listener).onMessage(Mockito.any(ClientEvent.class));
-
-		connection = RabbitMqConfiguration.connectionFactory(RABBIT_MQ.getHost(), RABBIT_MQ.getAmqpPort())
-			.newConnection("test");
-		RemoteEventQueue incomingQueue = RabbitMqConfiguration.externalEventQueue(connection);
-		incomingQueue.setup();
-		incomingQueue.subscribe(incoming::add);
-		writer = RabbitRpc.remoteCallProxy(connection, GameChatWriter.class, new GameChatWriter.Error.Unknown());
-		gameChatClient = RabbitRpc.remoteCallProxy(connection, GameChatClient.class, new GameChatClient.Error.Unknown());
 	}
 
 	protected void startBot() throws Exception {
@@ -113,7 +118,9 @@ public class BotIT {
 		if (connection != null && connection.isOpen()) {
 			connection.close();
 		}
-		kitteh.shutdown();
+		if (kitteh != null) {
+			kitteh.shutdown();
+		}
 	}
 
 	void withEvents(Consumer<List<ClientEvent>> consumer) {
@@ -135,8 +142,13 @@ public class BotIT {
 	public void livenessReactsToNgircd() throws Exception {
 		NGIRCD.stop();
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
+		Result<GameChatClientMetrics, GameChatClient.Error> metrics1 = gameChatClient.getMetrics();
+		assertThat(metrics1.ok()).hasValueSatisfying(metrics ->
+			assertThat(metrics.isConnected()).isFalse());
 		NGIRCD.start();
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+		assertThat(gameChatClient.getMetrics().ok()).hasValueSatisfying(metrics ->
+			assertThat(metrics.isConnected()).isTrue());
 	}
 
 	@Test
