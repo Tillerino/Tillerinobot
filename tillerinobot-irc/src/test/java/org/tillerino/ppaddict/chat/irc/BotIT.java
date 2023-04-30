@@ -185,6 +185,7 @@ public class BotIT {
 		await().untilAsserted(() -> assertThat(NGIRCD.logs).anySatisfy(message -> {
 			assertThat(message).contains("Kitteh");
 		}));
+		Thread.sleep(1000); // ngIRCd takes a bit to process the join
 		startBot();
 		await().untilAsserted(() -> assertThat(incoming)
 			.singleElement()
@@ -198,7 +199,7 @@ public class BotIT {
 	@Test
 	public void outgoingPrivateMessage() throws Exception {
 		connectKitteh();
-		writer.message("hello", "test");
+		assertThat(writer.message("hello", "test").ok()).isPresent();
 		await().untilAsserted(() -> withEvents(events -> assertThat(events)
 			.singleElement()
 			.isInstanceOfSatisfying(PrivateMessageEvent.class, message -> {
@@ -210,7 +211,7 @@ public class BotIT {
 	@Test
 	public void outgoingPrivateAction() throws Exception {
 		connectKitteh();
-		writer.action("hello", "test");
+		assertThat(writer.action("hello", "test").ok()).isPresent();
 		await().untilAsserted(() -> withEvents(events -> assertThat(events)
 			.singleElement()
 			.isInstanceOfSatisfying(PrivateCtcpQueryEvent.class, message -> {

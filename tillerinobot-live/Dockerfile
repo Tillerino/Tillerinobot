@@ -9,7 +9,7 @@ WORKDIR /build/
 # selection in .dockerignore
 ADD . .
 
-RUN (ls target/release/main && echo "already built") || cargo build --release
+RUN (ldd target/release/main && echo "already built") || cargo build --release
 
 # RUN
 # curl image is based on alpine, so we're compatible
