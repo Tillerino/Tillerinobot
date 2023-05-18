@@ -18,12 +18,12 @@ use crate::rabbit::irc_writer::IrcWriterErr;
 
 #[derive(Debug, Clone)]
 pub(crate) struct IrcConfig {
-	host: String,
-	port: u16,
+	pub host: String,
+	pub port: u16,
 	pub nickname: String,
-	password: String,
-	autojoin: Vec<String>,
-	ignore: bool,
+	pub password: String,
+	pub autojoin: Vec<String>,
+	pub ignore: bool,
 }
 
 impl Default for IrcConfig {
@@ -91,18 +91,24 @@ impl IrcEventConverter {
 		let timestamp = game_chat_client::now_millis();
 
 		self.metrics.lock().unwrap().last_interaction = timestamp;
-		if let Command::PRIVMSG(_, _) = message.command {
-			self.metrics.lock().unwrap().last_received_message = timestamp;
+		match message.command {
+			Command::PRIVMSG(_, _) => {
+				self.metrics.lock().unwrap().last_received_message = timestamp;
+			},
+			Command::PONG(_, Some(msg)) if Uuid::try_parse(&msg).is_ok() => {
+				pinger.pong(msg.clone()).await;
+				return vec![];
+			},
+			// Bancho IRC puts the identifier in a different place of the command than NgIRCd
+			Command::PONG(msg, _) if Uuid::try_parse(&msg).is_ok() => {
+				pinger.pong(msg.clone()).await;
+				return vec![];
+			},
+			Command::Response(Response::RPL_NAMREPLY, args) => {
+				return self.convert_names_event(timestamp, args);
+			},
+			_ => {}
 		}
-
-		if let Command::PONG(_, Some(msg)) = message.command {
-			pinger.pong(msg).await;
-			return vec![];
-		};
-
-		if let Command::Response(Response::RPL_NAMREPLY, args) = message.command {
-			return self.convert_names_event(timestamp, args);
-		};
 
 		let nick = match message.prefix {
 			Some(Prefix::Nickname(a, _, _)) if a == self.irc_config.nickname => {
