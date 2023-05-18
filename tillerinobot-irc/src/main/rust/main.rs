@@ -97,15 +97,16 @@ impl Main {
 				.map_or(false, |s| s.as_ref().map_or(false, |t| t.connected())) {
 			match self.connect_irc_once(&channel).await {
 				Err(Error::Irc(irc_error)) => {
-					println!("IRC error: {}. Reconnecting.", irc_error);
+					println!("IRC error: {}. Sleeping before reconnect.", irc_error);
 				},
 				Err(other) => {
 					return Err(other)
 				},
 				Ok(_) => {
-					println!("IRC connection ended. Reconnecting.");
+					println!("IRC connection ended. Sleeping before reconnect.");
 				},
 			}
+			tokio::time::sleep(Duration::from_secs(1)).await;
 		}
 		Ok(())
 	}
