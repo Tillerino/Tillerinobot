@@ -69,7 +69,7 @@ impl IrcEventConverter {
 		}
 	}
 
-	pub (crate) async fn listen_for_incoming_messages(&mut self, mut client: Client, channel: Channel, ponger: Ponger) -> Result<(), Error> {
+	pub (crate) async fn listen_for_incoming_messages(&mut self, mut client: Client, channel: &Channel, ponger: Ponger) -> Result<(), Error> {
 		let stream = &mut client.stream()?;
 		while let Some(message) = stream.next().await.transpose()? {
 			print!("{}", message);

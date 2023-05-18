@@ -36,7 +36,7 @@ async fn main() -> Result<(), Error> {
 	let main = Main::default();
 	let probes_fut = probes_config.start(main.rabbit_connected.clone(), main.metrics.clone());
 
-	let connect_fut = main.connect_loop();
+	let connect_fut = main.connect_rabbit_loop();
 
 	tokio::select! {
 		_ = probes_fut => {}
@@ -51,16 +51,15 @@ struct Main {
 	rabbit_config: RabbitConfig,
 	rabbit_connected: Arc<Mutex<Option<ConnectionStatus>>>,
 	quit: Arc<AtomicBool>,
-	metrics: Arc<Mutex<rabbit::game_chat_client::GameChatClientMetrics>>,
+	metrics: Arc<Mutex<game_chat_client::GameChatClientMetrics>>,
 }
 
 impl Main {
-	async fn connect_loop(self: &Self) -> Result<(), Error> {
+	async fn connect_rabbit_loop(self: &Self) -> Result<(), Error> {
 		while !self.quit.load(Ordering::Relaxed) {
 			let result = self.connect_once().await;
 			match result {
 				Ok(()) => {
-					// When the IRC connection is closed, the loop ends naturally :shrug:
 					println!("Connect loop ended.");
 				},
 				Err(Error::Irc(e)) => {
@@ -87,12 +86,31 @@ impl Main {
 
 		tokio::select! {
 			r = rabbit::game_chat_client::listen_for_calls(channel.clone(), self.metrics.clone()) => { r?; }
-			r = self.connect_once_irc(channel) => { r?; }
+			r = self.connect_irc_loop(&channel) => { r?; }
 		}
 		Ok(())
 	}
 
-	async fn connect_once_irc(self: &Self, channel: Channel) -> Result<(), Error> {
+	async fn connect_irc_loop(self: &Self, channel: &Channel) -> Result<(), Error> {
+		while !self.quit.load(Ordering::Relaxed)
+			&& self.rabbit_connected.lock()
+				.map_or(false, |s| s.as_ref().map_or(false, |t| t.connected())) {
+			match self.connect_irc_once(&channel).await {
+				Err(Error::Irc(irc_error)) => {
+					println!("IRC error: {}. Reconnecting.", irc_error);
+				},
+				Err(other) => {
+					return Err(other)
+				},
+				Ok(_) => {
+					println!("IRC connection ended. Reconnecting.");
+				},
+			}
+		}
+		Ok(())
+	}
+
+	async fn connect_irc_once(self: &Self, channel: &Channel) -> Result<(), Error> {
 		let client = self.connect_irc().await?;
 		let mut irc_converter = IrcEventConverter::create(self.irc_config.clone(), self.metrics.clone());
 
