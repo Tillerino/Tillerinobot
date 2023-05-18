@@ -21,13 +21,36 @@ Join the discussion on [discord](https://discord.gg/0ww19XGd9XsiJ4LI)!
 
 ## Technology
 
-Since a lot of people ask, the IRC frontend is built using [PircBotX](https://github.com/TheLQ/pircbotx).
+![Pepe Silvia](https://web.archive.org/web/20230329080529if_/https://i.kym-cdn.com/photos/images/original/002/546/187/fb1.jpg)
 
-For the [osu! API](https://github.com/ppy/osu-api/wiki), I rolled my own [Java library](https://github.com/Tillerino/osuApiConnector). It's available in [maven central](https://mvnrepository.com/artifact/com.github.tillerino/osu-api-connector). It also does some of the AR/OD calculations.
+Since I use the bot as a playground to try out technologies and concepts, it's... _interesting_ in some places and inconsistent at times.
+The bot is written mostly in Java with increasing amounts of Rust sprinkled about.
 
-To calculate pp, we first use [SanDoku](https://github.com/omkelderman/SanDoku) to calculate difficulty attributes
+frequently asked:
+- [The IRC frontend](tillerinobot-irc) is built using the Rust [irc](https://github.com/aatxe/irc) crate.
+- For the [osu! API](https://github.com/ppy/osu-api/wiki), I rolled my own [Java library](https://github.com/Tillerino/osuApiConnector).
+  It's available in [maven central](https://mvnrepository.com/artifact/com.github.tillerino/osu-api-connector). It also does some of the AR/OD calculations.
+  The bot still accesses the v1 api, I'd like to move to v2 when we can also use that for messaging.
+- To calculate pp, we first use [SanDoku](https://github.com/omkelderman/SanDoku) to calculate difficulty attributes
 and then our own [translation](src/main/java/tillerino/tillerinobot/diff/OsuScore.java) of the original pp code into Java.
+
+less frequently asked:
+- In a nutshell, the application runs in three containers:
+  - [The IRC frontend](tillerinobot-irc)
+  - [The backend](tillerinobot-live) for [this GUI](https://tillerino.github.io/Tillerinobot/)
+  - The core which is mostly in the [tillerinobot](tillerinobot) module, the [ppaddict backend](https://github.com/Tillerino/ppaddict) and some closed source stuff.
+- These three containers communicate via RabbitMQ with the contracts in [tillerinobot-model](tillerinobot-model) and [tillerinobot-rabbit](tillerinobot-rabbit).
+  Some of the communication is RPC (where it needs to be synchronous, e.g. block until a pong is received from IRC to prevent bursting), some is standard pub/sub.
+- There are a bunch of auxiliary containers, e.g. SanDoku (see above), some authentication stuff, RabbitMQ of course, etc.
 
 ## Building/Running Tillerinobot (for developing purposes)
 
 Check out [the wiki](https://github.com/Tillerino/Tillerinobot/wiki/Working-on-Tillerinobot) to find out how to build and run Tillerinobot locally for developing purposes.
+
+---
+
+If you want to support the project, consider becoming a patron:
+
+[![Become a patron](https://i.imgur.com/IvMFq4Q.png)](https://www.patreon.com/tillerinobot)
+
+For more info check out the [Wiki](https://github.com/Tillerino/Tillerinobot/wiki/Donate)!
