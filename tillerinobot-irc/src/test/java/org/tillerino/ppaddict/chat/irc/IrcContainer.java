@@ -19,8 +19,6 @@ public class IrcContainer {
 	public static final CustomTestContainer TILLERINOBOT_IRC = new CustomTestContainer(new File("../tillerinobot-irc/target/release/main").exists()
 			? base.withFileFromFile("target/release/main", new File("../tillerinobot-irc/target/release/main"))
 			: base)
-		// we set a fixed container name to make it more debuggable
-		.withCreateContainerCmdModifier(cmd -> cmd.withName("tillerinobot-irc"))
 		.withNetwork(NETWORK)
 		.withExposedPorts(8080)
 		.waitingFor(new HttpWaitStrategy().forPort(8080).forPath("/live"))
@@ -30,11 +28,12 @@ public class IrcContainer {
 		.withEnv("TILLERINOBOT_IRC_PASSWORD", "")
 		.withEnv("TILLERINOBOT_IRC_AUTOJOIN", "#osu")
 		.withEnv("TILLERINOBOT_IGNORE", "false")
+		.withEnv("RABBIT_VHOST", RabbitMqContainer.getVirtualHost())
 		.logging("IRC");
 
 	static {
 		NgircdContainer.NGIRCD.start();
-		RabbitMqContainer.getRabbitMq().start();
+		RabbitMqContainer.start();
 		TILLERINOBOT_IRC.start();
 	}
 }

@@ -194,7 +194,7 @@ public class FullBotTest {
 	static {
 		// these take a little longer to start, so we'll do that async
 		ForkJoinTask<?> mysql = ForkJoinTask.adapt((Runnable) MYSQL::start).fork();
-		RabbitMqContainer.getRabbitMq(); // make sure it's started
+		 // make sure it's started
 		getLive();
 		mysql.join();
 	}

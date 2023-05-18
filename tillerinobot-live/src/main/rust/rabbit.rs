@@ -8,6 +8,8 @@ use tokio::sync::mpsc::error::TrySendError;
 use tokio_amqp::LapinTokioExt;
 use warp::filters::ws::Message;
 
+use urlencoding::encode;
+
 use crate::websocket::{Conn, CONNECTIONS};
 
 lazy_static! {
@@ -90,12 +92,13 @@ async fn consume_rabbit() -> lapin::Result<()> {
 
 struct RabbitConfiguration {
     host: String,
-    port: u16
+    port: u16,
+    vhost: String,
 }
 
 impl RabbitConfiguration {
     fn connect_string(&self) -> String {
-        format!("amqp://{}:{}/%2f", self.host, self.port)
+        format!("amqp://{}:{}/{}", self.host, self.port, encode(&self.vhost))
     }
 }
 
@@ -103,7 +106,8 @@ impl Default for RabbitConfiguration {
     fn default() -> Self {
         Self {
             host: std::env::var("RABBIT_HOST").unwrap_or_else(|_| "rabbitmq".into()),
-            port: std::env::var("RABBIT_PORT").ok().and_then(|s| str::parse(s.as_str()).ok()).unwrap_or(5672)
+            port: std::env::var("RABBIT_PORT").ok().and_then(|s| str::parse(s.as_str()).ok()).unwrap_or(5672),
+            vhost: std::env::var("RABBIT_VHOST").unwrap_or_else(|_| "/".into()),
         }
     }
 }

@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
 import org.tillerino.ppaddict.util.CustomTestContainer;
 
 public class LiveContainer {
@@ -24,6 +25,7 @@ public class LiveContainer {
 			.withFileFromPath("Cargo.toml", Paths.get("../tillerinobot-live/Cargo.toml"))
 			.withFileFromPath("Cargo.lock", Paths.get("../tillerinobot-live/Cargo.lock")))
 			// accesing this static variable will make sure that RabbitMQ is started
+			.withEnv("RABBIT_VHOST", RabbitMqContainer.getVirtualHost())
 			.withNetwork(NETWORK)
 			.withExposedPorts(8080)
 			.waitingFor(Wait.forHttp("/ready").forStatusCode(200))

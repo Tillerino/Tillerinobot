@@ -18,6 +18,7 @@ irc = { version = "0.15", default-features = false, features = [ "ctcp" ] }
 thiserror = "1"
 warp = { version = "0.3", default-features = false }
 uuid = { version = "1", features = [ "v4" ] }
+urlencoding = "2"
 
 [[bin]]
 name = "main"

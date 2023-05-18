@@ -5,6 +5,7 @@ use std::fmt::Debug;
 use lapin::{BasicProperties, Channel, Connection, ConnectionProperties, Consumer, options::*, types::FieldTable};
 use lapin::message::Delivery;
 use serde::{Deserialize, Serialize};
+use urlencoding::encode;
 
 use crate::Error;
 
@@ -74,11 +75,12 @@ impl<O, E> From<Result<O, E>> for RabbitRpcResult<O, E> {
 pub(crate) struct RabbitConfig {
 	host: String,
 	port: u16,
+	vhost: String,
 }
 
 impl RabbitConfig {
 	pub(crate) async fn connect(&self) -> lapin::Result<Connection> {
-		let addr = format!("amqp://{}:{}/%2f", self.host, self.port);
+		let addr = format!("amqp://{}:{}/{}", self.host, self.port, encode(self.vhost.as_str()));
 
 		println!("Connecting to {}", addr);
 		let conn = Connection::connect(&addr, ConnectionProperties::default()
@@ -93,6 +95,7 @@ impl Default for RabbitConfig {
 		Self {
 			host: var("RABBIT_HOST").unwrap_or_else(|_| "rabbitmq".into()),
 			port: var("RABBIT_PORT").ok().map(|s| str::parse(s.as_str()).expect("unable to parse RABBIT_PORT")).unwrap_or(5672),
+			vhost: var("RABBIT_VHOST").unwrap_or_else(|_| "/".into()),
     }
 	}
 }

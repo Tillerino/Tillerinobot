@@ -20,8 +20,7 @@ public class RabbitMqContainerConnection extends ExternalResource {
 	@Override
 	protected void before() throws Throwable {
 		ConnectionFactory connectionFactory = RabbitMqConfiguration.connectionFactory(
-			"" + RabbitMqContainer.getRabbitMq().getHost(),
-			RabbitMqContainer.getRabbitMq().getMappedPort(5672));
+			RabbitMqContainer.getHost(), RabbitMqContainer.getAmqpPort(), RabbitMqContainer.getVirtualHost());
 		if (sharedExecutorService != null) {
 			connectionFactory.setSharedExecutor(sharedExecutorService);
 		}

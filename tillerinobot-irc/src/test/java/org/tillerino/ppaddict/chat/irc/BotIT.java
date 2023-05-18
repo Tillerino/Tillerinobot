@@ -5,7 +5,6 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.*;
 import static org.tillerino.ppaddict.chat.irc.IrcContainer.TILLERINOBOT_IRC;
 import static org.tillerino.ppaddict.chat.irc.NgircdContainer.NGIRCD;
-import static org.tillerino.ppaddict.rabbit.RabbitMqContainer.RABBIT_MQ;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,10 +28,12 @@ import org.kitteh.irc.client.library.exception.KittehNagException;
 import org.mockito.Mockito;
 import org.tillerino.ppaddict.chat.*;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
+import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
 import org.tillerino.ppaddict.rabbit.RabbitRpc;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 
 import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 
 import io.restassured.RestAssured;
 import org.tillerino.ppaddict.util.Result;
@@ -54,8 +55,9 @@ public class BotIT {
 		System.out.println();
 		System.out.println("Running " + testName.getMethodName());
 
-		RABBIT_MQ.start();
-		connection = RabbitMqConfiguration.connectionFactory(RABBIT_MQ.getHost(), RABBIT_MQ.getAmqpPort())
+		RabbitMqContainer.start();
+		connection = RabbitMqConfiguration.connectionFactory(RabbitMqContainer.getHost(),
+				RabbitMqContainer.getAmqpPort(), RabbitMqContainer.getVirtualHost())
 			.newConnection("test");
 		writer = RabbitRpc.remoteCallProxy(connection, GameChatWriter.class, new GameChatWriter.Error.Timeout());
 		gameChatClient = RabbitRpc.remoteCallProxy(connection, GameChatClient.class, new GameChatClient.Error.Timeout());
@@ -70,19 +72,7 @@ public class BotIT {
 		await().untilAsserted(() -> assertThat(gameChatClient.getMetrics().ok()).hasValueSatisfying(metrics ->
 			assertThat(metrics.isConnected()).isTrue()));
 
-		kitteh = Client.builder()
-			.nick("test")
-			.server()
-				.host(NGIRCD.getHost())
-				.port(NGIRCD.getMappedPort(6667), SecurityType.INSECURE)
-			.then().listeners()
-			.exception(e -> {
-				if (e instanceof KittehNagException) {
-					return;
-				}
-				e.printStackTrace();
-			})
-			.then().build();
+		kitteh = KittehForNgircd.buildKittehClient("test");
 		kitteh.getEventManager().registerEventListener(listener);
 		doAnswer(invocation -> {
 			ClientEvent event = invocation.getArgument(0);
@@ -132,9 +122,9 @@ public class BotIT {
 
 	@Test
 	public void livenessReactsToRabbit() throws Exception {
-		RABBIT_MQ.stop();
+		RabbitMqContainer.stop();
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
-		RABBIT_MQ.start();
+		RabbitMqContainer.start();
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
 	}
 

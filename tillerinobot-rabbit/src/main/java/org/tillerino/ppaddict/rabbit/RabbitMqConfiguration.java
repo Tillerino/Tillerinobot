@@ -11,10 +11,11 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class RabbitMqConfiguration {
 
-	public static ConnectionFactory connectionFactory(String hostName, int portNumber) {
+	public static ConnectionFactory connectionFactory(String hostName, int portNumber, String virtualHost) {
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost(hostName);
 		factory.setPort(portNumber);
+		factory.setVirtualHost(virtualHost);
 		return factory;
 	}
 
