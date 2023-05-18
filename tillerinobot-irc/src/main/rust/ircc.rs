@@ -127,9 +127,11 @@ impl IrcEventConverter {
 		};
 
 		match message.command {
-			Command::PRIVMSG(_, msg) if msg.starts_with("\u{1}ACTION ") && msg.ends_with("\u{1}") =>
+			Command::PRIVMSG(target, msg) if target == self.irc_config.nickname
+					&& msg.starts_with("\u{1}ACTION ") && msg.ends_with("\u{1}") =>
 				vec![GameChatEvent::PrivateAction { event_id, nick, timestamp, action: msg[8..msg.len() - 1].to_owned() }],
-			Command::PRIVMSG(_, msg) => vec![GameChatEvent::PrivateMessage { event_id, nick, timestamp, message: msg }],
+			Command::PRIVMSG(target, msg) if target == self.irc_config.nickname =>
+				vec![GameChatEvent::PrivateMessage { event_id, nick, timestamp, message: msg }],
 			Command::JOIN(_, _, _) => vec![GameChatEvent::Joined { event_id, nick, timestamp }],
 			_ => vec![GameChatEvent::Sighted { event_id, nick, timestamp }],
 		}
