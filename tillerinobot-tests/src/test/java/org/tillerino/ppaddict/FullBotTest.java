@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.tillerino.ppaddict.live.LiveContainer.getLive;
+import static tillerino.tillerinobot.MysqlContainer.mysql;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -43,7 +43,6 @@ import org.pircbotx.hooks.CoreHooks;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
-import org.testcontainers.containers.MySQLContainer;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
@@ -53,7 +52,6 @@ import org.tillerino.ppaddict.chat.irc.NgircdContainer;
 import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
-import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 import org.tillerino.ppaddict.rest.AuthenticationService;
@@ -179,9 +177,9 @@ public class FullBotTest {
 				@Override
 				protected DataSource dataSource() {
 					MysqlDataSource dataSource = new MysqlDataSource();
-					dataSource.setURL(MYSQL.getJdbcUrl());
-					dataSource.setUser(MYSQL.getUsername());
-					dataSource.setPassword(MYSQL.getPassword());
+					dataSource.setURL(mysql().getJdbcUrl());
+					dataSource.setUser(mysql().getUsername());
+					dataSource.setPassword(mysql().getPassword());
 					return dataSource;
 				}
 			});
@@ -189,14 +187,10 @@ public class FullBotTest {
 		}
 	}
 
-	private static final MySQLContainer MYSQL = new MySQLContainer<>();
-
 	static {
-		// these take a little longer to start, so we'll do that async
-		ForkJoinTask<?> mysql = ForkJoinTask.adapt((Runnable) MYSQL::start).fork();
-		 // make sure it's started
+		// make sure these are started
+		mysql();
 		getLive();
-		mysql.join();
 	}
 
 	@Mock

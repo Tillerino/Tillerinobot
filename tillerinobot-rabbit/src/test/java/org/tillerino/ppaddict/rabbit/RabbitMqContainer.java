@@ -3,53 +3,66 @@ package org.tillerino.ppaddict.rabbit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.RabbitMQContainer;
-
+import org.testcontainers.containers.output.OutputFrame;
+import org.tillerino.ppaddict.util.ReusableContainerInitializer;
 
 public class RabbitMqContainer {
 	private static final String VIRTUAL_HOST = UUID.randomUUID().toString();
-	private static String virtualHostAddedToId = null;
+
 
 	private static final Logger logger = LoggerFactory.getLogger("RABBIT");
-	public static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer()
+	private static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer()
 		.withNetwork(NETWORK)
 		.withNetworkAliases("rabbitmq")
 		.withReuse(true)
-		.withLogConsumer(frame -> logger.info(frame.getUtf8StringWithoutLineEnding()));
+		.withLogConsumer(new Consumer<OutputFrame>() {
+			// this logger makes sure that we don't output old logs from the reusable container.
+
+			boolean trip = false;
+			String startup = LocalDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+			@Override
+			public void accept(OutputFrame frame) {
+				String line = frame.getUtf8StringWithoutLineEnding();
+
+				// startsWith 20 checks if it starts with a timestamp. this will work until 2100 :D
+				if (!trip && line.startsWith("20") && line.compareTo(startup) >= 0) {
+					trip = true;
+				}
+				if (trip) {
+					logger.info(line);
+				}
+			}
+		});
+
+	private static final ReusableContainerInitializer<RabbitMQContainer> initializer = new ReusableContainerInitializer<>(
+		RABBIT_MQ, container ->
+			assertThat(container.execInContainer("rabbitmqadmin", "declare", "vhost", "name=" + VIRTUAL_HOST)
+					.getExitCode())
+				.isZero());
 
 	static {
 		start();
 	}
 
 	public synchronized static void start() {
-		RABBIT_MQ.start();
-		if (!Objects.equals(virtualHostAddedToId, RABBIT_MQ.getContainerId())) {
-			logger.info("Adding virtual host " + VIRTUAL_HOST);
-			try {
-				int exitCode = RABBIT_MQ.execInContainer("rabbitmqadmin", "declare", "vhost", "name=" + VIRTUAL_HOST)
-					.getExitCode();
-				assertThat(exitCode).isZero();
-				virtualHostAddedToId = RABBIT_MQ.getContainerId();
-			} catch (Exception e) {
-				logger.error("Error creating virtual host", e);
-			}
-			logger.info("RabbitMQ admin at " + RABBIT_MQ.getHttpUrl());
-		}
+		initializer.start();
 	}
 
 	public static String getHost() {
-		start();
-		return RABBIT_MQ.getHost();
+		return initializer.start().getHost();
 	}
 
 	public static int getAmqpPort() {
-		start();
-		return RABBIT_MQ.getAmqpPort();
+		return initializer.start().getAmqpPort();
 	}
 
 	public static String getVirtualHost() {
