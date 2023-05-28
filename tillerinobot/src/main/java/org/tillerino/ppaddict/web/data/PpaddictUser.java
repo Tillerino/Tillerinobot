@@ -23,7 +23,7 @@ public class PpaddictUser {
 	private String identifier;
 
 	@CheckForNull
-	@Column(length = 1024 * 1024)
+	@Column(length = 1024 * 1024, columnDefinition = "text")
 	private String data;
 
 	@PpaddictId

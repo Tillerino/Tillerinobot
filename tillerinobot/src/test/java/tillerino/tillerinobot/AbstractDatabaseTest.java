@@ -1,5 +1,7 @@
 package tillerino.tillerinobot;
 
+import static tillerino.tillerinobot.MysqlContainer.mysql;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,8 +14,6 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
 import org.tillerino.ppaddict.util.InjectionRunner;
@@ -23,6 +23,7 @@ import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.mysql.cj.jdbc.MysqlDataSource;
 
 import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
 import tillerino.tillerinobot.data.repos.BotConfigRepository;
@@ -64,7 +65,11 @@ public abstract class AbstractDatabaseTest {
 		}
 
 		protected DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).build();
+			MysqlDataSource dataSource = new MysqlDataSource();
+			dataSource.setURL(mysql().getJdbcUrl());
+			dataSource.setUser(mysql().getUsername());
+			dataSource.setPassword(mysql().getPassword());
+			return dataSource;
 		}
 
 		@Override

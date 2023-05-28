@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 
 import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.jetty.websocket.api.Session;
@@ -65,7 +64,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import com.mysql.cj.jdbc.MysqlDataSource;
 import com.rabbitmq.client.Connection;
 
 import lombok.RequiredArgsConstructor;
@@ -173,16 +171,7 @@ public class FullBotTest {
 			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 			bind(Connection.class).toInstance(rabbit.getConnection());
 			install(new RabbitQueuesModule());
-			install(new CreateInMemoryDatabaseModule() {
-				@Override
-				protected DataSource dataSource() {
-					MysqlDataSource dataSource = new MysqlDataSource();
-					dataSource.setURL(mysql().getJdbcUrl());
-					dataSource.setUser(mysql().getUsername());
-					dataSource.setPassword(mysql().getPassword());
-					return dataSource;
-				}
-			});
+			install(new CreateInMemoryDatabaseModule());
 			bind(BotStatus.class).to(BotInfoService.class);
 		}
 	}
