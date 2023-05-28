@@ -164,7 +164,6 @@ public class PersistentUserData implements HasLinkedOsuId {
     return linkedOsuId;
   }
 
-  @Nonnull
   public @UserId int getLinkedOsuIdOrThrow() throws NotLinked {
     Integer id = getLinkedOsuId();
     if (id == null) {
