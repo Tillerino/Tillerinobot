@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
+import org.tillerino.mormon.Mapping.FieldManager;
 import org.tillerino.mormon.Persister.Action;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -74,6 +75,25 @@ public record Database(Connection connection) implements AutoCloseable {
 
 		try(PreparedStatement s = prepare("delete from `" + Mapping.getOrCreateMapping(cls).table() + "` " + query)) {
 			Loader.setParameters(s, keyValues);
+
+			return s.executeUpdate();
+		}
+	}
+
+	public <T> int delete(@NonNull T obj) throws SQLException {
+		String query = Loader.getWhereQueryForKeyColumns(obj.getClass());
+		Mapping<? extends Object> mapping = Mapping.getOrCreateMapping(obj.getClass());
+
+		try(PreparedStatement s = prepare("delete from `" + mapping.table() + "` " + query)) {
+			int parameterCount = s.getParameterMetaData().getParameterCount();
+			for (int i = 0; i < parameterCount; i++) {
+				FieldManager<?> fieldManager = mapping.fieldManagers().get(i);
+				try {
+					fieldManager.toStatement(obj, s);
+				} catch (ReflectiveOperationException e) {
+					throw new RuntimeException("Error setting " + fieldManager.field(), e);
+				}
+			}
 
 			return s.executeUpdate();
 		}

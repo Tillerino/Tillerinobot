@@ -1,18 +1,16 @@
 package org.tillerino.ppaddict.web.data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import org.tillerino.mormon.KeyColumn;
+import org.tillerino.mormon.Table;
 import org.tillerino.ppaddict.web.types.PpaddictId;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Table("ppaddictlinkkeys")
+@KeyColumn("linkKey")
 @Data
-@Table(name = "ppaddictlinkkeys")
-@Entity(name = "ppaddictlinkkeys")
 @NoArgsConstructor
 @AllArgsConstructor
 public class PpaddictLinkKey {
@@ -20,7 +18,6 @@ public class PpaddictLinkKey {
 
 	private String displayName;
 
-	@Id
 	private String linkKey;
 
 	private long expires;

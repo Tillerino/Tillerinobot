@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -107,20 +109,39 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 	}
 
 	private static <T> List<FieldManager<?>> createFieldManagers(Class<T> cls) {
-		List<FieldManager<?>> fieldManagers = new ArrayList<>();
-		int indexInStatement = 1; // sql starts counting at 1
-		for(Class<?> curCls = cls; !curCls.equals(Object.class); curCls = curCls.getSuperclass()) {
-			for (Field f : curCls.getDeclaredFields()) {
-				Optional<FieldManager<Object>> fieldManager = FieldManager.create(f, indexInStatement);
-				if (!fieldManager.isPresent()) {
-					continue;
-				}
-				fieldManagers.add(fieldManager.get());
+		List<Field> fields = collectRelevantFields(cls);
 
-				indexInStatement++;
-			}
+		sortKeyColumnsToFront(cls, fields);
+
+		List<FieldManager<?>> fieldManagers = new ArrayList<>();
+		for (Field f : fields) {
+			// sql starts counting at 1
+			fieldManagers.add(FieldManager.create(f, fieldManagers.size() + 1));
 		}
 		return fieldManagers;
+	}
+
+	private static <T> List<Field> collectRelevantFields(Class<T> cls) {
+		List<Field> fields = new ArrayList<>();
+		for(Class<?> curCls = cls; !curCls.equals(Object.class); curCls = curCls.getSuperclass()) {
+			for (Field f : curCls.getDeclaredFields()) {
+				if (Modifier.isStatic(f.getModifiers()) || Modifier.isTransient(f.getModifiers())) {
+					continue;
+				}
+				fields.add(f);
+			}
+		}
+		return fields;
+	}
+
+	private static <T> void sortKeyColumnsToFront(Class<T> cls, List<Field> fields) {
+		List<String> keyColumns = Optional.ofNullable(cls.getAnnotation(KeyColumn.class))
+				.map(a -> List.of(a.value()))
+				.orElse(Collections.emptyList());
+		fields.sort(Comparator.comparingInt(f -> {
+			int index = keyColumns.indexOf(f.getName());
+			return index < 0 ? Integer.MAX_VALUE : index;
+		}));
 	}
 
 	private static String getTableName(Class<?> cls) {
@@ -142,7 +163,7 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 		return f.getName();
 	}
 
-	private record FieldManager<T>(
+	record FieldManager<T>(
 			Field field,
 			int index,
 			TypeHandler<T> call,
@@ -159,14 +180,7 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 			call.toStatement(value, statement, index);
 		}
 
-		static <T> Optional<FieldManager<T>> create(Field f, int indexInStatement) {
-			if (Modifier.isStatic(f.getModifiers()))
-				return Optional.empty();
-			if (Modifier.isTransient(f.getModifiers()))
-				return Optional.empty();
-			if(f.getName().startsWith("jdo"))
-				return Optional.empty();
-
+		static <T> FieldManager<T> create(Field f, int indexInStatement) {
 			@SuppressWarnings("unchecked")
 			TypeHandler<T> typeHandler = (TypeHandler<T>) typeHandlers.get(f.getType());
 			if (typeHandler == null) {
@@ -174,7 +188,7 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 			}
 
 			if (Modifier.isPublic(f.getModifiers())) {
-				return Optional.of(new FieldManager<>(f, indexInStatement, typeHandler, f::get, f::set));
+				return new FieldManager<>(f, indexInStatement, typeHandler, f::get, f::set);
 			} else {
 				Method getter;
 				try {
@@ -194,7 +208,7 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 					throw new RuntimeException("field " + f + " not public, but no setter!", e);
 				}
 
-				return Optional.of(new FieldManager<>(f, indexInStatement, typeHandler, getter::invoke, setter::invoke));
+				return new FieldManager<>(f, indexInStatement, typeHandler, getter::invoke, setter::invoke);
 			}
 		}
 	}

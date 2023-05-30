@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.Properties;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -15,6 +17,9 @@ import org.apache.commons.dbcp2.PoolableConnectionFactory;
 import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.tillerino.mormon.Persister.Action;
+
+import lombok.NonNull;
 
 @Singleton
 public class DatabaseManager implements AutoCloseable {
@@ -104,5 +109,33 @@ public class DatabaseManager implements AutoCloseable {
 	@Override
 	public void close() {
 		pool.close();
+	}
+
+	/**
+	 * Borrows a connection and calls {@link Database#loadUnique(Class, Object...)}
+	 */
+	@NonNull
+	public <T> Optional<T> loadUnique(Class<T> cls, Object... keyValues) throws SQLException {
+		try (Database db = getDatabase()) {
+			return db.loadUnique(cls, keyValues);
+		}
+	}
+
+	/**
+	 * Borrows a connection and calls {@link Database#persist(Object, Action)}
+	 */
+	public <T> int persist(@Nonnull @NonNull T obj, Action a) throws SQLException {
+		try (Database db = getDatabase()) {
+			return db.persist(obj, a);
+		}
+	}
+
+	/**
+	 * Borrows a connection and calls {@link Database#delete(Object)}
+	 */
+	public <T> int delete(@NonNull T obj) throws SQLException {
+		try (Database db = getDatabase()) {
+			return db.delete(obj);
+		}
 	}
 }
