@@ -14,7 +14,6 @@ import org.tillerino.ppaddict.server.auth.AuthArriveService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
 import org.tillerino.ppaddict.server.auth.implementations.OsuOauth;
 import org.tillerino.ppaddict.util.Clock;
-import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
@@ -55,10 +54,10 @@ public class PpaddictTestModule extends ServletModule {
 
   @Provides
   @Singleton
-  public PpaddictUserDataService getPpaddictUserDataService(PpaddictUserRepository users, DatabaseManager linkKeys, Clock clock, BotBackend botBackend) {
+  public PpaddictUserDataService getPpaddictUserDataService(DatabaseManager linkKeys, Clock clock, BotBackend botBackend) {
     final String osuOAuthPrefix = OsuOauth.OSU_AUTH_SERVICE_IDENTIFIER + ":";
 
-    return new PpaddictUserDataService(users, linkKeys, clock) {
+    return new PpaddictUserDataService(linkKeys, clock) {
       @Override
       public String getLinkString(String id, String displayName) throws SQLException {
         if (id.startsWith(osuOAuthPrefix)) {
