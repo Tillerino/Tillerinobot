@@ -1,19 +1,15 @@
 package tillerino.tillerinobot.data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import org.tillerino.mormon.KeyColumn;
+import org.tillerino.mormon.Table;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 
 import lombok.Data;
 
-@Table(name = "givenrecommendations")
-@Entity(name = "givenrecommendations")
+@Table("givenrecommendations")
+@KeyColumn("id")
 @Data
 public class GivenRecommendation {
 	public GivenRecommendation(@UserId int userid, @BeatmapId int beatmapid,
@@ -29,9 +25,7 @@ public class GivenRecommendation {
 		
 	}
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	@UserId
 	private int userid;

@@ -19,6 +19,8 @@ import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.tillerino.mormon.Loader;
+import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.util.TestModule;
@@ -47,6 +49,20 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 		backend.hintUser("donator", true, 1, 1000);
 
 		user = backend.downloadUser("donator");
+	}
+	
+	@Test
+	public void testAutoIncrement() throws SQLException {
+		GivenRecommendation rec = new GivenRecommendation(323456789, 2, 3, 4);
+
+		dbm.persist(rec, Action.INSERT);
+
+		try (Loader<GivenRecommendation> loader = db.loader(GivenRecommendation.class, "")) {
+			GivenRecommendation givenRecommendation = loader.queryUnique().get();
+			assertThat(givenRecommendation.getId())
+				.isPositive()
+				.isNotEqualTo(323456789);
+		}
 	}
 
 	@Test

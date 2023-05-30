@@ -25,7 +25,6 @@ import com.mysql.cj.jdbc.MysqlDataSource;
 
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
-import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.util.MysqlModule;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
@@ -66,11 +65,7 @@ public abstract class AbstractDatabaseTest {
 	@Inject
 	protected ThreadLocalAutoCommittingEntityManager em;
 	@Inject
-	protected GivenRecommendationRepository recommendationsRepo;
-	@Inject
 	protected ActualBeatmapRepository beatmapFilesRepo;
-	@Inject
-	protected GivenRecommendationRepository givenRecommendationRepository;
 	private ResetEntityManagerCloseable reset;
 
 	@Inject

@@ -127,7 +127,7 @@ public class Loader<T> implements AutoCloseable {
 		statement.close();
 	}
 
-	static void setParameters(PreparedStatement preparedStatement, Object... parameters) throws SQLException {
+	public static void setParameters(PreparedStatement preparedStatement, Object... parameters) throws SQLException {
 		int expectedParameterCount = preparedStatement.getParameterMetaData().getParameterCount();
 		if (expectedParameterCount != parameters.length) {
 			throw new SQLException("Expected " + expectedParameterCount + " parameters but received " + parameters.length);

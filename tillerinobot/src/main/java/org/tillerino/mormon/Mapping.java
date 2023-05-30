@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ContextedRuntimeException;
 import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.commons.lang3.function.FailableFunction;
 
@@ -72,8 +73,9 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 		for (FieldManager<?> fieldManager : fieldManagers) {
 			try {
 				fieldManager.toStatement(obj, statement);
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException("Error setting " + fieldManager.field, e);
+			} catch (Exception e) {
+				throw new ContextedRuntimeException(e)
+					.addContextValue("field", fieldManager.field);
 			}
 		}
 	}
@@ -82,8 +84,9 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 		for (FieldManager<?> fieldManager : fieldManagers) {
 			try {
 				fieldManager.fromResultSet(obj, resultSet);
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException("Error getting " + fieldManager.field, e);
+			} catch (Exception e) {
+				throw new ContextedRuntimeException(e)
+					.addContextValue("field", fieldManager.field);
 			}
 		}
 	}

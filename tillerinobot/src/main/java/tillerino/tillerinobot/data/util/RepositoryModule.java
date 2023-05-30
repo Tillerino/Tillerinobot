@@ -7,7 +7,6 @@ import javax.persistence.EntityManagerFactory;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 
 import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
-import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 import com.google.inject.AbstractModule;
@@ -21,7 +20,6 @@ public class RepositoryModule extends AbstractModule {
 		bind(ThreadLocalAutoCommittingEntityManager.class).in(Singleton.class);
 	}
 
-	private GivenRecommendationRepository recRepo;
 	private ActualBeatmapRepository beatmapFilesRepo;
 
 	@Provides
@@ -36,14 +34,7 @@ public class RepositoryModule extends AbstractModule {
 	}
 
 	protected void createRepositories(JpaRepositoryFactory factory) {
-		recRepo = factory.getRepository(GivenRecommendationRepository.class);
 		beatmapFilesRepo = factory.getRepository(ActualBeatmapRepository.class);
-	}
-
-	@Provides
-	@Singleton
-	public GivenRecommendationRepository recRepo(JpaRepositoryFactory factory) {
-		return recRepo;
 	}
 
 	@Provides

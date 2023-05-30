@@ -8,6 +8,7 @@ import static org.tillerino.osuApiModel.Mods.getMask;
 import static org.tillerino.osuApiModel.Mods.getMods;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.MDC;
+import org.tillerino.mormon.Database;
+import org.tillerino.mormon.DatabaseManager;
+import org.tillerino.mormon.Loader;
+import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -34,8 +39,6 @@ import org.tillerino.ppaddict.util.MdcUtils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
@@ -44,7 +47,6 @@ import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
-import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
@@ -60,7 +62,7 @@ import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 public class RecommendationsManager {
 	private final BotBackend backend;
 	
-	private final GivenRecommendationRepository recommendationsRepo;
+	private final DatabaseManager dbm;
 	
 	private final ThreadLocalAutoCommittingEntityManager em;
 
@@ -74,10 +76,6 @@ public class RecommendationsManager {
 			.expireAfterWrite(1, TimeUnit.HOURS)
 			.build();
 
-	private final LoadingCache<Integer, List<GivenRecommendation>> givenRecomendations = CacheBuilder.newBuilder()
-			.expireAfterAccess(1, TimeUnit.HOURS)
-			.build(CacheLoader.from(this::doLoadGivenRecommendations));
-	
 	/**
 	 * These take long to calculate, so we want to keep them for a bit, but they also take a lot of space. 100 should be a good balance.
 	 */
@@ -163,7 +161,6 @@ public class RecommendationsManager {
 
 		Recommendation recommendation = new Recommendation(loadBeatmap, sample);
 		
-		loadGivenRecommendations(userid).add(toGivenRecommendation(sample, userid));
 		lastRecommendation.put(userid, recommendation);
 
 		return recommendation;
@@ -211,12 +208,6 @@ public class RecommendationsManager {
 		return sampler;
 	}
 
-	private GivenRecommendation toGivenRecommendation(
-			BareRecommendation sample, @UserId int userid) {
-		return new GivenRecommendation(userid, sample.beatmapId(),
-				System.currentTimeMillis(), sample.mods());
-	}
-
 	private List<BareRecommendation> getTopRecommendations(
 			Collection<BareRecommendation> recommendations,
 			List<RecommendationPredicate> predicates) throws SQLException, IOException {
@@ -249,19 +240,20 @@ public class RecommendationsManager {
 
 	/**
 	 * forgets all given recommendations of the past for a single user
-	 * 
-	 * @param user
 	 */
-	public void forgetRecommendations(@UserId int user) {
-		em.ensureTransaction(() -> recommendationsRepo.forgetAll(user));
-		givenRecomendations.getUnchecked(user).clear();
+	public void forgetRecommendations(@UserId int user) throws SQLException {
+		try (Database db = dbm.getDatabase();
+				PreparedStatement statement = db.prepare("update givenrecommendations set forgotten = true where userid = ?");) {
+			Loader.setParameters(statement, user);
+			statement.executeUpdate();
+		}
 	}
 	
 	public void saveGivenRecommendation(@UserId int userid,
-			@BeatmapId int beatmapid, @BitwiseMods long mods) {
+			@BeatmapId int beatmapid, @BitwiseMods long mods) throws SQLException {
 		GivenRecommendation givenRecommendation = new GivenRecommendation(
 				userid, beatmapid, System.currentTimeMillis(), mods);
-		recommendationsRepo.save(givenRecommendation);
+		dbm.persist(givenRecommendation, Action.INSERT);
 	}
 	
 	/**
@@ -269,31 +261,34 @@ public class RecommendationsManager {
 	 * @param userid
 	 * @return ordered by date given from newest to oldest
 	 */
-	public List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) {
-		return givenRecomendations.getUnchecked(userid);
+	public List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) throws SQLException {
+		try (Database db = dbm.getDatabase();
+				Loader<GivenRecommendation> loader = db.loader(GivenRecommendation.class,
+						"where userid = ? and `date` > ? and not forgotten order by `date` desc")) {
+			return loader.queryList(userid, System.currentTimeMillis() - 28l * 24 * 60 * 60 * 1000);
+		}
 	}
 
-	private List<GivenRecommendation> doLoadGivenRecommendations(@UserId int userid) {
-		// we have to make a copy here since this list will escape the current entity manager
-		return new ArrayList<>(recommendationsRepo
-				.findByUseridAndDateGreaterThanAndForgottenFalseOrderByDateDesc(
-						userid, System.currentTimeMillis() - 28l * 24 * 60 * 60
-								* 1000));
-	}
-	
 	/**
 	 * Hide a recommendation. It will no longer be displayed in ppaddict, but
 	 * still taken into account when generating new recommendations.
 	 */
-	public void hideRecommendation(@UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods) {
-		em.ensureTransaction(() -> recommendationsRepo.hideRecommendations(userId, beatmapid, mods));
+	public void hideRecommendation(@UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods) throws SQLException {
+		try (Database db = dbm.getDatabase();
+				PreparedStatement statement = db.prepare("update givenrecommendations set hidden = true where userid = ? and beatmapid = ? and mods = ?");) {
+			Loader.setParameters(statement, userId, beatmapid, mods);
+			statement.executeUpdate();
+		}
 	}
 
 	/**
 	 * non-hidden recommendations. These might be older than four weeks.
 	 * @return ordered by date given from newest to oldest
 	 */
-	public List<GivenRecommendation> loadVisibleRecommendations(@UserId int userId) {
-		return recommendationsRepo.findByUseridAndHiddenFalseOrderByDateDesc(userId);
+	public List<GivenRecommendation> loadVisibleRecommendations(@UserId int userId) throws SQLException {
+		try (Database db = dbm.getDatabase();
+				Loader<GivenRecommendation> loader = db.loader(GivenRecommendation.class, "where userid = ? and not hidden order by `date` desc")) {
+			return loader.queryList(userId);
+		}
 	}
 }
