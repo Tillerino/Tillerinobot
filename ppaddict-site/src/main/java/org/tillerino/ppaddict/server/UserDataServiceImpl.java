@@ -175,8 +175,13 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
       if(persistent.getLinkedOsuId() == null && credentials instanceof CredentialsWithOsu osuCred) {
         // we've logged in with osu! OAuth and can immediately link this account :)
-        String token = ppaddictUserDataService.getLinkString(osuCred.identifier, osuCred.displayName);
-        ppaddictUserDataService.tryLinkToPpaddict(token, osuCred.getOsuUserId());
+        try {
+          String token =
+              ppaddictUserDataService.getLinkString(osuCred.identifier, osuCred.displayName);
+          ppaddictUserDataService.tryLinkToPpaddict(token, osuCred.getOsuUserId());
+        } catch (SQLException e) {
+          throw ExceptionsUtil.getLoggedWrappedException(log, e);
+        }
 
         // reload data right away in case that we already had settings stored in the osu:*** settings.
         persistent = getServerUserData(credentials);

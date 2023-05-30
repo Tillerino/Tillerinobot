@@ -6,11 +6,12 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.tillerino.mormon.DatabaseManager;
+import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.web.data.PpaddictLinkKey;
 import org.tillerino.ppaddict.web.data.PpaddictUser;
-import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
 import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 import org.tillerino.ppaddict.web.types.PpaddictId;
 
@@ -27,7 +28,7 @@ import tillerino.tillerinobot.handlers.LinkPpaddictHandler;
 public class PpaddictUserDataService {
 	private final PpaddictUserRepository users;
 
-	private final PpaddictLinkKeyRepository linkKeys;
+	private final DatabaseManager dbm;
 
 	private final Clock clock;
 
@@ -73,10 +74,10 @@ public class PpaddictUserDataService {
 		}
 	}
 
-	public String getLinkString(@PpaddictId String id, String displayName) {
+	public String getLinkString(@PpaddictId String id, String displayName) throws SQLException {
 		PpaddictLinkKey key = new PpaddictLinkKey(id, displayName, LinkPpaddictHandler.newKey(), clock.currentTimeMillis() + 60 * 1000L);
 
-		linkKeys.save(key);
+		dbm.persist(key, Action.INSERT);
 
 		return key.getLinkKey();
 	}
@@ -89,43 +90,43 @@ public class PpaddictUserDataService {
 	 * @return the name of the ppaddict account that current user was linked to, or empty if the token was not valid
 	 * @throws SQLException
 	 */
-	public Optional<String> tryLinkToPpaddict(String token, @UserId int osuUserId) {
-			Optional<PpaddictLinkKey> validLink = linkKeys.findById(token)
-			.filter(l -> l.getExpires() > clock.currentTimeMillis())
-			.filter(link -> !link.getIdentifier().startsWith("osu:")
-					// don't chain links
-			);
-			if (!validLink.isPresent()) {
-				return Optional.empty();
-			}
-			PpaddictLinkKey link = validLink.get();
-			PpaddictUser authenticatedUser = users.findById(link.getIdentifier())
-					.orElseGet(() -> new PpaddictUser(link.getIdentifier(), null, null));
-			if (authenticatedUser.getForward() != null) {
-				// don't change existing forwards
-				return Optional.empty();
-			}
-
-			String osuIdentifier = createPpaddictIdentifierForOsuId(osuUserId);
-
-			{
-				/*
-				 * copy old data to new place (if there were any and we're not overwriting
-				 * anything) and set osu id. note that the user data in the old place remains
-				 * unchanged as a backup.
-				 */
-				PersistentUserData osuData = loadUserData(osuIdentifier)
-						.orElseGet(() -> loadUserData(link.getIdentifier()).orElseGet(PersistentUserData::new));
-				osuData.setLinkedOsuId(osuUserId);
-				saveUserData(osuIdentifier, osuData);
-			}
-
-			authenticatedUser.setForward(osuIdentifier);
-			users.save(authenticatedUser);
-
-			linkKeys.delete(link);
-			return Optional.of(link.getDisplayName());
+	public Optional<String> tryLinkToPpaddict(String token, @UserId int osuUserId) throws SQLException {
+		Optional<PpaddictLinkKey> validLink = dbm.loadUnique(PpaddictLinkKey.class, token)
+				.filter(l -> l.getExpires() > clock.currentTimeMillis())
+				.filter(link -> !link.getIdentifier().startsWith("osu:")
+				// don't chain links
+				);
+		if (!validLink.isPresent()) {
+			return Optional.empty();
 		}
+		PpaddictLinkKey link = validLink.get();
+		PpaddictUser authenticatedUser = users.findById(link.getIdentifier())
+				.orElseGet(() -> new PpaddictUser(link.getIdentifier(), null, null));
+		if (authenticatedUser.getForward() != null) {
+			// don't change existing forwards
+			return Optional.empty();
+		}
+
+		String osuIdentifier = createPpaddictIdentifierForOsuId(osuUserId);
+
+		{
+			/*
+			 * copy old data to new place (if there were any and we're not overwriting
+			 * anything) and set osu id. note that the user data in the old place remains
+			 * unchanged as a backup.
+			 */
+			PersistentUserData osuData = loadUserData(osuIdentifier)
+					.orElseGet(() -> loadUserData(link.getIdentifier()).orElseGet(PersistentUserData::new));
+			osuData.setLinkedOsuId(osuUserId);
+			saveUserData(osuIdentifier, osuData);
+		}
+
+		authenticatedUser.setForward(osuIdentifier);
+		users.save(authenticatedUser);
+
+		dbm.delete(link);
+		return Optional.of(link.getDisplayName());
+	}
 
 	@SuppressFBWarnings(value = "TQ", justification = "source")
 	public static @PpaddictId String createPpaddictIdentifierForOsuId(@UserId int osuUserId) {
