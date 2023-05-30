@@ -68,14 +68,14 @@ import com.rabbitmq.client.Connection;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
+import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
-import tillerino.tillerinobot.TillerinobotConfigurationModule;
 import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.BotInfoService;
 import tillerino.tillerinobot.rest.BotStatus;
@@ -150,7 +150,6 @@ public class FullBotTest {
 
 		@Override
 		protected void configure() {
-			install(new TillerinobotConfigurationModule());
 			install(new ProcessorsModule());
 			install(new CachedDatabaseConfigServiceModule());
 
@@ -171,7 +170,7 @@ public class FullBotTest {
 			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
 			bind(Connection.class).toInstance(rabbit.getConnection());
 			install(new RabbitQueuesModule());
-			install(new CreateInMemoryDatabaseModule());
+			install(new DockeredMysqlModule());
 			bind(BotStatus.class).to(BotInfoService.class);
 		}
 	}
@@ -209,6 +208,9 @@ public class FullBotTest {
 	protected int recommendationsPerUser = 10;
 
 	private BotStatus botInfoApi;
+
+	@Rule
+	public MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
 	@Before
 	public void startBot() throws Exception {

@@ -49,7 +49,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.TestBackend;
@@ -62,7 +62,7 @@ public class ApiTest {
 	class ApiTestModule extends AbstractModule {
 		@Override
 		protected void configure() {
-			install(new CreateInMemoryDatabaseModule());
+			install(new DockeredMysqlModule());
 			bind(boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
 			bind(BotBackend.BeatmapsLoader.class).to(TestBeatmapsLoader.class);
 			bind(BotBackend.class).to(TestBackend.class);

@@ -2,68 +2,45 @@ package tillerino.tillerinobot;
 
 import static tillerino.tillerinobot.MysqlContainer.mysql;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.Properties;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
+import org.tillerino.mormon.Database;
+import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.ppaddict.util.InjectionRunner;
 import org.tillerino.ppaddict.util.TestModule;
 import org.tillerino.ppaddict.web.data.repos.PpaddictLinkKeyRepository;
 import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
+import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 import tillerino.tillerinobot.data.repos.ActualBeatmapRepository;
-import tillerino.tillerinobot.data.repos.BotConfigRepository;
 import tillerino.tillerinobot.data.repos.BotUserDataRepository;
 import tillerino.tillerinobot.data.repos.GivenRecommendationRepository;
 import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
-import tillerino.tillerinobot.data.util.RepositoryModule;
+import tillerino.tillerinobot.data.util.MysqlModule;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 /**
- * Creates an embedded HSQL database for tests.
+ * Creates a MySQL instance in running in Docker.
  */
-@TestModule(AbstractDatabaseTest.CreateInMemoryDatabaseModule.class)
+@TestModule(AbstractDatabaseTest.DockeredMysqlModule.class)
 @RunWith(InjectionRunner.class)
 public abstract class AbstractDatabaseTest {
-	public static class CreateInMemoryDatabaseModule extends AbstractModule {
-		EntityManagerFactory emf;
-		@Singleton
-		@Provides
-		public EntityManagerFactory newEntityManagerFactory() {
-			if (emf != null) {
-				return emf;
-			}
-			EclipseLinkJpaVendorAdapter vendorAdapter = new EclipseLinkJpaVendorAdapter();
-			vendorAdapter.setGenerateDdl(true);
-
-			LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-			factory.setJpaVendorAdapter(vendorAdapter);
-			Map<String, Object> jpaProperties = new LinkedHashMap<>();
-			jpaProperties.put(PersistenceUnitProperties.WEAVING, "false");
-			jpaProperties.put(PersistenceUnitProperties.CACHE_SHARED_DEFAULT, "false");
-			factory.setJpaPropertyMap(jpaProperties);
-			factory.setPackagesToScan("tillerino.tillerinobot.data", "org.tillerino.ppaddict.web.data");
-			factory.setDataSource(dataSource());
-			factory.afterPropertiesSet();
-
-			return emf = factory.getObject();
-		}
-
+	public static class DockeredMysqlModule extends MysqlModule {
 		protected DataSource dataSource() {
 			MysqlDataSource dataSource = new MysqlDataSource();
 			dataSource.setURL(mysql().getJdbcUrl());
@@ -72,11 +49,22 @@ public abstract class AbstractDatabaseTest {
 			return dataSource;
 		}
 
-		@Override
-		protected void configure() {
-			install(new RepositoryModule());
+		@Provides
+		@Named("mysql")
+		Properties myqslProperties() {
+			Properties props = new Properties();
+			props.put("host", mysql().getHost());
+			props.put("port", "" + mysql().getMappedPort(3306));
+			props.put("user", mysql().getUsername());
+			props.put("password", mysql().getPassword());
+			props.put("database", mysql().getDatabaseName());
+			return props;
 		}
 	}
+
+	@Rule
+	public TestRule resetMysql = new MysqlDatabaseLifecycle();
+
 	@Inject
 	protected EntityManagerFactory emf;
 	@Inject
@@ -94,23 +82,23 @@ public abstract class AbstractDatabaseTest {
 	@Inject
 	protected PpaddictLinkKeyRepository ppaddictLinkKeyRepository;
 	@Inject
-	protected BotConfigRepository botConfigRepository;
-	@Inject
 	protected GivenRecommendationRepository givenRecommendationRepository;
 	private ResetEntityManagerCloseable reset;
+
+	@Inject
+	protected DatabaseManager dbm;
+	protected Database db;
 
 	@Before
 	public void createEntityManager() {
 		reset = em.withNewEntityManager();
+		db = dbm.getDatabase();
 	}
 
 	@After
-	public void closeEntityManager() {
-		ppaddictUserRepository.deleteAll();
-		ppaddictLinkKeyRepository.deleteAll();
-		botConfigRepository.deleteAll();
-		givenRecommendationRepository.deleteAll();
+	public void closeEntityManager() throws SQLException {
 		reset.close();
+		db.close();
 	}
 
 	protected void reloadEntityManager() {

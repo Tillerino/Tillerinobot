@@ -42,6 +42,12 @@ less frequently asked:
 - These three containers communicate via RabbitMQ with the contracts in [tillerinobot-model](tillerinobot-model) and [tillerinobot-rabbit](tillerinobot-rabbit).
   Some of the communication is RPC (where it needs to be synchronous, e.g. block until a pong is received from IRC to prevent bursting), some is standard pub/sub.
 - There are a bunch of auxiliary containers, e.g. SanDoku (see above), some authentication stuff, RabbitMQ of course, etc.
+- I initially rolled my own ORM for database access. It was living in the closed-source part of the backend.
+  Since I wanted to open-source more and more of the backend and was hesitant about open-sourcing the ORM (it was messy),
+  I migrated all the database code that went into this repository to Spring Data JPA.
+  However, the use case is way too thin to justify the insane overhead of JPA,
+  so I polished my own ORM (dubbed mORMon) a bit and it now lives [in this repository](tillerinobot/src/main/java/org/tillerino/mormon).
+  I'm in the process of removing Spring Data JPA.
 
 ## Building/Running Tillerinobot (for developing purposes)
 

@@ -14,7 +14,6 @@ import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -47,6 +46,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 import tillerino.tillerinobot.lang.Default;
 
 /**
@@ -68,6 +68,9 @@ public class LoggingTest {
 	private TestBackend backend;
 
 	private Injector injector;
+
+	@Rule
+	public final MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
 	@Before
 	public void setUp() throws Exception {

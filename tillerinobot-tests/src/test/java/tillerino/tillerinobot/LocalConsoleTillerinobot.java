@@ -52,7 +52,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tillerino.tillerinobot.AbstractDatabaseTest.CreateInMemoryDatabaseModule;
+import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
@@ -73,8 +73,7 @@ import tillerino.tillerinobot.rest.BotApiDefinition;
 public class LocalConsoleTillerinobot extends AbstractModule {
 	@Override
 	protected void configure() {
-		install(new CreateInMemoryDatabaseModule());
-		install(new TillerinobotConfigurationModule());
+		install(new DockeredMysqlModule());
 		install(new InMemoryQueuesModule());
 		install(new ProcessorsModule());
 
@@ -119,11 +118,11 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		GameChatWriter writer = mock(GameChatWriter.class);
 		doAnswer(invocation -> {
 			System.out.println("*Tillerino " + invocation.getArguments()[0]);
-			return ok("");
+			return ok(new GameChatWriter.Response(null));
 		}).when(writer).action(anyString(), any());
 		doAnswer(invocation -> {
 			System.out.println("Tillerino: " + invocation.getArguments()[0]);
-			return ok("");
+			return ok(new GameChatWriter.Response(null));
 		}).when(writer).message(anyString(), any());
 		return writer;
 	}
@@ -142,6 +141,7 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	 */
 	public static void main(String[] args) throws Exception {
 		Injector injector = Guice.createInjector(new LocalConsoleTillerinobot());
+		MysqlContainer.MysqlDatabaseLifecycle.createSchema();
 
 		URI baseUri = UriBuilder.fromUri("http://localhost/")
 				.port(Integer.parseInt(Stream.of(args).findAny().orElse("0"))).build();

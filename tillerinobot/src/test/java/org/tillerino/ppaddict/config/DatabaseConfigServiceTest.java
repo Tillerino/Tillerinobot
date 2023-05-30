@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.inject.Inject;
 
 import org.junit.Test;
+import org.tillerino.mormon.Persister.Action;
 import org.tillerino.ppaddict.util.TestModule;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.data.BotConfig;
 
-@TestModule({ CachedDatabaseConfigServiceModule.class })
+@TestModule(CachedDatabaseConfigServiceModule.class)
 public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
 	@Inject
 	ConfigService config;
@@ -25,7 +26,7 @@ public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
 		BotConfig botConfig = new BotConfig();
 		botConfig.setPath("api-scores-maintenance");
 		botConfig.setValue("false");
-		botConfigRepository.save(botConfig);
+		db.persist(botConfig, Action.INSERT);
 		assertThat(config.scoresMaintenance()).isFalse();
 	}
 
@@ -34,7 +35,7 @@ public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
 		BotConfig botConfig = new BotConfig();
 		botConfig.setPath("api-scores-maintenance");
 		botConfig.setValue("true");
-		botConfigRepository.save(botConfig);
+		db.persist(botConfig, Action.INSERT);
 		assertThat(config.scoresMaintenance()).isTrue();
 	}
 }

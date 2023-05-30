@@ -1,20 +1,30 @@
 package org.tillerino.ppaddict.config;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ContextedRuntimeException;
+import org.tillerino.mormon.Database;
+import org.tillerino.mormon.DatabaseManager;
+
 import lombok.RequiredArgsConstructor;
-import tillerino.tillerinobot.data.repos.BotConfigRepository;
+import tillerino.tillerinobot.data.BotConfig;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DatabaseConfigService implements ConfigService {
-	private final BotConfigRepository repo;
+	private final DatabaseManager dbm;
 
 	@Override
 	public Optional<String> config(String key) {
-		return repo.findById(key).map(item -> item.getValue());
+		try (Database db = dbm.getDatabase()) {
+			return db.loadUnique(BotConfig.class, key).map(item -> item.getValue());
+		} catch (SQLException e) {
+			throw new ContextedRuntimeException("Unable to load config", e)
+				.addContextValue("key", key);
+		}
 	}
 }
