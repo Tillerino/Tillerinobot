@@ -19,7 +19,6 @@ import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.ppaddict.util.InjectionRunner;
 import org.tillerino.ppaddict.util.TestModule;
-import org.tillerino.ppaddict.web.data.repos.PpaddictUserRepository;
 
 import com.google.inject.Provides;
 import com.mysql.cj.jdbc.MysqlDataSource;
@@ -76,8 +75,6 @@ public abstract class AbstractDatabaseTest {
 	protected BotUserDataRepository userDataRepository;
 	@Inject
 	protected ActualBeatmapRepository beatmapFilesRepo;
-	@Inject
-	protected PpaddictUserRepository ppaddictUserRepository;
 	@Inject
 	protected GivenRecommendationRepository givenRecommendationRepository;
 	private ResetEntityManagerCloseable reset;
