@@ -53,8 +53,12 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements
 
     int osuId = userData.getLinkedOsuIdOrThrow();
 
-    List<GivenRecommendation> givenRecommendations =
-        recommendationsManager.loadVisibleRecommendations(osuId);
+    List<GivenRecommendation> givenRecommendations;
+    try {
+      givenRecommendations = recommendationsManager.loadVisibleRecommendations(osuId);
+    } catch (Exception e) {
+      throw ExceptionsUtil.getLoggedWrappedException(log, e);
+    }
 
     LinkedList<Beatmap> recommendations = new LinkedList<>();
 
