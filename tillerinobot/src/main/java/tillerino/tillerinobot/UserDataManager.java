@@ -13,6 +13,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
+import org.tillerino.mormon.DatabaseManager;
+import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
@@ -29,23 +31,15 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.data.BotUserData;
-import tillerino.tillerinobot.data.repos.BotUserDataRepository;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.util.IsMutable;
 
-/**
- * Manager for serializing and caching user data. Since user data can be
- * extremely volatile, we'll keep the data in cache and only serialize it when
- * the entry is being invalidated or the VM is being shut down. This might be a
- * bad idea.
- * 
- * @author Tillerino
- */
 @Singleton
 @SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
+@Slf4j
 public class UserDataManager {
 	/**
 	 * Bot-specific user data. It is only saved when changed and responsible for
@@ -180,22 +174,23 @@ public class UserDataManager {
 
 		@Override
 		public void close() {
-			manager.saveOptions(userid, this);
+			try {
+				manager.saveOptions(userid, this);
+			} catch (SQLException e) {
+				log.error("Error saving user data", e);
+			}
 		}
 	}
-	
-	final BotBackend backend;
-	
-	final ThreadLocalAutoCommittingEntityManager em;
-	
-	final BotUserDataRepository repository;
+
+	private final BotBackend backend;
+
+	private final DatabaseManager dbm;
 
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
-	public UserDataManager(BotBackend backend, ThreadLocalAutoCommittingEntityManager em, BotUserDataRepository repository) {
+	public UserDataManager(BotBackend backend, DatabaseManager dbm) {
 		this.backend = backend;
-		this.em = em;
-		this.repository = repository;
+		this.dbm = dbm;
 	}
 
 	/**
@@ -211,8 +206,8 @@ public class UserDataManager {
 			.setVisibility(PropertyAccessor.SETTER, Visibility.NONE)
 			.registerModule(new ParameterNamesModule());
 
-	public UserData getData(@UserId int userid) {
-		BotUserData data = repository.findByUserId(userid);
+	public UserData getData(@UserId int userid) throws SQLException {
+		BotUserData data = dbm.loadUnique(BotUserData.class, userid).orElse(null);
 
 		UserData options;
 		if(data == null || StringUtils.isEmpty(data.getUserdata())) {
@@ -231,7 +226,7 @@ public class UserDataManager {
 		return options;
 	}
 
-	void saveOptions(@UserId int userid, UserData options) {
+	void saveOptions(@UserId int userid, UserData options) throws SQLException {
 		if (!options.isChanged()) {
 			return;
 		}
@@ -249,7 +244,7 @@ public class UserDataManager {
 		BotUserData data = new BotUserData();
 		data.setUserId(userid);
 		data.setUserdata(serialized);
-		repository.save(data);
+		dbm.persist(data, Action.REPLACE);
 		options.setChanged(false);
 	}
 }
