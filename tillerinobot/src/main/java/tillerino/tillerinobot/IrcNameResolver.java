@@ -8,6 +8,8 @@ import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.tillerino.mormon.DatabaseManager;
+import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
@@ -21,13 +23,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.data.UserNameMapping;
-import tillerino.tillerinobot.data.repos.UserNameMappingRepository;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 @Slf4j
 @Singleton
 public class IrcNameResolver {
-	private final UserNameMappingRepository repo;
+	private final DatabaseManager dbm;
 
 	private final BotBackend backend;
 
@@ -67,7 +68,7 @@ public class IrcNameResolver {
 	@CheckForNull
 	public Integer getIDByUserName(@IRCName String userName) throws IOException,
 			SQLException {
-		UserNameMapping mapping = repo.findById(userName).orElse(null);
+		UserNameMapping mapping = dbm.loadUnique(UserNameMapping.class, userName).orElse(null);
 
 		long maxAge = 90l * 24 * 60 * 60 * 1000;
 		if (System.currentTimeMillis() < 1483747380000l /* sometime January 7th, 2017*/) {
@@ -109,7 +110,7 @@ public class IrcNameResolver {
 
 			mapping.setResolved(System.currentTimeMillis());
 
-			repo.save(mapping);
+			dbm.persist(mapping, Action.REPLACE);
 		}
 
 		if (mapping.getUserid() == -1) {
@@ -153,12 +154,12 @@ public class IrcNameResolver {
 	 * @param userId
 	 *            the osu! user id
 	 */
-	public void setMapping(@IRCName String ircName, @UserId int userId) {
+	public void setMapping(@IRCName String ircName, @UserId int userId) throws SQLException {
 		UserNameMapping mapping = new UserNameMapping();
 		mapping.setResolved(System.currentTimeMillis());
 		mapping.setUserid(userId);
 		mapping.setUserName(ircName);
-		repo.save(mapping);
+		dbm.persist(mapping, Action.REPLACE);
 		resolvedIRCNames.invalidate(ircName);
 	}
 
