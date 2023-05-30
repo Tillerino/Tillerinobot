@@ -13,6 +13,7 @@ import jakarta.ws.rs.WebApplicationException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.util.TestModule;
 
@@ -36,7 +37,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
 
   @Before
   public void init() {
-    resource = new AbstractBeatmapResource(beatmapFilesRepo, downloader, beatmap) {
+    resource = new AbstractBeatmapResource(dbm, downloader, beatmap) {
       @Override
       public OsuApiBeatmap get() {
         throw new UnsupportedOperationException();
@@ -48,13 +49,13 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
   public void testMigrations() throws Exception {
     String content = "hello";
     // save without hash for backwards compatibility
-    beatmapFilesRepo.save(new ActualBeatmap(12, content.getBytes(), null, 1, ""));
+    dbm.persist(new ActualBeatmap(12, content.getBytes(), null, 1, ""), Action.INSERT);
     beatmap.setBeatmapId(12);
     beatmap.setFileMd5(md5Hex(content));
     assertEquals(content, resource.getFile());
     verifyNoInteractions(downloader);
     // data was compressed after the fact
-    assertThat(beatmapFilesRepo.findById(12)).hasValueSatisfying(ab ->
+    assertThat(dbm.loadUnique(ActualBeatmap.class, 12)).hasValueSatisfying(ab ->
         assertThat(ab).hasFieldOrPropertyWithValue("content", null));
   }
 
@@ -62,7 +63,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
   public void testRedownloadOnWrongHash() throws Exception {
     String oldContent = "hello";
     String newContent = "world";
-    beatmapFilesRepo.save(new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)));
+    dbm.persist(new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)), Action.INSERT);
     beatmap.setBeatmapId(12);
     beatmap.setFileMd5(md5Hex(newContent));
     when(downloader.getActualBeatmap(12)).thenReturn(newContent);

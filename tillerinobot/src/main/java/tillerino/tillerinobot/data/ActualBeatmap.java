@@ -6,32 +6,29 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 import org.apache.commons.io.IOUtils;
+import org.tillerino.mormon.KeyColumn;
+import org.tillerino.mormon.Table;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Table("actualbeatmaps")
+@KeyColumn("beatmapid")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "actualbeatmaps")
-@Entity(name = "actualbeatmaps")
 @SuppressFBWarnings(value = "EI")
 public class ActualBeatmap {
-	@Id
 	@Nonnull
-	@Column(nullable = false)
 	private Integer beatmapid = 0;
 
-	@Column(length = 8 * 1024 * 1024, nullable = true)
+	@CheckForNull
 	private byte[] content;
 
 	/**
@@ -43,7 +40,7 @@ public class ActualBeatmap {
 	 * For the large beatmaps, this is very efficient.
 	 * E.g. beatmap 2571051 which is 14MiB is compressed down to 700KiB with gzip (no settings).
 	 */
-	@Column(name = "gzipContent", length = 8 * 1024 * 1024, nullable = true)
+	@CheckForNull
 	private byte[] gzipContent;
 
 	private long downloaded;
