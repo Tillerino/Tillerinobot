@@ -107,7 +107,7 @@ public class BeatmapMeta {
 	}
 
 	public interface PpMessageBuilder {
-	    String buildMessage(PercentageEstimates estimates);
+	    String buildMessage(PercentageEstimates estimates) throws UserException;
 
         static PpMessageBuilder getFor(Double acc, Integer combo, Integer misses) {
             if(acc == null) {
@@ -160,7 +160,7 @@ public class BeatmapMeta {
         }
 
         @Override
-        public String buildMessage(PercentageEstimates estimates) {
+        public String buildMessage(PercentageEstimates estimates) throws UserException {
             return format.format(acc * 100) + "% " + combo + "x " + misses + "miss: " +
                     noDecimalsFormat.format(estimates.getPP(acc, combo, misses)) + "pp";
         }

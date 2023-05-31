@@ -1,13 +1,14 @@
 package tillerino.tillerinobot.diff;
 
 import lombok.Value;
+import tillerino.tillerinobot.UserException;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
+import static tillerino.tillerinobot.UserException.validateInclusiveBetween;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.tillerino.osuApiModel.OsuApiScore;
 
@@ -84,11 +85,12 @@ public class AccuracyDistribution {
 	 * accuracy is matched. The accuracy that we can guarantee is +- 1/allObjects / 3, e.g.
 	 * for 500 objects it is +- 0.0006 or 0.06%.
 	 */
-	public static AccuracyDistribution model(int allObjects, int misses, final double acc) {
-		Validate.inclusiveBetween(1, Integer.MAX_VALUE, allObjects);
-		Validate.inclusiveBetween(0, allObjects, misses);
-		Validate.inclusiveBetween(OsuApiScore.getAccuracy(0, 0, allObjects - misses, misses),
-				OsuApiScore.getAccuracy(allObjects - misses, 0, 0, misses), acc);
+	public static AccuracyDistribution model(int allObjects, int misses, final double acc) throws UserException {
+		validateInclusiveBetween(1, Integer.MAX_VALUE, allObjects, "all object count");
+		validateInclusiveBetween(0, allObjects, misses, "number of misses");
+		// multiply acc by 100 for the error message
+		validateInclusiveBetween(100 * OsuApiScore.getAccuracy(0, 0, allObjects - misses, misses),
+				100 * OsuApiScore.getAccuracy(allObjects - misses, 0, 0, misses), 100 * acc, "accuracy");
 		// relative accuracy free of misses
 		double racc = acc * (allObjects / ((double) allObjects - misses));
 

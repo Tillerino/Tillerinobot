@@ -38,7 +38,6 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.UserException.QuietException;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 import tillerino.tillerinobot.handlers.AccHandler;
@@ -136,9 +135,6 @@ public class IRCBot implements GameChatEventConsumer {
 				return new Message("I'm undergoing maintenance and can't do that right now.");
 			}
 			if(e instanceof UserException) {
-				if(e instanceof QuietException) {
-					return GameChatResponse.none();
-				}
 				return new Message(e.getMessage());
 			} else {
 				if (e instanceof ServiceUnavailableException) {

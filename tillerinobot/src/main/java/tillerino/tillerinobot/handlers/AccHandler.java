@@ -86,7 +86,8 @@ public class AccHandler implements CommandHandler {
 		} catch (Exception e) {
 			throw new UserException(lang.invalidAccuracy(accString));
 		}
-		if (!(acc >= 0 && acc <= 100)) {
+		if (!(acc * 6 > 100 && acc <= 100)) {
+			// theoretically, with misses one can go lower than 1/6 accuracy, but whatever.
 			throw new UserException(lang.invalidAccuracy(accString));
 		}
 		acc = Math.round(acc * 100) / 10000d;

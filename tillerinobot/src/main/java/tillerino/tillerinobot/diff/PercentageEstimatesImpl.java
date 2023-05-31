@@ -3,6 +3,7 @@ package tillerino.tillerinobot.diff;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import lombok.Getter;
+import tillerino.tillerinobot.UserException;
 
 public class PercentageEstimatesImpl implements PercentageEstimates {
 	private final BeatmapImpl beatmap;
@@ -17,7 +18,13 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 
 	@Override
 	public double getPP(double acc) {
-		AccuracyDistribution dist = AccuracyDistribution.model(beatmap.getObjectCount(), 0, acc);
+		AccuracyDistribution dist;
+		try {
+			dist = AccuracyDistribution.model(beatmap.getObjectCount(), 0, acc);
+		} catch (UserException e) {
+			// this should have been allowed to get here.
+			throw new RuntimeException(e);
+		}
 
 		OsuScore score = new OsuScore((int) beatmap.DifficultyAttribute(getMods(), Beatmap.MaxCombo),
 				dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(), getMods());
@@ -26,7 +33,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 	}
 
 	@Override
-	public double getPP(double acc, int combo, int misses) {
+	public double getPP(double acc, int combo, int misses) throws UserException {
 		AccuracyDistribution dist = AccuracyDistribution.model(beatmap.getObjectCount(), misses, acc);
 
 		OsuScore score = new OsuScore(combo, dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(),

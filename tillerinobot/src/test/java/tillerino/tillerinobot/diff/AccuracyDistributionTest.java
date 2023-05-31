@@ -1,9 +1,12 @@
 package tillerino.tillerinobot.diff;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.tillerino.osuApiModel.OsuApiScore;
+
+import tillerino.tillerinobot.UserException;
 
 public class AccuracyDistributionTest {
 	@Test
@@ -88,5 +91,12 @@ public class AccuracyDistributionTest {
 			}
 			assertEquals(acc, rec, precision);
 		}
+	}
+
+	@Test
+	public void testIllegalAccuracy() throws Exception {
+		assertThatThrownBy(() -> AccuracyDistribution.model(100, 50, .6))
+			.isInstanceOf(UserException.class)
+			.hasMessageContaining("accuracy must be between 8.3");
 	}
 }
