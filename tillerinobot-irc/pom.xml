@@ -60,4 +60,51 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<!-- enable this profile with `-P cargo` to run cargo on your machine so that it doesn't need to be build in the Docker image -->
+			<id>cargo</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>cargo-build</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>cargo</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>--target=x86_64-unknown-linux-musl</argument>
+										<argument>--release</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy-custom-target</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>cp</executable>
+									<arguments>
+										<argument>target/x86_64-unknown-linux-musl/release/main</argument>
+										<argument>target/release/main</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
