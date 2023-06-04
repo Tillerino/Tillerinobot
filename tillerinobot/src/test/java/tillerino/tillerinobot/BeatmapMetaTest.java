@@ -55,7 +55,7 @@ public class BeatmapMetaTest {
 				.maxCombo(100)
 				.starDiff(2.68f)
 				.build();
-		beatmap.setStarDifficulty(cBeatmap.getStarDiff());
+		beatmap.setStarDifficulty(cBeatmap.starDiff());
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, Mods.getMask(Mods.DoubleTime));
 		return new BeatmapMeta(beatmap, personalPp, estimates);
 	}

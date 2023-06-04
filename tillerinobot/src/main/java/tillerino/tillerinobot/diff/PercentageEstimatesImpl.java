@@ -52,16 +52,16 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 
 	@Override
 	public double getStarDiff() {
-		return beatmap.getStarDiff();
+		return beatmap.starDiff();
 	}
 
 	@Override
 	public double getApproachRate() {
-		return beatmap.getApproachRate();
+		return beatmap.approachRate();
 	}
 
 	@Override
 	public double getOverallDifficulty() {
-		return beatmap.getOverallDifficulty();
+		return beatmap.overallDifficulty();
 	}
 }

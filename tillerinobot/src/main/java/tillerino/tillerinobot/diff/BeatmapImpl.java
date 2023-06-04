@@ -4,34 +4,30 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Builder;
-import lombok.Value;
 
 /**
  * This class implements {@link Beatmap} which is the interface that the
  * translated pp calculation uses to get info about the beatmap.
  */
-@Value
-@Builder(toBuilder = true)
+@Builder
 // suppress warning about case-insensitive field collision, because we cannot change the names in CBeatmap
 @SuppressWarnings("squid:S1845")
 @SuppressFBWarnings("NM")
-public class BeatmapImpl implements Beatmap {
-	@BitwiseMods
-	private long modsUsed;
-
-	private float starDiff;
-	private float aim;
-	private float speed;
-	private float overallDifficulty;
-	private float approachRate;
-	private int maxCombo;
-	private float sliderFactor;
-	private float flashlight;
-	private float speedNoteCount;
-
-	private int circleCount;
-	private int spinnerCount;
-	private int sliderCount;
+public record BeatmapImpl(
+		@BitwiseMods long modsUsed,
+		float starDiff,
+		float aim,
+		float speed,
+		float overallDifficulty,
+		float approachRate,
+		int maxCombo,
+		float sliderFactor,
+		float flashlight,
+		float speedNoteCount,
+		int circleCount,
+		int spinnerCount,
+		int sliderCount) implements Beatmap {
+	
 
 	@Override
 	public float DifficultyAttribute(long mods, int kind) {
