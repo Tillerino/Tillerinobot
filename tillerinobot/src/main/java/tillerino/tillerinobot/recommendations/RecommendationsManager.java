@@ -47,7 +47,6 @@ import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
 import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
@@ -63,8 +62,6 @@ public class RecommendationsManager {
 	private final BotBackend backend;
 	
 	private final DatabaseManager dbm;
-	
-	private final ThreadLocalAutoCommittingEntityManager em;
 
 	private final RecommendationRequestParser parser;
 

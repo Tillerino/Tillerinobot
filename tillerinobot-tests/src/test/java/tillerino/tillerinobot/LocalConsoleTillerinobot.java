@@ -55,8 +55,6 @@ import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
@@ -162,7 +160,6 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 		final @Named("messagePreprocessor") GameChatEventConsumer preprocessor;
 		final BotBackend backend;
 		final IrcNameResolver resolver;
-		final ThreadLocalAutoCommittingEntityManager em;
 
 		final AtomicBoolean running = new AtomicBoolean(true);
 		String username;
@@ -191,23 +188,21 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 			System.out.println("please provide your name:");
 			username = scanner.nextLine();
 
-			try(ResetEntityManagerCloseable cl = em.withNewEntityManager()) {
-				if (resolver.resolveIRCName(username) == null
-						&& backend instanceof TestBackend testBackend) {
-					System.out.println("you're new. I'll have to ask you a couple of questions.");
+			if (resolver.resolveIRCName(username) == null
+					&& backend instanceof TestBackend testBackend) {
+				System.out.println("you're new. I'll have to ask you a couple of questions.");
 
-					System.out.println("are you a donator? (anything for yes)");
-					final boolean donator = scanner.nextLine().length() > 0;
+				System.out.println("are you a donator? (anything for yes)");
+				final boolean donator = scanner.nextLine().length() > 0;
 
-					System.out.println("what's your rank?");
-					final int rank = Integer.parseInt(scanner.nextLine());
+				System.out.println("what's your rank?");
+				final int rank = Integer.parseInt(scanner.nextLine());
 
-					System.out.println("how much pp do you have?");
-					final double pp = Double.parseDouble(scanner.nextLine());
+				System.out.println("how much pp do you have?");
+				final double pp = Double.parseDouble(scanner.nextLine());
 
-					testBackend.hintUser(username, donator, rank, pp);
-					resolver.resolveManually(backend.downloadUser(username).getUserId());
-				}
+				testBackend.hintUser(username, donator, rank, pp);
+				resolver.resolveManually(backend.downloadUser(username).getUserId());
 			}
 
 			System.out.println("Welcome to the Tillerinobot simulator");

@@ -14,8 +14,6 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map.Entry;
 
-import javax.persistence.EntityManagerFactory;
-
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.Client;
@@ -146,11 +144,6 @@ public class ApiTest {
 		botStatus = WebResourceFactory.newResource(BotStatus.class, target);
 		beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
 		when(injector.getInstance(GameChatClient.class).getMetrics()).thenReturn(ok(remoteMetrics));
-	}
-
-	@After
-	public void stop() throws Exception {
-		injector.getInstance(EntityManagerFactory.class).close();
 	}
 
 	@Test

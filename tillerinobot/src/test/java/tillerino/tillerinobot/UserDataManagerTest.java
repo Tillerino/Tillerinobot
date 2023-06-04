@@ -36,7 +36,6 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 	}
 
 	private void reloadManager() {
-		reloadEntityManager();
 		manager = new UserDataManager(null, dbm);
 	}
 

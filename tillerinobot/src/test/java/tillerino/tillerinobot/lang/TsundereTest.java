@@ -28,8 +28,9 @@ public class TsundereTest {
 
 		// mock backend and create RecommendationsManager and RecommendHandler based on mocked backend
 		BotBackend backend = mock(BotBackend.class);
-		RecommendHandler handler = new RecommendHandler(new RecommendationsManager(backend, null, null,
-				new RecommendationRequestParser(backend), new TestBackend.TestBeatmapsLoader(), mock(Recommender.class)),
+		RecommendHandler handler = new RecommendHandler(new RecommendationsManager(backend, null,
+				new RecommendationRequestParser(backend),
+				new TestBackend.TestBeatmapsLoader(), mock(Recommender.class)),
 				mock(LiveActivity.class));
 
 		// make a bullshit call to the handler four times

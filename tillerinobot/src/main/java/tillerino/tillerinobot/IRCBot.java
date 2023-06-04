@@ -38,8 +38,6 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.ComplaintHandler;
 import tillerino.tillerinobot.handlers.DebugHandler;
@@ -70,7 +68,6 @@ public class IRCBot implements GameChatEventConsumer {
 	private final BotBackend backend;
 	private final UserDataManager userDataManager;
 	private final List<CommandHandler> commandHandlers = new ArrayList<>();
-	private final ThreadLocalAutoCommittingEntityManager em;
 	private final IrcNameResolver resolver;
 	private final OsutrackDownloader osutrackDownloader;
 	private final RateLimiter rateLimiter;
@@ -80,12 +77,11 @@ public class IRCBot implements GameChatEventConsumer {
 	@SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
 	@Inject
 	public IRCBot(BotBackend backend, RecommendationsManager manager,
-			UserDataManager userDataManager, ThreadLocalAutoCommittingEntityManager em,
+			UserDataManager userDataManager,
 			IrcNameResolver resolver, OsutrackDownloader osutrackDownloader, RateLimiter rateLimiter,
 			LiveActivity liveActivity, GameChatResponseQueue queue) {
 		this.backend = backend;
 		this.userDataManager = userDataManager;
-		this.em = em;
 		this.resolver = resolver;
 		this.osutrackDownloader = osutrackDownloader;
 		this.rateLimiter = rateLimiter;
@@ -279,7 +275,7 @@ public class IRCBot implements GameChatEventConsumer {
 
 	@Override
 	public void onEvent(GameChatEvent event) {
-		try(ResetEntityManagerCloseable x = em.withNewEntityManager()) {
+		try {
 			rateLimiter.setThreadPriority(event.isInteractive() ? RateLimiter.REQUEST : RateLimiter.EVENT);
 			// clear blocked time in case it wasn't cleared by the last thread
 			rateLimiter.blockedTime();

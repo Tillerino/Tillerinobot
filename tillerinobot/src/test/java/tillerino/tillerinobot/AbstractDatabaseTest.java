@@ -7,8 +7,6 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,13 +18,10 @@ import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.ppaddict.util.InjectionRunner;
 import org.tillerino.ppaddict.util.TestModule;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.mysql.cj.jdbc.MysqlDataSource;
 
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
-import tillerino.tillerinobot.data.util.MysqlModule;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 /**
  * Creates a MySQL instance in running in Docker.
@@ -34,15 +29,7 @@ import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.R
 @TestModule(AbstractDatabaseTest.DockeredMysqlModule.class)
 @RunWith(InjectionRunner.class)
 public abstract class AbstractDatabaseTest {
-	public static class DockeredMysqlModule extends MysqlModule {
-		protected DataSource dataSource() {
-			MysqlDataSource dataSource = new MysqlDataSource();
-			dataSource.setURL(mysql().getJdbcUrl());
-			dataSource.setUser(mysql().getUsername());
-			dataSource.setPassword(mysql().getPassword());
-			return dataSource;
-		}
-
+	public static class DockeredMysqlModule extends AbstractModule {
 		@Provides
 		@Named("mysql")
 		Properties myqslProperties() {
@@ -60,29 +47,16 @@ public abstract class AbstractDatabaseTest {
 	public TestRule resetMysql = new MysqlDatabaseLifecycle();
 
 	@Inject
-	protected EntityManagerFactory emf;
-	@Inject
-	protected ThreadLocalAutoCommittingEntityManager em;
-	private ResetEntityManagerCloseable reset;
-
-	@Inject
 	protected DatabaseManager dbm;
 	protected Database db;
 
 	@Before
 	public void createEntityManager() {
-		reset = em.withNewEntityManager();
 		db = dbm.getDatabase();
 	}
 
 	@After
 	public void closeEntityManager() throws SQLException {
-		reset.close();
 		db.close();
-	}
-
-	protected void reloadEntityManager() {
-		reset.close();
-		reset = em.withNewEntityManager();
 	}
 }

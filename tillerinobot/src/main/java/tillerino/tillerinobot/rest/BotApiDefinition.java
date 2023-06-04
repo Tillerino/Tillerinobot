@@ -11,7 +11,6 @@ import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Application;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import tillerino.tillerinobot.data.util.EntityManagerProxyFeature;
 
 /**
  * @author Tillerino
@@ -21,14 +20,13 @@ public class BotApiDefinition extends Application {
 
 	@Inject
 	public BotApiDefinition(BotInfoService botInfo, BeatmapInfoService beatmapInfo,
-			UserByIdService userById, EntityManagerProxyFeature proxyFeature, BeatmapsService beatmaps,
+			UserByIdService userById, BeatmapsService beatmaps,
 			AuthenticationFilter authentication, ApiLoggingFeature logging) {
 		super();
 
 		resourceInstances.add(botInfo);
 		resourceInstances.add(beatmapInfo);
 		resourceInstances.add(userById);
-		resourceInstances.add(proxyFeature);
 		resourceInstances.add(new DelegatingBeatmapsService(beatmaps));
 		resourceInstances.add(authentication);
 		resourceInstances.add(logging);

@@ -17,12 +17,9 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.assertj.core.api.ListAssert;
 import org.awaitility.Awaitility;
 import org.hamcrest.core.IsEqual;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -97,11 +94,6 @@ public class LoggingTest {
 			return ok(new GameChatWriter.Response(14L));
 		}).when(out).message(anyString(), any());
 		doReturn(ok(new GameChatWriter.Response(null))).when(out).action(any(), any());
-	}
-
-	@After
-	public void cleanUp() throws Exception {
-		injector.getInstance(EntityManagerFactory.class).close();
 	}
 
 	@Test

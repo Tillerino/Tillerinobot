@@ -110,7 +110,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		this.recommendationsManager = spy(recommendationsManager);
 		this.resolver = spy(this.resolver);
 		this.bot = new IRCBot(this.backend, recommendationsManager, new UserDataManager(this.backend, dbm),
-				em, resolver, osuTrackDownloader, rateLimiter,
+				resolver, osuTrackDownloader, rateLimiter,
 				liveActivity, queue);
 	}
 
