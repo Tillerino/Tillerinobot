@@ -16,14 +16,11 @@ import org.slf4j.MDC;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.RateLimiter;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager;
-import tillerino.tillerinobot.data.util.ThreadLocalAutoCommittingEntityManager.ResetEntityManagerCloseable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 @Slf4j
 public class PpaddictContextFilter implements Filter {
-  private final ThreadLocalAutoCommittingEntityManager em;
   private final RateLimiter rateLimiter;
 
   @Override
@@ -34,7 +31,7 @@ public class PpaddictContextFilter implements Filter {
       throws IOException, ServletException {
     MDC.clear();
     try {
-      try(ResetEntityManagerCloseable cl = em.withNewEntityManager();) {
+      try {
         rateLimiter.setThreadPriority(RateLimiter.REQUEST);
         chain.doFilter(req, res);
       } finally {
