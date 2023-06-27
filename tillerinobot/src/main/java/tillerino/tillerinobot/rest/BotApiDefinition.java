@@ -34,8 +34,8 @@ public class BotApiDefinition extends Application {
 			// allow requests from github page, e.g. swagger UI.
 			List<String> origin = requestContext.getHeaders().getOrDefault("Origin", Collections.emptyList());
 			if (origin.stream().allMatch(x -> x.startsWith("https://tillerino.github.io"))) {
-				origin.forEach(o -> responseContext.getHeaders().addAll("Access-Control-Allow-Origin", o));
-				requestContext.getHeaders().add("Access-Control-Allow-Headers", "api-key");
+				origin.forEach(o -> responseContext.getHeaders().add("Access-Control-Allow-Origin", o));
+				responseContext.getHeaders().add("Access-Control-Allow-Headers", "api-key");
 			}
 		});
 	}
