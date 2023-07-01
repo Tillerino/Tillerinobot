@@ -1,0 +1,11 @@
+*.iml
+.idea
+.project
+.classpath
+.gwt
+.settings
+.factorypath
+*/target
+.DS_Store
+ppaddict-db.json
+tillerinobot-db.json

@@ -1,4 +1,9 @@
 ppaddict-site
 =============================
 
-The project should be runnable through both the maven goal jetty:run and by running it in GWT dev mode. If you're using eclipse make sure your exports are right for dev mode: http://forgetmenotes.blogspot.ch/2009/05/gwteclipse-nosuchmethoderror.html
+This is the source code for the [ppaddict](http://ppaddict.tillerino.org) website.
+It depends on the [Tillerinobot](https://github.com/Tillerino/Tillerinobot). 
+
+To run it locally, start `org.tillerino.ppaddict.LocalPpaddict` from your IDE.
+You need to have Docker running since a local MySQL instance is started in a Docker container.
+All the data in the backend will be faked for testing.
