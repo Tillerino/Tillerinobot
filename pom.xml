@@ -18,7 +18,7 @@
 	</modules>
 
 	<properties>
-		<jacoco.version>0.8.7</jacoco.version>
+		<jacoco.version>0.8.10</jacoco.version>
 		<jersey.version>3.0.8</jersey.version>
 		<jetty.version>9.4.51.v20230217</jetty.version>
 		<jackson.version>2.15.2</jackson.version>
