@@ -22,7 +22,7 @@
 		<jersey.version>3.0.8</jersey.version>
 		<jetty.version>9.4.51.v20230217</jetty.version>
 		<jackson.version>2.15.2</jackson.version>
-		<testcontainers.version>1.18.0</testcontainers.version>
+		<testcontainers.version>1.18.3</testcontainers.version>
 		<!-- determined by container -->
 		<mockserver.version>5.15.0</mockserver.version>
 		<slf4j.version>1.7.36</slf4j.version>
@@ -42,7 +42,7 @@
 		<log4j.version>2.20.0</log4j.version>
 		<assertj-core.version>3.24.2</assertj-core.version>
 		<json-unit-assertj.version>3.0.0</json-unit-assertj.version>
-		<resilience4j.version>2.0.2</resilience4j.version>
+		<resilience4j.version>2.1.0</resilience4j.version>
 		<guava.version>20.0</guava.version>
 		<commons-io.version>2.13.0</commons-io.version>
 		<commons-dbcp2.version>2.9.0</commons-dbcp2.version>
@@ -406,6 +406,11 @@
 			<dependency>
 				<groupId>com.google.inject</groupId>
 				<artifactId>guice</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-servlet</artifactId>
 				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
