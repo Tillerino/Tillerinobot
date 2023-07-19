@@ -26,7 +26,7 @@
 		<!-- determined by container -->
 		<mockserver.version>5.15.0</mockserver.version>
 		<slf4j.version>1.7.36</slf4j.version>
-		<mapstruct.version>1.5.3.Final</mapstruct.version>
+		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<guice.version>5.1.0</guice.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
 		<spotbugs.version>4.7.3</spotbugs.version>
@@ -35,7 +35,7 @@
 		<mockito.version>5.3.0</mockito.version>
 		<rabbitmq.version>5.18.0</rabbitmq.version>
 		<lombok.version>1.18.28</lombok.version>
-		<mysql-connector-java.version>8.0.33</mysql-connector-java.version>
+		<mysql-connector-java.version>8.1.0</mysql-connector-java.version>
 		<jax-rs.version>3.1.0</jax-rs.version>
 		<rest-assured.version>5.3.1</rest-assured.version>
 		<awaitility.version>4.2.0</awaitility.version>
@@ -43,7 +43,7 @@
 		<assertj-core.version>3.24.2</assertj-core.version>
 		<json-unit-assertj.version>3.0.0</json-unit-assertj.version>
 		<resilience4j.version>2.1.0</resilience4j.version>
-		<guava.version>20.0</guava.version>
+		<guava.version>32.1.1-jre</guava.version>
 		<commons-io.version>2.13.0</commons-io.version>
 		<commons-dbcp2.version>2.9.0</commons-dbcp2.version>
 	</properties>
