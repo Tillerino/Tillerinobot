@@ -389,8 +389,7 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<!-- scribe and pircbotx both use older versions, we can't use a newer 
-					one -->
+				<!-- scribe uses older version, we can't use a newer one -->
 				<version>1.10</version>
 			</dependency>
 			<dependency>
@@ -486,6 +485,7 @@
 				<scope>test</scope>
 			</dependency>
 
+			<!-- tests -->
 			<dependency>
 				<groupId>io.rest-assured</groupId>
 				<artifactId>rest-assured</artifactId>
@@ -503,6 +503,11 @@
 				<artifactId>json-unit-assertj</artifactId>
 				<version>${json-unit-assertj.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.kitteh.irc</groupId>
+				<artifactId>client-lib</artifactId>
+				<version>8.0.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

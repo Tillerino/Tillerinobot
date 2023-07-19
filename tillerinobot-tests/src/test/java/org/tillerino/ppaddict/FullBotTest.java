@@ -34,19 +34,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
+import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
+import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.pircbotx.Configuration.Builder;
-import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.CoreHooks;
-import org.pircbotx.hooks.events.ConnectEvent;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
-import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
 import org.tillerino.ppaddict.chat.irc.IrcContainer;
+import org.tillerino.ppaddict.chat.irc.KittehForNgircd;
 import org.tillerino.ppaddict.chat.irc.NgircdContainer;
 import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
@@ -68,6 +65,7 @@ import com.rabbitmq.client.Connection;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.engio.mbassy.listener.Handler;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
@@ -86,7 +84,7 @@ import tillerino.tillerinobot.rest.BotStatus;
 public class FullBotTest {
 	@SuppressWarnings({ "unchecked" })
 	private class Client implements Runnable {
-		private final PircBotX bot;
+		private final org.kitteh.irc.client.library.Client kitteh;
 
 		private long lastReceivedRecommendation = 0;
 
@@ -94,52 +92,52 @@ public class FullBotTest {
 
 		private boolean connected = false;
 
-		private Client(int botNumber) {
-			Builder<PircBotX> configurationBuilder = new Builder<>().setServer(NgircdContainer.NGIRCD.getHost(), NgircdContainer.NGIRCD.getMappedPort(6667))
-					.setName("user" + botNumber).setEncoding(StandardCharsets.UTF_8).setAutoReconnect(false)
-					.setMessageDelay(50).setListenerManager(new ThreadedListenerManager<>(exec))
-					.addListener(new CoreHooks() {
-						@Override
-						public void onConnect(ConnectEvent event) {
-							connected = true;
-						}
+		private int botNumber;
 
-						@Override
-						public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
-							log.debug("user{} received private message from {}: {}", botNumber,
-									event.getUser().getNick(), event.getMessage());
-							if (event.getMessage().contains(IRCBot.VERSION_MESSAGE)) {
-								return;
-							}
-							if (event.getMessage().contains("Beatmap")) {
-								receivedRecommendations++;
-								lastReceivedRecommendation = System.currentTimeMillis();
-								recommendationCount.incrementAndGet();
-							}
-							if (receivedRecommendations < recommendationsPerUser) {
-								Thread.sleep(10);
-								r();
-							} else {
-								log.debug("user{} received {} recommendations. Quitting.", botNumber,
-										recommendationsPerUser);
-								event.getBot().sendIRC().quitServer();
-							}
-						}
-					});
-			bot = new PircBotX(configurationBuilder.buildConfiguration());
+		private Client(int botNumber) {
+			kitteh = KittehForNgircd.buildKittehClient("user" + botNumber);
+			kitteh.getEventManager().registerEventListener(this);
+			this.botNumber = botNumber;
+		}
+
+		@Handler
+		public void onConnect(ClientConnectionEstablishedEvent event) {
+			connected = true;
+		}
+
+		@Handler
+		public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
+			log.debug("user{} received private message from {}: {}", botNumber,
+					event.getActor().getNick(), event.getMessage());
+			if (event.getMessage().contains(IRCBot.VERSION_MESSAGE)) {
+				return;
+			}
+			if (event.getMessage().contains("Beatmap")) {
+				receivedRecommendations++;
+				lastReceivedRecommendation = System.currentTimeMillis();
+				recommendationCount.incrementAndGet();
+			}
+			if (receivedRecommendations < recommendationsPerUser) {
+				Thread.sleep(10);
+				r();
+			} else {
+				log.debug("user{} received {} recommendations. Quitting.", botNumber,
+						recommendationsPerUser);
+				kitteh.shutdown();
+			}
 		}
 
 		@Override
 		public void run() {
 			try {
-				bot.startBot();
+				kitteh.connect();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
 		private void r() {
-			bot.sendIRC().message("tillerinobot", "!r");
+			kitteh.sendMessage("tillerinobot", "!r");
 		}
 	}
 

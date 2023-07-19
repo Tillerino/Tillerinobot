@@ -56,7 +56,6 @@
 		<dependency>
 			<groupId>org.kitteh.irc</groupId>
 			<artifactId>client-lib</artifactId>
-			<version>8.0.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
