@@ -37,6 +37,7 @@ import com.rabbitmq.client.RpcClient;
 import com.rabbitmq.client.RpcClientParams;
 import com.rabbitmq.client.RpcServer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -105,6 +106,7 @@ public class RabbitRpc {
 
 		Type errorType = null;
 
+		@SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
 		public InterfaceProps(Class<I> cls, ObjectMapper objectMapper) {
 			this.objectMapper = objectMapper;
 			Validate.isTrue(cls.isInterface(), "%s must be an interface.", cls);

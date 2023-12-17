@@ -29,12 +29,12 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<guice.version>6.0.0</guice.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
-		<spotbugs.version>4.7.3</spotbugs.version>
-		<spotbugs.plugin.version>4.7.2.1</spotbugs.plugin.version>
+		<spotbugs.version>4.8.3</spotbugs.version>
+		<spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
 		<mockito.version>5.4.0</mockito.version>
 		<rabbitmq.version>5.18.0</rabbitmq.version>
-		<lombok.version>1.18.28</lombok.version>
+		<lombok.version>1.18.30</lombok.version>
 		<mysql-connector-java.version>8.1.0</mysql-connector-java.version>
 		<jax-rs.version>3.1.0</jax-rs.version>
 		<rest-assured.version>5.3.1</rest-assured.version>
@@ -69,7 +69,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
+					<version>3.11.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>

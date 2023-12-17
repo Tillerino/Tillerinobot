@@ -340,6 +340,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 	@Test
 	public void testMaintenanceOnSight() throws Exception {
 		doReturn(18).when(resolver).resolveIRCName("aRareUserAppears");
+		doAnswer(x -> null).when(backend).registerActivity(eq(18), anyLong());
 
 		Sighted event = new Sighted(12, "aRareUserAppears", 15);
 		bot.onEvent(event);

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import javax.annotation.Nonnull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 
 /**
@@ -35,6 +36,7 @@ public class Persister<T> implements AutoCloseable {
 
 	private int batched = 0;
 
+	@SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
 	Persister(Database database, Class<T> cls, Action a) throws SQLException {
 		mapping = Mapping.getOrCreateMapping(cls);
 

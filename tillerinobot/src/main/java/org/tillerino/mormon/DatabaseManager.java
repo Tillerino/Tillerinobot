@@ -19,6 +19,7 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.tillerino.mormon.Persister.Action;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 
 @Singleton
@@ -28,6 +29,7 @@ public class DatabaseManager implements AutoCloseable {
 	private final GenericObjectPool<PoolableConnection> pool;
 
 	@Inject
+	@SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
 	public DatabaseManager(@Named("mysql") Properties properties) {
 		this.properties = new Properties(properties);
 
