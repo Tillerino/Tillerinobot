@@ -9,6 +9,7 @@ import static org.tillerino.ppaddict.chat.irc.NgircdContainer.NGIRCD;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import net.engio.mbassy.listener.Handler;
@@ -18,13 +19,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.kitteh.irc.client.library.Client;
-import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
 import org.kitteh.irc.client.library.event.client.ClientReceiveCommandEvent;
 import org.kitteh.irc.client.library.event.client.ClientReceiveNumericEvent;
 import org.kitteh.irc.client.library.event.helper.ClientEvent;
 import org.kitteh.irc.client.library.event.user.PrivateCtcpQueryEvent;
 import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
-import org.kitteh.irc.client.library.exception.KittehNagException;
 import org.mockito.Mockito;
 import org.tillerino.ppaddict.chat.*;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
@@ -33,7 +32,6 @@ import org.tillerino.ppaddict.rabbit.RabbitRpc;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 import io.restassured.RestAssured;
 import org.tillerino.ppaddict.util.Result;
@@ -125,7 +123,8 @@ public class BotIT {
 		RabbitMqContainer.stop();
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
 		RabbitMqContainer.start();
-		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
+		await().atMost(1, TimeUnit.MINUTES)
+			.untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(200));
 	}
 
 	@Test
