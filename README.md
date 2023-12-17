@@ -47,7 +47,7 @@ less frequently asked:
   I migrated all the database code that went into this repository to Spring Data JPA.
   However, the use case is way too thin to justify the insane overhead of JPA,
   so I polished my own ORM (dubbed mORMon) a bit and it now lives [in this repository](tillerinobot/src/main/java/org/tillerino/mormon).
-  I'm in the process of removing Spring Data JPA.
+  Spring Data JPA was removed.
 
 ## Building/Running Tillerinobot (for developing purposes)
 

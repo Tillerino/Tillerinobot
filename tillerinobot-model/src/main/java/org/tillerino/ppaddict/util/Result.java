@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 
 /**
@@ -37,18 +38,20 @@ public sealed interface Result<T, E> {
 		return this instanceof Err;
 	}
 
+	@SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
 	default Optional<T> ok() {
-		if (this instanceof Ok<T, E> ok) {
-			return Optional.of(ok.t);
-		}
-		return Optional.empty();
+		return switch (this) {
+			case Ok<T, E> ok -> Optional.of(ok.t);
+			case Err<T, E> err -> Optional.empty();
+		};
 	}
 
+	@SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
 	default Optional<E> err() {
-		if (this instanceof Err<T, E> err) {
-			return Optional.of(err.e);
-		}
-		return Optional.empty();
+		return switch (this) {
+			case Ok<T, E> ok -> Optional.empty();
+			case Err<T, E> err -> Optional.of(err.e);
+		};
 	}
 
 	default Result<T, E> inspect(Consumer<T> f) {
@@ -59,10 +62,10 @@ public sealed interface Result<T, E> {
 	}
 
 	default T unwrapOrElse(Function<E, T> op) {
-		if (this instanceof Ok<T, E> ok) {
-			return ok.t;
-		}
-		else return op.apply(((Err<T, E>) this).e);
+		return switch (this) {
+			case Ok<T, E> ok -> ok.t;
+			case Err<T, E> err -> op.apply(err.e);
+		};
 	}
 
 	default T unwrapOr(T def) {
@@ -73,10 +76,10 @@ public sealed interface Result<T, E> {
 	}
 
 	default <U> Result<U, E> map(Function<T, U> op) {
-		if (this instanceof Ok<T, E> ok) {
-			return ok(op.apply(ok.t));
-		}
-		else return (Result<U, E>) this;
+		return switch (this) {
+			case Ok<T, E> ok -> ok(op.apply(ok.t));
+			case Err err -> err;
+		};
 	}
 
 	@JsonValue

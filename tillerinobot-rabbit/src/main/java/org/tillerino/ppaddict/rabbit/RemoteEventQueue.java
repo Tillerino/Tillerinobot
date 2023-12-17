@@ -2,8 +2,6 @@ package org.tillerino.ppaddict.rabbit;
 
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventQueue;
-import org.tillerino.ppaddict.chat.Joined;
-import org.tillerino.ppaddict.util.MdcUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
