@@ -12,11 +12,9 @@ import lombok.RequiredArgsConstructor;
 public enum Model {
 	ALPHA(false),
 	BETA(false),
-	GAMMA4(true),
-	GAMMA5(true),
-	GAMMA6(true),
 	GAMMA7(true),
 	GAMMA8(true),
+	GAMMA9(true),
 	/**
 	 * External model made by NamePendingApproval
 	 */

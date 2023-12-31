@@ -42,7 +42,7 @@ public class RecommendationRequestParser {
 		
 		RecommendationRequestBuilder settingsBuilder = RecommendationRequest.builder();
 		
-		settingsBuilder.model(Model.GAMMA8);
+		settingsBuilder.model(Model.GAMMA9);
 
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
@@ -86,18 +86,6 @@ public class RecommendationRequestParser {
 			settingsBuilder.model(Model.BETA);
 			return true;
 		}
-		if(getLevenshteinDistance(lowerCase, "gamma4") <= 2 && lowerCase.endsWith("4")) {
-			settingsBuilder.model(Model.GAMMA4);
-			return true;
-		}
-		if(getLevenshteinDistance(lowerCase, "gamma5") <= 2 && lowerCase.endsWith("5")) {
-			settingsBuilder.model(Model.GAMMA5);
-			return true;
-		}
-		if(getLevenshteinDistance(lowerCase, "gamma6") <= 2 && lowerCase.endsWith("6")) {
-			settingsBuilder.model(Model.GAMMA6);
-			return true;
-		}
 		if(getLevenshteinDistance(lowerCase, "gamma7") <= 2 && lowerCase.endsWith("7")) {
 			settingsBuilder.model(Model.GAMMA7);
 			return true;
@@ -106,9 +94,13 @@ public class RecommendationRequestParser {
 			settingsBuilder.model(Model.GAMMA8);
 			return true;
 		}
+		if(getLevenshteinDistance(lowerCase, "gamma9") <= 2 && lowerCase.endsWith("9")) {
+			settingsBuilder.model(Model.GAMMA9);
+			return true;
+		}
 		if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
 			// backwards compatibility
-			settingsBuilder.model(Model.GAMMA4);
+			settingsBuilder.model(Model.GAMMA9);
 			return true;
 		}
 		if (lowerCase.equals("nap")) {

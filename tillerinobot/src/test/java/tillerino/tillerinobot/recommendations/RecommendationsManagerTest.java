@@ -154,20 +154,20 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	@Test
 	public void defaultSettings() throws Exception {
 		assertThat(manager.getRecommendation(user, "", new Default())).isNotNull();
-		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA8), eq(false), eq(0L));
+		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA9), eq(false), eq(0L));
 	}
 
 	@Test
-	public void testGamma5() throws Exception {
-		assertThat(manager.getRecommendation(user, "gamma5", new Default())).isNotNull();
-		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA5), anyBoolean(), anyLong());
+	public void testGamma7() throws Exception {
+		assertThat(manager.getRecommendation(user, "gamma7", new Default())).isNotNull();
+		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA7), anyBoolean(), anyLong());
 	}
 
 	@Test
-	public void gamma5NotRestricted() throws Exception {
+	public void gamma7NotRestricted() throws Exception {
 		backend.hintUser("guy", false, 123, 123);
 		user = backend.downloadUser("guy");
-		assertThat(manager.getRecommendation(user, "gamma5", new Default())).isNotNull();
+		assertThat(manager.getRecommendation(user, "gamma7", new Default())).isNotNull();
 	}
 
 	@Test
@@ -194,6 +194,6 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 		topPlays.sort(Comparator.comparingDouble(TopPlay::getPp));
 
 		assertThat(manager.getRecommendation(user, mode, new Default())).isNotNull();
-		verify(recommender).loadRecommendations(argThat(l -> l.equals(topPlays.subList(0, limit))), any(), eq(Model.GAMMA8), anyBoolean(), anyLong());
+		verify(recommender).loadRecommendations(argThat(l -> l.equals(topPlays.subList(0, limit))), any(), eq(Model.GAMMA9), anyBoolean(), anyLong());
 	}
 }

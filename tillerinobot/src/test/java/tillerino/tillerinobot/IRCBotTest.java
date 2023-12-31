@@ -255,7 +255,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		verifyResponse(bot, message("user", "!R"), anyResponse());
 
 		verify(rec).loadRecommendations(Mockito.anyList(), any(),
-				eq(Model.GAMMA8), anyBoolean(), anyLong());
+				eq(Model.GAMMA9), anyBoolean(), anyLong());
 	}
 
     private static final GameChatResponse OSUTRACK_RESPONSE_WITH_SPACE = new Success("Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/has+space osu!track].");
