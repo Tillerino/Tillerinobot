@@ -3,6 +3,7 @@ package org.tillerino.ppaddict.chat.irc;
 import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
 import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.tillerino.ppaddict.util.CustomTestContainer;
 
 public class NgircdContainer {
@@ -12,7 +13,9 @@ public class NgircdContainer {
 		.withClasspathResourceMapping("/irc/ngircd.conf", "/config/ngircd.conf", BindMode.READ_ONLY)
 		.withClasspathResourceMapping("/irc/ngircd.motd", "/etc/ngircd/ngircd.motd", BindMode.READ_ONLY)
 		.withExposedPorts(6667)
-		.logging("NGIRCD");
+		.logging("NGIRCD")
+		.waitingFor(new LogMessageWaitStrategy()
+			.withRegEx(".*Now listening on.*"));
 
 	static {
 		NGIRCD.start();
