@@ -34,17 +34,17 @@
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
 		<mockito.version>5.11.0</mockito.version>
 		<rabbitmq.version>5.20.0</rabbitmq.version>
-		<lombok.version>1.18.30</lombok.version>
+		<lombok.version>1.18.32</lombok.version>
 		<mysql-connector-java.version>8.3.0</mysql-connector-java.version>
 		<jax-rs.version>3.1.0</jax-rs.version>
 		<rest-assured.version>5.4.0</rest-assured.version>
 		<awaitility.version>4.2.1</awaitility.version>
-		<log4j.version>2.23.0</log4j.version>
+		<log4j.version>2.23.1</log4j.version>
 		<assertj-core.version>3.25.3</assertj-core.version>
 		<json-unit-assertj.version>3.2.7</json-unit-assertj.version>
 		<resilience4j.version>2.2.0</resilience4j.version>
-		<guava.version>33.0.0-jre</guava.version>
-		<commons-io.version>2.15.1</commons-io.version>
+		<guava.version>33.1.0-jre</guava.version>
+		<commons-io.version>2.16.0</commons-io.version>
 		<commons-dbcp2.version>2.12.0</commons-dbcp2.version>
 	</properties>
 
