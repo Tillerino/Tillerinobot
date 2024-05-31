@@ -12,7 +12,7 @@
 			<AppenderRef ref="Console" />
 			<AppenderRef ref="Test" />
 		</Root>
-		<Logger name="org.pircbotx" level="error"/>
+
 		<Logger name="org.eclipse.jetty" level="info"/>
 		<Logger name="org.springframework" level="warn"/>
 		<Logger name="org.jboss.logging" level="info"/>

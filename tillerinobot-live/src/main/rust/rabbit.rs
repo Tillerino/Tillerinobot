@@ -71,7 +71,10 @@ pub(crate) async fn run_rabbit() {
     loop {
         match consume_rabbit().await {
             Ok(_) => println!("rabbit body succeeded. what the hell?"),
-            Err(e) => println!("Rabbit error: {}", e)
+            Err(e) => {
+                println!("Rabbit error: {}", e);
+                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            }
         }
     }
 }

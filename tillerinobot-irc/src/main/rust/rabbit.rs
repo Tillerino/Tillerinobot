@@ -96,7 +96,7 @@ impl Default for RabbitConfig {
 			host: var("RABBIT_HOST").unwrap_or_else(|_| "rabbitmq".into()),
 			port: var("RABBIT_PORT").ok().map(|s| str::parse(s.as_str()).expect("unable to parse RABBIT_PORT")).unwrap_or(5672),
 			vhost: var("RABBIT_VHOST").unwrap_or_else(|_| "/".into()),
-    }
+		}
 	}
 }
 

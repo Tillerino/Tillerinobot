@@ -412,7 +412,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		return new GameChatResponse() {
 			@Override
 			public boolean equals(Object arg0) {
-				return arg0 instanceof Message msg && msg.getContent().contains(s);
+				return arg0 instanceof Message msg && msg.content().contains(s);
 			}
 
 			@Override
@@ -431,7 +431,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		return new GameChatResponse() {
 			@Override
 			public boolean equals(Object arg0) {
-				return arg0 instanceof Success suc && suc.getContent().contains(s);
+				return arg0 instanceof Success suc && suc.content().contains(s);
 			}
 
 			@Override

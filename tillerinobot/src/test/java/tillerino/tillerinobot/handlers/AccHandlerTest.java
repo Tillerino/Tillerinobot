@@ -57,7 +57,7 @@ public class AccHandlerTest {
 		AccHandler accHandler = new AccHandler(backend, liveActivity);
 
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
-		assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).getContent())
+		assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).content())
 				.contains("800x");
 	}
 
@@ -87,7 +87,7 @@ public class AccHandlerTest {
 		AccHandler accHandler = new AccHandler(backend, liveActivity);
 
 		when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
-		assertThat(((Success) accHandler.handle("acc 17 800x 1m", null, userData, null)).getContent())
+		assertThat(((Success) accHandler.handle("acc 17 800x 1m", null, userData, null)).content())
 			.contains("800x");
 	}
 }

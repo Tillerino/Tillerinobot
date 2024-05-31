@@ -81,12 +81,11 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 
 	@SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
 	private Result<Response, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws InterruptedException, IOException {
-		if (response instanceof Message message) {
-			return message(message.getContent(), false, result);
-		} else if (response instanceof Success success) {
-			return message(success.getContent(), true, result);
-		} else if (response instanceof Action action) {
-			String msg = action.getContent();
+		if (response instanceof Message(String msg)) {
+			return message(msg, false, result);
+		} else if (response instanceof Success(String msg)) {
+			return message(msg, true, result);
+		} else if (response instanceof Action(String msg)) {
 			return writer.action(msg, result.getNick()).map(ok -> {
 				try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
 					if (ok.ping() != null) {

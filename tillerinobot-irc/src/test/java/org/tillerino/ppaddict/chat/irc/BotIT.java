@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import net.engio.mbassy.listener.Handler;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -119,6 +120,8 @@ public class BotIT {
 	}
 
 	@Test
+	// This test kills the shared rabbit MQ container, which messes with parallel tests.
+	@Ignore
 	public void livenessReactsToRabbit() throws Exception {
 		RabbitMqContainer.stop();
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
