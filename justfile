@@ -34,3 +34,18 @@ clean-verify-fast:
 # Install the JARs into the Maven repository without testing anything.
 install:
   mvn clean install -DskipTests -Dspotbugs.skip=true -T 2
+
+upgrade-rust module:
+  cargo update --manifest-path tillerinobot-{{module}}/Cargo.toml
+
+upgrade-rust-all:
+  just upgrade-rust live
+  just upgrade-rust irc
+
+outdated-rust module:
+  # install with cargo install --locked cargo-outdated
+  cargo outdated --manifest-path tillerinobot-{{module}}/Cargo.toml
+
+outdated-rust-all:
+  just outdated-rust live
+  just outdated-rust irc

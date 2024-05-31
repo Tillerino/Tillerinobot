@@ -25,7 +25,7 @@ jobs:
       - uses: addnab/docker-run-action@v3
         name: "Build live"
         with:
-          image: rust:1.50-alpine
+          image: rust:1.78-alpine
           options: -v ${{ github.workspace }}:/work
           run: |
             apk add --no-cache musl-dev

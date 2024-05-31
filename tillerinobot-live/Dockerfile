@@ -1,5 +1,5 @@
 # BUILD
-FROM rust:1.65-alpine
+FROM rust:1.78-alpine
 
 # we need to install one library on alpine
 RUN apk add --no-cache musl-dev
