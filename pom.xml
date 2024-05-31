@@ -18,7 +18,7 @@
 	</modules>
 
 	<properties>
-		<jacoco.version>0.8.10</jacoco.version>
+		<jacoco.version>0.8.12</jacoco.version>
 		<jersey.version>3.0.8</jersey.version>
 		<jetty.version>9.4.54.v20240208</jetty.version>
 		<jackson.version>2.17.1</jackson.version>
@@ -168,9 +168,9 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
-					<release>21</release>
+					<source>22</source>
+					<target>22</target>
+					<release>22</release>
 					<encoding>UTF-8</encoding>
 					<compilerArgs>
 						<compilerArg>-parameters</compilerArg>
