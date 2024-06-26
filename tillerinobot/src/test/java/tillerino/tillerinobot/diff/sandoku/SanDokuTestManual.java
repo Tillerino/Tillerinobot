@@ -23,8 +23,7 @@ import tillerino.tillerinobot.diff.OsuScore;
  * Manual test against a locally running instance at port 8080.
  * If you want to run this, go
  *
- * clone https://github.com/omkelderman/SanDoku.git
- * docker build -t san-doku SanDoku
+ * docker build -t san-doku https://github.com/omkelderman/SanDoku.git
  * docker run --rm -it -p 8080:80 san-doku
  *
  * Ctrl-C to stop SanDoku.

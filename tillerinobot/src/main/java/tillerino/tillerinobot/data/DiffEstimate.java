@@ -5,15 +5,24 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import org.tillerino.mormon.Column;
+import org.tillerino.mormon.Database;
 import org.tillerino.mormon.KeyColumn;
+import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Table;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.BeatmapImpl;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
+
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * In this class, we store the map-specific parameters that are used to calculate pp.
@@ -34,7 +43,7 @@ import tillerino.tillerinobot.diff.sandoku.SanDoku;
 public class DiffEstimate {
 	@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
 	public interface DiffEstimateToBeatmapImplMapper {
-		public static final DiffEstimateToBeatmapImplMapper INSTANCE = Mappers.getMapper(DiffEstimateToBeatmapImplMapper.class);
+		DiffEstimateToBeatmapImplMapper INSTANCE = Mappers.getMapper(DiffEstimateToBeatmapImplMapper.class);
 
 		@Mapping(target = "modsUsed", source = "mods")
 		BeatmapImpl map(DiffEstimate estimate);
@@ -86,5 +95,20 @@ public class DiffEstimate {
 
 		this.beatmapid = beatmapid;
 		this.mods = mods;
+	}
+
+	/**
+	 * Load multiple diff estimates at once.
+	 * @param beatmaps performance penalty if not unique, but will not throw up
+	 * @return entries for all diff estimates that could be found. Will not throw if some are missing.
+	 */
+	public static Map<BeatmapWithMods, DiffEstimate> loadMultiple(Database database, Collection<BeatmapWithMods> beatmaps) throws SQLException {
+		if (beatmaps.isEmpty()) {
+			return Collections.emptyMap();
+		}
+		String combinations = beatmaps.stream().map(bwm -> "(" + bwm.beatmap() + "," + bwm.mods() + ")").collect(Collectors.joining(",", "(", ")"));
+		try (Loader<DiffEstimate> loader = database.loader(DiffEstimate.class, "where (beatmapid, mods) in " + combinations)) {
+			return loader.queryList().stream().collect(Collectors.toMap(e -> new BeatmapWithMods(e.beatmapid, e.mods), e -> e));
+		}
 	}
 }

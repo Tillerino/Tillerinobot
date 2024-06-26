@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import lombok.With;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.tillerino.mormon.DatabaseManager;
@@ -33,6 +34,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.data.BotUserData;
+import tillerino.tillerinobot.diff.Beatmap;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.util.IsMutable;
@@ -51,7 +53,16 @@ public class UserDataManager {
 
 	@SuppressFBWarnings(value = "SA_FIELD_SELF_COMPARISON", justification = "Looks like a bug")
 	public static class UserData implements Closeable {
-		public record BeatmapWithMods(@BeatmapId int beatmap, @BitwiseMods long mods) { }
+		@With
+		public record BeatmapWithMods(@BeatmapId int beatmap, @BitwiseMods long mods) {
+			public BeatmapWithMods nomod() {
+				return new BeatmapWithMods(beatmap, 0);
+			}
+
+			public BeatmapWithMods diffMods() {
+				return new BeatmapWithMods(beatmap, Beatmap.getDiffMods(mods));
+			}
+		}
 
 		private transient boolean changed = false;
 

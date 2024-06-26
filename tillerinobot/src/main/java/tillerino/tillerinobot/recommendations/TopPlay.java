@@ -7,6 +7,7 @@ import org.tillerino.osuApiModel.types.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 
 @Data
 @NoArgsConstructor
@@ -22,4 +23,8 @@ public class TopPlay {
 	private long mods;
 
 	private double pp;
+
+	public BeatmapWithMods idAndMods() {
+		return new BeatmapWithMods(beatmapid, mods);
+	}
 }
