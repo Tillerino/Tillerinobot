@@ -158,9 +158,9 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	public void testGamma7() throws Exception {
-		assertThat(manager.getRecommendation(user, "gamma7", new Default())).isNotNull();
-		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA7), anyBoolean(), anyLong());
+	public void testGamma10() throws Exception {
+		assertThat(manager.getRecommendation(user, "gamma10", new Default())).isNotNull();
+		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA10), anyBoolean(), anyLong());
 	}
 
 	@Test

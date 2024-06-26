@@ -60,9 +60,9 @@ public class RecommendationRequestParserTest {
 	}
 
 	@Test
-	public void testGamma7Dt() throws Exception {
-		assertThat(parse("gamma7 dt"))
-			.hasFieldOrPropertyWithValue("model", Model.GAMMA7)
+	public void testGamma10Dt() throws Exception {
+		assertThat(parse("gamma10 dt"))
+			.hasFieldOrPropertyWithValue("model", Model.GAMMA10)
 			.hasFieldOrPropertyWithValue("requestedMods", 64L);
 	}
 
@@ -74,11 +74,11 @@ public class RecommendationRequestParserTest {
 	}
 
 	@Test
-	public void testGamma7Len() throws Exception {
+	public void testGamma10Len() throws Exception {
 		when(backend.getDonator(anyInt())).thenReturn(1);
-		RecommendationRequest request = parse("gamma7 LEN<=150");
+		RecommendationRequest request = parse("gamma10 LEN<=150");
 		assertThat(request)
-			.hasFieldOrPropertyWithValue("model", Model.GAMMA7);
+			.hasFieldOrPropertyWithValue("model", Model.GAMMA10);
 		assertThat(request.predicates())
 			.containsExactly(new NumericPropertyPredicate<>("LEN<=150", new MapLength(), Double.NEGATIVE_INFINITY, true, 150D, true));
 	}

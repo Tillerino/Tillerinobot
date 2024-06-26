@@ -86,16 +86,16 @@ public class RecommendationRequestParser {
 			settingsBuilder.model(Model.BETA);
 			return true;
 		}
-		if(getLevenshteinDistance(lowerCase, "gamma7") <= 2 && lowerCase.endsWith("7")) {
-			settingsBuilder.model(Model.GAMMA7);
-			return true;
-		}
 		if(getLevenshteinDistance(lowerCase, "gamma8") <= 2 && lowerCase.endsWith("8")) {
 			settingsBuilder.model(Model.GAMMA8);
 			return true;
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma9") <= 2 && lowerCase.endsWith("9")) {
 			settingsBuilder.model(Model.GAMMA9);
+			return true;
+		}
+		if(getLevenshteinDistance(lowerCase, "gamma10") <= 2 && lowerCase.endsWith("10")) {
+			settingsBuilder.model(Model.GAMMA10);
 			return true;
 		}
 		if(getLevenshteinDistance(lowerCase, "gamma") <= 2) {
