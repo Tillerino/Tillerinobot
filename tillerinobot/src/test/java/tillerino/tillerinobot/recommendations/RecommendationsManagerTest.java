@@ -154,7 +154,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	@Test
 	public void defaultSettings() throws Exception {
 		assertThat(manager.getRecommendation(user, "", new Default())).isNotNull();
-		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA9), eq(false), eq(0L));
+		verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA10), eq(false), eq(0L));
 	}
 
 	@Test
@@ -194,6 +194,6 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 		topPlays.sort(Comparator.comparingDouble(TopPlay::getPp));
 
 		assertThat(manager.getRecommendation(user, mode, new Default())).isNotNull();
-		verify(recommender).loadRecommendations(argThat(l -> l.equals(topPlays.subList(0, limit))), any(), eq(Model.GAMMA9), anyBoolean(), anyLong());
+		verify(recommender).loadRecommendations(argThat(l -> l.equals(topPlays.subList(0, limit))), any(), eq(Model.GAMMA10), anyBoolean(), anyLong());
 	}
 }

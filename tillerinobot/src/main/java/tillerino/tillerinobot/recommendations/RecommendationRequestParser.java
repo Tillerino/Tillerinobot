@@ -42,7 +42,7 @@ public class RecommendationRequestParser {
 		
 		RecommendationRequestBuilder settingsBuilder = RecommendationRequest.builder();
 		
-		settingsBuilder.model(Model.GAMMA9);
+		settingsBuilder.model(Model.GAMMA10);
 
 		for (int i = 0; i < remaining.length; i++) {
 			String param = remaining[i];
