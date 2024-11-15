@@ -129,7 +129,7 @@ pub(crate) mod irc_writer {
 	use serde::Serialize;
 	use tokio_stream::StreamExt;
 
-	use crate::Error;
+	use crate:: { Error, IrcConfig };
 	use crate::ircc::Pinger;
 	use crate::rabbit::RabbitRpcCall;
 
@@ -161,14 +161,18 @@ pub(crate) mod irc_writer {
 		}
 	}
 
-	pub(crate) async fn listen_for_calls(irc_sender: Sender, channel: Channel, mut pinger: Pinger) -> Result<(), Error> {
+	pub(crate) async fn listen_for_calls(irc_sender: Sender, channel: Channel, mut pinger: Pinger, irc_config: IrcConfig) -> Result<(), Error> {
 		let mut consumer = crate::rabbit::set_up_rpc_queue(&channel, "irc_writer", 12000).await?;
 		println!("polling rabbit");
 		while let Some(delivery) = consumer.next().await.transpose()? {
 			let call: IrcWriterCall = serde_json::from_slice(delivery.data.as_slice())?;
 			println!("got message from rabbit: {:?}", call);
-			let result: Result<IrcWriterOk, IrcWriterErr> = handle_irc_writer_call(&irc_sender, &mut pinger, &call).await;
-			crate::rabbit::respond_to_rpc(&channel, delivery, call, result).await?;
+			if irc_config.silent {
+					println!("Silenced: {:?}", call);
+			} else {
+					let result: Result<IrcWriterOk, IrcWriterErr> = handle_irc_writer_call(&irc_sender, &mut pinger, &call).await;
+					crate::rabbit::respond_to_rpc(&channel, delivery, call, result).await?;
+			}
 		}
 		Ok(())
 	}

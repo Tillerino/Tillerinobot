@@ -118,7 +118,7 @@ impl Main {
 		let (pinger, ponger) = ircc::create_pinger(client.sender().clone(), self.metrics.clone());
 		tokio::select! {
 			r = killer(client.sender().clone(), channel.clone(), self.quit.clone()) => { r?; }
-			r = rabbit::irc_writer::listen_for_calls(client.sender().clone(), channel.clone(), pinger) => { r?; }
+			r = rabbit::irc_writer::listen_for_calls(client.sender().clone(), channel.clone(), pinger, self.irc_config.clone()) => { r?; }
 			r = irc_converter.listen_for_incoming_messages(client, channel, ponger) => {
 				{
 					let mut metrics = self.metrics.lock().unwrap();

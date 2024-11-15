@@ -24,6 +24,7 @@ pub(crate) struct IrcConfig {
 	pub password: String,
 	pub autojoin: Vec<String>,
 	pub ignore: bool,
+	pub silent: bool,
 }
 
 impl Default for IrcConfig {
@@ -35,6 +36,7 @@ impl Default for IrcConfig {
 			password: var("TILLERINOBOT_IRC_PASSWORD").unwrap_or("".into()),
 			autojoin: var("TILLERINOBOT_IRC_AUTOJOIN").ok().map(|s| s.split(',').map(|s| s.trim().to_string()).collect()).unwrap_or(vec!["#osu".into()]),
 			ignore: var("TILLERINOBOT_IRC_IGNORE").ok().map(|s| str::parse(s.as_str()).expect("unable to parse TILLERINOBOT_IRC_IGNORE")).unwrap_or(false),
+			silent: var("TILLERINOBOT_IRC_SILENT").ok().map(|s| str::parse(s.as_str()).expect("unable to parse TILLERINOBOT_IRC_SILENT")).unwrap_or(false),
 		}
 	}
 }
