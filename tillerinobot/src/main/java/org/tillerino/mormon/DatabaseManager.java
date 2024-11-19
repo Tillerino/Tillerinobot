@@ -3,6 +3,7 @@ package org.tillerino.mormon;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLRecoverableException;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
@@ -12,16 +13,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
-import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.tillerino.mormon.Persister.Action;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
+import org.tillerino.ppaddict.util.MaintenanceException;
 
+@Slf4j
 @Singleton
 public class DatabaseManager implements AutoCloseable {
 	private final Properties properties;
@@ -99,13 +102,12 @@ public class DatabaseManager implements AutoCloseable {
 			return new Database(pool.borrowObject());
 		} catch (RuntimeException | Error e) {
 			throw e;
+		} catch (SQLRecoverableException e) {
+			log.warn("Recoverable exception while borrowing connection. Assuming maintenance.", e);
+			throw new MaintenanceException("Database maintenance");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public PoolingDataSource<PoolableConnection> getPoolingDatasource() {
-		return new PoolingDataSource<>(pool);
 	}
 
 	@Override
