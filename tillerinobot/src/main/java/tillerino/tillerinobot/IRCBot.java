@@ -206,7 +206,7 @@ public class IRCBot implements GameChatEventConsumer {
 
 	private GameChatResponse processPrivateMessage(final PrivateMessage message) throws InterruptedException {
 		try {
-			{
+			try(var _ = PhaseTimer.timeTask("fixId")) {
 				GameChatResponse fixIdResponse = new FixIDHandler(resolver).handle(message.getMessage(), null, null, new Default());
 				if (fixIdResponse != null) {
 					return fixIdResponse;

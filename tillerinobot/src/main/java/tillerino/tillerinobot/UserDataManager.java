@@ -108,13 +108,13 @@ public class UserDataManager {
 		public <T, E extends Exception> T usingLanguage(FailableFunction<Language, T, E> task) throws E {
 			if (language == null) {
 				if (serializedLanguage != null && !serializedLanguage.isNull()) {
-					try {
+					try(var _ = PhaseTimer.timeTask("deserializeLanguage")) {
 						language = JACKSON.treeToValue(serializedLanguage, languageIdentifier.cls);
 					} catch (JsonProcessingException e) {
 						throw new RuntimeException("Language data cannot be read", e);
 					}
 				} else {
-					try {
+					try(var _ = PhaseTimer.timeTask("instantiateLanguage")) {
 						language = languageIdentifier.cls.getDeclaredConstructor().newInstance();
 					} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 						throw new RuntimeException(languageIdentifier.cls + " needs an accessible no-arg constructor", e);
@@ -246,14 +246,16 @@ public class UserDataManager {
 		}
 
 		try (var _ = PhaseTimer.timeTask("saveUserData")) {
-			if (options.usingLanguage(lang -> lang instanceof IsMutable mutable && mutable.isModified())) {
-				options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
-			}
 			String serialized;
-			try {
-				serialized = JACKSON.writeValueAsString(options);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Cannot serialize options", e);
+			try (var _ = PhaseTimer.timeTask("serializeUserData")) {
+				if (options.usingLanguage(lang -> lang instanceof IsMutable mutable && mutable.isModified())) {
+					options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
+				}
+				try {
+					serialized = JACKSON.writeValueAsString(options);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException("Cannot serialize options", e);
+				}
 			}
 
 			BotUserData data = new BotUserData();
