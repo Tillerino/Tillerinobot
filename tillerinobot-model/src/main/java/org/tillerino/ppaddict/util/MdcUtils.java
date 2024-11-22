@@ -47,7 +47,7 @@ public class MdcUtils {
 	 * Implements a mechanism that cleans up changes to the MDC. See
 	 * {@link MdcUtils#with(String, Object)}.
 	 */
-	public static final class MdcAttributes implements AutoCloseable {
+	public static final class MdcAttributes implements QuietCloseable {
 		private Map<String, String> restore = null;
 
 		private String restoreKey = null;

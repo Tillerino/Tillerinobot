@@ -23,6 +23,7 @@ import org.tillerino.mormon.Persister.Action;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 import org.tillerino.ppaddict.util.MaintenanceException;
+import org.tillerino.ppaddict.util.PhaseTimer;
 
 @Slf4j
 @Singleton
@@ -98,7 +99,7 @@ public class DatabaseManager implements AutoCloseable {
 	}
 
 	public Database getDatabase() {
-		try {
+		try(var _ = PhaseTimer.timeTask("borrow connection")) {
 			return new Database(pool.borrowObject());
 		} catch (RuntimeException | Error e) {
 			throw e;

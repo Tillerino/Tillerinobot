@@ -36,7 +36,8 @@ public class RabbitQueuesModule extends AbstractModule {
 		RemoteResponseQueue queue = RabbitMqConfiguration.responseQueue(connection);
 		queue.setup();
 		queue.subscribe(response -> {
-			try (MdcAttributes mdc = response.getEvent().getMeta().getMdc().apply()) {
+			try (var _ = response.getEvent().getMeta().getMdc().apply();
+					var _ = response.getEvent().getMeta().getTimer().pinToThread()) {
 				post.onResponse(response.getResponse(), response.getEvent());
 			}
 		});
@@ -44,7 +45,7 @@ public class RabbitQueuesModule extends AbstractModule {
 	}
 
 	@Provides
-	LiveActivity liveActicity(Connection connection) throws IOException {
+	LiveActivity liveActivity(Connection connection) throws IOException {
 		RemoteLiveActivity liveActivity = RabbitMqConfiguration.liveActivity(connection);
 		liveActivity.setup();
 		return liveActivity;

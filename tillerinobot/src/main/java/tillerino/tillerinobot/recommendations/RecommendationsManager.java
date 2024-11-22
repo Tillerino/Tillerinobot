@@ -41,6 +41,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import lombok.RequiredArgsConstructor;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
@@ -117,7 +118,9 @@ public class RecommendationsManager {
 			RecommendationRequest settings = parseSamplerSettings(apiUser, message == null ? "" : message, lang);
 
 			if (sampler == null || !sampler.getSettings().equals(settings)) {
-				sampler = loadSampler(userid, settings);
+				try (var _ = PhaseTimer.timeTask("loadSampler")) {
+					sampler = loadSampler(userid, settings);
+				}
 
 				samplers.put(userid, sampler);
 			}
@@ -134,7 +137,10 @@ public class RecommendationsManager {
 		 * sample and load meta data
 		 */
 
-		BareRecommendation sample = sampler.sample();
+		BareRecommendation sample;
+		try (var _ = PhaseTimer.timeTask("sampleRecommendation")) {
+			sample = sampler.sample();
+		}
 
 		int beatmapid = sample.beatmapId();
 

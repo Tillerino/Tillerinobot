@@ -13,8 +13,8 @@ import lombok.Getter;
  * Distribution for recommendations. Changes upon sampling.
  * 
  * @author Tillerino
- * @param T domain to sample from
- * @param S settings which were used to fill this sampler
+ * @param <T> domain to sample from
+ * @param <S> settings which were used to fill this sampler
  */
 public class Sampler<T, S> {
 	private final SortedMap<Double, T> distribution = new TreeMap<>();

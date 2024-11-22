@@ -40,7 +40,8 @@ public class MessageHandlerScheduler implements GameChatEventConsumer {
 		event.completePhase(PhaseTimer.INTERNAL_QUEUE);
 		Runnable task = () -> {
 			event.completePhase(PhaseTimer.THREAD_POOL_QUEUE);
-			try (MdcAttributes attr = event.getMeta().getMdc().apply()) {
+			try (var _ = event.getMeta().getMdc().apply();
+					var _ = event.getMeta().getTimer().pinToThread()) {
 				messageHandler.onEvent(event);
 			} catch (Throwable e) {
 				log.error("Uncaught exception in core event handler", e);

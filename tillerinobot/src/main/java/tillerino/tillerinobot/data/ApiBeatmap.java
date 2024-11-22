@@ -29,6 +29,7 @@ import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 
 /**
@@ -62,16 +63,19 @@ public class ApiBeatmap extends OsuApiBeatmap {
 	private static ApiBeatmap loadOrDownloadPreloaded(Database database, @BeatmapId int beatmapid, @BitwiseMods long mods, long maxAge,
 			Downloader downloader, @CheckForNull ApiBeatmap beatmap) throws IOException, SQLException {
 		if(beatmap == null || (maxAge > 0 && beatmap.downloaded < System.currentTimeMillis() - maxAge)) {
-			System.out.printf("downloading api beatmap %s/%s (%s; approved %s)%n", beatmapid, mods, beatmap != null ? "outdated" : "new", beatmap != null ? beatmap.getApproved() : "-");
-			beatmap = downloader.getBeatmap(beatmapid, mods, ApiBeatmap.class);
-			System.out.printf(".downloaded api beatmap %s/%s (%s; approved %s)%n", beatmapid, mods, beatmap != null ? "exists" : "missed", beatmap != null ? beatmap.getApproved() : "-");
+			try (var _ = PhaseTimer.timeTask("downloadBeatmap")) {
+				System.out.printf("downloading api beatmap %s/%s (%s; approved %s)%n", beatmapid, mods, beatmap != null ? "outdated" : "new", beatmap != null ? beatmap.getApproved() : "-");
+				beatmap = downloader.getBeatmap(beatmapid, mods, ApiBeatmap.class);
+				System.out.printf(".downloaded api beatmap %s/%s (%s; approved %s)%n", beatmapid, mods, beatmap != null ? "exists" : "missed", beatmap != null ? beatmap.getApproved() : "-");
+			}
 
 			if(beatmap == null) {
 				database.delete(ApiBeatmap.class, false, beatmapid, mods);
 				return null;
 			}
 			
-			try(Persister<ApiBeatmap> persister = database.persister(ApiBeatmap.class, Action.REPLACE)) {
+			try(var _ = PhaseTimer.timeTask("persistBeatmap");
+					Persister<ApiBeatmap> persister = database.persister(ApiBeatmap.class, Action.REPLACE)) {
 				beatmap.setMods(mods);
 				persister.persist(beatmap);
 			}
@@ -92,7 +96,8 @@ public class ApiBeatmap extends OsuApiBeatmap {
 		// query from database in single query
 		String combinations = beatmapsWithMods.stream().map(bwm -> "(" + bwm.beatmap() + "," + bwm.mods() + ")").collect(Collectors.joining(",", "(", ")"));
 		Map<BeatmapWithMods, ApiBeatmap> loaded;
-		try (Loader<ApiBeatmap> loader = database.loader(ApiBeatmap.class, "where (`beatmapid`, `mods`) in " + combinations)) {
+		try (var _ = PhaseTimer.timeTask("loadBeatmaps");
+				Loader<ApiBeatmap> loader = database.loader(ApiBeatmap.class, "where (`beatmapid`, `mods`) in " + combinations)) {
 			loaded = loader.queryList().stream().collect(toMap(ApiBeatmap::idAndMods, Function.identity()));
 		}
 
