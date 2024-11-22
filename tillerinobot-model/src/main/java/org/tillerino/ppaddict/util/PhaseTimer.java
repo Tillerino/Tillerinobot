@@ -124,6 +124,7 @@ public class PhaseTimer {
 			}
 
 			return tasks.stream()
+				.filter(t -> t.duration >= 500_000)
 				.map(R::from).collect(Collectors.toMap(R::name, Function.identity(), R::add, LinkedHashMap::new))
 				.values().stream().map(Object::toString).collect(Collectors.joining("|", " [", "]"));
 		}

@@ -254,9 +254,11 @@ public class RecommendationsManager {
 	
 	public void saveGivenRecommendation(@UserId int userid,
 			@BeatmapId int beatmapid, @BitwiseMods long mods) throws SQLException {
-		GivenRecommendation givenRecommendation = new GivenRecommendation(
-				userid, beatmapid, System.currentTimeMillis(), mods);
-		dbm.persist(givenRecommendation, Action.INSERT);
+		try (var _ = PhaseTimer.timeTask("saveRecommendation")) {
+			GivenRecommendation givenRecommendation = new GivenRecommendation(
+					userid, beatmapid, System.currentTimeMillis(), mods);
+			dbm.persist(givenRecommendation, Action.INSERT);
+		}
 	}
 	
 	/**
