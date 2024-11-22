@@ -10,7 +10,7 @@ public class GameChatEventTest {
 	@Test
 	public void joinedSerialization() throws Exception {
 		String expected = """
-				{"@c":".Joined","eventId":123,"nick":"nick","timestamp":456,"meta":{"rateLimiterBlockedTime":0,"mdc":null}}
+				{"@c":".Joined","eventId":123,"nick":"nick","timestamp":456,"meta":{"rateLimiterBlockedTime":0,"mdc":null,"timer":null}}
 			""";
 		Joined joined = new Joined(123, "nick", 456);
 		String actual = new ObjectMapper().writeValueAsString(joined);

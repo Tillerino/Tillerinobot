@@ -37,6 +37,7 @@ import org.tillerino.ppaddict.util.MdcUtils;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.ComplaintHandler;
@@ -281,7 +282,13 @@ public class IRCBot implements GameChatEventConsumer {
 			rateLimiter.blockedTime();
 
 			try {
-				sendResponse(visit(event), event);
+				GameChatResponse visit;
+				try {
+					visit = visit(event);
+				} finally {
+					event.completePhase(PhaseTimer.HANDLE);
+				}
+				sendResponse(visit, event);
 			} catch (SQLException | IOException | UserException e) {
 				GameChatResponse exceptionResponse = handleException(e, new Default());
 				if (event.isInteractive()) {

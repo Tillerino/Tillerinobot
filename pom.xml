@@ -32,7 +32,7 @@
 		<spotbugs.version>4.8.5</spotbugs.version>
 		<spotbugs.plugin.version>4.8.3.1</spotbugs.plugin.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<mockito.version>5.12.0</mockito.version>
+		<mockito.version>5.14.2</mockito.version>
 		<rabbitmq.version>5.21.0</rabbitmq.version>
 		<lombok.version>1.18.32</lombok.version>
 		<mysql-connector-java.version>8.4.0</mysql-connector-java.version>

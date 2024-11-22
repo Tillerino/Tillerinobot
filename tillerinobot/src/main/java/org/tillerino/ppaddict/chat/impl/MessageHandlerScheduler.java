@@ -19,6 +19,7 @@ import com.google.inject.Provides;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.IRCBot;
 
 /**
@@ -36,7 +37,9 @@ public class MessageHandlerScheduler implements GameChatEventConsumer {
 
 	@Override
 	public void onEvent(GameChatEvent event) throws InterruptedException {
+		event.completePhase(PhaseTimer.INTERNAL_QUEUE);
 		Runnable task = () -> {
+			event.completePhase(PhaseTimer.THREAD_POOL_QUEUE);
 			try (MdcAttributes attr = event.getMeta().getMdc().apply()) {
 				messageHandler.onEvent(event);
 			} catch (Throwable e) {

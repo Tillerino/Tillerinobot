@@ -2,7 +2,6 @@ package org.tillerino.ppaddict.chat.impl;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -22,6 +21,7 @@ import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import org.tillerino.ppaddict.util.Result;
 import org.tillerino.ppaddict.util.Result.Err;
 
@@ -49,6 +49,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 
 	@Override
 	public void onResponse(GameChatResponse response, GameChatEvent event) throws InterruptedException {
+		event.completePhase(PhaseTimer.RESPONSE_QUEUE);
 		try {
 			for (GameChatResponse r : response.flatten()) {
 				for (int i = 0; i < 10; i++) { // arbitrary retry limit greater than zero
@@ -109,6 +110,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 				}
 				liveActivity.propagateSentMessage(result.getNick(), result.getEventId(), ok.ping());
 				if (success) {
+					result.completePhase(PhaseTimer.POSTPROCESS);
 					mdc.add(MdcUtils.MDC_DURATION, clock.currentTimeMillis() - result.getTimestamp());
 					mdc.add(MdcUtils.MDC_SUCCESS, true);
 					mdc.add(MdcUtils.MCD_OSU_API_RATE_BLOCKED_TIME, result.getMeta().getRateLimiterBlockedTime());
@@ -117,6 +119,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
 					}
 				}
 				log.debug("sent: " + msg);
+				result.getMeta().getTimer().print();
 				botInfo.setLastSentMessage(clock.currentTimeMillis());
 			}
 			return ok;

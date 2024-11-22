@@ -41,4 +41,8 @@ public abstract class GameChatEvent {
 		}
 		return 1;
 	}
+
+	public void completePhase(String name) {
+		meta.getTimer().completePhase(name);
+	}
 }

@@ -35,6 +35,7 @@ import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.IRCBot;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -52,10 +53,15 @@ public class LocalGameChatEventQueueTest {
 
 	private Future<?> queueRunner;
 
+	PrivateMessage event0 = new PrivateMessage(0, "sender", 125, "hello");
+	PrivateMessage event1 = new PrivateMessage(1, "sender", 125, "hello");
+
 	@Before
 	public void before() {
 		queue = new LocalGameChatEventQueue(new MessageHandlerScheduler(coreHandler, (ThreadPoolExecutor) exec.getExec()), botInfo);
 		queueRunner = exec.submit(queue);
+		event0.getMeta().setTimer(new PhaseTimer());
+		event1.getMeta().setTimer(new PhaseTimer());
 	}
 
 	@After
@@ -65,9 +71,8 @@ public class LocalGameChatEventQueueTest {
 
 	@Test
 	public void testSimpleQueue() throws Exception {
-		PrivateMessage event = new PrivateMessage(1, "sender", 125, "hello");
-		queue.onEvent(event);
-		verify(coreHandler, timeout(1000)).onEvent(event);
+		queue.onEvent(event1);
+		verify(coreHandler, timeout(1000)).onEvent(event1);
 	}
 
 	@Test
@@ -77,7 +82,7 @@ public class LocalGameChatEventQueueTest {
 				assertThat(MDC.get("someKey")).isEqualTo("someVal");
 				return null;
 			}).when(coreHandler).onEvent(any());
-			queue.onEvent(new PrivateMessage(1, "sender", 125, "hello"));
+			queue.onEvent(event1);
 		}
 		verify(coreHandler, timeout(1000)).onEvent(any());
 	}
@@ -86,7 +91,7 @@ public class LocalGameChatEventQueueTest {
 	public void testQueueSizes() throws Exception {
 		ThreadPoolExecutor exec = mock(ThreadPoolExecutor.class);
 		LocalGameChatEventQueue queue = new LocalGameChatEventQueue(new MessageHandlerScheduler(coreHandler, exec), botInfo);
-		queue.onEvent(new PrivateMessage(1, "sender", 125, "hello"));
+		queue.onEvent(event1);
 		verify(botInfo, only()).setEventQueueSize(1);
 		verify(exec, never()).submit(any(Runnable.class));
 		reset(botInfo);
@@ -114,8 +119,8 @@ public class LocalGameChatEventQueueTest {
 				new MessageHandlerScheduler(coreHandler, (ThreadPoolExecutor) exec.getExec()), botInfo);
 
 		// since one thread in the pool is occupied, we can block the executor pool with a single task
-		queue.onEvent(new PrivateMessage(0, "sender", 125, "hello"));
-		queue.onEvent(new PrivateMessage(1, "sender", 125, "hello"));
+		queue.onEvent(event0);
+		queue.onEvent(event1);
 		verify(botInfo).setEventQueueSize(2L);
 
 		// schedule

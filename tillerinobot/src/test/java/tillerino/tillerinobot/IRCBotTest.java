@@ -45,6 +45,8 @@ import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.util.MaintenanceException;
+import org.tillerino.ppaddict.util.MdcUtils;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import org.tillerino.ppaddict.util.TestModule;
 
 import jakarta.ws.rs.InternalServerErrorException;
@@ -59,11 +61,17 @@ import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 public class IRCBotTest extends AbstractDatabaseTest {
 
 	protected PrivateAction action(String nick, String action) {
-		return new PrivateAction(123, nick, 456, action);
+		return preprocess(new PrivateAction(123, nick, 456, action));
 	}
 
 	protected PrivateMessage message(String nick, String message) {
-		return new PrivateMessage(123, nick, 456, message);
+		return preprocess(new PrivateMessage(123, nick, 456, message));
+	}
+
+	static <T extends GameChatEvent> T preprocess(T event) {
+		event.getMeta().setMdc(MdcUtils.getSnapshot());
+		event.getMeta().setTimer(new PhaseTimer());
+		return event;
 	}
 
 	protected Joined join(String nick) {
@@ -177,16 +185,16 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		doReturn(1).when(backend).getDonator(userid);
 
 		doReturn(System.currentTimeMillis() - 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, join("TheDonator"), new Message("beep boop"));
+		verifyResponse(bot, preprocess(join("TheDonator")), new Message("beep boop"));
 
 		doReturn(System.currentTimeMillis() - 10 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, join("TheDonator"), new Message("Welcome back, TheDonator."));
+		verifyResponse(bot, preprocess(join("TheDonator")), new Message("Welcome back, TheDonator."));
 
 		doReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, join("TheDonator"), messageContaining("TheDonator, "));
+		verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator, "));
 
 		doReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, join("TheDonator"), messageContaining("TheDonator")
+		verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator")
 				.then(messageContaining("so long").then(messageContaining("back"))));
 	}
 
@@ -342,7 +350,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		doReturn(18).when(resolver).resolveIRCName("aRareUserAppears");
 		doAnswer(x -> null).when(backend).registerActivity(eq(18), anyLong());
 
-		Sighted event = new Sighted(12, "aRareUserAppears", 15);
+		Sighted event = preprocess(new Sighted(12, "aRareUserAppears", 15));
 		bot.onEvent(event);
 		verify(queue).onResponse(GameChatResponse.none(), event);
 		verify(backend, timeout(1000)).registerActivity(18, 15);

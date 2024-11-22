@@ -20,6 +20,7 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tillerino.ppaddict.util.PhaseTimer;
 
 /**
  * Here we do anything that we can do right after we receive the message and
@@ -48,6 +49,7 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 		try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_EVENT, event.getEventId())) {
 			mdc.add(MdcUtils.MDC_USER, event.getNick());
 			event.getMeta().setMdc(MdcUtils.getSnapshot());
+			event.getMeta().setTimer(new PhaseTimer());
 
 			if (event instanceof PrivateMessage || event instanceof PrivateAction) {
 				liveActivity.propagateReceivedMessage(event.getNick(), event.getEventId());
@@ -66,6 +68,8 @@ public class MessagePreprocessor implements GameChatEventConsumer {
 				responses.onResponse(handleSemaphoreInUse(event), event);
 				return;
 			}
+
+			event.completePhase(PhaseTimer.PREPROCESS);
 			queue.onEvent(event);
 		}
 	}

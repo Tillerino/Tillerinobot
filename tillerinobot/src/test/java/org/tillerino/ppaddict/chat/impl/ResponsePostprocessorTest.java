@@ -21,19 +21,15 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
-import org.tillerino.ppaddict.chat.GameChatResponse;
+import org.tillerino.ppaddict.chat.*;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
-import org.tillerino.ppaddict.chat.GameChatWriter;
-import org.tillerino.ppaddict.chat.Joined;
-import org.tillerino.ppaddict.chat.LiveActivity;
-import org.tillerino.ppaddict.chat.PrivateMessage;
-import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
+import org.tillerino.ppaddict.util.PhaseTimer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResponsePostprocessorTest {
@@ -55,16 +51,18 @@ public class ResponsePostprocessorTest {
 	@InjectMocks
 	private ResponsePostprocessor responsePostprocessor;
 
+	PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
+
 	@Before
 	public void setUp() throws Exception {
 		when(writer.action(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
 		when(writer.message(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
+		event.getMeta().setTimer(new PhaseTimer());
 	}
 
 	@Test
 	public void testAction() throws Exception {
-		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
-		responsePostprocessor.onResponse(new Action("xyz"), event);
+		responsePostprocessor.onResponse( new Action("xyz"), event);
 		verify(writer).action("xyz", "nick");
 		verify(liveActivity).propagateSentMessage("nick", 1, null);
 		verify(bouncer).exit("nick", 1);
@@ -72,7 +70,6 @@ public class ResponsePostprocessorTest {
 
 	@Test
 	public void testMessage() throws Exception {
-		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Message("xyz"), event);
 		verify(writer).message("xyz", "nick");
 		verify(liveActivity).propagateSentMessage("nick", 1, null);
@@ -82,7 +79,6 @@ public class ResponsePostprocessorTest {
 
 	@Test
 	public void testSuccess() throws Exception {
-		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Success("xyz"), event);
 		verify(writer).message("xyz", "nick");
 		verify(liveActivity).propagateSentMessage("nick", 1, null);
@@ -91,7 +87,6 @@ public class ResponsePostprocessorTest {
 
 	@Test
 	public void testList() throws Exception {
-		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(new Message("xyz").then(new Action("abc")), event);
 		verify(writer).message("xyz", "nick");
 		verify(writer).action("abc", "nick");
@@ -101,7 +96,6 @@ public class ResponsePostprocessorTest {
 
 	@Test
 	public void testNoResponse() throws Exception {
-		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		responsePostprocessor.onResponse(GameChatResponse.none(), event);
 		verifyNoInteractions(writer);
 		verifyNoInteractions(liveActivity);
@@ -112,7 +106,6 @@ public class ResponsePostprocessorTest {
 	public void testRecommendation() throws Exception {
 		when(clock.currentTimeMillis()).thenReturn(159L);
 		try (MdcAttributes mdc = MdcUtils.with("handler", "r")) {
-			PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 			responsePostprocessor.onResponse(new Success("xyz"), event);
 			verify(botInfo).setLastRecommendation(159);
 		}
@@ -121,6 +114,7 @@ public class ResponsePostprocessorTest {
 	@Test
 	public void testNoBouncerForNonInteractiveEvents() throws Exception {
 		Sighted event = new Sighted(1, "nick", 2);
+		event.getMeta().setTimer(new PhaseTimer());
 		responsePostprocessor.onResponse(new Success("hai"), event);
 		verify(writer).message("hai", "nick");
 		verifyNoInteractions(bouncer);
@@ -137,7 +131,6 @@ public class ResponsePostprocessorTest {
 			assertThat(MDC.get("osuApiRateBlockedTime")).isEqualTo("32");
 			return null;
 		}).when(botInfo).setLastSentMessage(123L);
-		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		event.getMeta().setRateLimiterBlockedTime(32);
 		when(clock.currentTimeMillis()).thenReturn(123L);
 		responsePostprocessor.onResponse(new Success("yeah"), event);
@@ -155,7 +148,6 @@ public class ResponsePostprocessorTest {
 			assertThat(MDC.get("osuApiRateBlockedTime")).isNull();
 			return null;
 		}).when(botInfo).setLastSentMessage(123L);
-		PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 		event.getMeta().setRateLimiterBlockedTime(32);
 		when(clock.currentTimeMillis()).thenReturn(123L);
 		responsePostprocessor.onResponse(new Message("yeah"), event);
@@ -164,7 +156,6 @@ public class ResponsePostprocessorTest {
 
 	@Test
 	public void writingIsRetried() throws Exception {
-		Joined event = new Joined(1234, "nick", 0);
 		int[] count = { 0 };
 		doAnswer(x -> {
 			if (count[0]++ > 0) {
@@ -178,7 +169,6 @@ public class ResponsePostprocessorTest {
 
 	@Test
 	public void retryingStops() throws Exception {
-		Joined event = new Joined(1234, "nick", 0);
 		doReturn(err(new GameChatWriter.Error.Retry(0))).when(writer).message("abc", "nick");
 		responsePostprocessor.onResponse(new Message("abc"), event);
 		verify(writer, times(10)).message("abc", "nick");
