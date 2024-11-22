@@ -84,7 +84,7 @@ public class PhaseTimer {
 				}
 				long total = System.nanoTime() - start;
 				long self = total - phaseTimer.nested;
-				phaseTimer.nested = originalNested != null ? originalNested + self : null;
+				phaseTimer.nested = originalNested != null ? originalNested + total : null;
 				phaseTimer.currentTasks.add(new Task(name, total, self));
 			}
 		};
