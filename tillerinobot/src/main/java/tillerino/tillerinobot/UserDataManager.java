@@ -33,6 +33,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.data.BotUserData;
 import tillerino.tillerinobot.diff.Beatmap;
 import tillerino.tillerinobot.lang.Language;
@@ -186,7 +187,7 @@ public class UserDataManager {
 		@Override
 		public void close() {
 			try {
-				manager.saveOptions(userid, this);
+				manager.saveUserData(userid, this);
 			} catch (SQLException e) {
 				log.error("Error saving user data", e);
 			}
@@ -217,45 +218,49 @@ public class UserDataManager {
 			.setVisibility(PropertyAccessor.SETTER, Visibility.NONE)
 			.registerModule(new ParameterNamesModule());
 
-	public UserData getData(@UserId int userid) throws SQLException {
-		BotUserData data = dbm.loadUnique(BotUserData.class, userid).orElse(null);
+	public UserData loadUserData(@UserId int userid) throws SQLException {
+		try (var _ = PhaseTimer.timeTask("loadUserData")) {
+			BotUserData data = dbm.loadUnique(BotUserData.class, userid).orElse(null);
 
-		UserData options;
-		if(data == null || StringUtils.isEmpty(data.getUserdata())) {
-			options = new UserData();
-		} else {
-			try {
-				options = JACKSON.readValue(data.getUserdata(), UserData.class);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Can't read user data", e);
+			UserData options;
+			if (data == null || StringUtils.isEmpty(data.getUserdata())) {
+				options = new UserData();
+			} else {
+				try {
+					options = JACKSON.readValue(data.getUserdata(), UserData.class);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException("Can't read user data", e);
+				}
 			}
+
+			options.manager = this;
+			options.userid = userid;
+
+			return options;
 		}
-
-		options.manager = this;
-		options.userid = userid;
-
-		return options;
 	}
 
-	void saveOptions(@UserId int userid, UserData options) throws SQLException {
+	void saveUserData(@UserId int userid, UserData options) throws SQLException {
 		if (!options.isChanged()) {
 			return;
 		}
 
-		if (options.usingLanguage(lang -> lang instanceof IsMutable mutable && mutable.isModified())) {
-			options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
-		}
-		String serialized;
-		try {
-			serialized = JACKSON.writeValueAsString(options);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Cannot serialize options", e);
-		}
+		try (var _ = PhaseTimer.timeTask("saveUserData")) {
+			if (options.usingLanguage(lang -> lang instanceof IsMutable mutable && mutable.isModified())) {
+				options.serializedLanguage = options.usingLanguage(JACKSON::valueToTree);
+			}
+			String serialized;
+			try {
+				serialized = JACKSON.writeValueAsString(options);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Cannot serialize options", e);
+			}
 
-		BotUserData data = new BotUserData();
-		data.setUserId(userid);
-		data.setUserdata(serialized);
-		dbm.persist(data, Action.REPLACE);
-		options.setChanged(false);
+			BotUserData data = new BotUserData();
+			data.setUserId(userid);
+			data.setUserdata(serialized);
+			dbm.persist(data, Action.REPLACE);
+			options.setChanged(false);
+		}
 	}
 }

@@ -106,7 +106,7 @@ public class IRCBot implements GameChatEventConsumer {
 		try {
 			versionInfo = checkVersionInfo(action);
 			OsuApiUser apiUser = getUserOrThrow(action.getNick());
-			try (UserData userData = userDataManager.getData(apiUser.getUserId())) {
+			try (UserData userData = userDataManager.loadUserData(apiUser.getUserId())) {
 				return versionInfo.then(userData.usingLanguage((Language lang) -> { 
 					try {
 						return npHandler.handle(action.getAction(), apiUser, userData, lang);
@@ -213,7 +213,7 @@ public class IRCBot implements GameChatEventConsumer {
 				}
 			}
 			OsuApiUser apiUser = getUserOrThrow(message.getNick());
-			try (UserData userData = userDataManager.getData(apiUser.getUserId())) {
+			try (UserData userData = userDataManager.loadUserData(apiUser.getUserId())) {
 				return userData.usingLanguage((Language lang) -> {
 					GameChatResponse prelimResponse = GameChatResponse.none();
 
@@ -283,7 +283,7 @@ public class IRCBot implements GameChatEventConsumer {
 
 			try {
 				GameChatResponse visit;
-				try {
+				try(var _ = PhaseTimer.timeTask("visit")) {
 					visit = visit(event);
 				} finally {
 					event.completePhase(PhaseTimer.HANDLE);
@@ -371,7 +371,7 @@ public class IRCBot implements GameChatEventConsumer {
 		}
 
 		// this is a donator, let's welcome them!
-		try (UserData data = userDataManager.getData(userid)) {
+		try (UserData data = userDataManager.loadUserData(userid)) {
 			if (!data.isShowWelcomeMessage()) {
 				return GameChatResponse.none();
 			}
@@ -410,8 +410,11 @@ public class IRCBot implements GameChatEventConsumer {
 
 	@Nonnull
 	OsuApiUser getUserOrThrow(@IRCName String nick) throws UserException, SQLException, IOException, InterruptedException {
-		Integer userId = resolver.resolveIRCName(nick);
-		
+		Integer userId;
+		try (var _ = PhaseTimer.timeTask("resolve")) {
+			userId = resolver.resolveIRCName(nick);
+		}
+
 		if(userId != null) {
 			OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000L);
 			

@@ -22,7 +22,7 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testSaveLoad() throws Exception {
-		UserData data = manager.getData(534678);
+		UserData data = manager.loadUserData(534678);
 		assertFalse(data.isAllowedToDebug());
 		data.setAllowedToDebug(true);
 		data.setLastSongInfo(new BeatmapWithMods(123, 456));
@@ -30,7 +30,7 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 
 		reloadManager();
 
-		data = manager.getData(534678);
+		data = manager.loadUserData(534678);
 		assertTrue(data.isAllowedToDebug());
 		assertThat(data.getLastSongInfo()).hasFieldOrPropertyWithValue("beatmap", 123);
 	}
@@ -43,7 +43,7 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 	public void testLanguageMutability() throws Exception {
 		UserDataManager manager = new UserDataManager(null, dbm);
 		List<String> answers = new ArrayList<>();
-		try(UserData data = manager.getData(534678)) {
+		try(UserData data = manager.loadUserData(534678)) {
 			data.usingLanguage(language -> {
 				answers.add(language.apiTimeoutException());
 				for (;;) {
@@ -60,7 +60,7 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 
 		// at this point we got the first answer again. Time go serialize, deserialize and check if we get the second answer next.
 		reloadManager();
-		try(UserData data = manager.getData(534678)) {
+		try(UserData data = manager.loadUserData(534678)) {
 			data.usingLanguage(lang -> {
 				assertThat(lang.apiTimeoutException()).as("API timeout message after reload").isEqualTo(answers.get(1));
 				return null;
