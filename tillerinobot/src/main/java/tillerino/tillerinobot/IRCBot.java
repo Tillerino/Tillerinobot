@@ -399,6 +399,8 @@ public class IRCBot implements GameChatEventConsumer {
 			}
 			
 			backend.registerActivity(userid, timestamp);
+		} catch (MaintenanceException e) {
+			// ignore
 		} catch (Exception e) {
 			if (isTimeout(e)) {
 				log.debug("osu api timeout while logging activity of user {}", fNick);

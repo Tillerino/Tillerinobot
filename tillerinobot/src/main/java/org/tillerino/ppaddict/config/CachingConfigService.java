@@ -10,6 +10,8 @@ import javax.inject.Singleton;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+import org.apache.commons.lang3.function.Failable;
 
 @Singleton
 public class CachingConfigService implements ConfigService {
@@ -24,6 +26,10 @@ public class CachingConfigService implements ConfigService {
 
 	@Override
 	public Optional<String> config(String key) {
-		return cache.getUnchecked(key);
+		try {
+			return cache.getUnchecked(key);
+		} catch (UncheckedExecutionException e) {
+			throw Failable.rethrow(e.getCause());
+		}
 	}
 }
