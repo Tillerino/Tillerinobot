@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import javax.inject.Inject;
 
+import lombok.NoArgsConstructor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.tillerino.ppaddict.util.InjectionRunner;
@@ -18,6 +19,7 @@ public class LoaderTest {
 	DatabaseManager dbm;
 
 	@Table("does_not_exist")
+	@NoArgsConstructor
 	static class DoesNotExist {
 		
 	}

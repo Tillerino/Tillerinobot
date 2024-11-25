@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLRecoverableException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -116,14 +117,20 @@ public class DatabaseManager implements AutoCloseable {
 		pool.close();
 	}
 
-	/**
-	 * Borrows a connection and calls {@link Database#loadUnique(Class, Object...)}
-	 */
-	@NonNull
-	public <T> Optional<T> loadUnique(Class<T> cls, Object... keyValues) throws SQLException {
-		try (Database db = getDatabase()) {
-			return db.loadUnique(cls, keyValues);
-		}
+	public <T> StringTemplate.Processor<List<T>, SQLException> selectList(Class<T> cls) {
+		return st -> {
+			try (Database db = getDatabase()) {
+				return db.selectList(cls).process(st);
+			}
+		};
+	}
+
+	public <T> StringTemplate.Processor<Optional<T>, SQLException> selectUnique(Class<T> cls) {
+		return st -> {
+			try (Database db = getDatabase()) {
+				return db.selectUnique(cls).process(st);
+			}
+		};
 	}
 
 	/**

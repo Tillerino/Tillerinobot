@@ -23,11 +23,11 @@ public class IrcNameResolverTest extends AbstractDatabaseTest {
 	public void testBasic() throws Exception {
 		assertNull(resolver.resolveIRCName("anybody"));
 
-		db.delete(UserNameMapping.class, true);
+		db.truncate(UserNameMapping.class);
 		backend.hintUser("anybody", false, 1000, 1000);
 		assertNotNull(resolver.resolveIRCName("anybody"));
 
-		assertThat(db.loadUnique(UserNameMapping.class, "anybody"))
+		assertThat(db.selectUnique(UserNameMapping.class)."where userName = \{"anybody"}")
 				.hasValueSatisfying(m -> assertThat(m.getUserid()).isEqualTo(1));
 	}
 

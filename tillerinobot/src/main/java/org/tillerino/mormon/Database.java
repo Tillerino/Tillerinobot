@@ -4,10 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.io.IOUtils;
 import org.tillerino.mormon.Mapping.FieldManager;
 import org.tillerino.mormon.Persister.Action;
 
@@ -31,6 +34,74 @@ public record Database(Connection connection) implements AutoCloseable {
 		return connection.prepareStatement(query);
 	}
 
+	private PreparedStatement prepareStatement(String prefix, int startIndex, StringTemplate st) throws SQLException {
+		String query = prefix + " " + String.join("?", st.fragments());
+		PreparedStatement ps = connection.prepareStatement(query);
+
+		try {
+			int index = startIndex;
+			for (Object value : st.values()) {
+				if (value == null) {
+					ps.setNull(index++, java.sql.Types.NULL);
+					continue;
+				}
+				if (value.getClass().isEnum()) {
+					value = ((Enum<?>) value).name();
+				}
+				switch (value) {
+					case Integer i -> ps.setInt(index++, i);
+					case Long l    -> ps.setLong(index++, l);
+					case Float f   -> ps.setFloat(index++, f);
+					case Double d  -> ps.setDouble(index++, d);
+					case Boolean b -> ps.setBoolean(index++, b);
+					case String s  -> ps.setString(index++, s);
+					default -> throw new IllegalArgumentException("Unsupported type: " + value.getClass());
+				}
+			}
+		} catch (Exception e) {
+			try {
+				ps.close();
+			} catch (Exception ex) {
+				e.addSuppressed(ex);
+			}
+			throw e;
+		}
+
+		return ps;
+	}
+
+	public <T> StringTemplate.Processor<List<T>, SQLException> selectList(Class<T> cls) {
+		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
+		return st -> {
+			try (PreparedStatement ps = prepareStatement(
+					STR."select \{mapping.fields()} from `\{mapping.table()}`",
+					1, st)) {
+				ResultSet set = ps.executeQuery();
+				return IteratorUtils.toList(new ResultSetIterator<>(set, mapping));
+			}
+		};
+	}
+
+	public <T> StringTemplate.Processor<Optional<T>, SQLException> selectUnique(Class<T> cls) {
+		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
+		return st -> {
+			try (PreparedStatement ps = prepareStatement(
+					STR."select \{mapping.fields()} from `\{mapping.table()}`",
+					1, st)) {
+				ResultSet set = ps.executeQuery();
+				ResultSetIterator<T> iterator = new ResultSetIterator<>(set, mapping);
+				if (!iterator.hasNext()) {
+					return Optional.empty();
+				}
+				T obj = iterator.next();
+				if (iterator.hasNext()) {
+					throw new SQLException("Result was not unique");
+				}
+				return Optional.of(obj);
+			}
+		};
+	}
+
 	/**
 	 * @param query not null. query after table name. if you have conditions, start with "where".
 	 */
@@ -43,13 +114,6 @@ public record Database(Connection connection) implements AutoCloseable {
 	 */
 	public <T> Loader<T> streamingLoader(Class<? extends T> cls, String query) throws SQLException {
 		return Loader.createLoader(this, cls, query, true);
-	}
-
-	/**
-	 * A loader for the key columns.
-	 */
-	public <T> Loader<T> loader(Class<? extends T> cls) throws SQLException {
-		return loader(cls, Loader.getWhereQueryForKeyColumns(cls));
 	}
 
 	public <T> Persister<T> persister(Class<T> cls, Action action) throws SQLException {
@@ -66,16 +130,19 @@ public record Database(Connection connection) implements AutoCloseable {
 		}
 	}
 
-	/**
-	 * Deletes one or multiple values from the database. See {@link KeyColumn}.
-	 * @param multiple if true, the key values may be shorter than the array in the {@link KeyColumn} annotation.
-	 */
-	public <T> int delete(Class<T> cls, boolean multiple, Object... keyValues) throws SQLException {
-		String query = Loader.getWhereQueryForKeyColumns(cls, multiple, keyValues);
+	public <T> StringTemplate.Processor<Integer, SQLException> deleteFrom(Class<T> cls) {
+		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
+		return st -> {
+			try (PreparedStatement ps = prepareStatement(
+					STR."delete from `\{mapping.table()}`",
+					1, st)) {
+				return ps.executeUpdate();
+			}
+		};
+	}
 
-		try(PreparedStatement s = prepare("delete from `" + Mapping.getOrCreateMapping(cls).table() + "` " + query)) {
-			Loader.setParameters(s, keyValues);
-
+	public <T> int truncate(Class<T> cls) throws SQLException {
+		try(PreparedStatement s = prepare("truncate table `" + Mapping.getOrCreateMapping(cls).table() + "`")) {
 			return s.executeUpdate();
 		}
 	}
@@ -105,18 +172,6 @@ public record Database(Connection connection) implements AutoCloseable {
 			ResultSet set = s.executeQuery();
 			set.next();
 			return set.getLong(1);
-		}
-	}
-
-	/**
-	 * Loads a unique value from the database. See {@link KeyColumn}.
-	 */
-	@NonNull
-	public <T> Optional<T> loadUnique(Class<T> cls, Object... keyValues) throws SQLException {
-		String query = Loader.getWhereQueryForKeyColumns(cls, false, keyValues);
-
-		try(Loader<T> loader = loader(cls, query)) {
-			return loader.queryUnique((Object[]) keyValues);
 		}
 	}
 

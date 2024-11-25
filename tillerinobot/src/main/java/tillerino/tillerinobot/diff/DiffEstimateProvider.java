@@ -12,6 +12,7 @@ import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -89,6 +90,7 @@ public class DiffEstimateProvider {
 		return loadOrCalculateMultiple(database, Collections.singleton(bwm)).get(bwm);
 	}
 
+	@SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
 	private BeatmapImpl loadOrCalculatePreloaded(Database database, @BeatmapId int beatmapid, @BitwiseMods long originalMods, ApiBeatmap cachedBeatmap, DiffEstimate estimate) throws SQLException, IOException, InterruptedException {
 		if (cachedBeatmap != null && cachedBeatmap.getApproved() != OsuApiBeatmap.RANKED) {
 			cachedBeatmap = ApiBeatmap.loadOrDownload(database, beatmapid, 0, cachedBeatmap.getApproved() == OsuApiBeatmap.APPROVED ? 24 * 60 * 60 * 1000 : 10000, downloader);
@@ -97,7 +99,7 @@ public class DiffEstimateProvider {
 		final long diffMods = Beatmap.getDiffMods(originalMods);
 		if (cachedBeatmap == null) {
 			// doesn't never existed or was deleted
-			database.delete(DiffEstimate.class, false, beatmapid, diffMods);
+			var _ = database.deleteFrom(DiffEstimate.class)."where beatmapid = \{beatmapid} and mods = \{diffMods}";
 			return null;
 		}
 

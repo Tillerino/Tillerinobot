@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class Loader<T> implements AutoCloseable {
 	private final PreparedStatement statement;
 	private final Mapping<? extends T> mapping;
-	private final Class<? extends T> cls;
 
 	/**
 	 * @param query not null. query after table name. if you have conditions, start with "where".
@@ -45,7 +44,7 @@ public class Loader<T> implements AutoCloseable {
 		} else {
 			statement = conn.prepare(fullQuery);
 		}
-		return new Loader<>(statement, mapping, cls);
+		return new Loader<>(statement, mapping);
 	}
 
 	/**
@@ -62,37 +61,7 @@ public class Loader<T> implements AutoCloseable {
 		// execute right away, not in lambda for earlier error messages
 		final ResultSet set = statement.executeQuery();
 
-		return () -> new ResultSetIterator(set);
-	}
-
-	private class ResultSetIterator implements Iterator<T> {
-		private final ResultSet set;
-
-		private ResultSetIterator(ResultSet set) {
-			this.set = set;
-		}
-
-		@Override
-		public boolean hasNext() {
-			try {
-				return set.next();
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		@Override
-		public T next() {
-			try {
-				T instance = cls.getConstructor().newInstance();
-				
-				mapping.get(instance, set);
-				
-				return instance;
-			} catch (ReflectiveOperationException | SQLException e) {
-				throw new RuntimeException(e);
-			}
-		}
+		return () -> new ResultSetIterator(set, mapping);
 	}
 
 	public List<T> queryList(Object... parameters) throws SQLException {
@@ -153,23 +122,4 @@ public class Loader<T> implements AutoCloseable {
 		return query.toString();
 	}
 
-	static <T> String getWhereQueryForKeyColumns(Class<T> cls, boolean partial, Object... keyValues) {
-		if (!cls.isAnnotationPresent(KeyColumn.class)) {
-			throw new RuntimeException(cls.getName());
-		}
-
-		String[] columns = cls.getAnnotation(KeyColumn.class).value();
-
-		if (!partial && columns.length != keyValues.length)
-			throw new RuntimeException(String.format("Key has length %s but %s arguments in where clause (%s)",
-					columns.length, keyValues.length, cls.getName()));
-
-		StringBuilder query = new StringBuilder();
-
-		for (int i = 0; i < (partial ? keyValues.length : columns.length); i++) {
-			query.append((i > 0 ? " and " : "where ") + "`" + columns[i] + "` = ?");
-		}
-
-		return query.toString();
-	}
 }

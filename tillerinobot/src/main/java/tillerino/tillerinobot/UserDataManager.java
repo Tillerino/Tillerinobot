@@ -220,7 +220,7 @@ public class UserDataManager {
 
 	public UserData loadUserData(@UserId int userid) throws SQLException {
 		try (var _ = PhaseTimer.timeTask("loadUserData")) {
-			BotUserData data = dbm.loadUnique(BotUserData.class, userid).orElse(null);
+			BotUserData data = dbm.selectUnique(BotUserData.class)."where userId = \{userid}".orElse(null);
 
 			UserData options;
 			if (data == null || StringUtils.isEmpty(data.getUserdata())) {

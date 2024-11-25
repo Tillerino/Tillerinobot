@@ -55,7 +55,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
     assertEquals(content, resource.getFile());
     verifyNoInteractions(downloader);
     // data was compressed after the fact
-    assertThat(dbm.loadUnique(ActualBeatmap.class, 12)).hasValueSatisfying(ab ->
+    assertThat(dbm.selectUnique(ActualBeatmap.class)."where beatmapid = \{12}").hasValueSatisfying(ab ->
         assertThat(ab).hasFieldOrPropertyWithValue("content", null));
   }
 

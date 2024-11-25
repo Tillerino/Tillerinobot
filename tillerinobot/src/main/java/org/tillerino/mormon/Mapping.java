@@ -2,6 +2,7 @@ package org.tillerino.mormon;
 
 import static java.util.stream.Collectors.joining;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -44,7 +45,7 @@ import lombok.Data;
  * To create suitable statements, use the {@link #fields()} string.
  */
 @SuppressFBWarnings({ "EI_EXPOSE_REP", "EI_EXPOSE_REP2" })
-public record Mapping<T>(String fields, String questionMarks, String table, List<FieldManager<?>> fieldManagers) {
+public record Mapping<T>(String fields, String questionMarks, String table, List<FieldManager<?>> fieldManagers, Constructor<T> constructor) {
 	private static final Map<Class<?>, TypeHandler<?>> typeHandlers = Map.ofEntries(
 		Map.entry(int.class, new DefaultTypeHandler(Types.INTEGER)),
 		Map.entry(long.class, new DefaultTypeHandler(Types.BIGINT)),
@@ -108,7 +109,13 @@ public record Mapping<T>(String fields, String questionMarks, String table, List
 				.map(sg -> "?")
 				.collect(joining(", "));
 
-		return new Mapping<>(fieldList, questionMarks, getTableName(cls), fieldManagers);
+		Constructor<T> constructor = null;
+		try {
+			constructor = cls.getConstructor();
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException("No accessible no-arg constructor of " + cls, e);
+		}
+		return new Mapping<>(fieldList, questionMarks, getTableName(cls), fieldManagers, constructor);
 	}
 
 	private static <T> List<FieldManager<?>> createFieldManagers(Class<T> cls) {

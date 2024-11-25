@@ -192,12 +192,12 @@ public class DiffEstimateProviderTest {
 			databaseManager.persist(actualBeatmap, Action.REPLACE);
 			when(beatmapDownloader.getActualBeatmap(123)).thenReturn("bla");
 
-			assertThat(database.loadUnique(DiffEstimate.class, 123, 0L)).hasValueSatisfying(
+			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{123} and mods = \{0L}").hasValueSatisfying(
 					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 0.0));
 
 			runAsyncAndWait(provider::updateDiffEstimatesAndWait); // since we downloaded, this won't sleep because it hasn't exhausted all beatmaps.
 			verify(beatmapDownloader).getActualBeatmap(123);
-			assertThat(database.loadUnique(DiffEstimate.class, 123, 0L)).hasValueSatisfying(
+			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{123} and mods = \{0L}").hasValueSatisfying(
 					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", (double) 1.919f));
 		}
 	}
@@ -208,16 +208,16 @@ public class DiffEstimateProviderTest {
 			setUpOutdatedVersionDiffEstimate(database, "bla123", 123);
 			setUpOutdatedVersionDiffEstimate(database, "bla456", 456);
 
-			assertThat(database.loadUnique(DiffEstimate.class, 123, 0L)).hasValueSatisfying(
+			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{123} and mods = \{0L}").hasValueSatisfying(
 					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 0.0));
-			assertThat(database.loadUnique(DiffEstimate.class, 456, 0L)).hasValueSatisfying(
+			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{456} and mods = \{0L}").hasValueSatisfying(
 					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 0.0));
 
 			runAsyncAndWait(provider::updateDiffEstimates);
 
-			assertThat(database.loadUnique(DiffEstimate.class, 123, 0L)).hasValueSatisfying(
+			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{123} and mods = \{0L}").hasValueSatisfying(
 					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", (double) 1.919f));
-			assertThat(database.loadUnique(DiffEstimate.class, 456, 0L)).hasValueSatisfying(
+			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{456} and mods = \{0L}").hasValueSatisfying(
 					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", (double) 1.919f));
 		}
 	}

@@ -68,7 +68,7 @@ public class IrcNameResolver {
 	@CheckForNull
 	public Integer getIDByUserName(@IRCName String userName) throws IOException,
 			SQLException {
-		UserNameMapping mapping = dbm.loadUnique(UserNameMapping.class, userName).orElse(null);
+		UserNameMapping mapping = dbm.selectUnique(UserNameMapping.class)."where userName = \{userName}".orElse(null);
 
 		long maxAge = 90l * 24 * 60 * 60 * 1000;
 		if (System.currentTimeMillis() < 1483747380000l /* sometime January 7th, 2017*/) {

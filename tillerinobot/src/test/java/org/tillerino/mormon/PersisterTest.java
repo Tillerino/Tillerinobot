@@ -55,21 +55,21 @@ public class PersisterTest {
 	}
 
 	@Test
-	public void testDeleteOneArgument() throws Exception {
+	public void testDelete() throws Exception {
 		db.connection().createStatement().execute(SimpleKey.TABLE_DEF);
-		db.delete(SimpleKey.class, true); // clean up from previous tests
+		db.truncate(SimpleKey.class); // clean up from previous tests
 
-		assertEquals(0, db.delete(SimpleKey.class, false, 1));
+		assertEquals(0, (int) db.deleteFrom(SimpleKey.class)."where myKey = \{2070907}");
 
 		db.persist(new SimpleKey(2070907, "more"), Action.INSERT);
 
-		assertEquals(1, db.delete(SimpleKey.class, false, 2070907));
+		assertEquals(1, (int) db.deleteFrom(SimpleKey.class)."where myKey = \{2070907}");
 	}
 
 	@Test
 	public void test() throws Exception {
 		db.connection().createStatement().execute(SimpleKey.TABLE_DEF);
-		db.delete(SimpleKey.class, true); // clean up from previous tests
+		db.truncate(SimpleKey.class); // clean up from previous tests
 
 		SimpleKey player1 = new SimpleKey(1, "abc");
 
@@ -109,33 +109,6 @@ public class PersisterTest {
 		String additionalProperty;
 
 		static final String TABLE_DEF = "CREATE TABLE IF NOT EXISTS `composite_key` (`myKey` int, `additionalKey` int, `additionalProperty` text)";
-	}
-
-	@Test
-	public void testDeleteTwoArgument() throws Exception {
-		db.connection().createStatement().execute(CompositeKey.TABLE_DEF);
-		db.delete(CompositeKey.class, true); // clean up from previous tests
-
-		assertEquals(0, db.delete(CompositeKey.class, false, 1, 1));
-
-		db.persist(new CompositeKey(1, 0, "abc"), Action.INSERT);
-		db.persist(new CompositeKey(1, 16, "abc"), Action.INSERT);
-
-		assertEquals(1, db.delete(CompositeKey.class, false, 1, 0));
-		assertEquals(1, db.delete(CompositeKey.class, false, 1, 16));
-	}
-
-	@Test
-	public void testDeleteTwoArgumentPartial() throws Exception {
-		db.connection().createStatement().execute(CompositeKey.TABLE_DEF);
-		db.delete(CompositeKey.class, true); // clean up from previous tests
-
-		assertEquals(0, db.delete(CompositeKey.class, false, 1, 1));
-
-		db.persist(new CompositeKey(1, 0, "abc"), Action.INSERT);
-		db.persist(new CompositeKey(1, 16, "abc"), Action.INSERT);
-
-		assertEquals(2, db.delete(CompositeKey.class, true, 1));
 	}
 
 	<T> List<T> toList(Iterable<T> iterable) {

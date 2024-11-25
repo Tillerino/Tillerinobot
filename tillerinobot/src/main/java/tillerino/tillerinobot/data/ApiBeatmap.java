@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.KeyColumn;
 import org.tillerino.mormon.Loader;
@@ -60,6 +61,7 @@ public class ApiBeatmap extends OsuApiBeatmap {
 		return loadOrDownload(database, List.of(idAndMods), maxAge, downloader).get(idAndMods);
 	}
 
+	@SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
 	private static ApiBeatmap loadOrDownloadPreloaded(Database database, @BeatmapId int beatmapid, @BitwiseMods long mods, long maxAge,
 			Downloader downloader, @CheckForNull ApiBeatmap beatmap) throws IOException, SQLException {
 		if(beatmap == null || (maxAge > 0 && beatmap.downloaded < System.currentTimeMillis() - maxAge)) {
@@ -70,7 +72,7 @@ public class ApiBeatmap extends OsuApiBeatmap {
 			}
 
 			if(beatmap == null) {
-				database.delete(ApiBeatmap.class, false, beatmapid, mods);
+				var _ = database.deleteFrom(ApiBeatmap.class)."where `beatmapId` = \{beatmapid} and `mods` = \{mods}";
 				return null;
 			}
 			

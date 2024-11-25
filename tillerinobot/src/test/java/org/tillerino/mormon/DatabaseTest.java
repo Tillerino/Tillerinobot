@@ -53,9 +53,28 @@ public class DatabaseTest {
 	}
 
 	@Test
+	public void testTruncate() throws SQLException {
+		db.connection().createStatement().execute(CompositeKey.TABLE_DEF);
+		db.truncate(CompositeKey.class); // clean up from previous tests
+
+		db.persist(new CompositeKey(1, 11, "abc"), Action.INSERT);
+		db.persist(new CompositeKey(2, 12, "def"), Action.INSERT);
+
+		try (Loader<CompositeKey> loader = db.loader(CompositeKey.class, "")) {
+			assertThat(loader.query()).hasSize(2);
+		}
+
+		db.truncate(CompositeKey.class);
+
+		try (Loader<CompositeKey> loader = db.loader(CompositeKey.class, "")) {
+			assertThat(loader.query()).isEmpty();
+		}
+	}
+
+	@Test
 	public void testDelete() throws SQLException {
 		db.connection().createStatement().execute(CompositeKey.TABLE_DEF);
-		db.delete(CompositeKey.class, true); // clean up from previous tests
+		db.truncate(CompositeKey.class); // clean up from previous tests
 
 		db.persist(new CompositeKey(1, 11, "abc"), Action.INSERT);
 		db.persist(new CompositeKey(2, 12, "def"), Action.INSERT);
