@@ -321,7 +321,7 @@ public class IRCBot implements GameChatEventConsumer {
 		if (event instanceof Joined) {
 			try {
 				return welcomeIfDonator(event);
-			} catch (SQLException | IOException | UserException e) {
+			} catch (SQLException | IOException | UserException | MaintenanceException e) {
 				handleException(e, new Default());
 				// don't return the created response, because we don't want the user to get random error messages
 				return GameChatResponse.none();
