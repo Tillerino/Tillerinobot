@@ -12,23 +12,27 @@ import tillerino.tillerinobot.diff.BeatmapImpl;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record SanDokuResponse(
 		@GameMode int beatmapGameMode,
+		String beatmapMd5,
 		@GameMode int gameModeUsed,
 		@BitwiseMods long modsUsed,
 		SanDokuDiffCalcResult diffCalcResult) {
 
 	@Builder(toBuilder = true)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public static record SanDokuDiffCalcResult(
+	public record SanDokuDiffCalcResult(
 		// only declare fields which are needed for std calc
-		int maxCombo,
 		double starRating,
+		int maxCombo,
 		double aim,
 		double speed,
-		double overallDifficulty,
-		double approachRate,
+		double speedNoteCount,
 		double flashlight,
 		double sliderFactor,
-		double speedNoteCount,
+		double aimDifficultStrainCount,
+		double speedDifficultStrainCount,
+		double approachRate,
+		double overallDifficulty,
+		double drainRate,
 		int hitCircleCount,
 		int sliderCount,
 		int spinnerCount) {
