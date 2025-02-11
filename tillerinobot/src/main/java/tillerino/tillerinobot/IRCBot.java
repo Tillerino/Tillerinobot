@@ -3,6 +3,7 @@ package tillerino.tillerinobot;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.SQLException;
+import java.sql.SQLRecoverableException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -128,7 +129,7 @@ public class IRCBot implements GameChatEventConsumer {
 			if(e instanceof InterruptedException) {
 				return GameChatResponse.none();
 			}
-			if (e instanceof MaintenanceException) {
+			if ((e instanceof MaintenanceException) || (e instanceof SQLRecoverableException)) {
 				return new Message("I'm undergoing maintenance and can't do that right now.");
 			}
 			if(e instanceof UserException) {
