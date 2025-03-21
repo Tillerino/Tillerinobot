@@ -13,6 +13,7 @@
 	</parent>
 
 	<artifactId>ppaddict-site</artifactId>
+	<packaging>gwt-lib</packaging>
 
 	<properties>
 		<gwt-version>2.10.0</gwt-version>
@@ -38,6 +39,12 @@
 			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-servlet</artifactId>
 			<version>${gwt-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gwtproject</groupId>
+			<artifactId>gwt-dev</artifactId>
+			<version>${gwt-version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.scribe</groupId>
@@ -124,19 +131,14 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
+				<groupId>net.ltgt.gwt.maven</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>${gwt-version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<phase>generate-resources</phase>
-					</execution>
-				</executions>
+				<version>1.1.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<moduleName>org.tillerino.ppaddict.Ppaddict</moduleName>
+				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
