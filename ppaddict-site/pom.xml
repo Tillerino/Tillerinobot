@@ -13,7 +13,7 @@
 	</parent>
 
 	<artifactId>ppaddict-site</artifactId>
-	<packaging>gwt-lib</packaging>
+	<packaging>jar</packaging>
 
 	<properties>
 		<gwt-version>2.10.0</gwt-version>
@@ -124,8 +124,8 @@
 				<targetPath>${build.outputDirectory}/static/ppaddict</targetPath>
 			</resource>
 			<resource>
-				<directory>target/${build.finalName}/WEB-INF</directory>
-				<targetPath>${build.outputDirectory}/WEB-INF</targetPath>
+				<directory>target/gwt/deploy</directory>
+				<targetPath>${build.outputDirectory}/WEB-INF/deploy</targetPath>
 			</resource>
 		</resources>
 
@@ -135,6 +135,15 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>1.1.0</version>
 				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-module</goal>
+							<goal>compile</goal>
+						</goals>
+						<phase>generate-resources</phase>
+					</execution>
+				</executions>
 				<configuration>
 					<moduleName>org.tillerino.ppaddict.Ppaddict</moduleName>
 				</configuration>
