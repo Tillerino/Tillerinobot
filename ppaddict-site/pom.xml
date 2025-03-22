@@ -16,7 +16,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<gwt-version>2.10.0</gwt-version>
+		<gwt-version>2.12.2</gwt-version>
 	</properties>
 
 	<dependencies>
