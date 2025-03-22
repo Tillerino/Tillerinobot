@@ -176,7 +176,7 @@ public class IRCBot implements GameChatEventConsumer {
 
 	public static boolean isTimeout(Throwable e) {
 		return (e instanceof SocketTimeoutException)
-				|| ((e instanceof IOException) && (e.getMessage().startsWith("Premature EOF")
+				|| ((e instanceof IOException) && e.getMessage() != null && (e.getMessage().startsWith("Premature EOF")
 						|| e.getMessage().startsWith("Remote host terminated the handshake for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("Error writing to server for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("Unexpected end of file from server for https://osu.ppy.sh/api/")
@@ -185,6 +185,7 @@ public class IRCBot implements GameChatEventConsumer {
 						|| e.getMessage().startsWith("response code 503 for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("response code 520 for https://osu.ppy.sh/api/")
 						|| e.getMessage().startsWith("response code 525 for https://osu.ppy.sh/api/")
+						|| e.getMessage().startsWith("Connection reset for https://osu.ppy.sh/api/")
 						));
 	}
 
