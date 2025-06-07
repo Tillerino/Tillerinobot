@@ -124,4 +124,13 @@ public class RateLimiter {
 	public List<Integer> getPermitCount() {
 		return permits.stream().map(Collection::size).collect(toList());
 	}
+
+	public static RateLimiter unlimited() {
+		return new RateLimiter() {
+			@Override
+			public void limitRate() {
+				// don't limit rate
+			}
+		};
+	}
 }

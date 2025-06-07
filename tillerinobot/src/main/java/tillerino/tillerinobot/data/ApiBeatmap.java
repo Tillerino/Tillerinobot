@@ -21,7 +21,7 @@ import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister;
 import org.tillerino.mormon.Table;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.osuApiModel.Downloader;
+import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -56,18 +56,18 @@ public class ApiBeatmap extends OsuApiBeatmap {
 	 * @param maxAge if > 0, maximum age in milliseconds
 	 */
 	@CheckForNull
-	public static ApiBeatmap loadOrDownload(Database database, @BeatmapId int beatmapid, @BitwiseMods long mods, long maxAge, Downloader downloader) throws SQLException, IOException {
+	public static ApiBeatmap loadOrDownload(Database database, @BeatmapId int beatmapid, @BitwiseMods long mods, long maxAge, OsuApi downloader) throws SQLException, IOException {
 		BeatmapWithMods idAndMods = new BeatmapWithMods(beatmapid, mods);
 		return loadOrDownload(database, List.of(idAndMods), maxAge, downloader).get(idAndMods);
 	}
 
 	@SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
 	private static ApiBeatmap loadOrDownloadPreloaded(Database database, @BeatmapId int beatmapid, @BitwiseMods long mods, long maxAge,
-			Downloader downloader, @CheckForNull ApiBeatmap beatmap) throws IOException, SQLException {
+			OsuApi downloader, @CheckForNull ApiBeatmap beatmap) throws IOException, SQLException {
 		if(beatmap == null || (maxAge > 0 && beatmap.downloaded < System.currentTimeMillis() - maxAge)) {
 			try (var _ = PhaseTimer.timeTask("downloadBeatmap")) {
 				System.out.printf("downloading api beatmap %s/%s (%s; approved %s)%n", beatmapid, mods, beatmap != null ? "outdated" : "new", beatmap != null ? beatmap.getApproved() : "-");
-				beatmap = downloader.getBeatmap(beatmapid, mods, ApiBeatmap.class);
+				beatmap = downloader.getBeatmap(beatmapid, mods);
 				System.out.printf(".downloaded api beatmap %s/%s (%s; approved %s)%n", beatmapid, mods, beatmap != null ? "exists" : "missed", beatmap != null ? beatmap.getApproved() : "-");
 			}
 
@@ -90,7 +90,7 @@ public class ApiBeatmap extends OsuApiBeatmap {
 	 * @param beatmapsWithMods care that this is unique
 	 * @return might not contain entries for all requests
 	 */
-	public static Map<BeatmapWithMods, ApiBeatmap> loadOrDownload(Database database, Collection<BeatmapWithMods> beatmapsWithMods, long maxAge, Downloader downloader) throws SQLException, IOException {
+	public static Map<BeatmapWithMods, ApiBeatmap> loadOrDownload(Database database, Collection<BeatmapWithMods> beatmapsWithMods, long maxAge, OsuApi downloader) throws SQLException, IOException {
 		if (beatmapsWithMods.isEmpty()) {
 			return Collections.emptyMap();
 		}

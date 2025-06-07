@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.mockito.Mockito;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.ResettableModule;
@@ -44,6 +43,8 @@ import com.google.inject.Provides;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import tillerino.tillerinobot.data.ApiScore;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.Beatmap;
 import tillerino.tillerinobot.diff.BeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
@@ -81,7 +82,7 @@ public class TestBackend implements BotBackend {
 	@JsonAutoDetect(fieldVisibility = Visibility.NON_PRIVATE)
 	static class User {
 		int lastVisistedVersion = 0;
-		OsuApiUser apiUser;
+		ApiUser apiUser;
 		boolean isDonator = false;
 		long lastActivity;
 	}
@@ -176,7 +177,7 @@ public class TestBackend implements BotBackend {
 		if (!database.userNames.containsKey(username)) {
 			write = true;
 			user = new User();
-			user.apiUser = new OsuApiUser();
+			user.apiUser = new ApiUser();
 			user.apiUser.setUserId(userid);
 			database.userNames.put(username, userid);
 			database.users.put(userid, user);
@@ -208,7 +209,7 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public OsuApiUser getUser(int userid, long maxAge) throws SQLException,
+	public ApiUser getUser(int userid, long maxAge) throws SQLException,
 			IOException {
 		User user = database.users.get(userid);
 		return user.apiUser;
@@ -264,12 +265,12 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Override
-	public List<OsuApiScore> getRecentPlays(int userid) throws IOException {
+	public List<ApiScore> getRecentPlays(int userid) throws IOException {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public OsuApiUser downloadUser(String userName) throws IOException,
+	public ApiUser downloadUser(String userName) throws IOException,
 			SQLException {
 		Integer userid = database.userNames.get(userName);
 		if (userid == null) {

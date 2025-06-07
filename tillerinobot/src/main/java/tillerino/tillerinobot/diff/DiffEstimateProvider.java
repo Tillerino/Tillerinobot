@@ -25,7 +25,7 @@ import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.osuApiModel.Downloader;
+import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -54,7 +54,7 @@ public class DiffEstimateProvider {
 
 	private final BeatmapsService beatmaps;
 
-	private final Downloader downloader;
+	private final OsuApi downloader;
 
 	private final SanDoku calculator;
 

@@ -50,6 +50,7 @@ import org.tillerino.ppaddict.util.PhaseTimer;
 import org.tillerino.ppaddict.util.TestModule;
 
 import jakarta.ws.rs.InternalServerErrorException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
@@ -177,7 +178,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		this.backend.hintUser("TheDonator", true, 1, 1);
 		int userid = resolver.getIDByUserName("TheDonator");
 
-		OsuApiUser osuApiUser = mock(OsuApiUser.class);
+		ApiUser osuApiUser = mock(ApiUser.class);
 		doReturn("TheDonator").when(osuApiUser).getUserName();
 		doReturn(userid).when(osuApiUser).getUserId();
 
@@ -371,8 +372,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		verifyResponse(bot, message("user", "!r"), messageContaining("maintenance"));
 	}
 
-	OsuApiUser user(@UserId int id, @OsuName String name) {
-		OsuApiUser user = new OsuApiUser();
+	ApiUser user(@UserId int id, @OsuName String name) {
+		ApiUser user = new ApiUser();
 		user.setUserId(id);
 		user.setUserName(name);
 		return user;

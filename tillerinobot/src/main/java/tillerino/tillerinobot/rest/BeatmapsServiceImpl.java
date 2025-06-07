@@ -12,7 +12,7 @@ import jakarta.ws.rs.NotFoundException;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Loader;
-import org.tillerino.osuApiModel.Downloader;
+import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
 import com.google.inject.AbstractModule;
@@ -47,7 +47,7 @@ public class BeatmapsServiceImpl implements BeatmapsService {
 
 	private final BeatmapDownloader downloader;
 
-	private final Downloader apiDownloader;
+	private final OsuApi apiDownloader;
 
 	@Override
 	public BeatmapResource byId(int id) {

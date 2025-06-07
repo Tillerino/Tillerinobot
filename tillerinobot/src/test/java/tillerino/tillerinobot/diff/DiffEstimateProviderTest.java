@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.osuApiModel.Downloader;
+import tillerino.tillerinobot.OsuApi;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.InjectionRunner;
 import org.tillerino.ppaddict.util.TestAppender;
@@ -43,12 +43,12 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
 @RunWith(InjectionRunner.class)
 @TestModule(value = { DockeredMysqlModule.class, BeatmapsServiceImpl.Module.class },
-		mocks = { SanDoku.class, Downloader.class, BeatmapDownloader.class })
+		mocks = { SanDoku.class, OsuApi.class, BeatmapDownloader.class })
 public class DiffEstimateProviderTest {
 	@Inject
 	SanDoku sanDoku;
 	@Inject
-	Downloader downloader;
+	OsuApi downloader;
 	@Inject
 	BeatmapDownloader beatmapDownloader;
 	@Inject
@@ -76,7 +76,7 @@ public class DiffEstimateProviderTest {
 
 			mockSanDokuResponse(beatmapContent, 1.919);
 
-			when(downloader.getBeatmap(123, 0L, ApiBeatmap.class)).thenReturn(beatmap);
+			when(downloader.getBeatmap(123, 0L)).thenReturn(beatmap);
 			assertThat(provider.loadOrCalculate(database, 123, 0))
 				.isNotNull()
 				.satisfies(impl -> assertThat(impl)
@@ -115,7 +115,7 @@ public class DiffEstimateProviderTest {
 
 			mockSanDokuResponse(beatmapContent, 1.919);
 
-			when(downloader.getBeatmap(123, 0L, ApiBeatmap.class)).thenReturn(beatmap);
+			when(downloader.getBeatmap(123, 0L)).thenReturn(beatmap);
 			assertThat(provider.loadOrCalculate(database, 123, 0))
 				.isNotNull()
 				.satisfies(impl -> assertThat(impl)

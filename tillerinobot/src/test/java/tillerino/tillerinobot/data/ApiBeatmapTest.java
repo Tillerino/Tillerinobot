@@ -6,12 +6,14 @@ import static org.mockito.Mockito.spy;
 
 import org.junit.Test;
 import org.tillerino.mormon.Persister.Action;
+import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.Downloader;
 import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.OsuApiV1;
 
 public class ApiBeatmapTest extends AbstractDatabaseTest {
 
-	protected static Downloader downloader = spy(Downloader.createTestDownloader(AbstractDatabaseTest.class));
+	protected static OsuApi downloader = spy(OsuApiV1.createTestApi(AbstractDatabaseTest.class));
 
 	@Test
 	public void testSchema() throws Exception {

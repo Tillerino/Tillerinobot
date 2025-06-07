@@ -15,6 +15,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.lang.Language;
 
 @Value
@@ -32,7 +33,7 @@ public class RecentHandler implements CommandHandler {
 			return null;
 		}
 
-		List<OsuApiScore> recentPlays = backend.getRecentPlays(apiUser.getUserId());
+		List<ApiScore> recentPlays = backend.getRecentPlays(apiUser.getUserId());
 		if (recentPlays.isEmpty()) {
 			throw new UserException(language.noRecentPlays());
 		}

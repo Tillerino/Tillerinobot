@@ -9,7 +9,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -17,6 +16,8 @@ import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
 
+import tillerino.tillerinobot.data.ApiScore;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
 
@@ -33,7 +34,7 @@ public interface BotBackend {
 	 * @throws InterruptedException 
 	 */
 	@CheckForNull
-	public BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException, InterruptedException;
+	BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException, InterruptedException;
 
 	/**
 	 * @param nick
@@ -42,9 +43,9 @@ public interface BotBackend {
 	 * @throws SQLException
 	 * @throws UserException
 	 */
-	public int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
+	int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
 	
-	public void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
+	void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
 
 	/**
 	 * Get a user's information. If the user is not known in the database, the data will be downloaded from the osu API.
@@ -59,7 +60,7 @@ public interface BotBackend {
 	 * @throws IOException API exception
 	 */
 	@CheckForNull
-	public OsuApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException;
+	ApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException;
 
 	/**
 	 * Registers activity of a user. This information is not historized, i.e. a
@@ -73,16 +74,16 @@ public interface BotBackend {
 	 * @param timestamp when the user was sighted
 	 * @throws SQLException only on connection errors
 	 */
-	public void registerActivity(@UserId int userid, @MillisSinceEpoch long timestamp) throws SQLException;
+	void registerActivity(@UserId int userid, @MillisSinceEpoch long timestamp) throws SQLException;
 	
-	public long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
+	long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
 
 	/**
 	 * Checks if a user is a donator/patron.
 	 *
 	 * @return a positive value if the user is a donator/patron.
 	 */
-	public int getDonator(@UserId int user) throws SQLException, IOException;
+	int getDonator(@UserId int user) throws SQLException, IOException;
 
 	/**
 	 * links the given user to a Patreon account using a token string.
@@ -92,20 +93,21 @@ public interface BotBackend {
 	 * @return the name of the Patreon account that current user was linked to, or null if the token was not valid
 	 */
 	@CheckForNull
-	public String tryLinkToPatreon(String token, OsuApiUser user);
+	String tryLinkToPatreon(String token, OsuApiUser user);
 
 	/**
 	 * Retrieves the last plays from this user. These don't have pp and might be failed attempts.
+	 *
 	 * @param userid
 	 * @return sorted from most recent to oldest
 	 * @throws IOException
 	 */
-	@Nonnull public List<OsuApiScore> getRecentPlays(@UserId int userid) throws IOException;
+	@Nonnull List<ApiScore> getRecentPlays(@UserId int userid) throws IOException;
 
 	@CheckForNull
-	public OsuApiUser downloadUser(String userName) throws IOException, SQLException;
+	ApiUser downloadUser(String userName) throws IOException, SQLException;
 
-	public interface BeatmapsLoader {
+	interface BeatmapsLoader {
 		default @CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId) throws SQLException, IOException {
 			return getBeatmap(beatmapId, 0L);
 		}
