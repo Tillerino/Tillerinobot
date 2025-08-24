@@ -20,33 +20,33 @@
 	<properties>
 		<jacoco.version>0.8.13</jacoco.version>
 		<jersey.version>3.0.8</jersey.version>
-		<jetty.version>9.4.54.v20240208</jetty.version>
-		<jackson.version>2.17.1</jackson.version>
-		<testcontainers.version>1.19.8</testcontainers.version>
+		<jetty.version>9.4.58.v20250814</jetty.version>
+		<jackson.version>2.19.2</jackson.version>
+		<testcontainers.version>1.21.3</testcontainers.version>
 		<!-- determined by container -->
 		<mockserver.version>5.15.0</mockserver.version>
 		<slf4j.version>2.0.13</slf4j.version>
-		<mapstruct.version>1.5.5.Final</mapstruct.version>
+		<mapstruct.version>1.6.3</mapstruct.version>
 		<guice.version>6.0.0</guice.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
 		<spotbugs.version>4.8.5</spotbugs.version>
 		<spotbugs.plugin.version>4.8.3.1</spotbugs.plugin.version>
 		<project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-		<mockito.version>5.14.2</mockito.version>
-		<rabbitmq.version>5.21.0</rabbitmq.version>
-		<lombok.version>1.18.36</lombok.version>
-		<mysql-connector-java.version>8.4.0</mysql-connector-java.version>
+		<mockito.version>5.19.0</mockito.version>
+		<rabbitmq.version>5.26.0</rabbitmq.version>
+		<lombok.version>1.18.38</lombok.version>
+		<mysql-connector-java.version>9.4.0</mysql-connector-java.version>
 		<jax-rs.version>4.0.0</jax-rs.version>
-		<rest-assured.version>5.4.0</rest-assured.version>
-		<awaitility.version>4.2.1</awaitility.version>
-		<log4j.version>2.23.1</log4j.version>
-		<assertj-core.version>3.26.0</assertj-core.version>
-		<json-unit-assertj.version>3.2.7</json-unit-assertj.version>
-		<resilience4j.version>2.2.0</resilience4j.version>
-		<guava.version>33.2.0-jre</guava.version>
-		<commons-io.version>2.16.1</commons-io.version>
-		<commons-dbcp2.version>2.12.0</commons-dbcp2.version>
-		<commons-lang3.version>3.14.0</commons-lang3.version>
+		<rest-assured.version>5.5.6</rest-assured.version>
+		<awaitility.version>4.3.0</awaitility.version>
+		<log4j.version>2.25.1</log4j.version>
+		<assertj-core.version>3.27.4</assertj-core.version>
+		<json-unit-assertj.version>4.1.1</json-unit-assertj.version>
+		<resilience4j.version>2.3.0</resilience4j.version>
+		<guava.version>33.4.8-jre</guava.version>
+		<commons-io.version>2.20.0</commons-io.version>
+		<commons-dbcp2.version>2.13.0</commons-dbcp2.version>
+		<commons-lang3.version>3.18.0</commons-lang3.version>
 		<kitteh.version>9.0.0</kitteh.version>
 		<undertow.version>2.2.25.Final</undertow.version>
 		<logcaptor.version>2.12.0</logcaptor.version>
