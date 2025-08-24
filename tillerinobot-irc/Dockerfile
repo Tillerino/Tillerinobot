@@ -1,23 +1,15 @@
 # BUILD
-FROM rust:1.78-alpine
-
-# we need to install one library on alpine
-RUN apk add --no-cache musl-dev
+FROM rust:1.89-alpine
 
 WORKDIR /build/
-
-# selection in .dockerignore
 ADD . .
 
-RUN (ldd target/release/main && echo "already built") || cargo build --release
+RUN if [ -e target/release/main ]; then chmod u+x target/release/main; fi
+RUN if ldd target/release/main; then echo "already built"; else apk add --no-cache musl-dev; cargo build --release; fi
 
 # RUN
 # curl image is based on alpine, so we're compatible
 FROM curlimages/curl
-
-USER root
-RUN apk add --no-cache musl-dev
-USER curl_user
 
 COPY --from=0 /build/target/release/main .
 

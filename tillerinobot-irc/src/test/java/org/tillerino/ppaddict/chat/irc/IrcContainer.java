@@ -11,14 +11,9 @@ import org.tillerino.ppaddict.util.CustomTestContainer;
 
 public class IrcContainer {
 	private static final ImageFromDockerfile base = new ImageFromDockerfile()
-			.withFileFromFile("Dockerfile", new File("../tillerinobot-irc/Dockerfile"))
-			.withFileFromFile("Cargo.toml", new File("../tillerinobot-irc/Cargo.toml"))
-			.withFileFromFile("Cargo.lock", new File("../tillerinobot-irc/Cargo.lock"))
-			.withFileFromFile("src/main/rust", new File("../tillerinobot-irc/src/main/rust"));
+			.withFileFromFile(".", new File("../../Tillerinobot/tillerinobot-irc"));
 
-	public static final CustomTestContainer TILLERINOBOT_IRC = new CustomTestContainer(new File("../tillerinobot-irc/target/release/main").exists()
-			? base.withFileFromFile("target/release/main", new File("../tillerinobot-irc/target/release/main"))
-			: base)
+	public static final CustomTestContainer TILLERINOBOT_IRC = new CustomTestContainer(base)
 		.withNetwork(NETWORK)
 		.withExposedPorts(8080)
 		.waitingFor(new HttpWaitStrategy().forPort(8080).forPath("/live"))
