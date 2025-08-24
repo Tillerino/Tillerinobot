@@ -36,9 +36,7 @@ import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
-import org.tillerino.ppaddict.util.Result;
 import org.tillerino.ppaddict.util.TestAppender;
-import org.tillerino.ppaddict.util.TestAppender.LogEventWithMdc;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.util.TestClock;
 
@@ -47,6 +45,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
+import nl.altindag.log.model.LogEvent;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.FakeAuthenticationService;
@@ -116,7 +115,7 @@ public class ApiTest {
 	public JdkServerResource server = new JdkServerResource(injector.getInstance(BotApiDefinition.class), "localhost", 0);
 
 	@Rule
-	public final LogRule log = TestAppender.rule();
+	public final LogRule log = TestAppender.rule(ApiLoggingFeature.class);
 
 	/**
 	 * API-internal object
@@ -185,7 +184,7 @@ public class ApiTest {
 			.element(1).satisfies(mdc("apiKey", "valid-ke")); // truncated
 	}
 
-	private ListAssert<LogEventWithMdc> assertThatOurLogs() {
+	private ListAssert<LogEvent> assertThatOurLogs() {
 		return log.assertThat()
 			.filteredOn(event -> event.getLoggerName().equals(ApiLoggingFeature.class.getName()));
 	}

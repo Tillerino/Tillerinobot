@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.tillerino.ppaddict.live.LiveContainer.getLive;
+import static org.tillerino.ppaddict.util.TestAppender.mdc;
 import static tillerino.tillerinobot.MysqlContainer.mysql;
 
 import java.net.URI;
@@ -42,6 +43,7 @@ import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSc
 import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
+import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.chat.irc.IrcContainer;
 import org.tillerino.ppaddict.chat.irc.KittehForNgircd;
 import org.tillerino.ppaddict.chat.irc.NgircdContainer;
@@ -197,7 +199,7 @@ public class FullBotTest {
 	private ExecutorService coreWorkerPool;
 
 	@Rule
-	public final LogRule logRule = TestAppender.rule();
+	public final LogRule logRule = TestAppender.rule(MessagePreprocessor.class, ResponsePostprocessor.class);
 
 	private final AtomicInteger recommendationCount = new AtomicInteger();
 	protected final List<Future<?>> started = new ArrayList<>();
@@ -280,9 +282,9 @@ public class FullBotTest {
 		verify(client, timeout(1000).atLeast(total)).message(argThat(s -> s.contains("\"messageDetails\":")));
 
 		logRule.assertThat()
-			.anySatisfy(event -> assertThat(event.getContextData().toMap()).containsEntry("handler", "r"))
-			.allSatisfy(event -> assertThat(event.getContextData().toMap()).containsKey("event"))
-			.allSatisfy(event -> assertThat(event.getContextData().toMap()).containsKey("user"));
+			.anySatisfy(mdc("handler", "r"))
+			.allSatisfy(event -> assertThat(event.getDiagnosticContext()).containsKey("event"))
+			.allSatisfy(event -> assertThat(event.getDiagnosticContext()).containsKey("user"));
 
 		assertThat(botInfoApi.isReceiving()).isTrue();
 		assertThat(botInfoApi.isSending()).isTrue();

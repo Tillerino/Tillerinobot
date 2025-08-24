@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT" />
+    </root>
+    
+    <!-- from main -->
+    <logger name="io.undertow.request.error-response" level="info"/>
+    <logger name="org.eclipse.jetty" level="info"/>
+    <logger name="org.springframework" level="warn"/>
+    <logger name="org.jboss.logging" level="info"/>
+    <logger name="com.github.dockerjava" level="info"/>
+    <logger name="com.networknt" level="info"/>
+    <logger name="org.testcontainers" level="info"/>
+    <logger name="jndi" level="info"/>
+    <logger name="org.apache.http" level="info"/>
+    <logger name="io.netty" level="info"/>
+    <logger name="tc" level="info"/>
+    <logger name="tc.localhost" level="debug"/>
+
+    <logger name="org.tillerino.irc" level="info"/>
+</configuration>

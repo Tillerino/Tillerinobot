@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOException;
 
@@ -20,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MdcUtilsTest {
 	@Rule
-	public final LogRule logRule = TestAppender.rule();
+	public final LogRule logRule = TestAppender.rule(MdcUtilsTest.class);
 
 	@After
 	public final void tearDown() throws Exception {
@@ -79,7 +80,7 @@ public class MdcUtilsTest {
 		log.debug("boink");
 		logRule.assertThat()
 			.hasSize(1)
-			.first().satisfies(x -> assertThat(x.getMDC("foo")).isEqualTo("bar"));
+			.first().satisfies(mdc("foo", "bar"));
 	}
 
 	@Test

@@ -2,105 +2,64 @@ package org.tillerino.ppaddict.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.Core;
-import org.apache.logging.log4j.core.Filter;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.appender.AbstractAppender;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.config.plugins.Plugin;
-import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
-import org.apache.logging.log4j.core.config.plugins.PluginElement;
-import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
-import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Delegate;
+import nl.altindag.log.LogCaptor;
+import nl.altindag.log.model.LogEvent;
 
 /**
- * Extends the regular {@link ConsoleAppender} so that log events are collected
- * and can be run assertions against. Use {@link #rule()} as a JUnit
- * {@link Rule} to capture the precise events that were logged during test
- * execution.
+ * Wrapper around {@link LogCaptor} for convenience.
  */
-@Plugin(name = "TestAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE)
-public class TestAppender extends AbstractAppender {
-	private TestAppender(String name, Filter filter) {
-		super(name, filter, null, false, null);
+public class TestAppender {
+	public static Consumer<LogEvent> mdc(String key, String value) {
+		return event -> assertThat(event.getDiagnosticContext().get(key)).isEqualTo(value);
 	}
 
-	@PluginFactory
-	public static TestAppender createAppender(
-			@PluginAttribute("name") String name,
-			@PluginElement("Filter") Filter filter) {
-		return new TestAppender(name, filter);
+	public static LogRule rule(Class... targets) {
+		Validate.exclusiveBetween(0, Integer.MAX_VALUE, targets.length, "Need to specify at least one logger to capture");
+		return new LogRule(() -> Stream.of(targets).map(LogCaptor::forClass).toList());
 	}
 
-	private static final List<LogEventWithMdc> events = new ArrayList<>();
-
-	@Override
-	public synchronized void append(LogEvent event) {
-		// make sure that the MDC is copied. Otherwise we'll look up the MDC of
-		// the test rather than the event when doing assertions on the Event.
-		synchronized (events) {
-			events.add(new LogEventWithMdc(event.toImmutable()));
-		}
-	}
-
-	public static Consumer<LogEventWithMdc> mdc(String key, String value) {
-		return event -> assertThat(event.getContextData().<String> getValue(key)).isEqualTo(value);
-	}
-
-	public static LogRule rule() {
-		return new LogRule();
+	public static LogRule rule(String... targets) {
+		Validate.exclusiveBetween(0, Integer.MAX_VALUE, targets.length, "Need to specify at least one logger to capture");
+		return new LogRule(() -> Stream.of(targets).map(LogCaptor::forName).toList());
 	}
 
 	public static class LogRule extends ExternalResource {
-		@Override
+		private final Supplier<List<LogCaptor>> initializer;
+
+		private List<LogCaptor> logCaptors;
+
+    private LogRule(Supplier<List<LogCaptor>> initializer) {this.initializer = initializer;}
+
+    @Override
 		protected void before() throws Throwable {
-			events.clear();
+			logCaptors = initializer.get();
 		}
 
 		@Override
 		protected void after() {
-			events.clear();
+			logCaptors.forEach(LogCaptor::close);
 		}
 
 		public void clear() {
-			events.clear();
+			logCaptors.forEach(LogCaptor::clearLogs);
 		}
 
-		public ListAssert<LogEventWithMdc> assertThat() {
+		public ListAssert<LogEvent> assertThat() {
 			return Assertions.assertThat(events());
 		}
 
-		public List<LogEventWithMdc> events() {
-			synchronized (events) {
-				return Collections.unmodifiableList(new ArrayList<>(events));
-			}
-		}
-	}
-
-	@RequiredArgsConstructor
-	public class LogEventWithMdc implements LogEvent {
-		@Delegate(types = LogEvent.class)
-		final LogEvent wrapped;
-
-		public String getMDC(String string) {
-			return wrapped.getContextData().getValue(string);
-		}
-
-		@Override
-		public String toString() {
-			return wrapped.toString();
+		public List<LogEvent> events() {
+			return logCaptors.stream().flatMap((LogCaptor logCaptor) -> logCaptor.getLogEvents().stream()).toList();
 		}
 	}
 }

@@ -29,12 +29,13 @@ import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
+import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
+import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
-import org.tillerino.ppaddict.util.TestAppender.LogEventWithMdc;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.util.TestClock;
 
@@ -43,6 +44,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import nl.altindag.log.model.LogEvent;
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 import tillerino.tillerinobot.lang.Default;
 
@@ -51,7 +53,7 @@ import tillerino.tillerinobot.lang.Default;
  */
 public class LoggingTest {
 	@Rule
-	public final LogRule logRule = TestAppender.rule();
+	public final LogRule logRule = TestAppender.rule(MessagePreprocessor.class, ResponsePostprocessor.class);
 
 	@Rule
 	public final ExecutorServiceRule exec = ExecutorServiceRule.cachedThreadPool("bot-root").interruptOnShutdown();
@@ -200,30 +202,30 @@ public class LoggingTest {
 			.allSatisfy(mdc("user", user));
 	}
 
-	private Consumer<LogEventWithMdc> sent(String messageStart) {
+	private Consumer<LogEvent> sent(String messageStart) {
 		return mdc("state", "sent")
-				.andThen(e -> assertThat((e.getMessage().getFormattedMessage())).startsWith("sent: " + messageStart));
+				.andThen(e -> assertThat((e.getMessage())).startsWith("sent: " + messageStart));
 	}
 
-	private Consumer<LogEventWithMdc> received(String message) {
+	private Consumer<LogEvent> received(String message) {
 		return mdc("state", "msg")
-				.andThen(event -> assertThat(event.getMessage().getFormattedMessage()).isEqualTo("received: " + message));
+				.andThen(event -> assertThat(event.getMessage()).isEqualTo("received: " + message));
 	}
 
-	private Consumer<LogEventWithMdc> action(String message) {
+	private Consumer<LogEvent> action(String message) {
 		return mdc("state", "action")
-				.andThen(event -> assertThat(event.getMessage().getFormattedMessage()).isEqualTo("action: " + message));
+				.andThen(event -> assertThat(event.getMessage()).isEqualTo("action: " + message));
 	}
 
 	private void awaitOurLogSize(long size) {
 		Awaitility.await().until(() -> logRule.events().stream().filter(isOurEvent()).count(), new IsEqual<>(size));
 	}
 
-	private ListAssert<LogEventWithMdc> assertThatOurLog() {
+	private ListAssert<LogEvent> assertThatOurLog() {
 		return logRule.assertThat().filteredOn(isOurEvent());
 	}
 
-	private Predicate<? super LogEventWithMdc> isOurEvent() {
+	private Predicate<? super LogEvent> isOurEvent() {
 		return event -> event.getLoggerName().startsWith("tillerino")
 				|| event.getLoggerName().startsWith("org.tillerino");
 	}

@@ -59,7 +59,7 @@ public class DiffEstimateProviderTest {
 	public final static ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newSingleThreadExecutor);
 
 	@Rule
-	public final LogRule logRule = TestAppender.rule();
+	public final LogRule logRule = TestAppender.rule(DiffEstimateProvider.class);
 
 	@Rule
 	public MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
@@ -92,7 +92,7 @@ public class DiffEstimateProviderTest {
 		thread.start();
 		Awaitility.await()
 			.pollInterval(10, TimeUnit.MILLISECONDS)
-			.untilAsserted(() -> logRule.assertThat().anyMatch(event -> event.getMessage().getFormattedMessage().contains("Sleeping now.")));
+			.untilAsserted(() -> logRule.assertThat().anyMatch(event -> event.getMessage().contains("Sleeping now.")));
 		thread.interrupt();
 		thread.join(1000);
 		assertThat(thread.isAlive()).isFalse();
