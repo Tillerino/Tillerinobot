@@ -1,27 +1,23 @@
 package tillerino.tillerinobot.lang;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
-@RunWith(MockitoJUnitRunner.class)
 public class HebrewTest {
 	Hebrew lang = new Hebrew();
 
-	@Mock
-	OsuApiUser apiUser;
+	OsuApiUser apiUser = mock(OsuApiUser.class);
 
 	boolean print = false;
 
-	@Before
+	@BeforeEach
 	public void setupMocks() {
 		when(apiUser.getUserName()).thenReturn("username");
 	}

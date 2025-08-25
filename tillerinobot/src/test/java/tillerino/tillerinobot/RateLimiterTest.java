@@ -1,6 +1,6 @@
 package tillerino.tillerinobot;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
@@ -8,13 +8,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 
 public class RateLimiterTest {
 	private static ExecutorService exec = Executors.newCachedThreadPool();
 
-	@AfterClass
+	@AfterAll
 	public static void stopExec() {
 		exec.shutdownNow();
 	}

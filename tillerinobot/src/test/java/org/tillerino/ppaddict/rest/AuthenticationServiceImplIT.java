@@ -9,9 +9,9 @@ import javax.inject.Singleton;
 import dagger.Component;
 import jakarta.ws.rs.NotAuthorizedException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.MockServerRule;
 
 public class AuthenticationServiceImplIT {
@@ -24,13 +24,13 @@ public class AuthenticationServiceImplIT {
 		DaggerAuthenticationServiceImplIT_Injector.create().inject(this);
 	}
 
-	@Rule
+	@RegisterExtension
 	public MockServerRule mockServer = new MockServerRule();
 
 	@Inject
 	AuthenticationService auth;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		mockServer.mockJsonGet("/auth/authorization", "{ \"unknownProperty\": true }", "api-key", "regular");
 		mockServer.mockJsonGet("/auth/authorization", "{ \"admin\": true }", "api-key", "adminKey");

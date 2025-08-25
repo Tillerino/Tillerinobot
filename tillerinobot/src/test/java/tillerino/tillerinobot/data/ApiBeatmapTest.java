@@ -1,15 +1,14 @@
 package tillerino.tillerinobot.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.spy;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Persister.Action;
 
 import tillerino.tillerinobot.DaggerAbstractDatabaseTest_Injector;
 import tillerino.tillerinobot.OsuApi;
-import org.tillerino.osuApiModel.Downloader;
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.OsuApiV1;
 

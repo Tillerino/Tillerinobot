@@ -2,10 +2,9 @@ package org.tillerino.ppaddict.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 
 public class ResultTest {
 	ObjectMapper jackson = new ObjectMapper();

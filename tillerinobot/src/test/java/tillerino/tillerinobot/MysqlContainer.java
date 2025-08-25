@@ -14,6 +14,10 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.testcontainers.containers.MySQLContainer;
@@ -48,11 +52,11 @@ public class MysqlContainer {
 		return initializer.start();
 	}
 
-	public static class MysqlDatabaseLifecycle extends TestWatcher {
-		static boolean createdSchema = false;
+	public static class MysqlDatabaseLifecycle implements BeforeEachCallback, AfterEachCallback {
+		private static boolean createdSchema = false;
 
 		@Override
-		protected void starting(Description description) {
+		public void beforeEach(ExtensionContext context) {
 			if (!createdSchema) {
 				try {
 					createSchema();
@@ -66,7 +70,7 @@ public class MysqlContainer {
 		}
 
 		@Override
-		protected void finished(Description description) {
+		public void afterEach(ExtensionContext context) {
 			MySQLContainer container;
 			try {
 				container = mysql();

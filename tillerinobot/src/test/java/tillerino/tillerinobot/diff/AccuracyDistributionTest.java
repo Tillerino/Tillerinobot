@@ -1,9 +1,9 @@
 package tillerino.tillerinobot.diff;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.OsuApiScore;
 
 import tillerino.tillerinobot.UserException;

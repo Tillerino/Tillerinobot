@@ -1,6 +1,6 @@
 package org.tillerino.ppaddict.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * It is super hard to write assertions here, so just check the output manually.

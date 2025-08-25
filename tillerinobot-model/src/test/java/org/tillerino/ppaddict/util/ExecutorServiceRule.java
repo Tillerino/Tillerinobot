@@ -5,17 +5,19 @@ import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 import org.awaitility.Awaitility;
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 
 /**
- * Wraps {@link ExecutorService} in an {@link ExternalResource}.
+ * Wraps {@link ExecutorService} in a JUnit 5 extension.
  */
 @RequiredArgsConstructor
-public class ExecutorServiceRule extends ExternalResource implements ExecutorService {
+public class ExecutorServiceRule implements ExecutorService, BeforeEachCallback, AfterEachCallback {
 	@Getter
 	@Delegate(types = ExecutorService.class)
 	private ExecutorService exec;
@@ -25,12 +27,12 @@ public class ExecutorServiceRule extends ExternalResource implements ExecutorSer
 	private boolean interruptOnShutdown = false;
 
 	@Override
-	protected void before() throws Throwable {
+	public void beforeEach(ExtensionContext context) throws Exception {
 		exec = supplier.get();
 	}
 
 	@Override
-	protected void after() {
+	public void afterEach(ExtensionContext context) throws Exception {
 		if (interruptOnShutdown) {
 			exec.shutdownNow();
 		} else {

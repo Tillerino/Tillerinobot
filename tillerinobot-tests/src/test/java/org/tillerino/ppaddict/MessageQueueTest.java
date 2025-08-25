@@ -5,8 +5,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.Sighted;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
@@ -14,7 +14,7 @@ import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 import org.tillerino.ppaddict.rabbit.RemoteEventQueue;
 
 public class MessageQueueTest {
-	@ClassRule
+	@RegisterExtension
 	public static final RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
 
 	/**

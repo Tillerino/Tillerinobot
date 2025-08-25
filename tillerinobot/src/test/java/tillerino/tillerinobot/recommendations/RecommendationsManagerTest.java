@@ -1,7 +1,9 @@
 package tillerino.tillerinobot.recommendations;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -18,8 +20,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
@@ -54,7 +56,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
 	OsuApiUser user;
 
-	@Before
+	@BeforeEach
 	public void createUser() throws SQLException, IOException {
 		backend.hintUser("donator", true, 1, 1000);
 
@@ -99,9 +101,10 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 		assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime), samplerSettings.requestedMods());
 	}
 
-	@Test(expected = UserException.class)
+	@Test
 	public void testContradiction() throws Exception {
-		manager.parseSamplerSettings(user, "ar=1 ar=2", new Default());
+		assertThatThrownBy(() -> manager.parseSamplerSettings(user, "ar=1 ar=2", new Default()))
+				.isInstanceOf(UserException.class);
 	}
 
 	@Test

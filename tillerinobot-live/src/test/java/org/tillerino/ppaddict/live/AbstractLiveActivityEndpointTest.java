@@ -10,20 +10,13 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.LiveActivity;
-import org.tillerino.ppaddict.util.MdcUtils;
-import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
-@RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractLiveActivityEndpointTest {
 	@WebSocket
 	public interface GenericWebSocketClient {
@@ -39,8 +32,7 @@ public abstract class AbstractLiveActivityEndpointTest {
 
 	private final WebSocketClient webSocketClient = new WebSocketClient();
 
-	@Mock
-	private GenericWebSocketClient client;
+	private GenericWebSocketClient client = Mockito.mock(GenericWebSocketClient.class);
 
 	abstract protected int port();
 
@@ -48,7 +40,6 @@ public abstract class AbstractLiveActivityEndpointTest {
 
 	abstract protected LiveActivity push();
 
-	@Before
 	public void setUp() throws Exception {
 		webSocketClient.start();
 		Future<Session> connect = webSocketClient.connect(client,
@@ -57,7 +48,7 @@ public abstract class AbstractLiveActivityEndpointTest {
 		waitForConnectionEstablished();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		webSocketClient.stop();
 	}

@@ -11,15 +11,12 @@ import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.err;
 import static org.tillerino.ppaddict.util.Result.ok;
 
-import java.util.Optional;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.*;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
@@ -31,7 +28,6 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.PhaseTimer;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ResponsePostprocessorTest {
 	@Spy
 	private LocalGameChatMetrics botInfo = new LocalGameChatMetrics();
@@ -53,8 +49,9 @@ public class ResponsePostprocessorTest {
 
 	PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 		when(writer.action(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
 		when(writer.message(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
 		event.getMeta().setTimer(new PhaseTimer());

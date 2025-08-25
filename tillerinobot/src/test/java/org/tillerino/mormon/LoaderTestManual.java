@@ -1,6 +1,6 @@
 package org.tillerino.mormon;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Persister.Action;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;

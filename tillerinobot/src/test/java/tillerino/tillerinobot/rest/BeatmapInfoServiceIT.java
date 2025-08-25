@@ -6,11 +6,10 @@ import static org.hamcrest.CoreMatchers.is;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.MockServerRule;
 import org.tillerino.MockServerRule.MockServerModule;
-import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.mockmodules.BeatmapsServiceMockModule;
 import org.tillerino.ppaddict.mockmodules.GameChatClientMockModule;
 import org.tillerino.ppaddict.rest.AuthenticationServiceImpl.RemoteAuthenticationModule;
@@ -32,10 +31,10 @@ public class BeatmapInfoServiceIT extends AbstractDatabaseTest {
 	}
 
 	@Inject
-	@Rule
+	@RegisterExtension
 	public BotApiRule botApi;
 
-	@Rule
+	@RegisterExtension
 	public MockServerRule mockServer = new MockServerRule();
 
 	@Test

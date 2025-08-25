@@ -20,13 +20,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.PrivateMessage;
@@ -38,15 +35,12 @@ import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.IRCBot;
 
-@RunWith(MockitoJUnitRunner.class)
 public class LocalGameChatEventQueueTest {
-	@Mock
-	private LocalGameChatMetrics botInfo;
+	private LocalGameChatMetrics botInfo = mock(LocalGameChatMetrics.class);
 
-	@Mock
-	private IRCBot coreHandler;
+	private IRCBot coreHandler = mock(IRCBot.class);
 
-	@Rule
+	@RegisterExtension
 	public final ExecutorServiceRule exec = new ExecutorServiceRule(() -> Executors.newFixedThreadPool(2));
 
 	private LocalGameChatEventQueue queue;
@@ -56,7 +50,7 @@ public class LocalGameChatEventQueueTest {
 	PrivateMessage event0 = new PrivateMessage(0, "sender", 125, "hello");
 	PrivateMessage event1 = new PrivateMessage(1, "sender", 125, "hello");
 
-	@Before
+	@BeforeEach
 	public void before() {
 		queue = new LocalGameChatEventQueue(new MessageHandlerScheduler(coreHandler, (ThreadPoolExecutor) exec.getExec()), botInfo);
 		queueRunner = exec.submit(queue);
@@ -64,7 +58,7 @@ public class LocalGameChatEventQueueTest {
 		event1.getMeta().setTimer(new PhaseTimer());
 	}
 
-	@After
+	@AfterEach
 	public void after() {
 		queueRunner.cancel(true);
 	}

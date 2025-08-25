@@ -2,8 +2,8 @@ package tillerino.tillerinobot.rest;
 
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -13,8 +13,8 @@ import javax.inject.Singleton;
 import dagger.Component;
 import jakarta.ws.rs.WebApplicationException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.mockmodules.BeatmapDownloaderMockModule;
@@ -46,7 +46,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
 
   AbstractBeatmapResource resource;
 
-  @Before
+  @BeforeEach
   public void init() {
     resource = new AbstractBeatmapResource(dbm, downloader, beatmap) {
       @Override

@@ -1,13 +1,13 @@
 package tillerino.tillerinobot;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import dagger.Component;
 import tillerino.tillerinobot.data.UserNameMapping;

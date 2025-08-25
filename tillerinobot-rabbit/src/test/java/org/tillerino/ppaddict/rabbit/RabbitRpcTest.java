@@ -15,9 +15,10 @@ import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
 import org.awaitility.Awaitility;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.RuleChain;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
@@ -26,14 +27,14 @@ import org.tillerino.ppaddict.util.Result;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.RpcServer;
 
-public class RabbitRpcTest {
-	public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
-
+class RabbitRpcTest {
+	@RegisterExtension
+	@Order(1)
 	public ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newCachedThreadPool);
 
-	@Rule
-	public RuleChain rules = RuleChain.outerRule(exec)
-		.around(rabbit);
+	@RegisterExtension
+	@Order(2)
+	public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
 
 	interface MyRpcInterface {
 		@Rpc(queue = "simple_call", timeout = 1000)
@@ -209,7 +210,7 @@ public class RabbitRpcTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	public void sequentialThroughput() throws Exception {
 		MyRpcInterface proxy = RabbitRpc.remoteCallProxy(rabbit.getConnection(), MyRpcInterface.class, "Timeout");
 		RpcServer rpcServer = RabbitRpc.handleRemoteCalls(rabbit.getConnection(), MyRpcInterface.class, x -> ok("x" + x), "Error");
@@ -223,7 +224,7 @@ public class RabbitRpcTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	public void manyToOneThroughput() throws Exception {
 		MyRpcInterface proxy = RabbitRpc.remoteCallProxy(rabbit.getConnection(), MyRpcInterface.class, "Timeout");
 		RpcServer rpcServer = RabbitRpc.handleRemoteCalls(rabbit.getConnection(), MyRpcInterface.class, x -> ok("x" + x), "Error");
@@ -243,7 +244,7 @@ public class RabbitRpcTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	public void manyToManyThroughput() throws Exception {
 		MyRpcInterface proxy = RabbitRpc.remoteCallProxy(rabbit.getConnection(), MyRpcInterface.class, "Timeout");
 		// start 10 servers

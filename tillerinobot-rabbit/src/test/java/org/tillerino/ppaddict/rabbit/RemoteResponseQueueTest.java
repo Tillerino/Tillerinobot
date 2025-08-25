@@ -2,7 +2,7 @@ package org.tillerino.ppaddict.rabbit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

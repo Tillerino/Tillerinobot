@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -27,7 +30,7 @@ import lombok.SneakyThrows;
  *
  * Use with MockServerModule to inject mocked URLs.
  */
-public class MockServerRule extends TestWatcher {
+public class MockServerRule implements BeforeEachCallback, AfterEachCallback {
 	private static final DockerImageName IMAGE = DockerImageName.parse("mockserver/mockserver").withTag(getMockServerVersion());
 	private static final MockServerContainer MOCK_SERVER = new MockServerContainer(IMAGE)
 			.withNetwork(DockerNetwork.NETWORK)
@@ -74,27 +77,18 @@ public class MockServerRule extends TestWatcher {
 			.respond(HttpResponse.response().withStatusCode(code));
 	}
 
-
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return super.apply(base, description);
+	public void beforeEach(ExtensionContext context) throws Exception {
+		CLIENT.reset();
 	}
 
 	@Override
-	protected void finished(Description description) {
-		try {
-			CLIENT.reset();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	protected void failed(Throwable e, Description description) {
-		super.failed(e, description);
+	public void afterEach(ExtensionContext context) throws Exception {
+		if(context.getExecutionException().isPresent()) {
 		Stream.of(CLIENT.retrieveLogMessagesArray(null))
 			.filter(x -> x.contains("no expectation for"))
 			.forEach(System.err::println);
+		}
 	}
 
 	/**

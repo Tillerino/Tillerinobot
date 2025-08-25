@@ -12,13 +12,12 @@ import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.Future;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
@@ -28,7 +27,6 @@ import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 
-@RunWith(MockitoJUnitRunner.class)
 public class LocalGameChatResponseQueueTest {
 	@Mock
 	private LocalGameChatMetrics botInfo;
@@ -39,14 +37,18 @@ public class LocalGameChatResponseQueueTest {
 	@InjectMocks
 	private LocalGameChatResponseQueue queue;
 
-	@Rule
+	{
+		MockitoAnnotations.initMocks(this);
+	}
+
+	@RegisterExtension
 	public final ExecutorServiceRule exec = ExecutorServiceRule.singleThread("response-queue");
 
 	private Future<?> queueFuture;
 
 	private final PrivateMessage event = new PrivateMessage(1, "nick", 123, "lo");
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		queueFuture.cancel(true);
 	}

@@ -1,33 +1,27 @@
 package tillerino.tillerinobot.handlers;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 
 public class DebugHandlerTest {
-	@Mock
-	BotBackend backend;
+	BotBackend backend = Mockito.mock(BotBackend.class);
 	
-	@Mock
-	IrcNameResolver resolver;
+	IrcNameResolver resolver = Mockito.mock(IrcNameResolver.class);
 	
-	DebugHandler handler;
+	DebugHandler handler = new DebugHandler(backend, resolver);
 	
 	UserData userData = new UserData();
 	
-	@Before
+	@BeforeEach
 	public void initMocks() {
-		MockitoAnnotations.initMocks(this);
-		
-		handler = new DebugHandler(backend, resolver);
-		userData.setAllowedToDebug(true);
+    userData.setAllowedToDebug(true);
 	}
 	
 	@Test

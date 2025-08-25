@@ -9,10 +9,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
 
@@ -47,19 +46,19 @@ public abstract class AbstractDatabaseTest {
 		}
 	}
 
-	@Rule
-	public TestRule resetMysql = new MysqlDatabaseLifecycle();
+	@RegisterExtension
+	public MysqlDatabaseLifecycle resetMysql = new MysqlDatabaseLifecycle();
 
 	@Inject
 	protected DatabaseManager dbm;
 	protected Database db;
 
-	@Before
+	@BeforeEach
 	public void createEntityManager() {
 		db = dbm.getDatabase();
 	}
 
-	@After
+	@AfterEach
 	public void closeEntityManager() throws SQLException {
 		db.close();
 	}

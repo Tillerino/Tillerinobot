@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,13 +24,10 @@ import tillerino.tillerinobot.predicates.NumericPropertyPredicate;
 import tillerino.tillerinobot.predicates.StarDiff;
 import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RecommendationRequestParserTest {
-	@Mock
-	private BotBackend backend;
+	private BotBackend backend = mock(BotBackend.class);
 
-	@InjectMocks
-	private RecommendationRequestParser recommendationRequestParser;
+	private RecommendationRequestParser recommendationRequestParser = new RecommendationRequestParser(backend);
 
 	private RecommendationRequest parse(String settings) throws Exception {
 		OsuApiUser user = new OsuApiUser();

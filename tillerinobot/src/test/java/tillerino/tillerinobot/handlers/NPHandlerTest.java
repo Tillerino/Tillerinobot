@@ -2,7 +2,7 @@ package tillerino.tillerinobot.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 

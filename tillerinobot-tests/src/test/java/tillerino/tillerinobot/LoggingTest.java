@@ -2,7 +2,7 @@ package tillerino.tillerinobot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,9 +20,9 @@ import java.util.function.Predicate;
 import org.assertj.core.api.ListAssert;
 import org.awaitility.Awaitility;
 import org.hamcrest.core.IsEqual;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.internal.util.MockUtil;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
@@ -37,7 +37,6 @@ import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.util.TestClock;
 
 import nl.altindag.log.model.LogEvent;
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.LocalConsoleTillerinobot.ClockModule;
 import tillerino.tillerinobot.LocalConsoleTillerinobot.Injector;
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
@@ -47,10 +46,10 @@ import tillerino.tillerinobot.lang.Default;
  * Tests that all the logging (specifically the MDC) actually works as expected.
  */
 public class LoggingTest {
-	@Rule
+	@RegisterExtension
 	public final LogRule logRule = TestAppender.rule(MessagePreprocessor.class, ResponsePostprocessor.class);
 
-	@Rule
+	@RegisterExtension
 	public final ExecutorServiceRule exec = ExecutorServiceRule.cachedThreadPool("bot-root").interruptOnShutdown();
 
 	public TestClock clock = new TestClock();
@@ -61,10 +60,10 @@ public class LoggingTest {
 
 	private TestBackend backend;
 
-	@Rule
+	@RegisterExtension
 	public final MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		MDC.clear(); // it might be that there's some garbage from other tests in the MDC
 		Injector injector = DaggerLocalConsoleTillerinobot_Injector.builder()

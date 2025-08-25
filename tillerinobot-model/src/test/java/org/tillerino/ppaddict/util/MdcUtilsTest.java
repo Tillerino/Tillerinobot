@@ -6,9 +6,9 @@ import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.MDC;
 import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.MdcUtils.MdcSnapshot;
@@ -20,10 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MdcUtilsTest {
-	@Rule
+	@RegisterExtension
 	public final LogRule logRule = TestAppender.rule(MdcUtilsTest.class);
 
-	@After
+	@AfterEach
 	public final void tearDown() throws Exception {
 		MDC.clear();
 	}

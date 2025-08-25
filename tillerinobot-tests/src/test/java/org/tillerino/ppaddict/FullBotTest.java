@@ -30,11 +30,11 @@ import javax.inject.Singleton;
 import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
 import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
@@ -241,21 +241,25 @@ public class FullBotTest extends AbstractDatabaseTest {
 	private final WebSocketClient webSocketClient = new WebSocketClient();
 
 	private final ThreadGroup clients = new ThreadGroup("Clients");
-	@Rule
+
+	@RegisterExtension
 	public final ExecutorServiceRule clientExec = new ExecutorServiceRule(() -> new ThreadPoolExecutor(0,
 			Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<>(), r -> new Thread(clients, r, "Client")));
 
+	@RegisterExtension
+	@Order(1)
 	public final ExecutorServiceRule exec = new ExecutorServiceRule(() -> new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			1L, TimeUnit.SECONDS, new SynchronousQueue<>(), r -> new Thread(r, "aux")));
+
+	@RegisterExtension
+	@Order(2)
 	public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(exec);
-	@Rule
-	public RuleChain chain = RuleChain.outerRule(exec).around(rabbit);
 
 	@Inject
 	@Named("core")
 	ThreadPoolExecutor coreWorkerPool;
 
-	@Rule
+	@RegisterExtension
 	public final LogRule logRule = TestAppender.rule(MessagePreprocessor.class, ResponsePostprocessor.class);
 
 	private final AtomicInteger recommendationCount = new AtomicInteger();
@@ -278,7 +282,7 @@ public class FullBotTest extends AbstractDatabaseTest {
 
 	}
 
-	@Before
+	@BeforeEach
 	public void startBot() throws Exception {
 		DaggerFullBotTest_Injector.builder()
 				.fullBotConfiguration(new FullBotTest.FullBotConfiguration())
@@ -302,7 +306,7 @@ public class FullBotTest extends AbstractDatabaseTest {
 		IrcContainer.TILLERINOBOT_IRC.start();
 	}
 
-	@After
+	@AfterEach
 	public void stopBot() throws Exception {
 		started.forEach(fut -> fut.cancel(true));
 		if (coreWorkerPool != null) {

@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.tillerino.ppaddict.chat.GameChatResponse.none;
 
 import java.util.Collections;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GameChatResponseTest {
 	static class Aresponse implements GameChatResponse {

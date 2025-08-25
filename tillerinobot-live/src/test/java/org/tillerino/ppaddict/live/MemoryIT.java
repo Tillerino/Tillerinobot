@@ -10,17 +10,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
@@ -65,12 +64,12 @@ public class MemoryIT {
 
 	private List<CollectingWebSocketClient> clients = new ArrayList<>();
 
-	@Rule
+	@RegisterExtension
 	public final RabbitMqContainerConnection rabbitMq = new RabbitMqContainerConnection(null);
 
 	LiveActivity source;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		source = RabbitMqConfiguration.liveActivity(rabbitMq.getConnection());
 		URI uri = new URI("ws://" + getLive().getContainerIpAddress() + ":" + getLive().getMappedPort(8080) + "/live/v0");
@@ -85,7 +84,7 @@ public class MemoryIT {
 		}
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		for (WebSocketClient webSocketClient: webSocketClients) {
 			webSocketClient.stop();

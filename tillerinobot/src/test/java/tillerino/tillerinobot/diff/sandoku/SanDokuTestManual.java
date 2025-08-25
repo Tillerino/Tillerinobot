@@ -11,7 +11,7 @@ import jakarta.ws.rs.BadRequestException;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiScore;
 

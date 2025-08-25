@@ -2,9 +2,10 @@ package org.tillerino.ppaddict.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 public class GameChatEventTest {
 	@Test

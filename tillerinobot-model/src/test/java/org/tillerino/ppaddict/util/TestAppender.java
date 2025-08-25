@@ -10,7 +10,9 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import nl.altindag.log.LogCaptor;
 import nl.altindag.log.model.LogEvent;
@@ -33,7 +35,7 @@ public class TestAppender {
 		return new LogRule(() -> Stream.of(targets).map(LogCaptor::forName).toList());
 	}
 
-	public static class LogRule extends ExternalResource {
+	public static class LogRule implements BeforeEachCallback, AfterEachCallback {
 		private final Supplier<List<LogCaptor>> initializer;
 
 		private List<LogCaptor> logCaptors;
@@ -41,12 +43,12 @@ public class TestAppender {
     private LogRule(Supplier<List<LogCaptor>> initializer) {this.initializer = initializer;}
 
     @Override
-		protected void before() throws Throwable {
+		public void beforeEach(ExtensionContext context) {
 			logCaptors = initializer.get();
 		}
 
 		@Override
-		protected void after() {
+		public void afterEach(ExtensionContext context) {
 			logCaptors.forEach(LogCaptor::close);
 		}
 

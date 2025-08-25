@@ -2,21 +2,18 @@ package tillerino.tillerinobot.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.osuApiModel.types.UserId;
@@ -24,15 +21,12 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 
 import tillerino.tillerinobot.BotBackend;
 
-@RunWith(MockitoJUnitRunner.class)
 public class LinkPpaddictHandlerTest {
-	@Mock
-	BotBackend backend;
+	BotBackend backend = mock(BotBackend.class);
 
-	@InjectMocks
-	LinkPpaddictHandler handler;
+	LinkPpaddictHandler handler = new LinkPpaddictHandler(backend);
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		when(backend.tryLinkToPatreon(anyString(), any())).thenReturn(null);
 	}

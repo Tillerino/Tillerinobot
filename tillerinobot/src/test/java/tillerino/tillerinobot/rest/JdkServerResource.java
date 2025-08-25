@@ -6,7 +6,9 @@ import jakarta.ws.rs.core.Application;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -15,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JdkServerResource extends ExternalResource {
+public class JdkServerResource implements BeforeEachCallback, AfterEachCallback {
 	private final Application app;
 
 	private final String host;
@@ -27,14 +29,14 @@ public class JdkServerResource extends ExternalResource {
 	private HttpServer server;
 
 	@Override
-	protected void before() throws Throwable {
+	public void beforeEach(ExtensionContext context) throws Exception {
 		server = JdkHttpServerFactory.createHttpServer(new URI("http", null, host, port, "/", null, null),
 				ResourceConfig.forApplication(app));
 		actualPort = server.getAddress().getPort();
 	}
 
 	@Override
-	protected void after() {
+	public void afterEach(ExtensionContext context) throws Exception {
 		try {
 			server.stop(1);
 		} catch (Exception e) {

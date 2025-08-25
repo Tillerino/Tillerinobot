@@ -2,7 +2,8 @@ package tillerino.tillerinobot.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -10,11 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.commons.lang3.function.FailableFunction;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
+import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
@@ -28,7 +25,6 @@ import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.lang.Vietnamese;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 
-@RunWith(MockitoJUnitRunner.class)
 public class OptionsHandlerTest {
 	enum E {
 		AA,
@@ -42,8 +38,7 @@ public class OptionsHandlerTest {
 		}).when(userData).usingLanguage(any(FailableFunction.class));
 	}
 
-	@Mock
-	UserData userData;
+	UserData userData = mock(UserData.class);
 
 	@Test
 	public void test() throws Exception {
@@ -53,16 +48,16 @@ public class OptionsHandlerTest {
 		assertEquals(E.BB, OptionsHandler.find(E.values(), E::name, "cb"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void testEmpty() throws Exception {
 		// this will match nothing
-		OptionsHandler.find(E.values(), E::name, "");
+		assertThrows(IllegalArgumentException.class, () -> OptionsHandler.find(E.values(), E::name, ""));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void testCenter() throws Exception {
 		// this will match both AA and BB
-		OptionsHandler.find(E.values(), E::name, "ab");
+		assertThrows(IllegalArgumentException.class, () -> OptionsHandler.find(E.values(), E::name, "ab"));
 	}
 	
 	@Test
@@ -128,13 +123,13 @@ public class OptionsHandlerTest {
       verify(userData).setDefaultRecommendationOptions(null);
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void testInvalidDefaultSettings() throws Exception {
       OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
 
       OsuApiUser user = new OsuApiUser();
       user.setUserId(1);
-      handler.handle("set default invalid", user , userData, new Default());
+      assertThrows(UserException.class, () -> handler.handle("set default invalid", user , userData, new Default()));
     }
 
     @Test

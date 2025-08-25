@@ -10,7 +10,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
@@ -21,7 +23,7 @@ import lombok.experimental.Delegate;
  * This is an {@link ExecutorService} implementation which executes all tasks on
  * a separate thread, but waits for completion of the task.
  */
-public class SynchronousExecutorServiceRule extends ExternalResource implements ExecutorService {
+public class SynchronousExecutorServiceRule implements ExecutorService, BeforeEachCallback, AfterEachCallback {
 	@Delegate(types = ExecutorService.class)
 	private ExecutorService exec;
 
@@ -50,7 +52,7 @@ public class SynchronousExecutorServiceRule extends ExternalResource implements 
 		}
 
 		@Override
-		public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+		public boolean awaitTermination(long timeout, TimeUnit unit) {
 			return isShutdown();
 		}
 
@@ -70,14 +72,12 @@ public class SynchronousExecutorServiceRule extends ExternalResource implements 
 	}
 
 	@Override
-	protected void before() throws Throwable {
-		super.before();
+	public void beforeEach(ExtensionContext context) {
 		exec = new Impl();
 	}
 
 	@Override
-	protected void after() {
+	public void afterEach(ExtensionContext context) {
 		exec.shutdown();
-		super.after();
 	}
 }

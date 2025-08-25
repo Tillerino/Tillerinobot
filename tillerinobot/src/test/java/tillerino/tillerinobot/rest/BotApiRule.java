@@ -2,6 +2,8 @@ package tillerino.tillerinobot.rest;
 
 import javax.inject.Inject;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
+
 import io.restassured.RestAssured;
 
 public class BotApiRule extends JdkServerResource {
@@ -11,8 +13,8 @@ public class BotApiRule extends JdkServerResource {
 	}
 
 	@Override
-	protected void before() throws Throwable {
-		super.before();
+	public void beforeEach(ExtensionContext context) throws Exception {
+		super.beforeEach(context);
 		RestAssured.baseURI = "http://localhost:" + getPort();
 	}
 }

@@ -1,6 +1,6 @@
 package tillerino.tillerinobot;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.OsuName;
@@ -90,7 +90,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		return new Joined(123, nick, 456);
 	}
 
-	@Rule
+	@RegisterExtension
 	public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
 
 	RateLimiter rateLimiter = new RateLimiter();
@@ -123,7 +123,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	private IRCBot bot;
 
-	@Before
+	@BeforeEach
 	public void initMocks() throws Exception {
 		mockQueuePrint();
 
@@ -143,7 +143,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		}).when(queue).onResponse(any(), any());
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		verifyNoMoreInteractions(queue);
 	}

@@ -6,8 +6,8 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.JsonBody;
@@ -15,7 +15,7 @@ import org.mockserver.model.MediaType;
 import org.tillerino.MockServerRule;
 
 public class NamePendingApprovalRecommenderTest {
-	@Rule
+	@RegisterExtension
 	public final MockServerRule mockServer = new MockServerRule();
 
 	@Test

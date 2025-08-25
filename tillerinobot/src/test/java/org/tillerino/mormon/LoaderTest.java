@@ -2,8 +2,9 @@ package org.tillerino.mormon;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.junit.jupiter.api.Test;
+
 import lombok.NoArgsConstructor;
-import org.junit.Test;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.DaggerAbstractDatabaseTest_Injector;

@@ -13,12 +13,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import net.engio.mbassy.listener.Handler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.event.client.ClientReceiveCommandEvent;
 import org.kitteh.irc.client.library.event.client.ClientReceiveNumericEvent;
@@ -38,9 +37,6 @@ import io.restassured.RestAssured;
 import org.tillerino.ppaddict.util.Result;
 
 public class BotIT {
-	@Rule
-	public final TestName testName = new TestName();
-
 	private Connection connection;
 	private final List<GameChatEvent> incoming = Collections.synchronizedList(new ArrayList<>());
 	private Client kitteh;
@@ -49,11 +45,8 @@ public class BotIT {
 	private KittehListener listener = mock(KittehListener.class);
 	private final List<ClientEvent> kittehEvents = new ArrayList<>();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
-		System.out.println();
-		System.out.println("Running " + testName.getMethodName());
-
 		RabbitMqContainer.start();
 		connection = RabbitMqConfiguration.connectionFactory(RabbitMqContainer.getHost(),
 				RabbitMqContainer.getAmqpPort(), RabbitMqContainer.getVirtualHost())
@@ -102,7 +95,7 @@ public class BotIT {
 		withEvents(List::clear);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		if (connection != null && connection.isOpen()) {
 			connection.close();
@@ -121,7 +114,7 @@ public class BotIT {
 
 	@Test
 	// This test kills the shared rabbit MQ container, which messes with parallel tests.
-	@Ignore
+	@Disabled
 	public void livenessReactsToRabbit() throws Exception {
 		RabbitMqContainer.stop();
 		await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));

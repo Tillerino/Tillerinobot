@@ -1,7 +1,7 @@
 package tillerino.tillerinobot.rest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
@@ -27,9 +27,9 @@ import jakarta.ws.rs.client.WebTarget;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.ListAssert;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
@@ -119,11 +119,11 @@ public class ApiTest {
 	/**
 	 * Jetty server
 	 */
-	@Rule
+	@RegisterExtension
 	@Inject
 	public JdkServerResource server;
 
-	@Rule
+	@RegisterExtension
 	public final LogRule log = TestAppender.rule(ApiLoggingFeature.class);
 
 	/**
@@ -147,7 +147,7 @@ public class ApiTest {
 
 	private final SetHeaderAndParam clientRequestFilter = new SetHeaderAndParam();
 
-	@Before
+	@BeforeEach
 	public void startServer() throws Exception {
 		// build clients
 		Client client = ClientBuilder.newBuilder().register(clientRequestFilter).build();

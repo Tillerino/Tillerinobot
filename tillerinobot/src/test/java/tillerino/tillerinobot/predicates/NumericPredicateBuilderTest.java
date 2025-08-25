@@ -1,8 +1,11 @@
 package tillerino.tillerinobot.predicates;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
@@ -65,13 +68,13 @@ public class NumericPredicateBuilderTest {
 		assertNull(builder.build("tx<=12", null));
 	}
 
-	@Test(expected = UserException.class)
+	@Test
 	public void testWrongSign() throws Exception {
-		builder.build("tl~12", new Default());
+		assertThrows(UserException.class, () -> builder.build("tl~12", new Default()));
 	}
 
-	@Test(expected = UserException.class)
+	@Test
 	public void testWrongNumberFormat() throws Exception {
-		builder.build("tl=twelve", new Default());
+		assertThrows(UserException.class, () -> builder.build("tl=twelve", new Default()));
 	}
 }

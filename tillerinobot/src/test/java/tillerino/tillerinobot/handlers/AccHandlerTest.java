@@ -2,19 +2,18 @@ package tillerino.tillerinobot.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.regex.Matcher;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.LiveActivity;
@@ -33,7 +32,7 @@ public class AccHandlerTest {
 	LiveActivity liveActivity = mock(LiveActivity.class);
 	OsuApiBeatmap beatmap = new OsuApiBeatmap();
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		when(backend.loadBeatmap(anyInt(), anyLong(), any()))
 			.thenReturn(new BeatmapMeta(beatmap, null, percentageEstimates));

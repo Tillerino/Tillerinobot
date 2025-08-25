@@ -2,13 +2,14 @@ package org.tillerino.ppaddict.chat.impl;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,25 +25,18 @@ import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
 import org.tillerino.ppaddict.util.Clock;
 
-@RunWith(MockitoJUnitRunner.class)
 public class MessagePreprocessorTest {
-	@Mock
-	Bouncer bouncer;
+	Bouncer bouncer = mock(Bouncer.class);
 
-	@Mock
-	GameChatEventQueue queue;
+	GameChatEventQueue queue = mock(GameChatEventQueue.class);
 
-	@Mock
-	GameChatResponseQueue responses;
+	GameChatResponseQueue responses = mock(GameChatResponseQueue.class);
 
-	@Mock
-	LiveActivity liveActivity;
+	LiveActivity liveActivity = mock(LiveActivity.class);
 
-	@Mock
-	Clock clock;
+	Clock clock = mock(Clock.class);
 
-	@InjectMocks
-	MessagePreprocessor preprocessor;
+	MessagePreprocessor preprocessor = new MessagePreprocessor(queue, liveActivity, bouncer, responses, clock);
 
 	@Test
 	public void testRegularMessage() throws Exception {

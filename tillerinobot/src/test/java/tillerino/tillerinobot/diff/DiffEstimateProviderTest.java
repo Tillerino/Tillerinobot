@@ -17,9 +17,8 @@ import javax.inject.Singleton;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.function.FailableRunnable;
 import org.awaitility.Awaitility;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.Persister.Action;
 
@@ -81,13 +80,13 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 	BeatmapDownloader beatmapDownloader;
 	@Inject
 	DiffEstimateProvider provider;
-	@ClassRule
-	public final static ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newSingleThreadExecutor);
+	@RegisterExtension
+	public final ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newSingleThreadExecutor);
 
-	@Rule
+	@RegisterExtension
 	public final LogRule logRule = TestAppender.rule(DiffEstimateProvider.class);
 
-	@Rule
+	@RegisterExtension
 	public MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
 	@Test
@@ -258,7 +257,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 		when(sanDoku.getDiff(0, 0, beatmapContent.getBytes())).thenReturn(response);
 	}
 
-	private static <E extends Exception> void runAsyncAndWait(FailableRunnable<E> r) throws Exception {
+	private <E extends Exception> void runAsyncAndWait(FailableRunnable<E> r) throws Exception {
 		exec.submit(() -> { r.run(); return null; }).get(1, TimeUnit.SECONDS);
 	}
 }
