@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.function.Failable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tillerino.ppaddict.util.TestClock;
 
 import dagger.Component;
