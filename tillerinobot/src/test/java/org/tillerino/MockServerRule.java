@@ -1,27 +1,23 @@
 package org.tillerino;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.stream.Stream;
+import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.verification.NearMiss;
 
+import java.util.List;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.testcontainers.containers.MockServerContainer;
-import org.testcontainers.utility.DockerImageName;
 import org.tillerino.ppaddict.util.DockerNetwork;
+import org.wiremock.integrations.testcontainers.WireMockContainer;
 
 import javax.inject.Named;
-
-import lombok.SneakyThrows;
 
 /**
  * Shorthands for using a mock server in tests.
@@ -31,63 +27,68 @@ import lombok.SneakyThrows;
  * Use with MockServerModule to inject mocked URLs.
  */
 public class MockServerRule implements BeforeEachCallback, AfterEachCallback {
-	private static final DockerImageName IMAGE = DockerImageName.parse("mockserver/mockserver").withTag(getMockServerVersion());
-	private static final MockServerContainer MOCK_SERVER = new MockServerContainer(IMAGE)
+	private static final WireMockContainer MOCK_SERVER = new WireMockContainer(WireMockContainer.WIREMOCK_2_LATEST)
 			.withNetwork(DockerNetwork.NETWORK)
 			.withNetworkAliases("mockserver");
-	private static final MockServerClient CLIENT;
+	private static final WireMock CLIENT;
 
 	static {
 		MOCK_SERVER.start();
-		CLIENT = new MockServerClient(MOCK_SERVER.getContainerIpAddress(), MOCK_SERVER.getMappedPort(1080));
-	}
-
-	@SneakyThrows
-	private static String getMockServerVersion() {
-		try (InputStream is = MockServerRule.class.getResourceAsStream("/META-INF/maven/org.mock-server/mockserver-client-java/pom.properties")) {
-			Properties props = new Properties();
-			props.load(is);
-			return (String) props.get("version");
-		}
+		System.out.println(MOCK_SERVER.getMappedPort(8080));
+		CLIENT = new WireMock(MOCK_SERVER.getHost(), MOCK_SERVER.getMappedPort(8080));
 	}
 
 	public static String getExternalMockServerAddress() {
-		return "http://" + MOCK_SERVER.getContainerIpAddress() + ":" + MOCK_SERVER.getMappedPort(1080);
+		return "http://" + MOCK_SERVER.getContainerIpAddress() + ":" + MOCK_SERVER.getMappedPort(8080);
 	}
 
-	public void mockJsonGet(String relativePath, String jsonResponse, String... headers) {
-		CLIENT.when(getRequest(relativePath, headers))
-			.respond(HttpResponse.response()
-					// for some reason JsonBody doesn't set the content-type?
-					.withBody(jsonResponse)
-					.withHeader("content-type", "application/json"));
+	public static String getDockerMockServerAddress() {
+		return "http://mockserver:8080";
 	}
 
-	private HttpRequest getRequest(String relativePath, String... headers) {
-		HttpRequest request = HttpRequest.request(relativePath).withMethod("GET");
+	public void mockJsonGet(String relativePath, String jsonResponseBody, String... headers) {
+		mockJsonGetWithRequestBody(relativePath, null, jsonResponseBody, headers);
+	}
+
+	public void mockJsonGetWithRequestBody(String relativePath, String jsonRequestBody, String jsonResponseBody,
+			String... headers) {
+		MappingBuilder request = get(urlEqualTo(relativePath));
+		if (jsonRequestBody != null) {
+			request.withRequestBody(equalToJson(jsonRequestBody));
+		}
 		assertThat(headers.length % 2).isZero();
 		for (int i = 0; i < headers.length; i+=2) {
-			request = request.withHeader(headers[i], headers[i + 1]);
+			request = request.withHeader(headers[i], WireMock.equalTo(headers[i + 1]));
 		}
-		return request;
+		mockServer().register(request
+			.willReturn(aResponse()
+					.withHeader("Content-Type", "application/json;charset=UTF-8")
+					.withBody(jsonResponseBody)));
 	}
 
 	public void mockStatusCodeGet(String relativePath, int code, String... headers) {
-		CLIENT.when(getRequest(relativePath))
-			.respond(HttpResponse.response().withStatusCode(code));
+		MappingBuilder request = get(urlEqualTo(relativePath));
+		assertThat(headers.length % 2).isZero();
+		for (int i = 0; i < headers.length; i+=2) {
+			request = request.withHeader(headers[i], WireMock.equalTo(headers[i + 1]));
+		}
+		mockServer().register(request
+			.willReturn(aResponse().withStatus(code)));
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws Exception {
-		CLIENT.reset();
+		CLIENT.resetRequests();
+		CLIENT.resetToDefaultMappings();
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) throws Exception {
 		if(context.getExecutionException().isPresent()) {
-		Stream.of(CLIENT.retrieveLogMessagesArray(null))
-			.filter(x -> x.contains("no expectation for"))
-			.forEach(System.err::println);
+			List<NearMiss> nearMisses = CLIENT.findNearMissesForAllUnmatchedRequests();
+			if (!nearMisses.isEmpty()) {
+				nearMisses.forEach(System.err::println);
+			}
 		}
 	}
 
@@ -102,7 +103,7 @@ public class MockServerRule implements BeforeEachCallback, AfterEachCallback {
 		}
 	}
 
-	public static MockServerClient mockServer() {
+	public static WireMock mockServer() {
 		return CLIENT;
 	}
 }

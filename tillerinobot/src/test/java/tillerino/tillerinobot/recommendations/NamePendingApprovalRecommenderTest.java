@@ -1,17 +1,17 @@
 package tillerino.tillerinobot.recommendations;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
-import org.mockserver.model.MediaType;
 import org.tillerino.MockServerRule;
 
 public class NamePendingApprovalRecommenderTest {
@@ -20,31 +20,34 @@ public class NamePendingApprovalRecommenderTest {
 
 	@Test
 	public void getRecommendations() throws Exception {
-		MockServerRule.mockServer().when(HttpRequest.request("/recommend")
-				.withContentType(MediaType.APPLICATION_JSON)
-				.withHeader("Authorization", "Bearer my-token")
-				.withHeader("User-Agent", "https://github.com/Tillerino/Tillerinobot")
-				.withBody(new JsonBody("""
+		ResponseDefinitionBuilder response = aResponse()
+				.withHeader("Content-Type", "application/json")
+				.withBody("""
+								{
+									"recommendations": [ {
+										"beatmapId": 2785705,
+										"mods": 8,
+										"pp": 221,
+										"probability": 0.001763579140327404
+									} ]
+								}
+						""");
+		MappingBuilder request = post(urlEqualTo("/recommend"))
+				.withHeader("Authorization", equalTo("Bearer my-token"))
+				.withHeader("User-Agent", equalTo("https://github.com/Tillerino/Tillerinobot"))
+				.withRequestBody(equalToJson("""
 						{
-							"topPlays" : [ {
-								"beatmapid" : 116128,
-								"mods" : 0,
-								"pp" : 240.588
-							} ],
-							"exclude" : [ 456, 116128 ],
-							"nomod" : true,
-							"requestMods" : 64
-						}""")))
-				.respond(HttpResponse.response("""
-						{
-							"recommendations": [ {
-								"beatmapId": 2785705,
-								"mods": 8,
-								"pp": 221,
-								"probability": 0.001763579140327404
-							} ]
-						}
-				"""));
+						"topPlays" : [ {
+						"beatmapid" : 116128,
+						"mods" : 0,
+						"pp" : 240.588
+						} ],
+						"exclude" : [ 456, 116128 ],
+						"nomod" : true,
+						"requestMods" : 64
+						}"""));
+		MockServerRule.mockServer().register(request.willReturn(
+				response));
 
 		NamePendingApprovalRecommender recommender = new NamePendingApprovalRecommender(
 				URI.create(MockServerRule.getExternalMockServerAddress() + "/recommend"), "my-token");

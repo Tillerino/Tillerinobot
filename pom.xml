@@ -20,11 +20,12 @@
 	<properties>
 		<jacoco.version>0.8.13</jacoco.version>
 		<jersey.version>3.0.8</jersey.version>
-		<jetty.version>9.4.58.v20250814</jetty.version>
+		<jetty.version>11.0.5</jetty.version>
 		<jackson.version>2.19.2</jackson.version>
 		<testcontainers.version>1.21.3</testcontainers.version>
 		<!-- determined by container -->
 		<mockserver.version>5.15.0</mockserver.version>
+		<wiremock.version>3.0.1</wiremock.version>
 		<slf4j.version>2.0.13</slf4j.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
 		<guice.version>6.0.0</guice.version>
@@ -505,7 +506,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.jetty.websocket</groupId>
-				<artifactId>javax-websocket-client-impl</artifactId>
+				<artifactId>websocket-jetty-client</artifactId>
 				<version>${jetty.version}</version>
 			</dependency>
 			<dependency>
@@ -572,6 +573,11 @@
 				<groupId>io.github.hakky54</groupId>
 				<artifactId>logcaptor</artifactId>
 				<version>${logcaptor.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wiremock.integrations.testcontainers</groupId>
+				<artifactId>wiremock-testcontainers-module</artifactId>
+				<version>1.0-alpha-13</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -644,6 +650,12 @@
 		<dependency>
 			<groupId>io.github.hakky54</groupId>
 			<artifactId>logcaptor</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>${wiremock.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

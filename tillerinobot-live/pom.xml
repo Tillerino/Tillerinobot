@@ -25,7 +25,7 @@
         <!-- Tests -->
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>javax-websocket-client-impl</artifactId>
+            <artifactId>websocket-jetty-client</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
