@@ -70,35 +70,6 @@ public class DatabaseManager implements AutoCloseable {
 				+ "&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&useSSL=false");
 	}
 
-	public static Properties loadMysqlPropertiesFromEnv() {
-		Properties properties = new Properties();
-
-		replaceWithEnv(properties, "MYSQL_HOST", "host");
-		replaceWithEnv(properties, "MYSQL_PORT", "port");
-		replaceWithEnv(properties, "MYSQL_USER", "user");
-		replaceWithEnv(properties, "MYSQL_PASSWORD", "password");
-		replaceWithEnv(properties, "MYSQL_DATABASE", "database");
-		ensurePropertyPresent(properties, "host");
-		ensurePropertyPresent(properties, "port");
-		ensurePropertyPresent(properties, "user");
-		ensurePropertyPresent(properties, "password");
-
-		return properties;
-	}
-
-	private static void ensurePropertyPresent(Properties properties, String string) {
-		if (!properties.containsKey(string)) {
-			throw new RuntimeException("Mysql connection property missing: " + string);
-		}
-	}
-
-	private static void replaceWithEnv(Properties properties, String env, String property) {
-		String value = System.getenv(env);
-		if (value != null) {
-			properties.put(property, value);
-		}
-	}
-
 	public Database getDatabase() {
 		try(var _ = PhaseTimer.timeTask("borrow connection")) {
 			return new Database(pool.borrowObject());
@@ -148,6 +119,39 @@ public class DatabaseManager implements AutoCloseable {
 	public <T> int delete(@NonNull T obj) throws SQLException {
 		try (Database db = getDatabase()) {
 			return db.delete(obj);
+		}
+	}
+
+	@dagger.Module
+	public interface Module {
+		@dagger.Provides
+		static @Named("mysql") Properties properties() {
+			Properties properties = new Properties();
+
+			replaceWithEnv(properties, "MYSQL_HOST", "host");
+			replaceWithEnv(properties, "MYSQL_PORT", "port");
+			replaceWithEnv(properties, "MYSQL_USER", "user");
+			replaceWithEnv(properties, "MYSQL_PASSWORD", "password");
+			replaceWithEnv(properties, "MYSQL_DATABASE", "database");
+			ensurePropertyPresent(properties, "host");
+			ensurePropertyPresent(properties, "port");
+			ensurePropertyPresent(properties, "user");
+			ensurePropertyPresent(properties, "password");
+
+			return properties;
+		}
+
+		private static void ensurePropertyPresent(Properties properties, String string) {
+			if (!properties.containsKey(string)) {
+				throw new RuntimeException("Mysql connection property missing: " + string);
+			}
+		}
+
+		private static void replaceWithEnv(Properties properties, String env, String property) {
+			String value = System.getenv(env);
+			if (value != null) {
+				properties.put(property, value);
+			}
 		}
 	}
 }

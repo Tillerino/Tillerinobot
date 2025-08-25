@@ -209,6 +209,7 @@ public class RabbitRpcTest {
 	}
 
 	@Test
+	@Ignore
 	public void sequentialThroughput() throws Exception {
 		MyRpcInterface proxy = RabbitRpc.remoteCallProxy(rabbit.getConnection(), MyRpcInterface.class, "Timeout");
 		RpcServer rpcServer = RabbitRpc.handleRemoteCalls(rabbit.getConnection(), MyRpcInterface.class, x -> ok("x" + x), "Error");

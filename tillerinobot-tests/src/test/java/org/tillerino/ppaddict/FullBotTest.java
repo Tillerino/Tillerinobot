@@ -135,7 +135,7 @@ public class FullBotTest extends AbstractDatabaseTest {
 		}
 
 		private void r() {
-			kitteh.sendMessage("tillerinobot", "!r");
+			kitteh.sendMessage("tbot", "!r");
 		}
 	}
 
@@ -160,7 +160,7 @@ public class FullBotTest extends AbstractDatabaseTest {
 		@Provides
 		@Named("tillerinobot.irc.nickname")
 		String provideIrcNickname() {
-			return "tillerinobot";
+			return "tbot";
 		}
 
 		@Provides

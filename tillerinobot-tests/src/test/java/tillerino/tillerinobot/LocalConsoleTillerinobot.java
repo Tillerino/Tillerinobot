@@ -67,9 +67,7 @@ import tillerino.tillerinobot.rest.BotApiDefinition;
  */
 @Slf4j
 public class LocalConsoleTillerinobot {
-	@Component(modules = {DockeredMysqlModule.class, InMemoryQueuesModule.class, LiveActivityMockModule.class,
-												TestBackend.Module.class, MessageHandlerSchedulerModule.class, ProcessorsModule.class,
-												Module.class, TestOsutrackDownloader.Module.class, ClockModule.class})
+	@Component(modules = {Module.class, ClockModule.class})
 	@Singleton
 	interface Injector {
 		BotApiDefinition botApiDefinition();
@@ -88,7 +86,7 @@ public class LocalConsoleTillerinobot {
 	}
 
 	@dagger.Module
-	static class ClockModule {
+	public static class ClockModule {
 		private final Clock clock;
 
     ClockModule(Clock clock) {this.clock = clock;}
@@ -99,8 +97,10 @@ public class LocalConsoleTillerinobot {
 		}
   }
 
-	@dagger.Module
-	interface Module {
+	@dagger.Module(includes = {DockeredMysqlModule.class, InMemoryQueuesModule.class, LiveActivityMockModule.class,
+														 TestBackend.Module.class, MessageHandlerSchedulerModule.class, ProcessorsModule.class,
+														 TestOsutrackDownloader.Module.class})
+	public interface Module {
 		@dagger.Provides
 		static @Named("tillerinobot.test.persistentBackend") boolean persistentBackend() {
 			return false;

@@ -146,7 +146,7 @@ public class BotIT {
 	@Test
 	public void incomingPrivateMessage() throws Exception {
 		connectKitteh();
-		kitteh.sendMessage("tillerinobot", "hello");
+		kitteh.sendMessage("tbot", "hello");
 
 		await().untilAsserted(() -> assertThat(incoming)
 			.singleElement()
@@ -159,7 +159,7 @@ public class BotIT {
 	@Test
 	public void incomingPrivateAction() throws Exception {
 		connectKitteh();
-		kitteh.sendMessage("tillerinobot", "\u0001ACTION hello\u0001");
+		kitteh.sendMessage("tbot", "\u0001ACTION hello\u0001");
  
 		await().untilAsserted(() -> assertThat(incoming)
 			.singleElement()

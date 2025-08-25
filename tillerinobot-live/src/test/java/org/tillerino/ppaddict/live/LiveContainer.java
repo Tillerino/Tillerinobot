@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.live;
 
 import static org.tillerino.ppaddict.util.DockerNetwork.NETWORK;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -11,19 +12,16 @@ import org.tillerino.ppaddict.rabbit.RabbitMqContainer;
 import org.tillerino.ppaddict.util.CustomTestContainer;
 
 public class LiveContainer {
-	private static final ImageFromDockerfile POTENTIALLY_PREBUILT = Files
-			.isExecutable(Paths.get("../tillerinobot-live/target/release/main"))
-					? new ImageFromDockerfile().withFileFromPath("target/release/main",
-							Paths.get("../tillerinobot-live/target/release/main"))
-					: new ImageFromDockerfile();
+	private static final ImageFromDockerfile base = new ImageFromDockerfile()
+			.withFileFromFile("Dockerfile", new File("../../Tillerinobot/tillerinobot-live/Dockerfile"))
+			.withFileFromFile("Cargo.toml", new File("../../Tillerinobot/tillerinobot-live/Cargo.toml"))
+			.withFileFromFile("Cargo.lock", new File("../../Tillerinobot/tillerinobot-live/Cargo.lock"))
+			.withFileFromFile("src/main/rust", new File("../Tillerinobot/../tillerinobot-live/src/main/rust"));
 
-	private static final CustomTestContainer LIVE = new CustomTestContainer(POTENTIALLY_PREBUILT
-			// move to parent so we can use this in multiple modules
-			// make sure to keep this aligned with dockerignore
-			.withFileFromPath("Dockerfile", Paths.get("../tillerinobot-live/Dockerfile"))
-			.withFileFromPath("src/main/rust", Paths.get("../tillerinobot-live/src/main/rust"))
-			.withFileFromPath("Cargo.toml", Paths.get("../tillerinobot-live/Cargo.toml"))
-			.withFileFromPath("Cargo.lock", Paths.get("../tillerinobot-live/Cargo.lock")))
+	public static final CustomTestContainer LIVE = new CustomTestContainer(new File("../../Tillerinobot" +
+			"/tillerinobot-live/target/release/main").exists()
+			? base.withFileFromFile("target/release/main", new File("../../Tillerinobot/tillerinobot-live/target/release/main"))
+			: base)
 			// accesing this static variable will make sure that RabbitMQ is started
 			.withEnv("RABBIT_VHOST", RabbitMqContainer.getVirtualHost())
 			.withNetwork(NETWORK)
