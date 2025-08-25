@@ -50,6 +50,7 @@
 		<kitteh.version>9.0.0</kitteh.version>
 		<undertow.version>2.2.25.Final</undertow.version>
 		<logcaptor.version>2.12.0</logcaptor.version>
+		<dagger.version>2.56.2</dagger.version>
 	</properties>
 
 	<build>
@@ -179,11 +180,14 @@
 						<annotationProcessorPath>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
 						</annotationProcessorPath>
 						<dependency>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
+						</dependency>
+						<dependency>
+							<groupId>com.google.dagger</groupId>
+							<artifactId>dagger-compiler</artifactId>
 						</dependency>
 					</annotationProcessorPaths>
 				</configuration>
@@ -219,11 +223,12 @@
 							<goal>check</goal>
 						</goals>
 						<phase>test</phase>
-						<configuration>
-							<maxRank>15</maxRank>
-						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<maxRank>15</maxRank>
+					<excludeFilterFile>../../Tillerinobot/spotbugs-exclude.xml</excludeFilterFile>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -441,6 +446,26 @@
 				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-dagger-adapter</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.dagger</groupId>
+				<artifactId>dagger</artifactId>
+				<version>${dagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.dagger</groupId>
+				<artifactId>dagger-compiler</artifactId>
+				<version>${dagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.mapstruct</groupId>
 				<artifactId>mapstruct</artifactId>
 				<version>${mapstruct.version}</version>
@@ -578,6 +603,10 @@
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.dagger</groupId>
+			<artifactId>dagger</artifactId>
 		</dependency>
 
 		<!-- Tests -->

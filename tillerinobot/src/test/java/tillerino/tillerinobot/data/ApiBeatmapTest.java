@@ -6,12 +6,17 @@ import static org.mockito.Mockito.spy;
 
 import org.junit.Test;
 import org.tillerino.mormon.Persister.Action;
+
+import tillerino.tillerinobot.DaggerAbstractDatabaseTest_Injector;
 import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.Downloader;
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.OsuApiV1;
 
 public class ApiBeatmapTest extends AbstractDatabaseTest {
+	{
+		DaggerAbstractDatabaseTest_Injector.create().inject(this);
+	}
 
 	protected static OsuApi downloader = spy(OsuApiV1.createTestApi(AbstractDatabaseTest.class));
 

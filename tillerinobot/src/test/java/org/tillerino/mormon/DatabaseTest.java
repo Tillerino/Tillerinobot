@@ -4,37 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 
-import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.ppaddict.util.InjectionRunner;
-import org.tillerino.ppaddict.util.TestModule;
 
+import dagger.Component;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
+import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.DaggerAbstractDatabaseTest_Injector;
 
-@RunWith(InjectionRunner.class)
-@TestModule(value = { DockeredMysqlModule.class })
-public class DatabaseTest {
-	@Inject
-	DatabaseManager dbm;
-
-	Database db;
-
-	@Before
-	public void setup() {
-		db = dbm.getDatabase();
-	}
-
-	@After
-	public void tearDown() throws SQLException {
-		db.close();
+public class DatabaseTest extends AbstractDatabaseTest {
+	{
+		DaggerAbstractDatabaseTest_Injector.create().inject(this);
 	}
 
 	@Data

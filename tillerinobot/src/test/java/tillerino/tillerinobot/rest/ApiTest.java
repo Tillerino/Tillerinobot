@@ -2,7 +2,6 @@ package tillerino.tillerinobot.rest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
@@ -14,6 +13,9 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map.Entry;
 
+import dagger.Binds;
+import dagger.Component;
+import dagger.Provides;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.Client;
@@ -25,49 +27,56 @@ import jakarta.ws.rs.client.WebTarget;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.ListAssert;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
+import org.tillerino.ppaddict.mockmodules.BeatmapsServiceMockModule;
+import org.tillerino.ppaddict.mockmodules.GameChatClientMockModule;
 import org.tillerino.ppaddict.rest.AuthenticationService;
-import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.util.TestClock;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.name.Names;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import nl.altindag.log.model.LogEvent;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.FakeAuthenticationService;
 import tillerino.tillerinobot.TestBackend;
-import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
+
 /**
  * Tests the Tillerinobot API on a live HTTP server including authentication.
  */
-@RunWith(MockitoJUnitRunner.class)
 public class ApiTest {
-	class ApiTestModule extends AbstractModule {
-		@Override
-		protected void configure() {
-			install(new DockeredMysqlModule());
-			bind(boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
-			bind(BotBackend.BeatmapsLoader.class).to(TestBeatmapsLoader.class);
-			bind(BotBackend.class).to(TestBackend.class);
-			bind(GameChatClient.class).toInstance(mock(GameChatClient.class));
-			bind(BeatmapsService.class).toInstance(mock(BeatmapsService.class));
-			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
-			bind(Clock.class).toInstance(clock);
+	@Component(modules = {DockeredMysqlModule.class, Module.class, TestBackend.Module.class, TestClock.Module.class,
+												BeatmapsServiceMockModule.class, GameChatClientMockModule.class })
+	@Singleton
+	interface Injector {
+		void inject(ApiTest t);
+	}
+	@dagger.Module
+	interface Module {
+		@Singleton
+		@Provides
+		static JdkServerResource jdkServerResource(BotApiDefinition def) {
+			return new JdkServerResource(def, "localhost", 0);
 		}
+
+		@Provides
+		static @Named("tillerinobot.test.persistentBackend") boolean persistentBackend() {
+			return false;
+		}
+
+		@Binds
+		AuthenticationService authenticationService(FakeAuthenticationService fakeAuthenticationService);
+	}
+	{
+		DaggerApiTest_Injector.create().inject(this);
 	}
 
 	/**
@@ -104,15 +113,15 @@ public class ApiTest {
 		}
 	}
 
-	private final TestClock clock = new TestClock();
-
-	private final Injector injector = Guice.createInjector(new ApiTestModule());
+	@Inject
+	TestClock clock;
 
 	/**
 	 * Jetty server
 	 */
 	@Rule
-	public JdkServerResource server = new JdkServerResource(injector.getInstance(BotApiDefinition.class), "localhost", 0);
+	@Inject
+	public JdkServerResource server;
 
 	@Rule
 	public final LogRule log = TestAppender.rule(ApiLoggingFeature.class);
@@ -120,8 +129,11 @@ public class ApiTest {
 	/**
 	 * API-internal object
 	 */
-	private LocalGameChatMetrics botInfo = injector.getInstance(LocalGameChatMetrics.class);
+	@Inject
+	LocalGameChatMetrics botInfo;
 	private GameChatClientMetrics remoteMetrics = new GameChatClientMetrics();
+	@Inject
+	GameChatClient gameChatClient;
 
 	/**
 	 * Endpoint which goes through the started HTTP API
@@ -142,7 +154,7 @@ public class ApiTest {
 		WebTarget target = client.target("http://localhost:" + server.getPort());
 		botStatus = WebResourceFactory.newResource(BotStatus.class, target);
 		beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
-		when(injector.getInstance(GameChatClient.class).getMetrics()).thenReturn(ok(remoteMetrics));
+		when(gameChatClient.getMetrics()).thenReturn(ok(remoteMetrics));
 	}
 
 	@Test

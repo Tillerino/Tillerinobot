@@ -8,14 +8,16 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import dagger.Component;
 import jakarta.ws.rs.WebApplicationException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.ppaddict.util.TestModule;
+import org.tillerino.ppaddict.mockmodules.BeatmapDownloaderMockModule;
 
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.data.ActualBeatmap;
@@ -26,8 +28,17 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
  * handles downloading and saving beatmaps files correctly with respect to the
  * expected hash value.
  */
-@TestModule(value = {}, mocks = BeatmapDownloader.class)
 public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
+  @Component(modules = {DockeredMysqlModule.class, BeatmapDownloaderMockModule.class })
+  @Singleton
+  interface Injector {
+    void inject(AbstractBeatmapResourceTest t);
+  }
+
+  {
+    DaggerAbstractBeatmapResourceTest_Injector.create().inject(this);
+  }
+
   @Inject
   BeatmapDownloader downloader;
 

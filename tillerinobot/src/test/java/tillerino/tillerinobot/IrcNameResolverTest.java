@@ -5,14 +5,23 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.junit.Test;
-import org.tillerino.ppaddict.util.TestModule;
 
+import dagger.Component;
 import tillerino.tillerinobot.data.UserNameMapping;
 
-@TestModule(value = TestBackend.Module.class, cache = false)
 public class IrcNameResolverTest extends AbstractDatabaseTest {
+	@Component(modules = {DockeredMysqlModule.class, TestBackend.Module.class})
+	@Singleton
+	interface Injector {
+		void inject(IrcNameResolverTest t);
+	}
+	{
+		DaggerIrcNameResolverTest_Injector.create().inject(this);
+	}
+
 	@Inject
 	TestBackend backend;
 

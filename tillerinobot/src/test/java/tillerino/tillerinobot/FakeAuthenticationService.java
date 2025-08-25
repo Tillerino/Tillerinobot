@@ -2,11 +2,17 @@ package tillerino.tillerinobot;
 
 import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
+import lombok.NoArgsConstructor;
 
 import org.tillerino.ppaddict.rest.AuthenticationService;
 
+@Singleton
+@NoArgsConstructor(onConstructor_ = @Inject)
 public class FakeAuthenticationService implements AuthenticationService {
 	@Override
 	public Authorization getAuthorization(String key) throws NotFoundException {

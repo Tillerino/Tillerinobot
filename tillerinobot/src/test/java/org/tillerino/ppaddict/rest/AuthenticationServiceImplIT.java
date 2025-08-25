@@ -4,20 +4,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import dagger.Component;
 import jakarta.ws.rs.NotAuthorizedException;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.tillerino.MockServerRule;
-import org.tillerino.ppaddict.util.InjectionRunner;
-import org.tillerino.ppaddict.util.TestModule;
 
-@RunWith(InjectionRunner.class)
-@TestModule({ MockServerRule.MockServerModule.class, AuthenticationServiceImpl.RemoteAuthenticationModule.class })
-public class AuthenticationServiceImplIT{
+public class AuthenticationServiceImplIT {
+	@Singleton
+	@Component(modules = { MockServerRule.MockServerModule.class, AuthenticationServiceImpl.RemoteAuthenticationModule.class})
+	interface Injector {
+		void inject(AuthenticationServiceImplIT t);
+	}
+	{
+		DaggerAuthenticationServiceImplIT_Injector.create().inject(this);
+	}
+
 	@Rule
 	public MockServerRule mockServer = new MockServerRule();
 

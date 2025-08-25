@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.After;
@@ -44,11 +45,13 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
+import org.tillerino.ppaddict.mockmodules.GameChatResponseQueueMockModule;
+import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
-import org.tillerino.ppaddict.util.TestModule;
 
+import dagger.Component;
 import jakarta.ws.rs.InternalServerErrorException;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
@@ -58,8 +61,16 @@ import tillerino.tillerinobot.recommendations.RecommendationsManager;
 import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
-@TestModule(value = TestBackend.Module.class, mocks = { LiveActivity.class, GameChatResponseQueue.class })
 public class IRCBotTest extends AbstractDatabaseTest {
+	@Singleton
+	@Component(modules = {DockeredMysqlModule.class, TestBackend.Module.class, LiveActivityMockModule.class,
+												GameChatResponseQueueMockModule.class})
+	interface Injector {
+		void inject(IRCBotTest t);
+	}
+	{
+		DaggerIRCBotTest_Injector.create().inject(this);
+	}
 
 	protected PrivateAction action(String nick, String action) {
 		return preprocess(new PrivateAction(123, nick, 456, action));

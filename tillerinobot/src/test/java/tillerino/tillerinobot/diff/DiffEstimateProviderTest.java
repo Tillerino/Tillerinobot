@@ -1,6 +1,7 @@
 package tillerino.tillerinobot.diff;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.function.FailableRunnable;
@@ -18,18 +20,17 @@ import org.awaitility.Awaitility;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.tillerino.mormon.Database;
-import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Persister.Action;
+
+import dagger.Component;
+import dagger.Module;
+import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.OsuApi;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
-import org.tillerino.ppaddict.util.InjectionRunner;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
-import org.tillerino.ppaddict.util.TestModule;
 
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 import tillerino.tillerinobot.data.ActualBeatmap;
 import tillerino.tillerinobot.data.ApiBeatmap;
@@ -41,10 +42,37 @@ import tillerino.tillerinobot.diff.sandoku.SanDokuResponse.SanDokuDiffCalcResult
 import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
-@RunWith(InjectionRunner.class)
-@TestModule(value = { DockeredMysqlModule.class, BeatmapsServiceImpl.Module.class },
-		mocks = { SanDoku.class, OsuApi.class, BeatmapDownloader.class })
-public class DiffEstimateProviderTest {
+public class DiffEstimateProviderTest extends AbstractDatabaseTest {
+	@Singleton
+	@Component(modules = { DockeredMysqlModule.class, BeatmapsServiceImpl.Module.class, Mocks.class })
+	interface Injector {
+		void inject(DiffEstimateProviderTest t);
+	}
+	@Module
+	interface Mocks {
+
+		@dagger.Provides
+		@Singleton
+		static SanDoku sanDoku() {
+			return mock(SanDoku.class);
+		}
+
+		@dagger.Provides
+		@Singleton
+		static OsuApi osuApi() {
+			return mock(OsuApi.class);
+		}
+
+		@dagger.Provides
+		@Singleton
+		static BeatmapDownloader beatmapDownloader() {
+			return mock(BeatmapDownloader.class);
+		}
+	}
+	{
+		DaggerDiffEstimateProviderTest_Injector.create().inject(this);
+	}
+
 	@Inject
 	SanDoku sanDoku;
 	@Inject
@@ -53,8 +81,6 @@ public class DiffEstimateProviderTest {
 	BeatmapDownloader beatmapDownloader;
 	@Inject
 	DiffEstimateProvider provider;
-	@Inject
-	DatabaseManager databaseManager;
 	@ClassRule
 	public final static ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newSingleThreadExecutor);
 
@@ -66,7 +92,7 @@ public class DiffEstimateProviderTest {
 
 	@Test
 	public void cached() throws Exception {
-		try (Database database = databaseManager.getDatabase()) {
+		try (Database database = dbm.getDatabase()) {
 			String beatmapContent = "bla";
 			when(beatmapDownloader.getActualBeatmap(123)).thenReturn(beatmapContent);
 
@@ -100,7 +126,7 @@ public class DiffEstimateProviderTest {
 
 	@Test
 	public void md5Changed() throws Exception {
-		try (Database database = databaseManager.getDatabase()) {
+		try (Database database = dbm.getDatabase()) {
 			String beatmapContent = "bla";
 			when(beatmapDownloader.getActualBeatmap(123)).thenReturn(beatmapContent);
 
@@ -129,7 +155,7 @@ public class DiffEstimateProviderTest {
 
 	@Test
 	public void versionChanged() throws Exception {
-		try (Database database = databaseManager.getDatabase()) {
+		try (Database database = dbm.getDatabase()) {
 			setUpOutdatedVersionDiffEstimate(database, "bla", 123);
 			assertThat(provider.loadOrCalculate(database, 123, 0))
 				.isNotNull()
@@ -148,7 +174,7 @@ public class DiffEstimateProviderTest {
 		actualBeatmap.setContent(beatmapContent.getBytes());
 		actualBeatmap.setDownloaded(System.currentTimeMillis());
 		actualBeatmap.setHash(DigestUtils.md5Hex(beatmapContent));
-		databaseManager.persist(actualBeatmap, Action.INSERT);
+		dbm.persist(actualBeatmap, Action.INSERT);
 
 		ApiBeatmap beatmap = ApiBeatmapTest.newApiBeatmap();
 		beatmap.setBeatmapId(beatmapId);
@@ -167,7 +193,7 @@ public class DiffEstimateProviderTest {
 
 	@Test
 	public void deleteOld() throws Exception {
-		try (Database database = databaseManager.getDatabase()) {
+		try (Database database = dbm.getDatabase()) {
 			DiffEstimate oldDiffEstimate = new DiffEstimate(123, 0);
 			oldDiffEstimate.setSuccess(true);
 			oldDiffEstimate.setMd5("no md5");
@@ -180,7 +206,7 @@ public class DiffEstimateProviderTest {
 
 	@Test
 	public void oneBackgroundMaintenance() throws Exception {
-		try (Database database = databaseManager.getDatabase()) {
+		try (Database database = dbm.getDatabase()) {
 			setUpOutdatedVersionDiffEstimate(database, "bla", 123);
 
 			// fake an outdated betmap in the database
@@ -189,7 +215,7 @@ public class DiffEstimateProviderTest {
 			actualBeatmap.setContent("bla old".getBytes());
 			actualBeatmap.setDownloaded(0); // so it can be updated
 			actualBeatmap.setHash(DigestUtils.md5Hex("bla old"));
-			databaseManager.persist(actualBeatmap, Action.REPLACE);
+			dbm.persist(actualBeatmap, Action.REPLACE);
 			when(beatmapDownloader.getActualBeatmap(123)).thenReturn("bla");
 
 			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{123} and mods = \{0L}").hasValueSatisfying(
@@ -204,7 +230,7 @@ public class DiffEstimateProviderTest {
 
 	@Test
 	public void noApiUpdatesArePerformedInBatch() throws Exception {
-		try (Database database = databaseManager.getDatabase()) {
+		try (Database database = dbm.getDatabase()) {
 			setUpOutdatedVersionDiffEstimate(database, "bla123", 123);
 			setUpOutdatedVersionDiffEstimate(database, "bla456", 456);
 

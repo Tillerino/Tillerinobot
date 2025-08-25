@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,16 +24,25 @@ import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-import org.tillerino.ppaddict.util.TestModule;
 
+import dagger.Component;
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.lang.Default;
 
-@TestModule(TestBackend.Module.class)
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
+	@Singleton
+	@Component(modules = {TestBackend.Module.class, DockeredMysqlModule.class})
+	interface Injector {
+		void inject(RecommendationsManagerTest test);
+	}
+
+	{
+		DaggerRecommendationsManagerTest_Injector.create().inject(this);
+	}
+
 	@Inject
 	TestBackend backend;
 

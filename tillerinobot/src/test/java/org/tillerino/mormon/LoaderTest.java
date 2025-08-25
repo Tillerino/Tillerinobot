@@ -2,22 +2,16 @@ package org.tillerino.mormon;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import javax.inject.Inject;
-
 import lombok.NoArgsConstructor;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.tillerino.ppaddict.util.InjectionRunner;
-import org.tillerino.ppaddict.util.TestModule;
 
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
+import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.DaggerAbstractDatabaseTest_Injector;
 
-@RunWith(InjectionRunner.class)
-@TestModule(value = { DockeredMysqlModule.class })
-public class LoaderTest {
-	@Inject
-	DatabaseManager dbm;
-
+public class LoaderTest extends AbstractDatabaseTest {
+	{
+		DaggerAbstractDatabaseTest_Injector.create().inject(this);
+	}
 	@Table("does_not_exist")
 	@NoArgsConstructor
 	static class DoesNotExist {

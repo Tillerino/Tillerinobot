@@ -1,23 +1,18 @@
 package org.tillerino.mormon;
 
-import javax.inject.Inject;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.ppaddict.util.InjectionRunner;
-import org.tillerino.ppaddict.util.TestModule;
 
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
+import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.DaggerAbstractDatabaseTest_Injector;
 
 /**
  * Check if streaming works.
  */
-@RunWith(InjectionRunner.class)
-@TestModule(value = { DockeredMysqlModule.class })
-public class LoaderTestManual {
-	@Inject
-	DatabaseManager dbm;
+public class LoaderTestManual extends AbstractDatabaseTest {
+	{
+		DaggerAbstractDatabaseTest_Injector.create().inject(this);
+	}
 
 	@Table("byteArrays")
 	public static class ByteArrays {

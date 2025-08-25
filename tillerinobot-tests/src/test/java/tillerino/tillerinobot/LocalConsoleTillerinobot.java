@@ -20,6 +20,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import dagger.Binds;
+import dagger.Component;
+import dagger.Provides;
 import jakarta.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
@@ -31,7 +34,6 @@ import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
 import org.tillerino.ppaddict.chat.GameChatWriter;
 import org.tillerino.ppaddict.chat.Joined;
-import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
@@ -39,23 +41,19 @@ import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
+import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.Result;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
-import com.google.inject.name.Names;
 import com.sun.net.httpserver.HttpServer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
-import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
-import tillerino.tillerinobot.recommendations.Recommender;
+import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
@@ -68,61 +66,89 @@ import tillerino.tillerinobot.rest.BotApiDefinition;
  * 
  */
 @Slf4j
-public class LocalConsoleTillerinobot extends AbstractModule {
-	@Override
-	protected void configure() {
-		install(new DockeredMysqlModule());
-		install(new InMemoryQueuesModule());
-		install(new ProcessorsModule());
+public class LocalConsoleTillerinobot {
+	@Component(modules = {DockeredMysqlModule.class, InMemoryQueuesModule.class, LiveActivityMockModule.class,
+												TestBackend.Module.class, MessageHandlerSchedulerModule.class, ProcessorsModule.class,
+												Module.class, TestOsutrackDownloader.Module.class, ClockModule.class})
+	@Singleton
+	interface Injector {
+		BotApiDefinition botApiDefinition();
 
-		bind(LiveActivity.class).toInstance(mock(LiveActivity.class));
-		bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
-		bind(Recommender.class).to(TestBackend.TestRecommender.class).in(Singleton.class);
-		bind(Boolean.class).annotatedWith(
-				Names.named("tillerinobot.test.persistentBackend")).toInstance(
-				true);
-		bind(BeatmapsLoader.class).to(TestBeatmapsLoader.class);
-		bind(Clock.class).toInstance(createClock());
-		bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(1);
-		install(new MessageHandlerSchedulerModule());
-		bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
-		bind(GameChatClient.class).to(ConsoleRunner.class);
+		LocalGameChatEventQueue localGameChatEventQueue();
+
+		LocalGameChatResponseQueue localGameChatResponseQueue();
+
+		ConsoleRunner consoleRunner();
+
+		BotBackend botBackend();
+
+		GameChatWriter gameChatWriter();
+
+		@Named("messagePreprocessor") GameChatEventConsumer messagePreprocessor();
 	}
 
-	protected Clock createClock() {
-		return Clock.system();
+	@dagger.Module
+	static class ClockModule {
+		private final Clock clock;
+
+    ClockModule(Clock clock) {this.clock = clock;}
+
+		@Provides
+		Clock clock() {
+			return clock;
+		}
+  }
+
+	@dagger.Module
+	interface Module {
+		@dagger.Provides
+		static @Named("tillerinobot.test.persistentBackend") boolean persistentBackend() {
+			return false;
+		}
+
+		@dagger.Provides
+		static @Named("coreSize") int coreSize() {
+			return 1;
+		}
+
+		@Binds
+		AuthenticationService authenticationService(FakeAuthenticationService fakeAuthenticationService);
+
+		@Binds
+		GameChatClient gameChatClient(ConsoleRunner consoleRunner);
+
+		@dagger.Provides
+		@Singleton
+		static BeatmapsService getBeatmapsService(BeatmapsLoader backend) {
+			BeatmapsService beatService = mock(BeatmapsService.class);
+			when(beatService.byId(anyInt())).thenAnswer(req -> {
+				BeatmapResource res = mock(BeatmapResource.class);
+				doAnswer(x -> backend.getBeatmap((Integer) req.getArguments()[0])).when(res).get();
+				doAnswer(x -> { System.out.println("Beatmap uploaded: " + x.getArguments()[0]); return null; }).when(res).setFile(anyString());
+				return res;
+			});
+			return beatService;
+		}
+
+		@dagger.Provides
+		@Singleton
+		@SneakyThrows
+		static GameChatWriter writer() {
+			GameChatWriter writer = mock(GameChatWriter.class);
+			doAnswer(invocation -> {
+				System.out.println("*Tillerino " + invocation.getArguments()[0]);
+				return ok(new GameChatWriter.Response(null));
+			}).when(writer).action(anyString(), any());
+			doAnswer(invocation -> {
+				System.out.println("Tillerino: " + invocation.getArguments()[0]);
+				return ok(new GameChatWriter.Response(null));
+			}).when(writer).message(anyString(), any());
+			return writer;
+		}
 	}
 
 	static ThreadFactory threadFactory(String name) {
 		return r -> { Thread thread = new Thread(r, name); thread.setDaemon(true); return thread; };
-	}
-
-	@Provides
-	@Singleton
-	public BeatmapsService getBeatmapsService(BeatmapsLoader backend) {
-		BeatmapsService beatService = mock(BeatmapsService.class);
-		when(beatService.byId(anyInt())).thenAnswer(req -> {
-			BeatmapResource res = mock(BeatmapResource.class);
-			doAnswer(x -> backend.getBeatmap((Integer) req.getArguments()[0])).when(res).get();
-			doAnswer(x -> { System.out.println("Beatmap uploaded: " + x.getArguments()[0]); return null; }).when(res).setFile(anyString());
-			return res;
-		});
-		return beatService;
-	}
-
-	@Provides
-	@Singleton
-	public GameChatWriter writer() throws Exception {
-		GameChatWriter writer = mock(GameChatWriter.class);
-		doAnswer(invocation -> {
-			System.out.println("*Tillerino " + invocation.getArguments()[0]);
-			return ok(new GameChatWriter.Response(null));
-		}).when(writer).action(anyString(), any());
-		doAnswer(invocation -> {
-			System.out.println("Tillerino: " + invocation.getArguments()[0]);
-			return ok(new GameChatWriter.Response(null));
-		}).when(writer).message(anyString(), any());
-		return writer;
 	}
 
 	static ExecutorService singleThreadExecutor(String name) {
@@ -138,18 +164,20 @@ public class LocalConsoleTillerinobot extends AbstractModule {
 	 *            Otherwise, a random, free port will be chosen.
 	 */
 	public static void main(String[] args) throws Exception {
-		Injector injector = Guice.createInjector(new LocalConsoleTillerinobot());
+		Injector injector = DaggerLocalConsoleTillerinobot_Injector.builder()
+				.clockModule(new ClockModule(Clock.system()))
+				.build();
 		MysqlContainer.MysqlDatabaseLifecycle.createSchema();
 
 		URI baseUri = UriBuilder.fromUri("http://localhost/")
 				.port(Integer.parseInt(Stream.of(args).findAny().orElse("0"))).build();
 		HttpServer apiServer = JdkHttpServerFactory.createHttpServer(baseUri, 
-				ResourceConfig.forApplication(injector.getInstance(BotApiDefinition.class)));
+				ResourceConfig.forApplication(injector.botApiDefinition()));
 		log.info("Started API at port {}", apiServer.getAddress().getPort());
 
-		singleThreadExecutor("event queue").submit(injector.getInstance(LocalGameChatEventQueue.class));
-		singleThreadExecutor("response queue").submit(injector.getInstance(LocalGameChatResponseQueue.class));
-		injector.getInstance(ConsoleRunner.class).run();
+		singleThreadExecutor("event queue").submit(injector.localGameChatEventQueue());
+		singleThreadExecutor("response queue").submit(injector.localGameChatResponseQueue());
+		injector.consoleRunner().run();
 
 		apiServer.stop(1);
 	}

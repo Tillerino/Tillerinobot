@@ -31,20 +31,15 @@ import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
-import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
-import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
-import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.util.TestClock;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-
 import nl.altindag.log.model.LogEvent;
+import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
+import tillerino.tillerinobot.LocalConsoleTillerinobot.ClockModule;
+import tillerino.tillerinobot.LocalConsoleTillerinobot.Injector;
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 import tillerino.tillerinobot.lang.Default;
 
@@ -66,27 +61,22 @@ public class LoggingTest {
 
 	private TestBackend backend;
 
-	private Injector injector;
-
 	@Rule
 	public final MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
 	@Before
 	public void setUp() throws Exception {
 		MDC.clear(); // it might be that there's some garbage from other tests in the MDC
-		injector = Guice.createInjector(new LocalConsoleTillerinobot() {
-			@Override
-			protected Clock createClock() {
-				return clock;
-			}
-		});
+		Injector injector = DaggerLocalConsoleTillerinobot_Injector.builder()
+				.clockModule(new ClockModule(clock))
+				.build();
 
-		in = injector.getInstance(Key.get(GameChatEventConsumer.class, Names.named("messagePreprocessor")));
-		out = injector.getInstance(GameChatWriter.class);
+		in = injector.messagePreprocessor();
+		out = injector.gameChatWriter();
 		assertTrue(MockUtil.isMock(out));
-		backend = (TestBackend) injector.getInstance(BotBackend.class);
-		exec.submit(injector.getInstance(LocalGameChatEventQueue.class));
-		exec.submit(injector.getInstance(LocalGameChatResponseQueue.class));
+		backend = (TestBackend) injector.botBackend();
+		exec.submit(injector.localGameChatEventQueue());
+		exec.submit(injector.localGameChatResponseQueue());
 
 		backend.hintUser("irc-guy", false, 1000, 1000);
 		backend.hintUser("other-guy", true, 1000, 1000);

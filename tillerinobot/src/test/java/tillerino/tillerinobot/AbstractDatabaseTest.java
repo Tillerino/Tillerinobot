@@ -7,32 +7,36 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.ppaddict.util.InjectionRunner;
-import org.tillerino.ppaddict.util.TestModule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-
+import dagger.Component;
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
 
 /**
  * Creates a MySQL instance in running in Docker.
  */
-@TestModule(AbstractDatabaseTest.DockeredMysqlModule.class)
-@RunWith(InjectionRunner.class)
 public abstract class AbstractDatabaseTest {
-	public static class DockeredMysqlModule extends AbstractModule {
-		@Provides
+	/**
+	 * Use this if your child test requires no further injection except the database.
+	 */
+	@Component(modules = DockeredMysqlModule.class)
+	@Singleton
+	public interface Injector {
+		void inject(AbstractDatabaseTest t);
+	}
+
+	@dagger.Module
+	public interface DockeredMysqlModule {
+		@dagger.Provides
 		@Named("mysql")
-		Properties myqslProperties() {
+		static Properties myqslProperties() {
 			Properties props = new Properties();
 			props.put("host", mysql().getHost());
 			props.put("port", "" + mysql().getMappedPort(3306));

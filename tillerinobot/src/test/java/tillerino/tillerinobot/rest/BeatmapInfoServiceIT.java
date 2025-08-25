@@ -4,22 +4,33 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.tillerino.MockServerRule;
 import org.tillerino.MockServerRule.MockServerModule;
 import org.tillerino.ppaddict.chat.GameChatClient;
+import org.tillerino.ppaddict.mockmodules.BeatmapsServiceMockModule;
+import org.tillerino.ppaddict.mockmodules.GameChatClientMockModule;
 import org.tillerino.ppaddict.rest.AuthenticationServiceImpl.RemoteAuthenticationModule;
 import org.tillerino.ppaddict.util.TestClock;
-import org.tillerino.ppaddict.util.TestModule;
 
+import dagger.Component;
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.TestBackend;
 
-@TestModule(value = { RemoteAuthenticationModule.class, MockServerModule.class, TestClock.Module.class,
-		TestBackend.Module.class }, mocks = { GameChatClient.class, BeatmapsService.class })
 public class BeatmapInfoServiceIT extends AbstractDatabaseTest {
+	@Singleton
+	@Component(modules = {DockeredMysqlModule.class, RemoteAuthenticationModule.class, MockServerModule.class, TestClock.Module.class,
+												TestBackend.Module.class, GameChatClientMockModule.class, BeatmapsServiceMockModule.class })
+	interface Injector {
+		void inject(BeatmapInfoServiceIT t);
+	}
+	{
+		DaggerBeatmapInfoServiceIT_Injector.create().inject(this);
+	}
+
 	@Inject
 	@Rule
 	public BotApiRule botApi;

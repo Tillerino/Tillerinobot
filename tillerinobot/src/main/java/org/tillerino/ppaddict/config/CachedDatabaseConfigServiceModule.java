@@ -1,12 +1,13 @@
 package org.tillerino.ppaddict.config;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import javax.inject.Named;
 
-public class CachedDatabaseConfigServiceModule extends AbstractModule {
-	@Override
-	protected void configure() {
-		bind(ConfigService.class).to(CachingConfigService.class);
-		bind(ConfigService.class).annotatedWith(Names.named("uncached")).to(DatabaseConfigService.class);
-	}
+import dagger.Binds;
+import dagger.Module;
+
+@Module
+public interface CachedDatabaseConfigServiceModule {
+	@Binds ConfigService cached(CachingConfigService c);
+
+	@Binds @Named("uncached") ConfigService uncached(DatabaseConfigService c);
 }

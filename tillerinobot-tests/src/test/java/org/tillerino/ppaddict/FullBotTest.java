@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.tillerino.ppaddict.live.LiveContainer.getLive;
@@ -11,12 +12,10 @@ import static org.tillerino.ppaddict.util.TestAppender.mdc;
 import static tillerino.tillerinobot.MysqlContainer.mysql;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -24,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.awaitility.core.ConditionTimeoutException;
@@ -34,11 +35,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import org.junit.runner.RunWith;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
 import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
@@ -58,32 +56,30 @@ import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import com.rabbitmq.client.Connection;
 
-import lombok.RequiredArgsConstructor;
+import dagger.Component;
+import dagger.Module;
+import dagger.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.engio.mbassy.listener.Handler;
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
-import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
-import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
-import tillerino.tillerinobot.FakeAuthenticationService;
-import tillerino.tillerinobot.IRCBot;
-import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
+import tillerino.tillerinobot.TestBackend.TestRecommender;
+import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.BotInfoService;
 import tillerino.tillerinobot.rest.BotStatus;
 
 @Slf4j
-@RunWith(MockitoJUnitRunner.class)
-@RequiredArgsConstructor
-public class FullBotTest {
+public class FullBotTest extends AbstractDatabaseTest {
+	@Component(modules = {FullBotConfiguration.class})
+	@Singleton
+	interface Injector {
+		void inject(FullBotTest test);
+	}
+
 	@SuppressWarnings({ "unchecked" })
 	private class Client implements Runnable {
 		private final org.kitteh.irc.client.library.Client kitteh;
@@ -143,35 +139,95 @@ public class FullBotTest {
 		}
 	}
 
-	@RequiredArgsConstructor
-	protected class FullBotConfiguration extends AbstractModule {
-		private final String host;
-		private final int port;
+	@Module(includes = {RabbitQueuesModule.class, DockeredMysqlModule.class, MessageHandlerSchedulerModule.class,
+											ProcessorsModule.class, CachedDatabaseConfigServiceModule.class, TestOsutrackDownloader.Module.class})
+	protected class FullBotConfiguration {
+		private final String host = NgircdContainer.NGIRCD.getHost();
+		private final int port = NgircdContainer.NGIRCD.getMappedPort(6667);
 
-		@Override
-		protected void configure() {
-			install(new ProcessorsModule());
-			install(new CachedDatabaseConfigServiceModule());
+		@Provides
+		@Named("tillerinobot.irc.server")
+		String provideIrcServer() {
+			return host;
+		}
 
-			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.server")).toInstance(host);
-			bind(Integer.class).annotatedWith(Names.named("tillerinobot.irc.port")).toInstance(port);
-			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.nickname")).toInstance("tillerinobot");
-			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.password")).toInstance("");
-			bind(String.class).annotatedWith(Names.named("tillerinobot.irc.autojoin")).toInstance("#osu");
+		@Provides
+		@Named("tillerinobot.irc.port")
+		Integer provideIrcPort() {
+			return port;
+		}
 
-			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.ignore")).toInstance(false);
-			bind(BotBackend.class).to(TestBackend.class).in(Singleton.class);
-			bind(Recommender.class).to(TestBackend.TestRecommender.class).in(Singleton.class);
-			bind(Clock.class).toInstance(Clock.system());
-			bind(Boolean.class).annotatedWith(Names.named("tillerinobot.test.persistentBackend")).toInstance(false);
-			bind(BeatmapsLoader.class).to(TestBeatmapsLoader.class);
-			install(new MessageHandlerSchedulerModule());
-			bind(int.class).annotatedWith(Names.named("coreSize")).toInstance(4);
-			bind(AuthenticationService.class).toInstance(new FakeAuthenticationService());
-			bind(Connection.class).toInstance(rabbit.getConnection());
-			install(new RabbitQueuesModule());
-			install(new DockeredMysqlModule());
-			bind(BotStatus.class).to(BotInfoService.class);
+		@Provides
+		@Named("tillerinobot.irc.nickname")
+		String provideIrcNickname() {
+			return "tillerinobot";
+		}
+
+		@Provides
+		@Named("tillerinobot.irc.password")
+		String provideIrcPassword() {
+			return "";
+		}
+
+		@Provides
+		@Named("tillerinobot.irc.autojoin")
+		String provideIrcAutojoin() {
+			return "#osu";
+		}
+
+		@Provides
+		@Named("tillerinobot.ignore")
+		Boolean provideIgnore() {
+			return false;
+		}
+
+		@Provides
+		@Singleton
+		BotBackend provideBotBackend(TestBackend testBackend) {
+			return testBackend;
+		}
+
+		@Provides
+		@Singleton
+		Recommender provideRecommender(TestRecommender testRecommender) {
+			return testRecommender;
+		}
+
+		@Provides
+		Clock provideClock() {
+			return Clock.system();
+		}
+
+		@Provides
+		@Named("tillerinobot.test.persistentBackend")
+		Boolean providePersistentBackend() {
+			return false;
+		}
+
+		@Provides
+		BeatmapsLoader provideBeatmapsLoader(TestBeatmapsLoader testBeatmapsLoader) {
+			return testBeatmapsLoader;
+		}
+
+		@Provides
+		@Named("coreSize")
+		int provideCoreSize() {
+			return 4;
+		}
+
+		@Provides
+		AuthenticationService provideAuthenticationService() {
+			return new FakeAuthenticationService();
+		}
+
+		@Provides
+		Connection provideConnection() {
+			return rabbit.getConnection();
+		}
+
+		@Provides
+		BotStatus provideBotStatus(BotInfoService botInfoService) {
+			return botInfoService;
 		}
 	}
 
@@ -181,8 +237,7 @@ public class FullBotTest {
 		getLive();
 	}
 
-	@Mock
-	private GenericWebSocketClient client;
+	private final GenericWebSocketClient client = mock(GenericWebSocketClient.class);
 	private final WebSocketClient webSocketClient = new WebSocketClient();
 
 	private final ThreadGroup clients = new ThreadGroup("Clients");
@@ -196,7 +251,9 @@ public class FullBotTest {
 	@Rule
 	public RuleChain chain = RuleChain.outerRule(exec).around(rabbit);
 
-	private ExecutorService coreWorkerPool;
+	@Inject
+	@Named("core")
+	ThreadPoolExecutor coreWorkerPool;
 
 	@Rule
 	public final LogRule logRule = TestAppender.rule(MessagePreprocessor.class, ResponsePostprocessor.class);
@@ -207,30 +264,41 @@ public class FullBotTest {
 	protected int users = 2;
 	protected int recommendationsPerUser = 10;
 
-	private BotStatus botInfoApi;
+	@Inject
+	BotStatus botInfoApi;
 
-	@Rule
-	public MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
+	@Inject
+	MessagePreprocessor messagePreprocessor;
+
+	@Inject
+	TestBackend testBackend;
+
+	@Override
+	public void createEntityManager() {
+
+	}
 
 	@Before
 	public void startBot() throws Exception {
-		Injector injector = Guice.createInjector(new FullBotConfiguration(NgircdContainer.NGIRCD.getHost(), NgircdContainer.NGIRCD.getMappedPort(6667)));
+		DaggerFullBotTest_Injector.builder()
+				.fullBotConfiguration(new FullBotTest.FullBotConfiguration())
+				.build()
+				.inject(this);
 
-		coreWorkerPool = injector.getInstance(Key.get(ThreadPoolExecutor.class, Names.named("core")));
+		super.createEntityManager();
+
 		webSocketClient.start();
 		String wsUrl = "ws://" + getLive().getHost() + ":" + getLive().getMappedPort(8080) + "/live/v0";
 		log.info("Connecting to websocket at {}", wsUrl);
 		Future<Session> connect = webSocketClient.connect(client, new URI(wsUrl));
 		connect.get(10, TimeUnit.SECONDS);
 
-		TestBackend backend = (TestBackend) injector.getInstance(BotBackend.class);
 		for (int botNumber = 0; botNumber < users; botNumber++) {
-			backend.hintUser("user" + botNumber, false, 12, 1000);
+			testBackend.hintUser("user" + botNumber, false, 12, 1000);
 		}
-		botInfoApi = injector.getInstance(BotStatus.class);
 		RemoteEventQueue externalEventQueue = RabbitMqConfiguration.externalEventQueue(rabbit.getConnection());
 		externalEventQueue.setup();
-		externalEventQueue.subscribe(injector.getInstance(MessagePreprocessor.class)::onEvent);
+		externalEventQueue.subscribe(messagePreprocessor::onEvent);
 		IrcContainer.TILLERINOBOT_IRC.start();
 	}
 

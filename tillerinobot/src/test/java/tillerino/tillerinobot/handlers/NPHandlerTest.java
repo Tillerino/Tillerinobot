@@ -4,27 +4,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.tillerino.ppaddict.chat.GameChatResponse;
-import org.tillerino.ppaddict.chat.LiveActivity;
-import org.tillerino.ppaddict.util.InjectionRunner;
-import org.tillerino.ppaddict.util.TestModule;
+import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 
+import dagger.Component;
 import tillerino.tillerinobot.TestBackend;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
 
-@RunWith(InjectionRunner.class)
-@TestModule(value = { TestBackend.Module.class }, mocks = LiveActivity.class)
 public class NPHandlerTest {
+	@Component(modules = { TestBackend.Module.class, LiveActivityMockModule.class })
+	@Singleton
+	interface Injector {
+		void inject(NPHandlerTest t);
+	}
+
+	{
+		DaggerNPHandlerTest_Injector.create().inject(this);
+	}
+
 	@Inject
 	NPHandler handler;
 

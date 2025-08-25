@@ -8,15 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.junit.Test;
-import org.tillerino.ppaddict.util.TestModule;
 
+import dagger.Component;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 
-@TestModule(TestBackend.Module.class)
 public class UserDataManagerTest extends AbstractDatabaseTest {
+	@Component(modules = {DockeredMysqlModule.class, TestBackend.Module.class})
+	@Singleton
+	interface Injector {
+		void inject(UserDataManagerTest t);
+	}
+	{
+		DaggerUserDataManagerTest_Injector.create().inject(this);
+	}
+
 	@Inject
 	UserDataManager manager;
 

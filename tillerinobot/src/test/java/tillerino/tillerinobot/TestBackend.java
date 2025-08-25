@@ -27,21 +27,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.mockito.Mockito;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.util.MaintenanceException;
-import org.tillerino.ppaddict.util.ResettableModule;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
@@ -78,6 +75,7 @@ import tillerino.tillerinobot.recommendations.TopPlay;
  * 
  * @author Tillerino
  */
+@Singleton
 public class TestBackend implements BotBackend {
 	@JsonAutoDetect(fieldVisibility = Visibility.NON_PRIVATE)
 	static class User {
@@ -144,7 +142,7 @@ public class TestBackend implements BotBackend {
 		}
 	}
 
-	private static Database database = new Database();
+	private Database database = new Database();
 
 	@Override
 	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
@@ -280,6 +278,7 @@ public class TestBackend implements BotBackend {
 	}
 
 	@Singleton
+	@NoArgsConstructor(onConstructor_ = @Inject)
 	public static class TestBeatmapsLoader implements BeatmapsLoader {
 		@Override
 		public OsuApiBeatmap getBeatmap(int beatmapid, long mods) {
@@ -367,33 +366,24 @@ public class TestBackend implements BotBackend {
 		}
 	}
 
-	public static class Module extends AbstractModule implements ResettableModule {
-		private TestBackend backend;
-
-		@Override
-		protected void configure() {
-			bind(BotBackend.class).to(TestBackend.class);
-			bind(BeatmapsLoader.class).to(TestBeatmapsLoader.class);
+	@dagger.Module
+	public interface Module {
+		@dagger.Provides
+		@Singleton
+		static TestBackend testBackend(BeatmapsLoader loader) {
+			return spy(new TestBackend(false, loader));
 		}
 
-		@Provides
+		@dagger.Provides
 		@Singleton
-		public TestBackend testBackend(BeatmapsLoader loader) {
-			return backend = spy(new TestBackend(false, loader));
-		}
-
-		@Provides
-		@Singleton
-		public Recommender recommender(TestBackend backend) {
+		static Recommender recommender(TestBackend backend) {
 			return spy(new TestRecommender(backend));
 		}
 
-		@Override
-		public void reset() throws Exception {
-			database = new Database();
-			if (backend != null) {
-				Mockito.reset(backend);
-			}
-		}
-	}
+		@dagger.Binds
+    BotBackend b(TestBackend b);
+
+    @dagger.Binds
+    BeatmapsLoader l(TestBeatmapsLoader b);
+  }
 }

@@ -2,43 +2,23 @@ package org.tillerino.mormon;
 
 import static org.junit.Assert.assertEquals;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.ppaddict.util.InjectionRunner;
-import org.tillerino.ppaddict.util.TestModule;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
+import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.DaggerAbstractDatabaseTest_Injector;
 
-@RunWith(InjectionRunner.class)
-@TestModule(value = { DockeredMysqlModule.class })
-public class PersisterTest {
-	@Inject
-	DatabaseManager dbm;
-
-	Database db;
-
-	@Before
-	public void setup() {
-		db = dbm.getDatabase();
-	}
-
-	@After
-	public void tearDown() throws SQLException {
-		db.close();
+public class PersisterTest extends AbstractDatabaseTest {
+	{
+		DaggerAbstractDatabaseTest_Injector.create().inject(this);
 	}
 
 	@Data

@@ -2,13 +2,13 @@ package org.tillerino.ppaddict.util;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
+import lombok.NoArgsConstructor;
 
-import lombok.Getter;
-
+@Singleton
+@NoArgsConstructor(onConstructor_ = @Inject)
 public class TestClock implements Clock {
 	private final AtomicLong time = new AtomicLong();
 
@@ -25,13 +25,9 @@ public class TestClock implements Clock {
 		time.set(millis);
 	}
 
-	public static class Module extends AbstractModule {
-		@Getter(onMethod = @__({@Provides, @Singleton}))
-		private final TestClock clock = new TestClock();
-
-		@Override
-		protected void configure() {
-			bind(Clock.class).to(TestClock.class);
-		}
-	}
+	@dagger.Module
+	public interface Module {
+		@dagger.Binds
+		Clock c(TestClock c);
+  }
 }

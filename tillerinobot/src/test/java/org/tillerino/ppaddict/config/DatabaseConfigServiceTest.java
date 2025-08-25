@@ -3,16 +3,26 @@ package org.tillerino.ppaddict.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.junit.Test;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.ppaddict.util.TestModule;
 
+import dagger.Component;
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.data.BotConfig;
 
-@TestModule(CachedDatabaseConfigServiceModule.class)
 public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
+	@Component(modules = {DockeredMysqlModule.class, CachedDatabaseConfigServiceModule.class})
+	@Singleton
+	interface Injector {
+		void inject(DatabaseConfigServiceTest test);
+	}
+
+	{
+		DaggerDatabaseConfigServiceTest_Injector.create().inject(this);
+	}
+
 	@Inject
 	ConfigService config;
 

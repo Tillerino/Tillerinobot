@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.MDC;
@@ -53,6 +54,7 @@ public class RateLimiter {
 
 	private final List<BlockingQueue<Object>> permits = new ArrayList<>();
 
+	@Inject
 	public RateLimiter() {
 		permits.add(new ArrayBlockingQueue<>(50, true));
 		permits.add(new ArrayBlockingQueue<>(50, true));

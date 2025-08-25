@@ -9,8 +9,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.NotFoundException;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import dagger.Binds;
+import jakarta.ws.rs.NotFoundException;
+import lombok.RequiredArgsConstructor;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TestOsutrackDownloader extends OsutrackDownloader {
     static final ObjectMapper JACKSON = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -36,5 +43,11 @@ public class TestOsutrackDownloader extends OsutrackDownloader {
         String json = new BufferedReader(new InputStreamReader(inputStream)).lines()
                 .collect(Collectors.joining("\n"));
         return parseJson(json);
+    }
+
+    @dagger.Module
+    public interface Module {
+        @Binds
+        OsutrackDownloader osutrackDownloader(TestOsutrackDownloader testOsutrackDownloader);
     }
 }

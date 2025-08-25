@@ -16,8 +16,7 @@ import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.tillerino.ppaddict.util.DockerNetwork;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import javax.inject.Named;
 
 import lombok.SneakyThrows;
 
@@ -101,10 +100,11 @@ public class MockServerRule extends TestWatcher {
 	/**
 	 * This injects URLs for services which we mock via the mockserver.
 	 */
-	public static class MockServerModule extends AbstractModule {
-		@Override
-		protected void configure() {
-			bind(String.class).annotatedWith(Names.named("ppaddict.auth.url")).toInstance(getExternalMockServerAddress() + "/auth");
+	@dagger.Module
+	public interface MockServerModule {
+		@dagger.Provides
+		@Named("ppaddict.auth.url") static String u() {
+			return getExternalMockServerAddress() + "/auth";
 		}
 	}
 

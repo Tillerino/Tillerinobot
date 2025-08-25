@@ -1,5 +1,6 @@
 package org.tillerino.ppaddict.chat.local;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.mapstruct.MappingTarget;
@@ -8,12 +9,14 @@ import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Singleton
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor(onConstructor_ = @Inject)
 public class LocalGameChatMetrics extends GameChatClientMetrics {
 	private long lastSentMessage;
 	private long lastRecommendation;

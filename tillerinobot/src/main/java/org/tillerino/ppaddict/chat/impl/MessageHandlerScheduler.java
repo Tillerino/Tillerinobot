@@ -12,10 +12,6 @@ import javax.inject.Singleton;
 
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
-import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,15 +64,12 @@ public class MessageHandlerScheduler implements GameChatEventConsumer {
 		}
 	}
 
-	public static class MessageHandlerSchedulerModule extends AbstractModule {
-		@Override
-		protected void configure() {
-		}
-
-		@Provides
+	@dagger.Module
+	public interface MessageHandlerSchedulerModule {
+		@dagger.Provides
 		@Singleton
 		@Named("core")
-		ThreadPoolExecutor coreExecutorService(@Named("coreSize") int coreSize) {
+		static ThreadPoolExecutor coreExecutorService(@Named("coreSize") int coreSize) {
 			final ThreadGroup group = new ThreadGroup("CoreHandlerThreads");
 			return new ThreadPoolExecutor(coreSize, coreSize,
 					0L, TimeUnit.MILLISECONDS,

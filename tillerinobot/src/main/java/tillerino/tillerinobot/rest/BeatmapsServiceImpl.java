@@ -15,8 +15,6 @@ import org.tillerino.mormon.Loader;
 import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 
-import com.google.inject.AbstractModule;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tillerino.tillerinobot.data.ApiBeatmap;
@@ -36,11 +34,10 @@ public class BeatmapsServiceImpl implements BeatmapsService {
 		}
 	}
 
-	public static class Module extends AbstractModule {
-		@Override
-		protected void configure() {
-			bind(BeatmapsService.class).to(BeatmapsServiceImpl.class);
-		}
+	@dagger.Module
+	public interface Module {
+		@dagger.Binds
+		BeatmapsService beatmapsService(BeatmapsServiceImpl impl);
 	}
 
 	private final DatabaseManager databaseManager;

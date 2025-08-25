@@ -2,7 +2,9 @@ package org.tillerino.ppaddict.rest;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+import dagger.Module;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
@@ -11,14 +13,13 @@ import jakarta.ws.rs.client.ResponseProcessingException;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 
-import com.google.inject.AbstractModule;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implements the {@link AuthenticationService} against an internal HTTP API.
  */
 @Slf4j
+@Singleton
 public class AuthenticationServiceImpl implements AuthenticationService {
 	private final AuthenticationService remoteService;
 
@@ -43,10 +44,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return remoteService.createKey(adminKey, osuUserId);
 	}
 
-	public static class RemoteAuthenticationModule extends AbstractModule {
-		@Override
-		protected void configure() {
-			bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-		}
+	@Module
+	public interface RemoteAuthenticationModule {
+		@dagger.Binds
+		AuthenticationService s(AuthenticationServiceImpl s);
 	}
 }
