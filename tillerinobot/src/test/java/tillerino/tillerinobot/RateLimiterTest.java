@@ -2,6 +2,7 @@ package tillerino.tillerinobot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,8 +26,10 @@ public class RateLimiterTest {
 		AtomicInteger high = new AtomicInteger();
 		AtomicInteger low = new AtomicInteger();
 
+		CountDownLatch bothReady = new CountDownLatch(2);
 		exec.submit(() -> {
 			limiter.setThreadPriority(RateLimiter.REQUEST);
+			bothReady.countDown();
 			for (;;) {
 				limiter.limitRate();
 				high.incrementAndGet();
@@ -34,11 +37,13 @@ public class RateLimiterTest {
 		});
 		exec.submit(() -> {
 			limiter.setThreadPriority(RateLimiter.MAINTENANCE);
+			bothReady.countDown();
 			for (;;) {
 				limiter.limitRate();
 				low.incrementAndGet();
 			}
 		});
+		bothReady.await();
 		IntStream.range(0, 100).forEach(x -> limiter.addPermit());
 		while (high.get() + low.get() < 100) {
 			Thread.sleep(10);

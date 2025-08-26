@@ -1,0 +1,26 @@
+{
+  "id" : "643de9b8-a481-4150-bfba-a7d250e9e2b4",
+  "name" : "api_get_user",
+  "request" : {
+    "url" : "/api/get_user?k=1234567890123456789012345678901234567890&u=Tillerino&m=0&type=string",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "[{\"user_id\":\"2070907\",\"username\":\"Tillerino\",\"join_date\":\"2012-11-10 11:16:57\",\"count300\":\"6834964\",\"count100\":\"553919\",\"count50\":\"57018\",\"playcount\":\"29790\",\"ranked_score\":\"6011554859\",\"total_score\":\"39780078806\",\"pp_rank\":\"55036\",\"level\":\"100.128\",\"pp_raw\":\"0\",\"accuracy\":\"95.41890025138855\",\"count_rank_ss\":\"18\",\"count_rank_ssh\":\"1\",\"count_rank_s\":\"386\",\"count_rank_sh\":\"6\",\"count_rank_a\":\"631\",\"country\":\"DE\",\"total_seconds_played\":\"1566059\",\"pp_country_rank\":\"106546\",\"events\":[]}]",
+    "headers" : {
+      "Date" : "Tue, 26 Aug 2025 15:11:25 GMT",
+      "Content-Type" : "application/json; charset=UTF-8",
+      "CF-RAY" : "975442f95c347377-MUC",
+      "Access-Control-Allow-Origin" : "*",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Content-Type-Options" : "nosniff",
+      "Server" : "cloudflare"
+    }
+  },
+  "uuid" : "643de9b8-a481-4150-bfba-a7d250e9e2b4",
+  "persistent" : true,
+  "insertionIndex" : 3
+}

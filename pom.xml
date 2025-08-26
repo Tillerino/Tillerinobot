@@ -24,7 +24,6 @@
 		<jackson.version>2.19.2</jackson.version>
 		<testcontainers.version>1.21.3</testcontainers.version>
 		<!-- determined by container -->
-		<mockserver.version>5.15.0</mockserver.version>
 		<wiremock.version>3.0.1</wiremock.version>
 		<slf4j.version>2.0.13</slf4j.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
@@ -537,12 +536,6 @@
 				<version>${testcontainers.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.mock-server</groupId>
-				<artifactId>mockserver-client-java</artifactId>
-				<version>${mockserver.version}</version>
-				<scope>test</scope>
 			</dependency>
 
 			<!-- tests -->

@@ -167,10 +167,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-client-java</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 		</dependency>

@@ -21,7 +21,6 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-model</artifactId>
-			<scope>tests</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
@@ -31,7 +30,6 @@
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>
 			<artifactId>tillerinobot-rabbit</artifactId>
-			<scope>tests</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.tillerino.osu</groupId>

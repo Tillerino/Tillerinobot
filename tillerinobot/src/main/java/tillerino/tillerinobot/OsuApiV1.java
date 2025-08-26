@@ -2,21 +2,30 @@ package tillerino.tillerinobot;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.ws.rs.ServiceUnavailableException;
+
+import org.apache.commons.io.IOUtils;
 import org.tillerino.osuApiModel.Downloader;
 import org.tillerino.ppaddict.util.MdcUtils;
+
+import lombok.SneakyThrows;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
  * Implements a client for the v1 API including rate limiting.
  */
+@Singleton
 public class OsuApiV1 implements OsuApi {
 	private final RateLimiter rateLimiter;
 
@@ -75,10 +84,44 @@ public class OsuApiV1 implements OsuApi {
 		}
 	}
 
-	/**
-	 * see {@link Downloader#createTestDownloader(Class)}
-	 */
-	public static OsuApiV1 createTestApi(Class<?> cls) {
-		return new OsuApiV1(Downloader.createTestDownloader(cls), RateLimiter.unlimited());
+	@dagger.Module
+	public interface Module {
+		@dagger.Binds
+		OsuApi osuApi(OsuApiV1 osuApiV1);
+	}
+
+	@dagger.Module
+	public interface DownloaderModule {
+		@dagger.Provides
+		@Named("osuapi.key")
+		static String getOsuApiKey() {
+			String env = System.getenv("OSUAPIKEY");
+			if (env != null) {
+				return env;
+			}
+			InputStream is = DownloaderModule.class.getResourceAsStream("/osuapikey");
+			if (is == null) {
+				throw new RuntimeException("cannot find osu api key");
+			}
+			try {
+				return IOUtils.toString(is, StandardCharsets.UTF_8);
+			} catch (IOException e) {
+				throw new RuntimeException("error reading osu api key", e);
+			}
+		}
+
+		@dagger.Provides
+		@Named("osuapi.url")
+		@SneakyThrows
+		static URL getOsuApiUrl() {
+			String env = System.getenv("OSUAPI_URL");
+			if (env != null) {
+				if (!env.endsWith("/")) {
+					throw new MalformedURLException("osu API URL must end with a slash");
+				}
+				return new URL(env);
+			}
+			return new URL("https://osu.ppy.sh/api/");
+		}
 	}
 }

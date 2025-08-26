@@ -6,10 +6,16 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.Mount;
+import com.github.dockerjava.api.model.MountType;
+import com.github.dockerjava.api.model.Volume;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.NearMiss;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -29,7 +35,19 @@ import javax.inject.Named;
 public class MockServerRule implements BeforeEachCallback, AfterEachCallback {
 	private static final WireMockContainer MOCK_SERVER = new WireMockContainer(WireMockContainer.WIREMOCK_2_LATEST)
 			.withNetwork(DockerNetwork.NETWORK)
-			.withNetworkAliases("mockserver");
+			.withNetworkAliases("mockserver")
+			.withCreateContainerCmdModifier(cmd -> {
+				cmd.withHostConfig(cmd.getHostConfig()
+						.withMounts(List.of(
+								new Mount()
+										.withSource(Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/mappings").normalize().toAbsolutePath().toString())
+										.withTarget("/home/wiremock/mappings")
+										.withType(MountType.BIND),
+								new Mount()
+										.withSource(Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/__files").normalize().toAbsolutePath().toString())
+										.withTarget("/home/wiremock/__files")
+										.withType(MountType.BIND))));
+			});
 	private static final WireMock CLIENT;
 
 	static {

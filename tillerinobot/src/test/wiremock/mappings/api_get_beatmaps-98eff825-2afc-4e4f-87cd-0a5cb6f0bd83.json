@@ -1,0 +1,26 @@
+{
+  "id" : "98eff825-2afc-4e4f-87cd-0a5cb6f0bd83",
+  "name" : "api_get_beatmaps",
+  "request" : {
+    "url" : "/api/get_beatmaps?k=1234567890123456789012345678901234567890&b=131891&mods=0",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "[{\"beatmapset_id\":\"41823\",\"beatmap_id\":\"131891\",\"approved\":\"2\",\"total_length\":\"139\",\"hit_length\":\"112\",\"version\":\"WHO'S AFRAID OF THE BIG BLACK\",\"file_md5\":\"2d687e5ee79f3862ad0c60651471cdcc\",\"diff_size\":\"4\",\"diff_overall\":\"7\",\"diff_approach\":\"10\",\"diff_drain\":\"5\",\"mode\":\"0\",\"count_normal\":\"410\",\"count_slider\":\"334\",\"count_spinner\":\"2\",\"submit_date\":\"2011-12-24 00:34:33\",\"approved_date\":\"2012-02-19 05:51:54\",\"last_update\":\"2012-02-19 05:05:41\",\"artist\":\"The Quick Brown Fox\",\"artist_unicode\":null,\"title\":\"The Big Black\",\"title_unicode\":null,\"creator\":\"Blue Dragon\",\"creator_id\":\"19048\",\"bpm\":\"360.3\",\"source\":\"\",\"tags\":\"onosakihito speedcore renard lapfox\",\"genre_id\":\"10\",\"language_id\":\"2\",\"favourite_count\":\"12291\",\"rating\":\"9.32146\",\"storyboard\":\"1\",\"video\":\"0\",\"download_unavailable\":\"0\",\"audio_unavailable\":\"0\",\"playcount\":\"38705847\",\"passcount\":\"3580663\",\"packs\":\"P266,R129,R56,SA9,TM32\",\"max_combo\":\"1337\",\"diff_aim\":\"3.56781\",\"diff_speed\":\"2.90171\",\"difficultyrating\":\"6.86091\"}]",
+    "headers" : {
+      "Date" : "Tue, 26 Aug 2025 15:11:26 GMT",
+      "Content-Type" : "application/json; charset=UTF-8",
+      "CF-RAY" : "975442fcb925daab-MUC",
+      "Access-Control-Allow-Origin" : "*",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Content-Type-Options" : "nosniff",
+      "Server" : "cloudflare"
+    }
+  },
+  "uuid" : "98eff825-2afc-4e4f-87cd-0a5cb6f0bd83",
+  "persistent" : true,
+  "insertionIndex" : 1
+}

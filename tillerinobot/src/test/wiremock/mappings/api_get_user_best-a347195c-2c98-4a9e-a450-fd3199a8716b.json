@@ -1,0 +1,26 @@
+{
+  "id" : "a347195c-2c98-4a9e-a450-fd3199a8716b",
+  "name" : "api_get_user_best",
+  "request" : {
+    "url" : "/api/get_user_best?k=1234567890123456789012345678901234567890&u=2070907&m=0&limit=50&type=id",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "api_get_user_best-a347195c-2c98-4a9e-a450-fd3199a8716b.json",
+    "headers" : {
+      "Date" : "Tue, 26 Aug 2025 15:59:03 GMT",
+      "Content-Type" : "application/json; charset=UTF-8",
+      "CF-RAY" : "975488bf6da0a60f-MUC",
+      "Access-Control-Allow-Origin" : "*",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Content-Type-Options" : "nosniff",
+      "Server" : "cloudflare"
+    }
+  },
+  "uuid" : "a347195c-2c98-4a9e-a450-fd3199a8716b",
+  "persistent" : true,
+  "insertionIndex" : 6
+}
