@@ -1,0 +1,34 @@
+{
+  "id" : "695a4863-f8c1-44dd-833a-c61ed67b2e26",
+  "name" : "api_v2_users_2070907_scores_best",
+  "request" : {
+    "url" : "/api/v2/users/2070907/scores/best?mode=osu&limit=50",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "api_v2_users_2070907_scores_best-695a4863-f8c1-44dd-833a-c61ed67b2e26.json",
+    "headers" : {
+      "Date" : "Tue, 26 Aug 2025 17:39:31 GMT",
+      "Content-Type" : "application/json",
+      "CF-RAY" : "97551be89b6730f4-FRA",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1198",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "X-Content-Type-Options" : "nosniff",
+      "Server" : "cloudflare"
+    }
+  },
+  "uuid" : "695a4863-f8c1-44dd-833a-c61ed67b2e26",
+  "persistent" : true,
+  "insertionIndex" : 10
+}

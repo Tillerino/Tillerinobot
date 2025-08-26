@@ -1,0 +1,34 @@
+{
+  "id" : "db18d5bc-33b8-4692-a633-fcbeccf21523",
+  "name" : "oauth_token",
+  "request" : {
+    "url" : "/oauth/token",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalTo" : "client_id=12345&client_secret=jusTAL0OfnumB3r5aNdch4r4CT3Er5Br0PlStAHp&grant_type=client_credentials&scope=public",
+      "caseInsensitive" : false
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"token_type\":\"Bearer\",\"expires_in\":86400,\"access_token\":\"osu-oauth-mock-token\"}",
+    "headers" : {
+      "Date" : "Tue, 26 Aug 2025 17:39:30 GMT",
+      "Content-Type" : "application/json; charset=UTF-8",
+      "CF-RAY" : "97551be3bcbb2fee-MUC",
+      "Pragma" : "no-cache",
+      "Cache-Control" : "no-store, private",
+      "X-Ratelimit-Limit" : "60",
+      "X-Ratelimit-Remaining" : "59",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "X-Content-Type-Options" : "nosniff",
+      "Server" : "cloudflare"
+    }
+  },
+  "uuid" : "db18d5bc-33b8-4692-a633-fcbeccf21523",
+  "persistent" : true,
+  "insertionIndex" : 12
+}

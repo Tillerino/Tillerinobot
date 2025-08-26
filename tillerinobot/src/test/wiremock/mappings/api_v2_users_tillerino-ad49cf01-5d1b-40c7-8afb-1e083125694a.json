@@ -1,0 +1,34 @@
+{
+  "id" : "ad49cf01-5d1b-40c7-8afb-1e083125694a",
+  "name" : "api_v2_users_tillerino",
+  "request" : {
+    "url" : "/api/v2/users/Tillerino?mode=osu&key=username",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "api_v2_users_tillerino-ad49cf01-5d1b-40c7-8afb-1e083125694a.json",
+    "headers" : {
+      "Date" : "Tue, 26 Aug 2025 17:39:31 GMT",
+      "Content-Type" : "application/json",
+      "CF-RAY" : "97551beae9909f1e-FRA",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1197",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "X-Content-Type-Options" : "nosniff",
+      "Server" : "cloudflare"
+    }
+  },
+  "uuid" : "ad49cf01-5d1b-40c7-8afb-1e083125694a",
+  "persistent" : true,
+  "insertionIndex" : 9
+}

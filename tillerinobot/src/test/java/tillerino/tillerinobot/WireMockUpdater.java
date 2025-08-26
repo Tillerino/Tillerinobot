@@ -18,8 +18,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
+import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
 
+import dagger.Provides;
 import lombok.SneakyThrows;
 import tillerino.tillerinobot.OsuApiV1.DownloaderModule;
 
@@ -28,59 +32,72 @@ import tillerino.tillerinobot.OsuApiV1.DownloaderModule;
  */
 class WireMockUpdater {
 
-  @dagger.Component(modules = UpdateModule.class)
+  @dagger.Component(modules = {UpdateModule.class, UrlsModule.class})
   @Singleton
   interface UpdateInjector {
     void inject(WireMockUpdater o);
   }
 
-  @dagger.Component(modules = CheckModule.class)
+  @dagger.Component(modules = {CheckModule.class, UrlsModule.class})
   @Singleton
   interface CheckInjector {
     void inject(WireMockUpdater o);
   }
 
   @dagger.Module
-  record UpdateModule(String wireMockBase) {
-    UpdateModule {
-      if (!wireMockBase.endsWith("/")) {
-        throw new IllegalArgumentException("osu API URL must end with a slash");
+  record UrlsModule(String wireMockBase) {
+    UrlsModule {
+      if (wireMockBase.endsWith("/")) {
+        throw new IllegalArgumentException("osu API URL must not end with a slash");
       }
     }
 
     @dagger.Provides
     @Named("osuapi.url")
     @SneakyThrows
-    URL getOsuApiUrl() {
-      return URI.create(wireMockBase).toURL();
+    URL getOsuApiV1Url() {
+      return URI.create(wireMockBase + "/api/").toURL();
     }
 
+    @dagger.Provides
+    @Named("osuapiv2.url")
+    @SneakyThrows
+    URI getOsuApiV2Url() {
+      return URI.create(wireMockBase);
+    }
+
+    @Provides
+    static TokenCache tokenCache(@Named("osuapiv2.url") URI baseUrl, Credentials credentials) {
+      return TokenCache.inMemory(baseUrl, credentials);
+    }
+  }
+
+  @dagger.Module
+  record UpdateModule(String wireMockBase) {
     @dagger.Provides
     @Named("osuapi.key")
     static String getOsuApiKey() {
       return DownloaderModule.getOsuApiKey();
     }
+
+    @Provides
+    static Credentials clientId() {
+      return OsuApiV2.CredentialsFromEnvModule.credentials();
+    }
   }
 
   @dagger.Module
   record CheckModule(String wireMockBase) {
-    CheckModule {
-      if (!wireMockBase.endsWith("/")) {
-        throw new IllegalArgumentException("osu API URL must end with a slash");
-      }
-    }
-
-    @dagger.Provides
-    @Named("osuapi.url")
-    @SneakyThrows
-    URL getOsuApiUrl() {
-      return URI.create(wireMockBase).toURL();
-    }
 
     @dagger.Provides
     @Named("osuapi.key")
     static String getOsuApiKey() {
       return OsuApiV1Test.OSUAPI_V1_MOCK_KEY;
+    }
+
+    @Provides
+    static Credentials clientId() {
+      return OsuApiV2Test.OSUAPI_V2_MOCK_CREDENTIALS;
     }
   }
 
@@ -97,22 +114,20 @@ class WireMockUpdater {
   }
 
 
-  @Inject
-  OsuApiV1 api;
+  @Inject OsuApiV1 osuApiV1;
+  @Inject OsuApiV2 osuApiV2;
+  @Inject RateLimiter rateLimiter;
+  @Inject @Named("osuapi.key") String osuApiV1Key;
+  @Inject Credentials credentials;
 
-  @Inject
-  RateLimiter rateLimiter;
-
-  @Inject
-  @Named("osuapi.key")
-  String osuApiV1Key;
+  @Inject TokenCache tokenCache;
 
   private void updateMocks() throws IOException {
-    DaggerWireMockUpdater_UpdateInjector.builder().updateModule(new UpdateModule(wireMockServer.baseUrl() + "/api/")).build().inject(this);
+    DaggerWireMockUpdater_UpdateInjector.builder().urlsModule(new WireMockUpdater.UrlsModule(wireMockServer.baseUrl())).build().inject(this);
 
     wireMockServer.startRecording(new RecordSpecBuilder()
         .forTarget("https://osu.ppy.sh")
-        .transformers("removeCredentials")
+        .captureHeader("Authorization")
         .ignoreRepeatRequests()
         .allowNonProxied(true));
 
@@ -129,9 +144,14 @@ class WireMockUpdater {
    */
   private void replaceSecrets() throws IOException {
     List<Pair<String, String>> replacements = List.of(
-        Pair.of(osuApiV1Key, OsuApiV1Test.OSUAPI_V1_MOCK_KEY)
+        Pair.of(osuApiV1Key, OsuApiV1Test.OSUAPI_V1_MOCK_KEY),
+        Pair.of(credentials.clientId(), OsuApiV2Test.OSUAPI_V2_MOCK_CLIENT_ID),
+        Pair.of(credentials.clientSecret(), OsuApiV2Test.OSUAPI_V2_MOCK_CLIENT_SECRET),
+        Pair.of(tokenCache.getToken(), OsuApiV2Test.OSUAPI_V2_MOCK_TOKEN)
     );
-    for (File mappingFile : new File("src/test/wiremock/mappings").listFiles()) {
+    for (File mappingFile : ArrayUtils.addAll(
+        new File("src/test/wiremock/mappings").listFiles(),
+        new File("src/test/wiremock/__files").listFiles())) {
       String originalContent = FileUtils.readFileToString(mappingFile, StandardCharsets.UTF_8);
       String editedContent = originalContent;
       for (Pair<String, String> replacement : replacements) {
@@ -144,7 +164,7 @@ class WireMockUpdater {
   }
 
   private void checkMocks() throws IOException {
-    DaggerWireMockUpdater_CheckInjector.builder().checkModule(new CheckModule(wireMockServer.baseUrl() + "/api/")).build().inject(this);
+    DaggerWireMockUpdater_CheckInjector.builder().urlsModule(new WireMockUpdater.UrlsModule(wireMockServer.baseUrl())).build().inject(this);
 
     callRoutes();
   }
@@ -153,12 +173,17 @@ class WireMockUpdater {
     rateLimiter.startSchedulingPermits(Executors.newScheduledThreadPool(1, Thread.ofVirtual().factory()));
     rateLimiter.setThreadPriority(RateLimiter.REQUEST);
 
-    // System.out.println(api.getUser(2070907, 0));
-    // System.out.println(api.getUserTop(2070907, 0, 100));
-    System.out.println(api.getUserTop(2070907, 0, 50));
-    // System.out.println(api.getUser("Tillerino", 0));
-    // System.out.println(api.getUserRecent(2070907, 0));
-    // System.out.println(api.getBeatmap(131891, 0));
+    // System.out.println(osuApiV1.getUser(2070907, 0));
+    // System.out.println(osuApiV1.getUserTop(2070907, 0, 50));
+    // System.out.println(osuApiV1.getUser("Tillerino", 0));
+    // System.out.println(osuApiV1.getUserRecent(2070907, 0));
+    // System.out.println(osuApiV1.getBeatmap(131891, 0));
+
+    System.out.println(osuApiV2.getUser(2070907, 0));
+    System.out.println(osuApiV2.getUserTop(2070907, 0, 50));
+    System.out.println(osuApiV2.getUser("Tillerino", 0));
+    System.out.println(osuApiV2.getUserRecent(2070907, 0));
+    System.out.println(osuApiV2.getBeatmap(131891, 0));
   }
 
   /**
@@ -171,7 +196,7 @@ class WireMockUpdater {
   public static void main(String[] args) throws Exception {
     WireMockUpdater updater = new WireMockUpdater();
 
-    updater.updateMocks();
+    updater.checkMocks();
 
     updater.wireMockServer.stop();
   }
