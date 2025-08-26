@@ -9,9 +9,11 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 import org.apache.commons.lang3.function.FailableFunction;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
@@ -39,6 +41,16 @@ public class OptionsHandlerTest {
 	}
 
 	UserData userData = mock(UserData.class);
+
+	@BeforeEach
+	public void setup() throws Exception {
+		// Make the mock return the last set value
+		doAnswer(invocation -> {
+			boolean value = invocation.getArgument(0);
+			when(userData.isV2()).thenReturn(value);
+			return null;
+		}).when(userData).setV2(any(boolean.class));
+	}
 
 	@Test
 	public void test() throws Exception {
@@ -138,5 +150,50 @@ public class OptionsHandlerTest {
         assertThat(OptionsHandler.find(LanguageIdentifier.values(), i -> i.token, language.token))
           .isNotNull();
       }
+    }
+
+    @Test
+    public void testSetV2On() throws Exception {
+      OptionsHandler handler = new OptionsHandler(null);
+      
+      GameChatResponse response = handler.handle("set v2 on", null, userData, new Default());
+      
+      verify(userData).setV2(true);
+      assertThat(response).isEqualTo(new Message("v2 API: ON"));
+    }
+
+    @Test
+    public void testSetV2Off() throws Exception {
+      OptionsHandler handler = new OptionsHandler(null);
+      
+      GameChatResponse response = handler.handle("set v2 false", null, userData, new Default());
+      
+      verify(userData).setV2(false);
+      assertThat(response).isEqualTo(new Message("v2 API: OFF"));
+    }
+
+    @Test
+    public void testGetV2On() throws Exception {
+      when(userData.isV2()).thenReturn(true);
+      
+      assertThat(new OptionsHandler(null).handle("get v2", null, userData, new Default()))
+        .isEqualTo(new Message("v2 API: ON"));
+    }
+
+    @Test
+    public void testGetV2Off() throws Exception {
+      when(userData.isV2()).thenReturn(false);
+      
+      assertThat(new OptionsHandler(null).handle("get v2", null, userData, new Default()))
+        .isEqualTo(new Message("v2 API: OFF"));
+    }
+
+    @Test
+    public void testSetV2InvalidValue() throws Exception {
+      OptionsHandler handler = new OptionsHandler(null);
+      
+      assertThatThrownBy(() -> handler.handle("set v2 maybe", null, userData, new Default()))
+        .isInstanceOf(UserException.class)
+        .hasMessageContaining("on|true|yes|1|off|false|no|0");
     }
 }

@@ -23,6 +23,7 @@ import tillerino.tillerinobot.handlers.options.LangOptionHandler;
 import tillerino.tillerinobot.handlers.options.MapMetaDataOptionHandler;
 import tillerino.tillerinobot.handlers.options.OptionHandler;
 import tillerino.tillerinobot.handlers.options.OsutrackWelcomeOptionHandler;
+import tillerino.tillerinobot.handlers.options.V2ApiOptionHandler;
 import tillerino.tillerinobot.handlers.options.WelcomeOptionHandler;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
@@ -37,6 +38,7 @@ public class OptionsHandler implements CommandHandler {
 		optionHandlers.add(new OsutrackWelcomeOptionHandler());
 		optionHandlers.add(new DefaultOptionHandler(requestParser));
 		optionHandlers.add(new MapMetaDataOptionHandler());
+		optionHandlers.add(new V2ApiOptionHandler());
 	}
 
 	@Override

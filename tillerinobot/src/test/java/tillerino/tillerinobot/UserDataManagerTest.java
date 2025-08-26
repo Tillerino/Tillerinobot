@@ -44,6 +44,19 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 		assertThat(data.getLastSongInfo()).hasFieldOrPropertyWithValue("beatmap", 123);
 	}
 
+	@Test
+	public void testV2SaveLoad() throws Exception {
+		UserData data = manager.loadUserData(534678);
+		assertFalse(data.isV2());
+		data.setV2(true);
+		data.close();
+
+		reloadManager();
+
+		data = manager.loadUserData(534678);
+		assertTrue(data.isV2());
+	}
+
 	private void reloadManager() {
 		manager = new UserDataManager(null, dbm);
 	}

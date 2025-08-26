@@ -184,6 +184,14 @@ public class UserDataManager {
 			this.showMapMetaDataOnRecommendation = showMapMetaDataOnRecommendation;
 		}
 
+		@Getter
+		private boolean v2 = false;
+
+		public void setV2(boolean v2) {
+			changed |= v2 != this.v2;
+			this.v2 = v2;
+		}
+
 		@Override
 		public void close() {
 			try {
