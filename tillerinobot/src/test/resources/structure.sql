@@ -54,6 +54,59 @@ CREATE TABLE `apibeatmaps` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `apiscores`
+--
+
+CREATE TABLE `apiscores` (
+  `userId` int NOT NULL,
+  `beatmapId` int NOT NULL,
+  `pp` double NOT NULL,
+  `score` bigint NOT NULL,
+  `mods` bigint NOT NULL,
+  `maxCombo` int NOT NULL,
+  `count50` mediumint NOT NULL,
+  `count100` mediumint NOT NULL,
+  `count300` mediumint NOT NULL,
+  `countMiss` mediumint NOT NULL,
+  `countKatu` mediumint NOT NULL,
+  `countGeki` mediumint NOT NULL,
+  `perfect` tinyint NOT NULL,
+  `date` bigint NOT NULL,
+  `rank` char(2) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `mode` int NOT NULL,
+  `downloaded` bigint NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `apiusers`
+--
+
+CREATE TABLE `apiusers` (
+  `userId` int NOT NULL,
+  `userName` tinytext COLLATE utf8mb3_unicode_ci NOT NULL,
+  `mode` tinyint NOT NULL DEFAULT '0',
+  `count300` int NOT NULL,
+  `count100` int NOT NULL,
+  `count50` int NOT NULL,
+  `playCount` int NOT NULL,
+  `rankedScore` bigint NOT NULL,
+  `totalScore` bigint NOT NULL,
+  `rank` int NOT NULL,
+  `level` double NOT NULL,
+  `pp` double NOT NULL,
+  `accuracy` double NOT NULL,
+  `countSS` int NOT NULL,
+  `countS` int NOT NULL,
+  `countA` int NOT NULL,
+  `country` tinytext COLLATE utf8mb3_unicode_ci NOT NULL,
+  `downloaded` bigint NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `botconfig`
 --
 
@@ -110,6 +163,19 @@ CREATE TABLE `givenrecommendations` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `players`
+--
+
+CREATE TABLE `players` (
+  `userid` int NOT NULL,
+  `lastseen` bigint NOT NULL DEFAULT '0',
+  `lastupdatetop50` bigint NOT NULL DEFAULT '0',
+  `agetop50` bigint NOT NULL DEFAULT '0' COMMENT 'lastseen - lastupdatetop50'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `ppaddictlinkkeys`
 --
 
@@ -157,6 +223,18 @@ CREATE TABLE `usernames` (
   `firstresolveattempt` bigint(20) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `usertop50`
+--
+
+CREATE TABLE `usertop50` (
+  `userid` int NOT NULL,
+  `place` int NOT NULL,
+  `beatmapid` int NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -174,6 +252,21 @@ ALTER TABLE `apibeatmaps`
   ADD PRIMARY KEY (`beatmapId`,`mods`),
   ADD KEY `mode` (`mode`),
   ADD KEY `beatmapId` (`beatmapId`) USING BTREE;
+
+--
+-- Indexes for table `apiscores`
+--
+ALTER TABLE `apiscores`
+  ADD PRIMARY KEY (`userId`,`beatmapId`),
+  ADD KEY `userid` (`userId`),
+  ADD KEY `beatmapid` (`beatmapId`),
+  ADD KEY `idandmods` (`beatmapId`,`mods`);
+
+--
+-- Indexes for table `apiusers`
+--
+ALTER TABLE `apiusers`
+  ADD PRIMARY KEY (`userId`,`mode`);
 
 --
 -- Indexes for table `botconfig`
@@ -195,6 +288,13 @@ ALTER TABLE `givenrecommendations`
   ADD PRIMARY KEY (`id`),
   ADD KEY `userid` (`userid`),
   ADD KEY `useridanddate` (`userid`,`date`);
+
+--
+-- Indexes for table `players`
+--
+ALTER TABLE `players`
+  ADD PRIMARY KEY (`userid`),
+  ADD KEY `agetop50` (`agetop50`);
 
 --
 -- Indexes for table `ppaddictlinkkeys`
@@ -219,6 +319,14 @@ ALTER TABLE `userdata`
 --
 ALTER TABLE `usernames`
   ADD PRIMARY KEY (`username`);
+
+--
+-- Indexes for table `usertop50`
+--
+ALTER TABLE `usertop50`
+  ADD PRIMARY KEY (`userid`,`place`),
+  ADD UNIQUE KEY `userid_2` (`userid`,`beatmapid`),
+  ADD KEY `userid` (`userid`);
 
 --
 -- AUTO_INCREMENT for dumped tables
