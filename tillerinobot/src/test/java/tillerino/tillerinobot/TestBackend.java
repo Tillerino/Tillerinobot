@@ -147,7 +147,7 @@ public class TestBackend implements BotBackend {
 	@Override
 	public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
 			throws SQLException, IOException {
-		OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid);
+    OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid, 0L);
 
 		BeatmapImpl cBeatmap = BeatmapImpl.builder()
 				.modsUsed(Beatmap.getDiffMods(mods))

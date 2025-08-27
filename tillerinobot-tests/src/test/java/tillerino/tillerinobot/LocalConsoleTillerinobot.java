@@ -123,7 +123,7 @@ public class LocalConsoleTillerinobot {
 			BeatmapsService beatService = mock(BeatmapsService.class);
 			when(beatService.byId(anyInt())).thenAnswer(req -> {
 				BeatmapResource res = mock(BeatmapResource.class);
-				doAnswer(x -> backend.getBeatmap((Integer) req.getArguments()[0])).when(res).get();
+				doAnswer(x -> backend.getBeatmap((Integer) req.getArguments()[0], 0L)).when(res).get();
 				doAnswer(x -> { System.out.println("Beatmap uploaded: " + x.getArguments()[0]); return null; }).when(res).setFile(anyString());
 				return res;
 			});

@@ -7,7 +7,11 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import org.tillerino.mormon.Database;
+import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
@@ -16,6 +20,8 @@ import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
 
+import lombok.RequiredArgsConstructor;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.PercentageEstimates;
@@ -108,10 +114,6 @@ public interface BotBackend {
 	ApiUser downloadUser(String userName) throws IOException, SQLException;
 
 	interface BeatmapsLoader {
-		default @CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId) throws SQLException, IOException {
-			return getBeatmap(beatmapId, 0L);
-		}
-
 		/**
 		 * Retreives beatmap. Implementation hint: this might be called a *lot* when
 		 * checking recommendation predicates and should probably be cached.

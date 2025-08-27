@@ -220,7 +220,7 @@ public class RecommendationsManager {
 			OsuApiBeatmap beatmap = null;
 			for (RecommendationPredicate predicate : predicates) {
 				if (beatmap == null) {
-					beatmap = beatmapsLoader.getBeatmap(bareRecommendation.beatmapId());
+          beatmap = beatmapsLoader.getBeatmap(bareRecommendation.beatmapId(), 0L);
 				}
 				if (beatmap == null) {
 					continue recommendationsLoop;

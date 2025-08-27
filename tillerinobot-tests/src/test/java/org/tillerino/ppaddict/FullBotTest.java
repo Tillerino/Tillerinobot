@@ -142,45 +142,6 @@ public class FullBotTest extends AbstractDatabaseTest {
 	@Module(includes = {RabbitQueuesModule.class, DockeredMysqlModule.class, MessageHandlerSchedulerModule.class,
 											ProcessorsModule.class, CachedDatabaseConfigServiceModule.class, TestOsutrackDownloader.Module.class})
 	protected class FullBotConfiguration {
-		private final String host = NgircdContainer.NGIRCD.getHost();
-		private final int port = NgircdContainer.NGIRCD.getMappedPort(6667);
-
-		@Provides
-		@Named("tillerinobot.irc.server")
-		String provideIrcServer() {
-			return host;
-		}
-
-		@Provides
-		@Named("tillerinobot.irc.port")
-		Integer provideIrcPort() {
-			return port;
-		}
-
-		@Provides
-		@Named("tillerinobot.irc.nickname")
-		String provideIrcNickname() {
-			return "tbot";
-		}
-
-		@Provides
-		@Named("tillerinobot.irc.password")
-		String provideIrcPassword() {
-			return "";
-		}
-
-		@Provides
-		@Named("tillerinobot.irc.autojoin")
-		String provideIrcAutojoin() {
-			return "#osu";
-		}
-
-		@Provides
-		@Named("tillerinobot.ignore")
-		Boolean provideIgnore() {
-			return false;
-		}
-
 		@Provides
 		@Singleton
 		BotBackend provideBotBackend(TestBackend testBackend) {
