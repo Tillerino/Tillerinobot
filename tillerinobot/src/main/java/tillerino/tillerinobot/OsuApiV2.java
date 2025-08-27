@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.tillerino.osuApiModel.v2.DownloaderV2;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
+import org.tillerino.ppaddict.ProdModule;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import dagger.Provides;
@@ -82,10 +83,15 @@ public class OsuApiV2 implements OsuApi {
 	}
 
 	@dagger.Module
-	interface CredentialsFromEnvModule {
+	public interface CredentialsFromEnvModule {
 		@Provides
 		static @Named("osuapiv2.url") URI baseUrl() {
 			return URI.create(envOrThrow("OSU_API_V2_URL"));
+		}
+
+		@Provides
+		static TokenCache tokenCache(@Named("osuapiv2.url") URI baseUrl, Credentials credentials) {
+			return TokenCache.inMemory(baseUrl, credentials);
 		}
 
 		@Provides
@@ -94,11 +100,7 @@ public class OsuApiV2 implements OsuApi {
 		}
 
 		static String envOrThrow(String name) {
-			String env = System.getenv(name);
-			if (env == null) {
-				throw new NoSuchElementException("Missing environment variable " + name);
-			}
-			return env;
+			return ProdModule.env(name).orElseThrow(() -> new NoSuchElementException(name + " must be configured!"));
 		}
 	}
 }

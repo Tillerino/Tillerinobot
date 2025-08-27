@@ -13,6 +13,9 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
+import org.tillerino.osuApiModel.v2.DownloaderV2;
+import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
+import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
@@ -25,10 +28,8 @@ import org.tillerino.ppaddict.util.Clock;
 import dagger.Binds;
 import dagger.Provides;
 import lombok.SneakyThrows;
-import tillerino.tillerinobot.BeatmapsLoaderImpl;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
-import tillerino.tillerinobot.OsuApi;
-import tillerino.tillerinobot.OsuApiV1;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
 import tillerino.tillerinobot.recommendations.AllRecommenders;
 import tillerino.tillerinobot.recommendations.Recommender;
@@ -38,6 +39,8 @@ import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
 /**
  * This sets up the configuration for production.
  * It is referenced outside of this project.
+ *
+ * <p>Only realized the Factorio-reference just now, so this shall never be renamed.
  */
 @dagger.Module(includes = {
     RabbitQueuesModule.class,
@@ -45,6 +48,7 @@ import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
     CachedDatabaseConfigServiceModule.class,
     BeatmapsServiceImpl.Module.class,
     OsuApiV1.DownloaderModule.class,
+    OsuApiV2.CredentialsFromEnvModule.class,
     MessageHandlerSchedulerModule.class
 })
 public interface ProdModule {
@@ -55,7 +59,7 @@ public interface ProdModule {
   AuthenticationService authenticationService(AuthenticationServiceImpl authenticationService);
 
   @Binds
-  OsuApi osuApi(OsuApiV1 osuApiV1);
+  OsuApi osuApi(OsuApiV2Sometimes osuApiV2Sometimes);
 
   @Binds
   Recommender recommender(AllRecommenders allRecommenders);

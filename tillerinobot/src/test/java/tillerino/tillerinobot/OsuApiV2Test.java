@@ -17,7 +17,7 @@ import lombok.SneakyThrows;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiUser;
 
-class OsuApiV2Test {
+public class OsuApiV2Test {
   public static final String OSUAPI_V2_MOCK_CLIENT_ID = "12345";
   public static final String OSUAPI_V2_MOCK_CLIENT_SECRET = "jusTAL0OfnumB3r5aNdch4r4CT3Er5Br0PlStAHp";
   public static final Credentials
