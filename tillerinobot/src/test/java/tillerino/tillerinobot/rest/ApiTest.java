@@ -160,14 +160,14 @@ public class ApiTest {
 	@Test
 	public void testIsReceiving() throws Exception {
 		clock.advanceBy(60 * 60 * 1000); // one hour
-		remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 11000); // eleven seconds ago
+		remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 31000); // thirty-one seconds ago
 		assertThatThrownBy(() -> botStatus.isReceiving()).isInstanceOf(NotFoundException.class);
 		assertThatOurLogs().hasOnlyOneElementSatisfying(
 			mdc("apiPath", "botinfo/isReceiving")
 				.andThen(mdc("apiStatus", "404"))
 				.andThen(mdc("osuApiRateBlockedTime", "0")));
 		log.clear();
-		remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 10000); // ten seconds ago
+		remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 30000); // thirty seconds ago
 		assertTrue(botStatus.isReceiving());
 		assertThatOurLogs().hasOnlyOneElementSatisfying(
 				mdc("apiPath", "botinfo/isReceiving")

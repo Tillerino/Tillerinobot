@@ -39,7 +39,7 @@ public class BotInfoService implements BotStatus {
 	@Override
 	public boolean isReceiving() {
 		// set remotely, so we need to call botinfo()
-		if (botinfo().getLastReceivedMessage() < clock.currentTimeMillis() - 10000) {
+		if (botinfo().getLastReceivedMessage() < clock.currentTimeMillis() - 30000) {
 			throw new NotFoundException();
 		}
 		return true;
