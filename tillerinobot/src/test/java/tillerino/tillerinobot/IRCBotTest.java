@@ -6,16 +6,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -45,8 +36,10 @@ import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
+import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.mockmodules.GameChatResponseQueueMockModule;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
+import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
@@ -64,7 +57,9 @@ import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 public class IRCBotTest extends AbstractDatabaseTest {
 	@Singleton
 	@Component(modules = {DockeredMysqlModule.class, TestBackend.Module.class, LiveActivityMockModule.class,
-												GameChatResponseQueueMockModule.class})
+												GameChatResponseQueueMockModule.class, OsuApiV2Sometimes.Module.class,
+												OsuApiV1Test.Module.class, OsuApiV2Test.Module.class, CachedDatabaseConfigServiceModule.class,
+												Clock.Module.class})
 	interface Injector {
 		void inject(IRCBotTest t);
 	}
@@ -95,29 +90,22 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 	RateLimiter rateLimiter = new RateLimiter();
 
-	@Inject
-	TestBackend backend;
-
-	@Inject
-	IrcNameResolver resolver;
-
-	@Inject
-	RecommendationsManager recommendationsManager;
-
-	@Inject
-	LiveActivity liveActivity;
-
-	@Inject
-	Recommender rec;
-
 	TestOsutrackDownloader osuTrackDownloader = spy(new TestOsutrackDownloader());
+
+	@Inject TestBackend backend;
+	@Inject IrcNameResolver resolver;
+	@Inject RecommendationsManager recommendationsManager;
+	@Inject LiveActivity liveActivity;
+	@Inject Recommender rec;
+	@Inject UserDataManager userDataManager;
+	@Inject OsuApiV1 osuApiV1;
+	@Inject OsuApiV2 osuApiV2;
 
 	/**
 	 * Contains the messages and actions sent by the bot. At the end of each
 	 * test, it must be empty or the test fails.
 	 */
-	@Inject
-	GameChatResponseQueue queue;
+	@Inject GameChatResponseQueue queue;
 
 	boolean printResponses = false;
 
@@ -129,7 +117,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
 		this.recommendationsManager = spy(recommendationsManager);
 		this.resolver = spy(this.resolver);
-		this.bot = new IRCBot(this.backend, recommendationsManager, new UserDataManager(this.backend, dbm),
+		this.bot = new IRCBot(this.backend, recommendationsManager, userDataManager,
 				resolver, osuTrackDownloader, rateLimiter,
 				liveActivity, queue);
 	}
@@ -381,6 +369,15 @@ public class IRCBotTest extends AbstractDatabaseTest {
 		backend.hintUser("user", false, 1000, 1000);
 		turnOffVersionMessage();
 		verifyResponse(bot, message("user", "!r"), messageContaining("maintenance"));
+	}
+
+	@Test
+	public void v2ApiTriggersUpdate() throws Exception {
+		turnOffVersionMessage();
+
+		backend.hintUser("user", false, 1000, 1000, 2070907);
+		verifyResponse(bot, message("user", "!set v2 on"), messageContaining("v2 API: ON"));
+		verify(osuApiV2).getUserTop(2070907, 0, 50);
 	}
 
 	ApiUser user(@UserId int id, @OsuName String name) {

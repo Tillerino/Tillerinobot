@@ -91,7 +91,7 @@ public class IRCBot implements GameChatEventConsumer {
 		this.npHandler = new NPHandler(backend, liveActivity);
 
 		commandHandlers.add(new ResetHandler(manager));
-		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend)));
+		commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend), userDataManager, manager));
 		commandHandlers.add(new AccHandler(backend, liveActivity));
 		commandHandlers.add(new WithHandler(backend, liveActivity));
 		commandHandlers.add(new RecommendHandler(manager, liveActivity));

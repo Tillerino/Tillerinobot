@@ -140,7 +140,9 @@ public class FullBotTest extends AbstractDatabaseTest {
 	}
 
 	@Module(includes = {RabbitQueuesModule.class, DockeredMysqlModule.class, MessageHandlerSchedulerModule.class,
-											ProcessorsModule.class, CachedDatabaseConfigServiceModule.class, TestOsutrackDownloader.Module.class})
+											ProcessorsModule.class, CachedDatabaseConfigServiceModule.class, TestOsutrackDownloader.Module.class,
+											OsuApiV1.Module.class,
+											OsuApiV1Test.Module.class, CachedDatabaseConfigServiceModule.class, Clock.Module.class})
 	protected class FullBotConfiguration {
 		@Provides
 		@Singleton
@@ -152,11 +154,6 @@ public class FullBotTest extends AbstractDatabaseTest {
 		@Singleton
 		Recommender provideRecommender(TestRecommender testRecommender) {
 			return testRecommender;
-		}
-
-		@Provides
-		Clock provideClock() {
-			return Clock.system();
 		}
 
 		@Provides

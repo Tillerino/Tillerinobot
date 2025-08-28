@@ -49,7 +49,8 @@ import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
     BeatmapsServiceImpl.Module.class,
     OsuApiV1.DownloaderModule.class,
     OsuApiV2.CredentialsFromEnvModule.class,
-    MessageHandlerSchedulerModule.class
+    MessageHandlerSchedulerModule.class,
+    Clock.Module.class
 })
 public interface ProdModule {
   @Binds
@@ -67,11 +68,6 @@ public interface ProdModule {
   @Provides
   static SanDoku sanDoku() {
     return SanDoku.defaultClient(URI.create(Optional.ofNullable(System.getenv("SAN_DOKU_URL")).orElse("http://san-doku:8080")));
-  }
-
-  @Provides
-  static Clock clock() {
-    return Clock.system();
   }
 
   @Provides

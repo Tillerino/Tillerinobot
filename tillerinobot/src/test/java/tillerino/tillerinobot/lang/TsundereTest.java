@@ -30,7 +30,8 @@ public class TsundereTest {
 		BotBackend backend = mock(BotBackend.class);
 		RecommendHandler handler = new RecommendHandler(new RecommendationsManager(backend, null,
 				new RecommendationRequestParser(backend),
-				new TestBackend.TestBeatmapsLoader(), mock(Recommender.class)),
+				new TestBackend.TestBeatmapsLoader(), mock(Recommender.class),
+				null, null, null),
 				mock(LiveActivity.class));
 
 		// make a bullshit call to the handler four times

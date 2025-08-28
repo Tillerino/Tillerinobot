@@ -32,8 +32,9 @@ public class OsuApiV2Test {
   @dagger.Module
   public interface Module {
     @Provides
+    @Singleton
     @SneakyThrows
-    static OsuApiV2 osuApiV1() {
+    static OsuApiV2 osuApiV2() {
       URI baseUrl = URI.create(MockServerRule.getExternalMockServerAddress());
       return Mockito.spy(new OsuApiV2(
           baseUrl, TokenCache.inMemory(baseUrl, OSUAPI_V2_MOCK_CREDENTIALS),

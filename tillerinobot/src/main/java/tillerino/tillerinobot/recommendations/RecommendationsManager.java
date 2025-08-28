@@ -10,13 +10,7 @@ import static org.tillerino.osuApiModel.Mods.getMods;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
@@ -35,6 +29,8 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
+import org.tillerino.ppaddict.config.ConfigService;
+import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 
 import com.google.common.cache.Cache;
@@ -45,9 +41,11 @@ import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
+import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
+import tillerino.tillerinobot.data.Player;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
 import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
@@ -61,14 +59,13 @@ import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RecommendationsManager {
 	private final BotBackend backend;
-	
 	private final DatabaseManager dbm;
-
 	private final RecommendationRequestParser parser;
-
 	private final BeatmapsLoader beatmapsLoader;
-
 	private final Recommender recommender;
+	private final OsuApi osuApi;
+	private final Clock clock;
+	private final ConfigService config;
 
 	private final Cache<Integer, Recommendation> lastRecommendation = CacheBuilder.newBuilder()
 			.expireAfterWrite(1, TimeUnit.HOURS)
@@ -294,6 +291,12 @@ public class RecommendationsManager {
 		try (Database db = dbm.getDatabase();
 				Loader<GivenRecommendation> loader = db.loader(GivenRecommendation.class, "where userid = ? and not hidden order by `date` desc")) {
 			return loader.queryList(userId);
+		}
+	}
+
+	public void forceUpdateTopScores(@UserId int userId) throws SQLException, IOException {
+		try (Database db = dbm.getDatabase()) {
+			Player.getPlayer(db, userId).updateTop50(db, 0, osuApi, clock, config);
 		}
 	}
 }

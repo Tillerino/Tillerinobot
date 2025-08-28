@@ -16,6 +16,7 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
 import tillerino.tillerinobot.CommandHandler;
+import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.handlers.options.DefaultOptionHandler;
@@ -27,18 +28,19 @@ import tillerino.tillerinobot.handlers.options.V2ApiOptionHandler;
 import tillerino.tillerinobot.handlers.options.WelcomeOptionHandler;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class OptionsHandler implements CommandHandler {
 	private final List<OptionHandler> optionHandlers = new ArrayList<>();
 
 	@Inject
-	public OptionsHandler(RecommendationRequestParser requestParser) {
+	public OptionsHandler(RecommendationRequestParser requestParser, UserDataManager userDataManager, RecommendationsManager recommendationsManager) {
 		optionHandlers.add(new LangOptionHandler());
 		optionHandlers.add(new WelcomeOptionHandler());
 		optionHandlers.add(new OsutrackWelcomeOptionHandler());
 		optionHandlers.add(new DefaultOptionHandler(requestParser));
 		optionHandlers.add(new MapMetaDataOptionHandler());
-		optionHandlers.add(new V2ApiOptionHandler());
+		optionHandlers.add(new V2ApiOptionHandler(userDataManager, recommendationsManager));
 	}
 
 	@Override
@@ -71,8 +73,8 @@ public class OptionsHandler implements CommandHandler {
 		}
 
 		for (OptionHandler optionHandler : optionHandlers) {
-			GameChatResponse resposne = optionHandler.handle(option, set, value, userData, apiUser, lang);
-			if(resposne != null) return resposne;
+			GameChatResponse response = optionHandler.handle(option, set, value, userData, apiUser, lang);
+			if(response != null) return response;
 		}
 
 		int userHearts = userData.getHearts();

@@ -26,17 +26,18 @@ import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
+import org.tillerino.ppaddict.util.Clock;
 
 import dagger.Component;
-import tillerino.tillerinobot.AbstractDatabaseTest;
-import tillerino.tillerinobot.TestBackend;
-import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.lang.Default;
 
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
 	@Singleton
-	@Component(modules = {TestBackend.Module.class, DockeredMysqlModule.class})
+	@Component(modules = {TestBackend.Module.class, DockeredMysqlModule.class, OsuApiV1.Module.class,
+												OsuApiV1Test.Module.class, CachedDatabaseConfigServiceModule.class, Clock.Module.class})
 	interface Injector {
 		void inject(RecommendationsManagerTest test);
 	}

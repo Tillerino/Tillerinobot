@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.tillerino.osuApiModel.v2.DownloaderV2;
 
@@ -13,10 +14,11 @@ import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 
+@Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class OsuApiV2Sometimes implements OsuApi {
   private final OsuApiV1 v1;
-  private final OsuApiV1 v2;
+  private final OsuApiV2 v2;
   private final UserDataManager userDataManager;
 
   @Override
@@ -57,5 +59,10 @@ public class OsuApiV2Sometimes implements OsuApi {
   @Override
   public ApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
     return v1.getBeatmap(beatmapid, mods);
+  }
+
+  @dagger.Module
+  interface Module {
+    @dagger.Binds OsuApi osuApi(OsuApiV2Sometimes osuApiV2Sometimes);
   }
 }

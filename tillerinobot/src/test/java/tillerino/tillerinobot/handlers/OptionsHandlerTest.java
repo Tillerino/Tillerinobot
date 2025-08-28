@@ -19,6 +19,7 @@ import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
@@ -26,6 +27,7 @@ import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.lang.Vietnamese;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
+import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 public class OptionsHandlerTest {
 	enum E {
@@ -41,6 +43,9 @@ public class OptionsHandlerTest {
 	}
 
 	UserData userData = mock(UserData.class);
+
+	OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)), mock(
+			UserDataManager.class), mock(RecommendationsManager.class));
 
 	@BeforeEach
 	public void setup() throws Exception {
@@ -74,7 +79,6 @@ public class OptionsHandlerTest {
 	
 	@Test
 	public void testSetLanguage() throws Exception {
-		OptionsHandler handler = new OptionsHandler(null);
 		mockUserDataUsingLanguage(LanguageIdentifier.Tsundere);
 
 		handler.handle("set languge tsundre", null, userData, new Default());
@@ -86,7 +90,7 @@ public class OptionsHandlerTest {
 	public void testGetTsundere() throws Exception {
 		when(userData.getLanguageIdentifier()).thenReturn(LanguageIdentifier.Tsundere);
 
-		assertThat(new OptionsHandler(null).handle("get language", null, userData, new Default()))
+		assertThat(handler.handle("get language", null, userData, new Default()))
 			.isEqualTo(new Message("Language: Tsundere"));
 	}
 
@@ -94,7 +98,7 @@ public class OptionsHandlerTest {
 	public void testSetVietnamese() throws Exception {
 		mockUserDataUsingLanguage(LanguageIdentifier.Vietnamese);
 
-		GameChatResponse response = new OptionsHandler(null).handle("set languge Tiếng Việt", null, userData, new Default());
+		GameChatResponse response = handler.handle("set languge Tiếng Việt", null, userData, new Default());
 
 		verify(userData).setLanguage(LanguageIdentifier.Vietnamese);
 		assertThat(response).isEqualTo(new Vietnamese().optionalCommentOnLanguage(null));
@@ -104,14 +108,12 @@ public class OptionsHandlerTest {
 	public void testGetVietnamese() throws Exception {
 		when(userData.getLanguageIdentifier()).thenReturn(LanguageIdentifier.Vietnamese);
 
-		assertThat(new OptionsHandler(null).handle("get language", null, userData, new Default()))
+		assertThat(handler.handle("get language", null, userData, new Default()))
 			.isEqualTo(new Message("Language: Tiếng Việt"));
 	}
 
 	@Test
 	public void testSetUnknownLanguage() throws Exception {
-		OptionsHandler handler = new OptionsHandler(null);
-		
 		assertThatThrownBy(() -> handler.handle("set language defflt", null, userData, new Default()))
 			.isInstanceOf(UserException.class)
 			.hasMessageContaining("Tiếng Việt");
@@ -119,7 +121,6 @@ public class OptionsHandlerTest {
 
     @Test
     public void testDefaultSettings() throws Exception {
-      OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
 
       handler.handle("set default hd hr", null, userData, new Default());
 
@@ -128,8 +129,6 @@ public class OptionsHandlerTest {
 
     @Test
     public void testClearDefaultSettings() throws Exception {
-      OptionsHandler handler = new OptionsHandler(null);
-
       handler.handle("set default", null, userData, new Default());
 
       verify(userData).setDefaultRecommendationOptions(null);
@@ -137,8 +136,6 @@ public class OptionsHandlerTest {
 
     @Test
     public void testInvalidDefaultSettings() throws Exception {
-      OptionsHandler handler = new OptionsHandler(new RecommendationRequestParser(mock(BotBackend.class)));
-
       OsuApiUser user = new OsuApiUser();
       user.setUserId(1);
       assertThrows(UserException.class, () -> handler.handle("set default invalid", user , userData, new Default()));
@@ -154,8 +151,6 @@ public class OptionsHandlerTest {
 
     @Test
     public void testSetV2On() throws Exception {
-      OptionsHandler handler = new OptionsHandler(null);
-      
       GameChatResponse response = handler.handle("set v2 on", null, userData, new Default());
       
       verify(userData).setV2(true);
@@ -164,8 +159,6 @@ public class OptionsHandlerTest {
 
     @Test
     public void testSetV2Off() throws Exception {
-      OptionsHandler handler = new OptionsHandler(null);
-      
       GameChatResponse response = handler.handle("set v2 false", null, userData, new Default());
       
       verify(userData).setV2(false);
@@ -176,7 +169,7 @@ public class OptionsHandlerTest {
     public void testGetV2On() throws Exception {
       when(userData.isV2()).thenReturn(true);
       
-      assertThat(new OptionsHandler(null).handle("get v2", null, userData, new Default()))
+      assertThat(handler.handle("get v2", null, userData, new Default()))
         .isEqualTo(new Message("v2 API: ON"));
     }
 
@@ -184,14 +177,12 @@ public class OptionsHandlerTest {
     public void testGetV2Off() throws Exception {
       when(userData.isV2()).thenReturn(false);
       
-      assertThat(new OptionsHandler(null).handle("get v2", null, userData, new Default()))
+      assertThat(handler.handle("get v2", null, userData, new Default()))
         .isEqualTo(new Message("v2 API: OFF"));
     }
 
     @Test
     public void testSetV2InvalidValue() throws Exception {
-      OptionsHandler handler = new OptionsHandler(null);
-      
       assertThatThrownBy(() -> handler.handle("set v2 maybe", null, userData, new Default()))
         .isInstanceOf(UserException.class)
         .hasMessageContaining("on|true|yes|1|off|false|no|0");

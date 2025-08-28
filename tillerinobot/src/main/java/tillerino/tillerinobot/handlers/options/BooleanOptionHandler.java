@@ -1,5 +1,7 @@
 package tillerino.tillerinobot.handlers.options;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 
@@ -16,7 +18,8 @@ public abstract class BooleanOptionHandler extends OptionHandler {
     }
 
     @Override
-    protected void handleSet(String value, UserData userData, OsuApiUser apiUser, Language lang) throws UserException {
+    protected void handleSet(String value, UserData userData, OsuApiUser apiUser, Language lang)
+        throws UserException, SQLException, IOException {
         handleSetBoolean(parseBoolean(value, lang), userData);
     }
 
@@ -26,7 +29,7 @@ public abstract class BooleanOptionHandler extends OptionHandler {
         return getCurrentBooleanValue(userData) ? "ON" : "OFF";
     }
 
-    protected abstract void handleSetBoolean(boolean value, UserData userData);
+    protected abstract void handleSetBoolean(boolean value, UserData userData) throws SQLException, IOException;
 
     protected abstract boolean getCurrentBooleanValue(UserData userData);
 

@@ -153,8 +153,8 @@ public class UserDataManager {
 
 		private transient UserDataManager manager;
 
-		@UserId
-		private transient int userid;
+		@Getter
+		private transient @UserId int userid;
 
 		public int getHearts() throws SQLException, IOException {
 			return manager.backend.getDonator(userid);
@@ -195,7 +195,7 @@ public class UserDataManager {
 		@Override
 		public void close() {
 			try {
-				manager.saveUserData(userid, this);
+				manager.saveUserData(this);
 			} catch (SQLException e) {
 				log.error("Error saving user data", e);
 			}
@@ -248,7 +248,7 @@ public class UserDataManager {
 		}
 	}
 
-	void saveUserData(@UserId int userid, UserData options) throws SQLException {
+	public void saveUserData(UserData options) throws SQLException {
 		if (!options.isChanged()) {
 			return;
 		}
@@ -267,7 +267,7 @@ public class UserDataManager {
 			}
 
 			BotUserData data = new BotUserData();
-			data.setUserId(userid);
+			data.setUserId(options.userid);
 			data.setUserdata(serialized);
 			dbm.persist(data, Action.REPLACE);
 			options.setChanged(false);

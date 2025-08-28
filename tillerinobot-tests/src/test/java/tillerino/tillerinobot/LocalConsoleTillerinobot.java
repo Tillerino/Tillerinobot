@@ -41,6 +41,7 @@ import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
+import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
@@ -99,7 +100,9 @@ public class LocalConsoleTillerinobot {
 
 	@dagger.Module(includes = {DockeredMysqlModule.class, InMemoryQueuesModule.class, LiveActivityMockModule.class,
 														 TestBackend.Module.class, MessageHandlerSchedulerModule.class, ProcessorsModule.class,
-														 TestOsutrackDownloader.Module.class})
+														 TestOsutrackDownloader.Module.class, OsuApiV1.Module.class, OsuApiV1Test.Module.class,
+														 CachedDatabaseConfigServiceModule.class})
+
 	public interface Module {
 		@dagger.Provides
 		static @Named("tillerinobot.test.persistentBackend") boolean persistentBackend() {
@@ -165,7 +168,7 @@ public class LocalConsoleTillerinobot {
 	 */
 	public static void main(String[] args) throws Exception {
 		Injector injector = DaggerLocalConsoleTillerinobot_Injector.builder()
-				.clockModule(new ClockModule(Clock.system()))
+				.clockModule(new LocalConsoleTillerinobot.ClockModule(Clock.system()))
 				.build();
 		MysqlContainer.MysqlDatabaseLifecycle.createSchema();
 

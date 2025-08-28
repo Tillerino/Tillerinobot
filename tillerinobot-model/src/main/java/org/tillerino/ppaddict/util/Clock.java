@@ -1,5 +1,7 @@
 package org.tillerino.ppaddict.util;
 
+import dagger.Provides;
+
 /**
  * Hides {@link System#currentTimeMillis()} for unit tests.
  */
@@ -14,5 +16,12 @@ public interface Clock {
 
     static Clock system() {
       return System::currentTimeMillis;
+    }
+
+    @dagger.Module interface Module {
+        @Provides
+        static Clock systemClock() {
+          return System::currentTimeMillis;
+        }
     }
 }
