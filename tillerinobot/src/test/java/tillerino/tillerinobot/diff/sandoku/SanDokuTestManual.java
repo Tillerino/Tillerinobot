@@ -40,53 +40,53 @@ public class SanDokuTestManual {
 		// NoMod
 		assertThat(sanDoku.getDiff(0, 0, beatmap).diffCalcResult()).satisfies(result -> {
 			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=0
-			assertThat(result.starRating()).isCloseTo(4.73447, apiRounding);
-			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
-			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.starRating()).isCloseTo(4.74189, apiRounding);
+			assertThat(result.aim()).isCloseTo(2.54927, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.84998, apiRounding);
 			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
 		// Hidden, should not change anything
 		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.Hidden), beatmap).diffCalcResult()).satisfies(result -> {
 			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=0  ==> uses 0 as mods since HD doesn't give a result
-			assertThat(result.starRating()).isCloseTo(4.73447, apiRounding);
-			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
-			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.starRating()).isCloseTo(4.74189, apiRounding);
+			assertThat(result.aim()).isCloseTo(2.54927, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.84998, apiRounding);
 			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
 		// Flashlight
 		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.Flashlight), beatmap).diffCalcResult()).satisfies(result -> {
 			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=1024
-			assertThat(result.starRating()).isCloseTo(5.28149, apiRounding); // star rating is different!
-			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
-			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.starRating()).isCloseTo(5.29152, apiRounding); // star rating is different!
+			assertThat(result.aim()).isCloseTo(2.54927, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.84998, apiRounding);
 			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
 		// and now Hidden & Flashlight, here Hidden actually does get taken into account, but only because it is combined with FL
 		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.Hidden, Mods.Flashlight), beatmap).diffCalcResult()).satisfies(result -> {
 			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=1032
-			assertThat(result.starRating()).isCloseTo(5.49584, apiRounding); // star rating is different!
-			assertThat(result.aim()).isCloseTo(2.53878, apiRounding);
-			assertThat(result.speed()).isCloseTo(1.88141, apiRounding);
+			assertThat(result.starRating()).isCloseTo(5.50678, apiRounding); // star rating is different!
+			assertThat(result.aim()).isCloseTo(2.54927, apiRounding);
+			assertThat(result.speed()).isCloseTo(1.84998, apiRounding);
 			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
 		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.DoubleTime), beatmap).diffCalcResult()).satisfies(result -> {
 			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=64
-			assertThat(result.starRating()).isCloseTo(6.65472, apiRounding);
-			assertThat(result.aim()).isCloseTo(3.52504, apiRounding);
-			assertThat(result.speed()).isCloseTo(2.72927, apiRounding);
+			assertThat(result.starRating()).isCloseTo(6.65498, apiRounding);
+			assertThat(result.aim()).isCloseTo(3.5396, apiRounding);
+			assertThat(result.speed()).isCloseTo(2.67524, apiRounding);
 			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 
 		// now with HR DT
 		assertThat(sanDoku.getDiff(0, Mods.getMask(Mods.HardRock, Mods.DoubleTime), beatmap).diffCalcResult()).satisfies(result -> {
 			// https://osu.ppy.sh/api/get_beatmaps?k=***&m=0&b=328472&mods=80
-			assertThat(result.starRating()).isCloseTo(7.06681, apiRounding);
-			assertThat(result.aim()).isCloseTo(3.82241, apiRounding);
-			assertThat(result.speed()).isCloseTo(2.74129, apiRounding);
+			assertThat(result.starRating()).isCloseTo(7.07645, apiRounding);
+			assertThat(result.aim()).isCloseTo(3.83819, apiRounding);
+			assertThat(result.speed()).isCloseTo(2.68853, apiRounding);
 			assertThat(result.maxCombo()).isEqualTo(404);
 		});
 	}
@@ -197,5 +197,17 @@ public class SanDokuTestManual {
 						.hasValueSatisfying(error -> assertThat(error)
 								.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
 								.hasFieldOrPropertyWithValue("errors", Map.of("mods", List.of("invalid mod combination: HR,EZ")))));
+	}
+
+	@Test
+	public void invalidGameMode() throws Exception {
+		byte[] beatmap = IOUtils.resourceToByteArray("/Daniel Ingram - Awesome as I Want to Be (cagmcpe) [20(ni)% Cooler].osu");
+		int beatmapGameMode = 1; // above map is a taiko map
+		int gameMode = 0;
+		assertThatThrownBy(() -> sanDoku.getDiff(gameMode, 0, beatmap))
+				.isInstanceOfSatisfying(BadRequestException.class, e -> assertThat(SanDoku.unwrapError(e))
+						.hasValueSatisfying(error -> assertThat(error)
+								.hasFieldOrPropertyWithValue("title", "One or more validation errors occurred.")
+								.hasFieldOrPropertyWithValue("errors", Map.of("beatmap", List.of("Cannot convert beatmap game mode ("+beatmapGameMode+") to requested game mode ("+gameMode+")")))));
 	}
 }
