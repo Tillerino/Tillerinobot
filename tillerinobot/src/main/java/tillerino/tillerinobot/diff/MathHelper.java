@@ -37,6 +37,10 @@ public final class MathHelper {
 		return (float) Math.log10(x);
 	}
 
+	static float std_log(float x) {
+		return (float) Math.log(x);
+	}
+
 	static float std_max(float x, float y) {
 		return Math.max(x, y);
 	}

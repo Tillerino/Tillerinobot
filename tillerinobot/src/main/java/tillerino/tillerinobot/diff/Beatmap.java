@@ -32,6 +32,8 @@ public interface Beatmap {
 	public static final int SliderFactor = 5;
 	public static final int Flashlight = 6;
 	public static final int SpeedNoteCount = 7;
+	public static final int AimDifficultStrainCount = 8;
+	public static final int SpeedDifficultStrainCount = 9;
 
 	@BitwiseMods
 	static long diffMods = getMask(TouchDevice, HalfTime, DoubleTime, Easy, HardRock, Mods.Flashlight);
@@ -78,4 +80,7 @@ public interface Beatmap {
 
 	int NumSliders();
 
+	default int getObjectCount() {
+		return NumHitCircles() + NumSpinners() + NumSliders();
+	}
 }

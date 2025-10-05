@@ -20,12 +20,15 @@ import javax.inject.Singleton;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.glassfish.jersey.client.proxy.WebResourceFactory;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
 
 import dagger.Provides;
 import lombok.SneakyThrows;
 import tillerino.tillerinobot.OsuApiV1.DownloaderModule;
+import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
 /**
  * See {@link #main(String[])}
@@ -69,6 +72,13 @@ class WireMockUpdater {
     @Provides
     static TokenCache tokenCache(@Named("osuapiv2.url") URI baseUrl, Credentials credentials) {
       return TokenCache.inMemory(baseUrl, credentials);
+    }
+
+    @dagger.Provides
+    BeatmapDownloader beatmapDownloader() {
+      return WebResourceFactory.newResource(
+          BeatmapDownloader.class,
+          JerseyClientBuilder.createClient().target(wireMockBase));
     }
   }
 
@@ -119,6 +129,7 @@ class WireMockUpdater {
   @Inject RateLimiter rateLimiter;
   @Inject @Named("osuapi.key") String osuApiV1Key;
   @Inject Credentials credentials;
+  @Inject BeatmapDownloader beatmapDownloader;
 
   @Inject TokenCache tokenCache;
 
@@ -179,24 +190,27 @@ class WireMockUpdater {
     // System.out.println(osuApiV1.getUserRecent(2070907, 0));
     // System.out.println(osuApiV1.getBeatmap(131891, 0));
 
-    System.out.println(osuApiV2.getUser(2070907, 0));
-    System.out.println(osuApiV2.getUserTop(2070907, 0, 50));
-    System.out.println(osuApiV2.getUser("Tillerino", 0));
-    System.out.println(osuApiV2.getUserRecent(2070907, 0));
-    System.out.println(osuApiV2.getBeatmap(131891, 0));
+    // System.out.println(osuApiV2.getUser(2070907, 0));
+    // System.out.println(osuApiV2.getUserTop(2070907, 0, 50));
+    // System.out.println(osuApiV2.getUser("Tillerino", 0));
+    // System.out.println(osuApiV2.getUserRecent(2070907, 0));
+    // System.out.println(osuApiV2.getBeatmap(131891, 0));
+    System.out.println(osuApiV2.getBeatmap(131891, 16));
+    // System.out.println(osuApiV2.getBeatmapTop(131891, 0));
+    // beatmapDownloader.getActualBeatmap(131891);
   }
 
   /**
    * Updates or checks mocks. When you update mocks, maybe comment out those mocks you don't really want to update.
    * Make sure this runs in the `tillerinobot` module, otherwise the correct paths are not found.
    * Reads credentials for APIs from environment variables:
-   * OSUAPIKEY
-   *
+   * OSUAPIKEY (for v1)
+   * OSU_API_CLIENT_ID, OSU_API_CLIENT_SECRET (for v2)
    */
   public static void main(String[] args) throws Exception {
     WireMockUpdater updater = new WireMockUpdater();
 
-    updater.checkMocks();
+    updater.updateMocks();
 
     updater.wireMockServer.stop();
   }

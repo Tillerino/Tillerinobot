@@ -26,7 +26,9 @@ public record BeatmapImpl(
 		float speedNoteCount,
 		int circleCount,
 		int spinnerCount,
-		int sliderCount) implements Beatmap {
+		int sliderCount,
+		float aimDifficultyStrainCount,
+		float speedDifficultyStrainCount) implements Beatmap {
 	
 
 	@Override
@@ -44,6 +46,8 @@ public record BeatmapImpl(
 			case Beatmap.SliderFactor -> sliderFactor;
 			case Beatmap.Flashlight -> flashlight;
 			case Beatmap.SpeedNoteCount -> speedNoteCount;
+			case Beatmap.AimDifficultStrainCount -> aimDifficultyStrainCount;
+			case Beatmap.SpeedDifficultStrainCount -> speedDifficultyStrainCount;
 			default -> throw new IllegalArgumentException("Unexpected kind: " + kind);
 		};
 	}

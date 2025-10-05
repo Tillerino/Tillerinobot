@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import org.tillerino.osuApiModel.types.BeatmapId;
+import org.tillerino.osuApiModel.types.GameMode;
 import org.tillerino.osuApiModel.v2.DownloaderV2;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
@@ -70,6 +72,11 @@ public class OsuApiV2 implements OsuApi {
 	public List<ApiScore> getUserRecent(int userid, int mode) throws IOException {
 		limitRate();
 		return downloader.getUserRecent(userid, mode, ApiScore.class);
+	}
+
+	public List<ApiScore> getBeatmapTop(@BeatmapId int beatmapId, @GameMode int gameMode) throws IOException {
+		limitRate();
+		return downloader.getBeatmapTop(beatmapId, gameMode, ApiScore.class);
 	}
 
 	private void limitRate() {

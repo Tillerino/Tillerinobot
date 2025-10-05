@@ -27,7 +27,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 		}
 
 		OsuScore score = new OsuScore((int) beatmap.DifficultyAttribute(getMods(), Beatmap.MaxCombo),
-				dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(), getMods());
+				dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(), getMods(), true);
 
 		return score.getPP(beatmap);
 	}
@@ -37,7 +37,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 		AccuracyDistribution dist = AccuracyDistribution.model(beatmap.getObjectCount(), misses, acc);
 
 		OsuScore score = new OsuScore(combo, dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(),
-				getMods());
+				getMods(), true);
 
 		return score.getPP(beatmap);
 	}
@@ -45,7 +45,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 	@Override
 	public double getPP(int x100, int x50, int combo, int misses) {
 		int x300 = beatmap.getObjectCount() - x50 - x100;
-		OsuScore score = new OsuScore(combo, x300, x100, x50, misses, getMods());
+		OsuScore score = new OsuScore(combo, x300, x100, x50, misses, getMods(), true);
 
 		return score.getPP(beatmap);
 	}

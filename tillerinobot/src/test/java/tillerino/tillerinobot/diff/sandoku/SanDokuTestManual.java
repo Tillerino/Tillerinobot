@@ -105,7 +105,7 @@ public class SanDokuTestManual {
 		score.setCount50(0);
 		score.setCountMiss(0);
 		score.setMods(mods);
-		OsuScore standardScore = new OsuScore(score);
+		OsuScore standardScore = new OsuScore(score, true);
 		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(560.049f, webRounding);
 	}
 
@@ -123,7 +123,7 @@ public class SanDokuTestManual {
 		score.setCount50(0);
 		score.setCountMiss(0);
 		score.setMods(mods);
-		OsuScore standardScore = new OsuScore(score);
+		OsuScore standardScore = new OsuScore(score, true);
 		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(190.343f, webRounding);
 	}
 
@@ -141,7 +141,7 @@ public class SanDokuTestManual {
 		score.setCount50(0);
 		score.setCountMiss(0);
 		score.setMods(mods);
-		OsuScore standardScore = new OsuScore(score);
+		OsuScore standardScore = new OsuScore(score, true);
 		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(379.488f, webRounding);
 	}
 
@@ -166,7 +166,7 @@ public class SanDokuTestManual {
 		score.setCount50(0);
 		score.setCountMiss(0);
 		score.setMods(0);
-		OsuScore standardScore = new OsuScore(score);
+		OsuScore standardScore = new OsuScore(score, true);
 		assertThat(standardScore.getPP(diff.toBeatmap())).isCloseTo(626.636f, webRounding);
 	}
 
