@@ -105,7 +105,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			assertThat(provider.loadOrCalculate(database, 123, 0))
 				.isNotNull()
 				.satisfies(impl -> assertThat(impl)
-						.hasFieldOrPropertyWithValue("aim", 1.919f));
+						.hasFieldOrPropertyWithValue("AimDifficulty", 1.919f));
 			assertThat(provider.loadOrCalculate(database, 123, 0)).isNotNull();
 
 			// MD5 not changed, so only one invocation
@@ -144,7 +144,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			assertThat(provider.loadOrCalculate(database, 123, 0))
 				.isNotNull()
 				.satisfies(impl -> assertThat(impl)
-						.hasFieldOrPropertyWithValue("aim", 1.919f));
+						.hasFieldOrPropertyWithValue("AimDifficulty", 1.919f));
 			assertThat(provider.loadOrCalculate(database, 123, 0)).isNotNull();
 
 			// MD5 not changed, so only one invocation
@@ -159,7 +159,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			assertThat(provider.loadOrCalculate(database, 123, 0))
 				.isNotNull()
 				.satisfies(impl -> assertThat(impl)
-						.hasFieldOrPropertyWithValue("aim", 1.919f));
+						.hasFieldOrPropertyWithValue("AimDifficulty", 1.919f));
 			assertThat(provider.loadOrCalculate(database, 123, 0)).isNotNull();
 
 			// MD5 not changed, so only one invocation

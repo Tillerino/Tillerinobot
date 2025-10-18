@@ -46,9 +46,15 @@ public class DiffEstimate {
 		DiffEstimateToBeatmapImplMapper INSTANCE = Mappers.getMapper(DiffEstimateToBeatmapImplMapper.class);
 
 		@Mapping(target = "modsUsed", source = "mods")
-		@Mapping(target = "aimDifficultyStrainCount", ignore = true)
-		@Mapping(target = "aimDifficultySliderCount", ignore = true)
-		@Mapping(target = "speedDifficultyStrainCount", ignore = true)
+		@Mapping(target = "AimDifficultyStrainCount", ignore = true)
+		@Mapping(target = "AimDifficultySliderCount", ignore = true)
+		@Mapping(target = "SpeedDifficultyStrainCount", ignore = true)
+		@Mapping(target = "OverallDifficulty", source = "overallDifficulty")
+		@Mapping(target = "MaxCombo", source = "maxCombo")
+		@Mapping(target = "AimDifficulty", source = "aim")
+		@Mapping(target = "SpeedDifficulty", source = "speed")
+		@Mapping(target = "SpeedNoteCount", source = "speedNoteCount")
+		@Mapping(target = "SliderFactor", source = "sliderFactor")
 		BeatmapImpl map(DiffEstimate estimate);
 
 		@Mapping(target = "beatmapid", ignore = true)
@@ -58,6 +64,12 @@ public class DiffEstimate {
 		@Mapping(target = "calculated", ignore = true)
 		@Mapping(target = "dataVersion", ignore = true)
 		@Mapping(target = "md5", ignore = true)
+		@Mapping(target = "overallDifficulty", source = "OverallDifficulty")
+		@Mapping(target = "maxCombo", source = "MaxCombo")
+		@Mapping(target = "aim", source = "AimDifficulty")
+		@Mapping(target = "speed", source = "SpeedDifficulty")
+		@Mapping(target = "sliderFactor", source = "SliderFactor")
+		@Mapping(target = "speedNoteCount", source = "SpeedNoteCount")
 		void map(BeatmapImpl beatmap, @MappingTarget DiffEstimate database);
 	}
 

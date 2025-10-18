@@ -102,11 +102,11 @@ void computeEffectiveMissCount(Beatmap beatmap)
 	float comboBasedMissCount = 0.0f;
 	float beatmapMaxCombo = beatmap.DifficultyAttribute(_mods, Beatmap.MaxCombo);
 
-	if (beatmap.NumSliders() > 0)
+	if (beatmap.SliderCount() > 0)
 	{
 		// Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
 		// In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
-		float fullComboThreshold = beatmapMaxCombo - 0.1f * beatmap.NumSliders();
+		float fullComboThreshold = beatmapMaxCombo - 0.1f * beatmap.SliderCount();
 		if (_maxCombo < fullComboThreshold)
 			comboBasedMissCount = fullComboThreshold / std_max(1.0f, _maxCombo);
 
@@ -136,7 +136,7 @@ void computeTotalValue(Beatmap beatmap)
 
 	int numTotalHits = TotalHits();
 	if (SpunOut.is(_mods))
-		multiplier *= 1.0f - std_pow(beatmap.NumSpinners() / static_cast_f32(numTotalHits), 0.85f);
+		multiplier *= 1.0f - std_pow(beatmap.SpinnerCount() / static_cast_f32(numTotalHits), 0.85f);
 
 	_totalValue =
 		std_pow(
@@ -152,7 +152,7 @@ void computeAimValue(Beatmap beatmap)
 {
 	float aimDifficulty = beatmap.DifficultyAttribute(_mods, Beatmap.Aim);
 
-	if (beatmap.NumSliders() > 0 && beatmap.DifficultyAttribute(_mods, Beatmap.AimDifficultStrainCount) > 0)
+	if (beatmap.SliderCount() > 0 && beatmap.DifficultyAttribute(_mods, Beatmap.AimDifficultStrainCount) > 0)
 	{
 		float estimateImproperlyFollowedDifficultSliders;
 		if (usingClassicSliderAccuracy)
@@ -198,11 +198,11 @@ void computeAimValue(Beatmap beatmap)
 
 	_aimValue *= 1.0f + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-	// We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+	// We want to give more reward for lower AR when it comes to AimDifficulty and HD. This nerfs high AR and buffs lower AR.
 	if (Hidden.is(_mods))
 		_aimValue *= 1.0f + 0.04f * (12.0f - approachRate);
 
-	if (beatmap.NumSliders() > 0)
+	if (beatmap.SliderCount() > 0)
 	{
 		float maxCombo = beatmap.DifficultyAttribute(_mods, Beatmap.MaxCombo);
 		float aimDifficultSliderCount = beatmap.DifficultyAttribute(_mods, Beatmap.AimDifficultStrainCount);
@@ -222,7 +222,7 @@ void computeAimValue(Beatmap beatmap)
 
 void computeSpeedValue(Beatmap beatmap)
 {
-	// Check for relax mod - if present, speed value should be 0
+	// Check for relax mod - if present, SpeedDifficulty value should be 0
 	if (Relax.is(_mods) || Relax2.is(_mods))
 	{
 		_speedValue = 0;
@@ -254,7 +254,7 @@ void computeSpeedValue(Beatmap beatmap)
 
 	_speedValue *= 1.0f + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-	// We want to give more reward for lower AR when it comes to speed and HD. This nerfs high AR and buffs lower AR.
+	// We want to give more reward for lower AR when it comes to SpeedDifficulty and HD. This nerfs high AR and buffs lower AR.
 	if (Hidden.is(_mods))
 		_speedValue *= 1.0f + 0.04f * (12.0f - approachRate);
 
@@ -265,10 +265,10 @@ void computeSpeedValue(Beatmap beatmap)
 	float relevantCountMeh = std_max(0.0f, _num50 - std_max(0.0f, relevantTotalDiff - _num300 - _num100));
 	float relevantAccuracy = beatmap.DifficultyAttribute(_mods, Beatmap.SpeedNoteCount) == 0.0f ? 0.0f : (relevantCountGreat * 6.0f + relevantCountOk * 2.0f + relevantCountMeh) / (beatmap.DifficultyAttribute(_mods, Beatmap.SpeedNoteCount) * 6.0f);
 
-	// Scale the speed value with accuracy and OD.
+	// Scale the SpeedDifficulty value with accuracy and OD.
 	_speedValue *= (0.95f + std_pow(beatmap.DifficultyAttribute(_mods, Beatmap.OD), 2) / 750) * std_pow((Accuracy() + relevantAccuracy) / 2.0f, (14.5f - beatmap.DifficultyAttribute(_mods, Beatmap.OD)) / 2);
 
-	// Scale the speed value with # of 50s to punish doubletapping.
+	// Scale the SpeedDifficulty value with # of 50s to punish doubletapping.
 	_speedValue *= std_pow(0.99f, _num50 < numTotalHits / 500.0f ? 0.0f : _num50 - numTotalHits / 500.0f);
 }
 
@@ -286,7 +286,7 @@ void computeAccuracyValue(Beatmap beatmap)
 	// Either ScoreV1 or some unknown value. Let's default to previous behavior.
 	else
 	{
-		numHitObjectsWithAccuracy = beatmap.NumHitCircles();
+		numHitObjectsWithAccuracy = beatmap.HitCircleCount();
 		if (numHitObjectsWithAccuracy > 0)
 			betterAccuracyPercentage = static_cast_f32((_num300 - (TotalHits() - numHitObjectsWithAccuracy)) * 6 + _num100 * 2 + _num50) / (numHitObjectsWithAccuracy * 6);
 		else

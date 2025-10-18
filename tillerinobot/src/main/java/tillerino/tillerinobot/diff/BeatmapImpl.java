@@ -15,20 +15,20 @@ import lombok.Builder;
 @SuppressFBWarnings("NM")
 public record BeatmapImpl(
 		@BitwiseMods long modsUsed,
-		float overallDifficulty,
+		float OverallDifficulty,
 		float approachRate,
 		int circleCount,
 		int sliderCount,
 		int spinnerCount,
 		float starDiff,
-		int maxCombo,
-		float aim,
-		float aimDifficultySliderCount,
-		float speed,
-		float speedNoteCount,
-		float sliderFactor,
-		float aimDifficultyStrainCount,
-		float speedDifficultyStrainCount,
+		int MaxCombo,
+		float AimDifficulty,
+		float AimDifficultySliderCount,
+		float SpeedDifficulty,
+		float SpeedNoteCount,
+		float SliderFactor,
+		float AimDifficultyStrainCount,
+		float SpeedDifficultyStrainCount,
 		float flashlight) implements Beatmap {
 	
 
@@ -39,32 +39,32 @@ public record BeatmapImpl(
 		}
 
 		return switch (kind) {
-			case Beatmap.Aim -> aim;
-			case Beatmap.Speed -> speed;
-			case Beatmap.OD -> overallDifficulty;
+			case Beatmap.Aim -> AimDifficulty;
+			case Beatmap.Speed -> SpeedDifficulty;
+			case Beatmap.OD -> OverallDifficulty;
 			case Beatmap.AR -> approachRate;
-			case Beatmap.MaxCombo -> maxCombo;
-			case Beatmap.SliderFactor -> sliderFactor;
+			case Beatmap.MaxCombo -> MaxCombo;
+			case Beatmap.SliderFactor -> SliderFactor;
 			case Beatmap.Flashlight -> flashlight;
-			case Beatmap.SpeedNoteCount -> speedNoteCount;
-			case Beatmap.AimDifficultStrainCount -> aimDifficultyStrainCount;
-			case Beatmap.SpeedDifficultStrainCount -> speedDifficultyStrainCount;
+			case Beatmap.SpeedNoteCount -> SpeedNoteCount;
+			case Beatmap.AimDifficultStrainCount -> AimDifficultyStrainCount;
+			case Beatmap.SpeedDifficultStrainCount -> SpeedDifficultyStrainCount;
 			default -> throw new IllegalArgumentException("Unexpected kind: " + kind);
 		};
 	}
 
 	@Override
-	public int NumHitCircles() {
+	public int HitCircleCount() {
 		return circleCount;
 	}
 
 	@Override
-	public int NumSpinners() {
+	public int SpinnerCount() {
 		return spinnerCount;
 	}
 
 	@Override
-	public int NumSliders() {
+	public int SliderCount() {
 		return sliderCount;
 	}
 

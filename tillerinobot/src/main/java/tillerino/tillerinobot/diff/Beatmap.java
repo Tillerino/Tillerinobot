@@ -69,18 +69,18 @@ public interface Beatmap {
 	 * 
 	 * @return
 	 */
-	int NumHitCircles();
+	int HitCircleCount();
 
 	default EScoreVersion ScoreVersion() {
 		// as of now, we don't care about score versions.
 		return null;
 	}
 
-	int NumSpinners();
+	int SpinnerCount();
 
-	int NumSliders();
+	int SliderCount();
 
 	default int getObjectCount() {
-		return NumHitCircles() + NumSpinners() + NumSliders();
+		return HitCircleCount() + SpinnerCount() + SliderCount();
 	}
 }

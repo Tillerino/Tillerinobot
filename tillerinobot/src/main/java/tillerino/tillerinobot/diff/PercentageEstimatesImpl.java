@@ -62,6 +62,6 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 
 	@Override
 	public double getOverallDifficulty() {
-		return beatmap.overallDifficulty();
+		return beatmap.OverallDifficulty();
 	}
 }
