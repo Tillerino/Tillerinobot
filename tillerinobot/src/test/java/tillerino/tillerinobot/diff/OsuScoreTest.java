@@ -2,18 +2,22 @@ package tillerino.tillerinobot.diff;
 
 import dagger.Component;
 import java.io.IOException;
-import java.util.List;
+import java.util.NoSuchElementException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.assertj.core.data.Offset;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.tillerino.osuApiModel.Mods;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import tillerino.tillerinobot.OsuApiV2;
 import tillerino.tillerinobot.OsuApiV2Test;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 
+@ExtendWith(SoftAssertionsExtension.class)
 class OsuScoreTest {
   @Component(modules = OsuApiV2Test.Module.class)
   @Singleton
@@ -29,84 +33,169 @@ class OsuScoreTest {
   OsuApiV2 api;
 
   @Test
-  void testBigBlackNomodV2() throws Exception {
-    ApiScore score = api.getBeatmapTop(131891, 0).get(43);
-    OsuScore osuScore = new OsuScore(score, false);
-    Assertions.assertThat((double) osuScore.getPP(getBigBlackNomod())).isEqualTo(score.getPp(), Offset.offset(1E-2));
+  void testBigBlack(SoftAssertions softly) throws IOException {
+    for (ApiScore score : api.getBeatmapTop(131891, 0)) {
+      if (score.getPp() == null) {
+        continue;
+      }
+
+      boolean v2 = Mods.V2.is(score.getMods());
+      OsuPerformanceAttributes attrs = new OsuPerformanceCalculator().CreatePerformanceAttributes(score, getBeatmap(score), !v2);
+      softly.assertThat(attrs.total())
+          .as("%s", Mods.toShortNamesContinuous(Mods.getMods(score.getMods())))
+          // for v2 we are not very precise yet because of slider ends
+          .isEqualTo(score.getPp(), Offset.offset(v2 ? .5 : 0.0007));
+    }
   }
 
   @Test
-  void testBigBlackHiddenV1() throws Exception {
-    ApiScore score = api.getBeatmapTop(131891, 0).get(4);
-    OsuScore osuScore = new OsuScore(score, true);
-    Assertions.assertThat((double) osuScore.getPP(getBigBlackNomod())).isEqualTo(score.getPp(), Offset.offset(1E-2));
+  void testSongsCompilationIV(SoftAssertions softly) throws IOException {
+    for (ApiScore score : api.getBeatmapTop(5047712, 0)) {
+      if (score.getPp() == null) {
+        continue;
+      }
+
+      boolean v2 = Mods.V2.is(score.getMods());
+      OsuPerformanceAttributes attrs = new OsuPerformanceCalculator().CreatePerformanceAttributes(score, getBeatmap(score), !v2);
+      softly.assertThat(attrs.total())
+          .as("Mods: %s", Mods.toShortNamesContinuous(Mods.getMods(score.getMods())))
+          // for v2 we are not very precise yet because of slider ends
+          .isEqualTo(score.getPp(), Offset.offset(v2 ? .5 : 0.0007));
+      System.out.println(attrs.total());
+    }
   }
 
-  @Test
-  void testBigBlackHdhrV1() throws Exception {
-    ApiScore score = api.getBeatmapTop(131891, 0).get(0);
-    OsuScore osuScore = new OsuScore(score, true);
-    Assertions.assertThat((double) osuScore.getPP(getBigBlackHardrock())).isEqualTo(score.getPp(), Offset.offset(1E-2));
+  private BeatmapImpl getBeatmap(ApiScore score) throws IOException {
+    int id = score.getBeatmapId();
+    long mods = Beatmap.getDiffMods(score.getMods());
+
+    return switch (id) {
+      case 131891 -> switch ((int) mods) {
+        case 0 -> getBigBlackNomod();
+        case 16 -> getBigBlackHardrock();
+        default -> throw new NoSuchElementException("" + mods);
+      };
+      case 5047712 -> switch ((int) mods) {
+        case 0 -> getSongCompilationIVNomod();
+        case 16 -> getSongCompilationIVHardrock();
+        case 64 -> getSongCompilationIVDt();
+        default -> throw new NoSuchElementException("" + mods);
+      };
+      default -> throw new NoSuchElementException("" + id);
+    };
   }
 
   private BeatmapImpl getBigBlackNomod() throws IOException {
-    ApiBeatmap apiBeatmap = api.getBeatmap(131891, 0L);
-    //     "body" : "{\"attributes\":{\"star_rating\":6.860909938812256,
-    //     \"max_combo\":1337,
-    //     \"aim_difficulty\":3.56781005859375,
-    //     \"aim_difficult_slider_count\":200.3780059814453,
-    //     \"speed_difficulty\":2.901710033416748,
-    //     \"speed_note_count\":363.6050109863281,
-    //     \"slider_factor\":0.9920060038566589,
-    //     \"aim_difficult_strain_count\":118.95600128173828,
-    //     \"speed_difficult_strain_count\":142.7740020751953}}",
+    long mods = 0L;
+    ApiBeatmap apiBeatmap = api.getBeatmap(131891, mods);
     return new BeatmapImpl(
-        0L,
-        0,
-        3.56781005859375f,
-        2.901710033416748f,
-        (float) apiBeatmap.getOverallDifficulty(),
-        (float) apiBeatmap.getApproachRate(),
-        apiBeatmap.getMaxCombo(),
-        0.9920060038566589f,
-        (float) 0,
-        363.6050109863281f,
+        mods,
+        (float) OsuApiBeatmap.calcOd(apiBeatmap.getOverallDifficulty(), mods),
+        (float) OsuApiBeatmap.calcAR(apiBeatmap.getApproachRate(), mods),
         410,
-        2,
         334,
+        2,
+        0,
+        apiBeatmap.getMaxCombo(),
+        3.56781005859375f,
+        200.3780059814453f,
+        2.901710033416748f,
+        363.6050109863281f,
+        0.9920060038566589f,
         118.95600128173828f,
-        142.7740020751953f
+        142.7740020751953f,
+        (float) 0
     );
   }
 
   private BeatmapImpl getBigBlackHardrock() throws IOException {
-    ApiBeatmap apiBeatmap = api.getBeatmap(131891, 16L);
-    //     "body" : "{\"attributes\":{
-    //     \"star_rating\":7.370090007781982,
-    //     \"max_combo\":1337,
-    //     \"aim_difficulty\":3.8672399520874023,
-    //     \"aim_difficult_slider_count\":206.76300048828125,
-    //     \"speed_difficulty\":3.0591800212860107,
-    //     \"speed_note_count\":282.6159973144531,
-    //     \"slider_factor\":0.9905149936676025,
-    //     \"aim_difficult_strain_count\":123.26200103759766,
-    //     \"speed_difficult_strain_count\":116.10900115966797}}",
+    long mods = 16L;
+    ApiBeatmap apiBeatmap = api.getBeatmap(131891, mods);
     return new BeatmapImpl(
-        16L,
-        0,
-        3.8672399520874023f,
-        3.0591800212860107f,
-        (float) apiBeatmap.getOverallDifficulty(),
-        (float) apiBeatmap.getApproachRate(),
-        apiBeatmap.getMaxCombo(),
-        0.9905149936676025f,
-        (float) 0,
-        282.6159973144531f,
+        mods,
+        (float) OsuApiBeatmap.calcOd(apiBeatmap.getOverallDifficulty(), mods),
+        (float) OsuApiBeatmap.calcAR(apiBeatmap.getApproachRate(), mods),
         410,
-        2,
         334,
+        2,
+        0,
+        apiBeatmap.getMaxCombo(),
+        3.8672399520874023f,
+        206.76300048828125f,
+        3.0591800212860107f,
+        282.6159973144531f,
+        0.9905149936676025f,
         123.26200103759766f,
-        116.10900115966797f
+        116.10900115966797f,
+        (float) 0
     );
   }
+
+  private BeatmapImpl getSongCompilationIVNomod() throws IOException {
+    long mods = 0L;
+    ApiBeatmap apiBeatmap = api.getBeatmap(5047712, mods);
+    return new BeatmapImpl(
+        mods,
+        (float) OsuApiBeatmap.calcOd(apiBeatmap.getOverallDifficulty(), mods),
+        (float) OsuApiBeatmap.calcAR(apiBeatmap.getApproachRate(), mods),
+        1121,
+        860,
+        4,
+        0,
+        apiBeatmap.getMaxCombo(),
+        3.977260112762451f,
+        323.0539855957031f,
+        2.68107008934021f,
+        998.8770141601562f,
+        0.9961370229721069f,
+        185.45599365234375f,
+        245.968994140625f,
+        (float) 0
+    );
+  }
+
+  private BeatmapImpl getSongCompilationIVHardrock() throws IOException {
+    long mods = 16L;
+    ApiBeatmap apiBeatmap = api.getBeatmap(5047712, mods);
+    return new BeatmapImpl(
+        mods,
+        (float) OsuApiBeatmap.calcOd(apiBeatmap.getOverallDifficulty(), mods),
+        (float) OsuApiBeatmap.calcAR(apiBeatmap.getApproachRate(), mods),
+        1121,
+        860,
+        4,
+        0,
+        apiBeatmap.getMaxCombo(),
+        4.264699935913086f,
+        341.4339904785156f,
+        2.6813700199127197f,
+        1008.1400146484375f,
+        0.993461012840271f,
+        193.65199279785156f,
+        248.65699768066406f,
+        (float) 0
+    );
+  }
+
+  private BeatmapImpl getSongCompilationIVDt() throws IOException {
+    long mods = 64L;
+    ApiBeatmap apiBeatmap = api.getBeatmap(5047712, mods);
+    return new BeatmapImpl(
+        mods,
+        (float) OsuApiBeatmap.calcOd(apiBeatmap.getOverallDifficulty(), mods),
+        (float) OsuApiBeatmap.calcAR(apiBeatmap.getApproachRate(), mods),
+        1121,
+        860,
+        4,
+        0,
+        apiBeatmap.getMaxCombo(),
+        6.0218000411987305f,
+        313.4620056152344f,
+        3.7941699028015137f,
+        1054.469970703125f,
+        0.9939389824867249f,
+        167.5780029296875f,
+        314.1919860839844f,
+        (float) 0
+    );}
 }

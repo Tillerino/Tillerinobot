@@ -195,8 +195,12 @@ class WireMockUpdater {
     // System.out.println(osuApiV2.getUser("Tillerino", 0));
     // System.out.println(osuApiV2.getUserRecent(2070907, 0));
     // System.out.println(osuApiV2.getBeatmap(131891, 0));
-    System.out.println(osuApiV2.getBeatmap(131891, 16));
+    // System.out.println(osuApiV2.getBeatmap(131891, 16));
     // System.out.println(osuApiV2.getBeatmapTop(131891, 0));
+    // System.out.println(osuApiV2.getBeatmap(5047712, 0));
+    // System.out.println(osuApiV2.getBeatmap(5047712, 16));
+    System.out.println(osuApiV2.getBeatmap(5047712, 64));
+    // System.out.println(osuApiV2.getBeatmapTop(5047712, 0));
     // beatmapDownloader.getActualBeatmap(131891);
   }
 

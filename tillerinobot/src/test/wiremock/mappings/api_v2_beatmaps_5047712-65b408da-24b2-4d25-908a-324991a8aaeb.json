@@ -1,0 +1,34 @@
+{
+  "id" : "65b408da-24b2-4d25-908a-324991a8aaeb",
+  "name" : "api_v2_beatmaps_5047712",
+  "request" : {
+    "url" : "/api/v2/beatmaps/5047712",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"beatmapset_id\":2347113,\"difficulty_rating\":7.27,\"id\":5047712,\"mode\":\"osu\",\"status\":\"ranked\",\"total_length\":427,\"user_id\":10077431,\"version\":\"Collab Extra\",\"accuracy\":9.8,\"ar\":9.8,\"bpm\":260,\"convert\":false,\"count_circles\":1121,\"count_sliders\":860,\"count_spinners\":4,\"cs\":3.6,\"deleted_at\":null,\"drain\":5,\"hit_length\":402,\"is_scoreable\":true,\"last_updated\":\"2025-04-11T21:55:45Z\",\"mode_int\":0,\"passcount\":58338,\"playcount\":483634,\"ranked\":1,\"url\":\"https:\\/\\/osu.ppy.sh\\/beatmaps\\/5047712\",\"checksum\":\"9b0136d350ccf57afefe18615afc79d3\",\"beatmapset\":{\"artist\":\"Various Artists\",\"artist_unicode\":\"Various Artists\",\"covers\":{\"cover\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/cover.jpg?1744408567\",\"cover@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/cover@2x.jpg?1744408567\",\"card\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/card.jpg?1744408567\",\"card@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/card@2x.jpg?1744408567\",\"list\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/list.jpg?1744408567\",\"list@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/list@2x.jpg?1744408567\",\"slimcover\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/slimcover.jpg?1744408567\",\"slimcover@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/2347113\\/covers\\/slimcover@2x.jpg?1744408567\"},\"creator\":\"Sotarks\",\"favourite_count\":552,\"genre_id\":6,\"hype\":null,\"id\":2347113,\"language_id\":14,\"nsfw\":false,\"offset\":0,\"play_count\":655210,\"preview_url\":\"\\/\\/b.ppy.sh\\/preview\\/2347113.mp3\",\"source\":\"\",\"spotlight\":false,\"status\":\"ranked\",\"title\":\"Songs Compilation VI\",\"title_unicode\":\"Songs Compilation VI\",\"track_id\":null,\"user_id\":4452992,\"video\":false,\"bpm\":132,\"can_be_hyped\":false,\"deleted_at\":null,\"discussion_enabled\":true,\"discussion_locked\":false,\"is_scoreable\":true,\"last_updated\":\"2025-04-11T21:55:44Z\",\"legacy_thread_url\":\"https:\\/\\/osu.ppy.sh\\/community\\/forums\\/topics\\/2060324\",\"nominations_summary\":{\"current\":2,\"eligible_main_rulesets\":[\"osu\"],\"required_meta\":{\"main_ruleset\":2,\"non_main_ruleset\":1}},\"ranked\":1,\"ranked_date\":\"2025-04-12T22:44:48Z\",\"rating\":9.01185,\"storyboard\":true,\"submitted_date\":\"2025-03-30T15:16:05Z\",\"tags\":\"dj-jo djjo ado \\u30eb\\u30eb rule \\u30d3\\u30ea\\u30aa\\u30f3\\u00d7\\u30b9\\u30af\\u30fc\\u30eb zanmu \\u6b8b\\u5922 billion x school $chool maretu gokuaku-p \\u6975\\u60aap gokuakup kano \\u9e7f\\u4e43 walk this way! stella-rium niconico samfree hatsune miku vocaloid nowhere \\u521d\\u97f3\\u30df\\u30af way ! bad nerves antidote still nervous green day bang bang revolution radio tomoya ohtani \\u5927\\u8c37\\u667a\\u54c9 unstoppable \\u30bd\\u30cb\\u30c3\\u30af \\u30d5\\u30a9\\u30fc\\u30b9 a hero will rise sonic forces hedgehog primary \\u30a4\\u30ca\\u30a4\\u30bb\\u30ab\\u30a4 inai sekai \\u30a4\\u30ca\\u30a4\\u30bb\\u30ab\\u30a4 yuikonnu yuiko meis clauson jeff williams feat. casey lee williams time to say goodbye rwby the wrecks favorite liar we are nick anderson toby fox song that might play when you fight sans undertale duckboy my love life needs a lobotomy tragic songs to study middle kids r u 4 me? today we're the greatest we are for four you yousei teikoku \\u5996\\u7cbe\\u5e1d\\u570b zetsubou plantation \\u7d76\\u671bplantation sc6 sc 6 leomine leominexd enkrypton plasma kuki1537 fuxi fuxi66 parad0xa tylerderp sstari my angel ram pika pikaqours reform kujinn nymphe kiyoshi guarden gwb kxlman kolman rock pop electronic japanese english instrumental\",\"availability\":{\"download_disabled\":false,\"more_information\":null},\"ratings\":[0,38,2,0,0,3,0,4,5,22,348]},\"current_user_playcount\":0,\"failtimes\":{\"fail\":[0,0,828,2133,3789,52254,13275,19503,1431,558,711,981,261,2043,1359,153,72,2151,1854,1269,702,909,459,180,1125,675,1224,1908,540,198,0,414,198,2979,1188,495,1521,3258,117,108,558,1926,162,441,243,99,216,297,2772,576,261,171,225,207,153,126,81,243,216,270,108,0,18,0,18,18,9,36,171,0,9,0,18,9,36,45,54,36,0,27,0,0,0,18,0,9,9,6093,4779,261,0,45,0,36,27,0,36,36,171,144],\"exit\":[0,1197,13374,11862,7263,39330,14796,21870,10791,6354,6084,5148,2637,12762,792,774,441,2079,2430,1512,3726,4770,2943,1422,2448,2124,2799,1800,2160,1971,1026,477,567,900,2484,891,909,1449,900,783,441,1080,531,1044,324,351,486,504,810,576,738,180,351,243,135,162,378,270,81,837,117,126,126,90,63,144,45,180,243,126,234,63,90,45,36,72,36,54,63,54,144,45,36,18,36,99,117,324,360,270,90,198,45,225,126,144,270,144,423,1008]},\"max_combo\":2905,\"owners\":[{\"id\":3723568,\"username\":\"Kujinn\"},{\"id\":6174349,\"username\":\"Kuki1537\"},{\"id\":8357007,\"username\":\"My Angel Ram\"},{\"id\":9180442,\"username\":\"PikAqours\"},{\"id\":10077431,\"username\":\"Plasma\"},{\"id\":10507407,\"username\":\"Nymphe\"},{\"id\":12187937,\"username\":\"Parad0xa\"},{\"id\":13216706,\"username\":\"gwb\"},{\"id\":16004080,\"username\":\"Tylerderp\"},{\"id\":19334055,\"username\":\"kolman\"},{\"id\":24230576,\"username\":\"Fuxi66\"},{\"id\":27969712,\"username\":\"sstari\"}]}",
+    "headers" : {
+      "Date" : "Sat, 18 Oct 2025 09:46:53 GMT",
+      "Content-Type" : "application/json",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1199",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "99071c72ada6e0cb-MUC"
+    }
+  },
+  "uuid" : "65b408da-24b2-4d25-908a-324991a8aaeb",
+  "persistent" : true,
+  "insertionIndex" : 18
+}

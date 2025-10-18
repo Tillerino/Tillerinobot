@@ -47,6 +47,7 @@ public class DiffEstimate {
 
 		@Mapping(target = "modsUsed", source = "mods")
 		@Mapping(target = "aimDifficultyStrainCount", ignore = true)
+		@Mapping(target = "aimDifficultySliderCount", ignore = true)
 		@Mapping(target = "speedDifficultyStrainCount", ignore = true)
 		BeatmapImpl map(DiffEstimate estimate);
 

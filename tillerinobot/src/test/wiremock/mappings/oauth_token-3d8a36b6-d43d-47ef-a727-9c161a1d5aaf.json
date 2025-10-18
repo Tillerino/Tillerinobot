@@ -1,5 +1,5 @@
 {
-  "id" : "db18d5bc-33b8-4692-a633-fcbeccf21523",
+  "id" : "3d8a36b6-d43d-47ef-a727-9c161a1d5aaf",
   "name" : "oauth_token",
   "request" : {
     "url" : "/oauth/token",
@@ -13,9 +13,10 @@
     "status" : 200,
     "body" : "{\"token_type\":\"Bearer\",\"expires_in\":86400,\"access_token\":\"osu-oauth-mock-token\"}",
     "headers" : {
-      "Date" : "Tue, 26 Aug 2025 17:39:30 GMT",
+      "Date" : "Sat, 18 Oct 2025 10:01:20 GMT",
       "Content-Type" : "application/json; charset=UTF-8",
-      "CF-RAY" : "97551be3bcbb2fee-MUC",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
       "Pragma" : "no-cache",
       "Cache-Control" : "no-store, private",
       "X-Ratelimit-Limit" : "60",
@@ -24,11 +25,10 @@
       "X-Frame-Options" : "SAMEORIGIN",
       "vary" : "accept-encoding",
       "cf-cache-status" : "DYNAMIC",
-      "X-Content-Type-Options" : "nosniff",
-      "Server" : "cloudflare"
+      "CF-RAY" : "9907319d0d419246-MUC"
     }
   },
-  "uuid" : "db18d5bc-33b8-4692-a633-fcbeccf21523",
+  "uuid" : "3d8a36b6-d43d-47ef-a727-9c161a1d5aaf",
   "persistent" : true,
-  "insertionIndex" : 12
+  "insertionIndex" : 21
 }

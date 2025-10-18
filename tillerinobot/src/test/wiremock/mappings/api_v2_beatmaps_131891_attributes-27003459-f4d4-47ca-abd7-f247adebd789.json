@@ -1,0 +1,39 @@
+{
+  "id" : "27003459-f4d4-47ca-abd7-f247adebd789",
+  "name" : "api_v2_beatmaps_131891_attributes",
+  "request" : {
+    "url" : "/api/v2/beatmaps/131891/attributes",
+    "method" : "POST",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    },
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"mods\":0}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"attributes\":{\"star_rating\":6.860909938812256,\"max_combo\":1337,\"aim_difficulty\":3.56781005859375,\"aim_difficult_slider_count\":200.3780059814453,\"speed_difficulty\":2.901710033416748,\"speed_note_count\":363.6050109863281,\"slider_factor\":0.9920060038566589,\"aim_difficult_strain_count\":118.95600128173828,\"speed_difficult_strain_count\":142.7740020751953}}",
+    "headers" : {
+      "Date" : "Sat, 18 Oct 2025 09:04:31 GMT",
+      "Content-Type" : "application/json",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1194",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "9906de639dc4ee26-MUC"
+    }
+  },
+  "uuid" : "27003459-f4d4-47ca-abd7-f247adebd789",
+  "persistent" : true,
+  "insertionIndex" : 10
+}

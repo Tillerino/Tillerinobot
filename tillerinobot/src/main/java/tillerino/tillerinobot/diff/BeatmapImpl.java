@@ -15,20 +15,21 @@ import lombok.Builder;
 @SuppressFBWarnings("NM")
 public record BeatmapImpl(
 		@BitwiseMods long modsUsed,
-		float starDiff,
-		float aim,
-		float speed,
 		float overallDifficulty,
 		float approachRate,
-		int maxCombo,
-		float sliderFactor,
-		float flashlight,
-		float speedNoteCount,
 		int circleCount,
-		int spinnerCount,
 		int sliderCount,
+		int spinnerCount,
+		float starDiff,
+		int maxCombo,
+		float aim,
+		float aimDifficultySliderCount,
+		float speed,
+		float speedNoteCount,
+		float sliderFactor,
 		float aimDifficultyStrainCount,
-		float speedDifficultyStrainCount) implements Beatmap {
+		float speedDifficultyStrainCount,
+		float flashlight) implements Beatmap {
 	
 
 	@Override

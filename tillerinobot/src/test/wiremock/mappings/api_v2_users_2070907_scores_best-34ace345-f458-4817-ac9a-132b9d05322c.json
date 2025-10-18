@@ -1,8 +1,8 @@
 {
-  "id" : "ad49cf01-5d1b-40c7-8afb-1e083125694a",
-  "name" : "api_v2_users_tillerino",
+  "id" : "34ace345-f458-4817-ac9a-132b9d05322c",
+  "name" : "api_v2_users_2070907_scores_best",
   "request" : {
-    "url" : "/api/v2/users/Tillerino?mode=osu&key=username",
+    "url" : "/api/v2/users/2070907/scores/best?mode=osu&limit=50",
     "method" : "GET",
     "headers" : {
       "Authorization" : {
@@ -12,23 +12,23 @@
   },
   "response" : {
     "status" : 200,
-    "bodyFileName" : "api_v2_users_tillerino-ad49cf01-5d1b-40c7-8afb-1e083125694a.json",
+    "bodyFileName" : "api_v2_users_2070907_scores_best-34ace345-f458-4817-ac9a-132b9d05322c.json",
     "headers" : {
-      "Date" : "Tue, 26 Aug 2025 17:39:31 GMT",
+      "Date" : "Sat, 18 Oct 2025 09:04:30 GMT",
       "Content-Type" : "application/json",
-      "CF-RAY" : "97551beae9909f1e-FRA",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
       "Cache-Control" : "no-cache, private",
       "X-Ratelimit-Limit" : "1200",
-      "X-Ratelimit-Remaining" : "1197",
+      "X-Ratelimit-Remaining" : "1198",
       "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
       "X-Frame-Options" : "SAMEORIGIN",
       "vary" : "accept-encoding",
       "cf-cache-status" : "DYNAMIC",
-      "X-Content-Type-Options" : "nosniff",
-      "Server" : "cloudflare"
+      "CF-RAY" : "9906de5a28d2921c-MUC"
     }
   },
-  "uuid" : "ad49cf01-5d1b-40c7-8afb-1e083125694a",
+  "uuid" : "34ace345-f458-4817-ac9a-132b9d05322c",
   "persistent" : true,
-  "insertionIndex" : 9
+  "insertionIndex" : 13
 }

@@ -1,0 +1,3821 @@
+{
+  "score_count": 452437,
+  "scores": [
+    {
+      "classic_total_score": 19606653,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HR"
+        },
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 1,
+        "great": 745
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1336624012,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 5182050,
+      "accuracy": 0.999106,
+      "build_id": null,
+      "ended_at": "2021-08-09T20:20:46Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 3812908497,
+      "legacy_total_score": 26507482,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 576.06,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1075768,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/5182050?1760728058.png",
+        "country_code": "GB",
+        "default_group": "default",
+        "id": 5182050,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Bubbleman",
+        "country": {
+          "code": "GB",
+          "name": "United Kingdom"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/5182050\/57432c3cab6708cc8fa28182d69f43961e07569bfc1d52322da24eb4e1334192.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/5182050\/57432c3cab6708cc8fa28182d69f43961e07569bfc1d52322da24eb4e1334192.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/21935\/606f33c52090e9a59fd06fca267859ac75e4929e984a9b77c40a4edf1dbced09.png",
+          "id": 21935,
+          "name": "BLEM",
+          "short_name": "BLEM"
+        }
+      }
+    },
+    {
+      "classic_total_score": 19554199,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HR"
+        },
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 2,
+        "great": 744
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1706923679,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 12408961,
+      "accuracy": 0.998213,
+      "build_id": null,
+      "ended_at": "2023-04-11T00:16:06Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 4416103357,
+      "legacy_total_score": 26445892,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 569.923,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1072890,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/12408961?1759654528.png",
+        "country_code": "PL",
+        "default_group": "default",
+        "id": 12408961,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "MALISZEWSKI",
+        "country": {
+          "code": "PL",
+          "name": "Poland"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/12408961\/048e50f27dd23da7bc0a7818d3062f1b2a83ca3185229eaf9cc6b1b3e168e88e.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/12408961\/048e50f27dd23da7bc0a7818d3062f1b2a83ca3185229eaf9cc6b1b3e168e88e.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/29080\/507862c7045cd6a64b0ac130b6180800568538d5a42e24ecdb2a602e0ff8ac3d.jpeg",
+          "id": 29080,
+          "name": "tarczynski",
+          "short_name": "ESSA"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18830037,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HR"
+        },
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 16,
+        "great": 730
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1046702392,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 4209965,
+      "accuracy": 0.985702,
+      "build_id": null,
+      "ended_at": "2020-10-30T08:12:11Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 3300458764,
+      "legacy_total_score": 26067409,
+      "max_combo": 1333,
+      "passed": true,
+      "pp": 502.493,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1033157,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/4209965?1738872462.jpeg",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 4209965,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": true,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T09:03:27+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Bonk",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/4209965\/815be5dc68bbc8b96d05f3b0628901e7d1f60bab789e8bac953b97f1eab68d6e.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/4209965\/815be5dc68bbc8b96d05f3b0628901e7d1f60bab789e8bac953b97f1eab68d6e.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/2423\/dc03bfbb2fdd699e6cb6a0e9e71136f1319b86bd9fb91256b37f5b69903aec77.png",
+          "id": 2423,
+          "name": "Michigan",
+          "short_name": "M"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18629936,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HR"
+        },
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 20,
+        "great": 726
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1536796815,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 3328742,
+      "accuracy": 0.982127,
+      "build_id": null,
+      "ended_at": "2022-05-02T06:54:32Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4148506369,
+      "legacy_total_score": 25975872,
+      "max_combo": 1334,
+      "passed": true,
+      "pp": 488.595,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1022178,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/3328742?1710880163.png",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 3328742,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T04:44:56+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Trail Mix",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3328742\/bc1fd5cd4ae4307dc8e34a3a41aa3fc7ce39fcc15bc6d9f27d60022e95dd5db7.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3328742\/bc1fd5cd4ae4307dc8e34a3a41aa3fc7ce39fcc15bc6d9f27d60022e95dd5db7.jpeg",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18553498,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "great": 746
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1784351454,
+      "rank": "XH",
+      "type": "solo_score",
+      "user_id": 8116659,
+      "accuracy": 1,
+      "build_id": null,
+      "ended_at": "2023-10-30T18:00:14Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 4529603937,
+      "legacy_total_score": 25050960,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 387.55,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1017984,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/8116659?1756134605.jpeg",
+        "country_code": "DE",
+        "default_group": "default",
+        "id": 8116659,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T22:52:29+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "criller",
+        "country": {
+          "code": "DE",
+          "name": "Germany"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/8116659\/5946458e617c765fad971250e55b5750adc42fa9f9cde1b0a908a359b18986d6.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/15\/8ddd8423001f11dc5b57508720413b22001a0f62acb91cea14219f27fab481f5.png",
+          "id": "15"
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/588\/9f310afb74d64f2fdacc05bf5892e691f07ccf636a614aa8f6bc3ca2b8f7d260.jpeg",
+          "id": 588,
+          "name": "TRANQUILO",
+          "short_name": "TQ"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18552568,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "PF"
+        },
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "great": 746
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 772029359,
+      "rank": "XH",
+      "type": "solo_score",
+      "user_id": 4787150,
+      "accuracy": 1,
+      "build_id": null,
+      "ended_at": "2019-06-07T05:23:08Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 2823326694,
+      "legacy_total_score": 25049960,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 387.55,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1017933,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/4787150?1701637777.jpeg",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 4787150,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": true,
+        "profile_colour": null,
+        "username": "Vaxei",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": null,
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/7\/4a0ccb7b7fdd5c4238b11f0e7c686760fe2c99c6472b19400e82d1a8ff503e31.jpeg",
+          "id": "7"
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/31189\/ec100263aee7fd13cf60a67f6c4cadfe270c83ee1087252fdfe94f439963d4b3.jpeg",
+          "id": 31189,
+          "name": "Donkey Kong",
+          "short_name": "DKK"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18552568,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "great": 746
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1686432961,
+      "rank": "XH",
+      "type": "solo_score",
+      "user_id": 6404488,
+      "accuracy": 1,
+      "build_id": null,
+      "ended_at": "2023-02-23T03:48:26Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 4384952899,
+      "legacy_total_score": 25049960,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 387.55,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1017933,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/6404488?1752460995.jpeg",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 6404488,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T08:41:28+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "bocchicookie",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/6404488\/6320a246110a232bd4989898e131dc2e257f0dd244a890dc1223cc5a421760c5.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/6404488\/6320a246110a232bd4989898e131dc2e257f0dd244a890dc1223cc5a421760c5.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/439\/30dd2e3d2768deed4f21c7953804819f9a4731159ae12256767b4e48988af409.png",
+          "id": 439,
+          "name": "SS",
+          "short_name": "SS"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18552477,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "great": 746
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1058486852,
+      "rank": "XH",
+      "type": "solo_score",
+      "user_id": 4196808,
+      "accuracy": 1,
+      "build_id": null,
+      "ended_at": "2020-11-13T18:22:52Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 3321578342,
+      "legacy_total_score": 25049860,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 387.55,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1017928,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/4196808?1689272131.jpeg",
+        "country_code": "GB",
+        "default_group": "default",
+        "id": 4196808,
+        "is_active": false,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": "2025-08-30T16:12:34+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Karthy",
+        "country": {
+          "code": "GB",
+          "name": "United Kingdom"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/4196808\/851ec789449cc22b4c20d284ec3d9b61c5e9fbe4f4057b9e43d8d9f8cecce846.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/4196808\/851ec789449cc22b4c20d284ec3d9b61c5e9fbe4f4057b9e43d8d9f8cecce846.jpeg",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18550345,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "great": 746
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 2970603911,
+      "rank": "XH",
+      "type": "solo_score",
+      "user_id": 16509171,
+      "accuracy": 1,
+      "build_id": null,
+      "ended_at": "2024-06-09T20:16:33Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 4638340727,
+      "legacy_total_score": 25047560,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 387.55,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1017811,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/16509171?1760293059.jpeg",
+        "country_code": "PT",
+        "default_group": "default",
+        "id": 16509171,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "uatzap",
+        "country": {
+          "code": "PT",
+          "name": "Portugal"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/16509171\/7ee902ae4ad45b32886db1cd8f8425497665d11777f04435d3ec176c206b496b.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/16509171\/7ee902ae4ad45b32886db1cd8f8425497665d11777f04435d3ec176c206b496b.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/458\/9e8a25d4ed12464d839b36dc4c96512a5f3ca20e757bbd40b09e2bb1ce62c2e6.jpeg",
+          "id": 458,
+          "name": "Heat abnormal",
+          "short_name": "HEAT"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18496852,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 1,
+        "great": 745
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1003701892,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 5459981,
+      "accuracy": 0.999106,
+      "build_id": null,
+      "ended_at": "2020-09-02T12:12:21Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 3223313317,
+      "legacy_total_score": 25033764,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 385.164,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1014876,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/5459981?1665763508.jpeg",
+        "country_code": "AU",
+        "default_group": "default",
+        "id": 5459981,
+        "is_active": false,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": "2022-10-25T09:38:49+00:00",
+        "pm_friends_only": true,
+        "profile_colour": null,
+        "username": "-Machine-",
+        "country": {
+          "code": "AU",
+          "name": "Australia"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/5459981\/558a0005b443ca4bb817fd742292e2c4ef7d0577cdefe26f5203a90e61a0c56d.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/3\/32ddb3eb261e38a82067f9ef4ea96c12f6abf8bd228e6413330f9d351420301b.jpeg",
+          "id": "3"
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18496852,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 1,
+        "great": 745
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1504931421,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 7338010,
+      "accuracy": 0.999106,
+      "build_id": null,
+      "ended_at": "2022-03-14T17:35:04Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 4096589610,
+      "legacy_total_score": 25031464,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 385.164,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1014876,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/7338010?1758914360.jpeg",
+        "country_code": "SE",
+        "default_group": "default",
+        "id": 7338010,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T16:11:14+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "TOnyrino",
+        "country": {
+          "code": "SE",
+          "name": "Sweden"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7338010\/5683ce234f8bfd28d4c065cb11880dfee944b36fbe16f762f73cf45952d84125.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7338010\/5683ce234f8bfd28d4c065cb11880dfee944b36fbe16f762f73cf45952d84125.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/19806\/c5f7f863d73500294b333e9ced9efc424919aad8976a31d3a095afa2734bde89.png",
+          "id": 19806,
+          "name": "COUCH GANG",
+          "short_name": "COGA"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18496852,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 1,
+        "great": 745
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 2254577648,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 11042418,
+      "accuracy": 0.999106,
+      "build_id": null,
+      "ended_at": "2024-01-25T09:54:52Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": 4574299476,
+      "legacy_total_score": 25022592,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": 385.164,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1014876,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/11042418?1760741239.png",
+        "country_code": "GB",
+        "default_group": "default",
+        "id": 11042418,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T00:40:03+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "lystia",
+        "country": {
+          "code": "GB",
+          "name": "United Kingdom"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/11042418\/1c7bed0b709d252a11c9183a3d82c8fcf6946a2a03c0ab53a41c5eee0049798b.png",
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/10\/1e6e3ae468d87bfec64acee31bce234c52c35fbb65cabcd6dabbbc15d4f3f8ee.png",
+          "id": "10"
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/21935\/606f33c52090e9a59fd06fca267859ac75e4929e984a9b77c40a4edf1dbced09.png",
+          "id": 21935,
+          "name": "BLEM",
+          "short_name": "BLEM"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18495175,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 1,
+        "great": 745
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 3354264862,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 2932510,
+      "accuracy": 0.999106,
+      "build_id": null,
+      "ended_at": "2024-08-17T17:34:12Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4670152708,
+      "legacy_total_score": 25009682,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 385.081,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1014784,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/2932510?1759390023.jpeg",
+        "country_code": "MY",
+        "default_group": "default",
+        "id": 2932510,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T08:01:05+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "wuhua",
+        "country": {
+          "code": "MY",
+          "name": "Malaysia"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/2932510\/5412a88a324488866384f13e6637708b3cd8d21c1d8d3126164ca962dd4ee11b.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/24\/5a5264eff92d34688b237087c355ca0e57dab4e6f66305660cca1a0c4f2405c9.jpeg",
+          "id": "24"
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/661\/f286a8b5e07c0dd9b4910c1d2292842d060416e69d364902212d7dfda441cdd3.jpeg",
+          "id": 661,
+          "name": "Visual Novel Readers",
+          "short_name": "VNR"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18494920,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 1,
+        "great": 745
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1605028907,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 11215030,
+      "accuracy": 0.999106,
+      "build_id": null,
+      "ended_at": "2022-08-28T16:58:04Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4257715542,
+      "legacy_total_score": 25006734,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 385.081,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1014770,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/11215030?1759598941.jpeg",
+        "country_code": "SM",
+        "default_group": "default",
+        "id": 11215030,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T18:44:44+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Toukai Teiou",
+        "country": {
+          "code": "SM",
+          "name": "San Marino"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/11215030\/d61ec1fa93d6fe166d4f56f908e9e5574befffcba269a77682c27d7bb521e527.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/11215030\/d61ec1fa93d6fe166d4f56f908e9e5574befffcba269a77682c27d7bb521e527.jpeg",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18445765,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 2,
+        "great": 744
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1784351433,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 14385814,
+      "accuracy": 0.998213,
+      "build_id": null,
+      "ended_at": "2023-10-30T17:54:31Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4529601284,
+      "legacy_total_score": 24988596,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 382.761,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1012073,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/14385814?1747249924.png",
+        "country_code": "DE",
+        "default_group": "default",
+        "id": 14385814,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T22:35:09+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Tim Kackner",
+        "country": {
+          "code": "DE",
+          "name": "Germany"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/14385814\/8d0e19c042d4081a84c70c6ca7449e76145417cf46d1d456bab7008166a435e1.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/14385814\/8d0e19c042d4081a84c70c6ca7449e76145417cf46d1d456bab7008166a435e1.png",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18444927,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 2,
+        "great": 744
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 2842320313,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 9665206,
+      "accuracy": 0.998213,
+      "build_id": null,
+      "ended_at": "2024-05-17T01:07:53Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4627611407,
+      "legacy_total_score": 24972295,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 382.678,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1012027,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/9665206?1741726945.jpeg",
+        "country_code": "CA",
+        "default_group": "default",
+        "id": 9665206,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "kirby mix",
+        "country": {
+          "code": "CA",
+          "name": "Canada"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9665206\/a545be9cc7758aae548b35578abdc87d28df819740711a1aff99d4c575f61ffe.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9665206\/a545be9cc7758aae548b35578abdc87d28df819740711a1aff99d4c575f61ffe.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/3747\/ccd1845e1807b5babed35ed5b1335a902346a958770554bf05b738c4aaba8ebb.jpeg",
+          "id": 3747,
+          "name": "Griedos Deluxe",
+          "short_name": "tewa"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18444417,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 2,
+        "great": 744
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 391420716,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 2378346,
+      "accuracy": 0.998213,
+      "build_id": null,
+      "ended_at": "2016-09-13T16:50:20Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 2174582612,
+      "legacy_total_score": 24964631,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 382.678,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1011999,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/2378346?1745867636.png",
+        "country_code": "KR",
+        "default_group": "default",
+        "id": 2378346,
+        "is_active": false,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": "2025-09-05T17:41:46+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "ExpertBOT",
+        "country": {
+          "code": "KR",
+          "name": "South Korea"
+        },
+        "cover": {
+          "custom_url": null,
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/1\/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
+          "id": "1"
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18405815,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HR"
+        },
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 18,
+        "miss": 4,
+        "great": 724
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 584868045,
+      "rank": "A",
+      "type": "solo_score",
+      "user_id": 39828,
+      "accuracy": 0.978552,
+      "build_id": null,
+      "ended_at": "2018-04-04T19:44:51Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 2504588348,
+      "legacy_total_score": 25478917,
+      "max_combo": 1319,
+      "passed": true,
+      "pp": 382.164,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1009881,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/39828?1727546034.jpeg",
+        "country_code": "PL",
+        "default_group": "default",
+        "id": 39828,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T16:13:23+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "WubWoofWolf",
+        "country": {
+          "code": "PL",
+          "name": "Poland"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/39828\/9345cf14b2fb463278a18e234637eee12803f593dd7c7c5a18530ef557fadb28.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/39828\/9345cf14b2fb463278a18e234637eee12803f593dd7c7c5a18530ef557fadb28.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": null,
+          "id": 4488,
+          "name": "Well Played",
+          "short_name": "WP"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18396611,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 3,
+        "great": 743
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 799689716,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 6754712,
+      "accuracy": 0.997319,
+      "build_id": null,
+      "ended_at": "2019-08-11T08:53:44Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 2870267835,
+      "legacy_total_score": 24968875,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 380.503,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1009376,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/6754712?1715721519.png",
+        "country_code": "RU",
+        "default_group": "default",
+        "id": 6754712,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Cappu",
+        "country": {
+          "code": "RU",
+          "name": "Russian Federation"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/6754712\/bca0ce8f07c47724ccbd1b15dfc1f5e20f23caafe1fff2e00c18ba4a62564b67.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/6754712\/bca0ce8f07c47724ccbd1b15dfc1f5e20f23caafe1fff2e00c18ba4a62564b67.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/2876\/521f963902a323e561ce724899187bfb5f02bc6214eb5ddbf3a0284e0cf2b480.png",
+          "id": 2876,
+          "name": "Slider Art Enjoyer",
+          "short_name": "SAE"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18395827,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 3,
+        "great": 743
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 3279044053,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 10975777,
+      "accuracy": 0.997319,
+      "build_id": null,
+      "ended_at": "2024-08-04T23:04:27Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4663961355,
+      "legacy_total_score": 24954329,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 380.42,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1009333,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/10975777?1728703987.jpeg",
+        "country_code": "CA",
+        "default_group": "default",
+        "id": 10975777,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T04:34:45+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "CutPaper",
+        "country": {
+          "code": "CA",
+          "name": "Canada"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10975777\/c5e684c898d9e6568a7ae98bcca4bc6bc12293f8ca5d92a2743e4eaed82895bb.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10975777\/c5e684c898d9e6568a7ae98bcca4bc6bc12293f8ca5d92a2743e4eaed82895bb.jpeg",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18395189,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 3,
+        "great": 743
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1585698183,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 3765989,
+      "accuracy": 0.997319,
+      "build_id": null,
+      "ended_at": "2022-07-24T13:57:14Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4226979154,
+      "legacy_total_score": 24944114,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 380.42,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1009298,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/3765989?1735742064.jpeg",
+        "country_code": "DE",
+        "default_group": "default",
+        "id": 3765989,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T22:30:26+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "okinamo",
+        "country": {
+          "code": "DE",
+          "name": "Germany"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3765989\/b50ff0a24c1065dab874f4c7f5394edcd38f2fadf1642562b569c93dda094294.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3765989\/b50ff0a24c1065dab874f4c7f5394edcd38f2fadf1642562b569c93dda094294.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/2680\/a783f444ab4ce483e9bd7c63b1c7944dda6b49de1f06f34774755f1409e245d3.jpeg",
+          "id": 2680,
+          "name": "Otffcaiuwxs bcvu Czrpnnzdiee",
+          "short_name": "YQS"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18394332,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 3,
+        "great": 743
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 2696671335,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 13063996,
+      "accuracy": 0.997319,
+      "build_id": null,
+      "ended_at": "2024-04-19T14:33:38Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4615217722,
+      "legacy_total_score": 24928022,
+      "max_combo": 1334,
+      "passed": true,
+      "pp": 380.339,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1009251,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/13063996?1760729523.png",
+        "country_code": "RU",
+        "default_group": "default",
+        "id": 13063996,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T06:31:28+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Nescafe Classic",
+        "country": {
+          "code": "RU",
+          "name": "Russian Federation"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/13063996\/295008ada2443d8b824ac64dbc8053c133f3f487756f5278799e702e4c62f51d.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/13063996\/295008ada2443d8b824ac64dbc8053c133f3f487756f5278799e702e4c62f51d.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/5065\/457bd5552af6225ec5025e53650f3fbabe516882280e5930d4cfbbf3a3e13b56.png",
+          "id": 5065,
+          "name": "GYM",
+          "short_name": "GYM"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18345743,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 4,
+        "great": 742
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 3224972466,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 9561644,
+      "accuracy": 0.996425,
+      "build_id": null,
+      "ended_at": "2024-07-26T17:07:24Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4659515799,
+      "legacy_total_score": 24916599,
+      "max_combo": 1334,
+      "passed": true,
+      "pp": 378.142,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1006585,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/9561644?1732529725.jpeg",
+        "country_code": "FI",
+        "default_group": "default",
+        "id": 9561644,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T07:51:43+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "AllyrD",
+        "country": {
+          "code": "FI",
+          "name": "Finland"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9561644\/6a5f1b22f2b0da4930137e316b49f145dd554cff64d4fb5c4612215febdcd031.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9561644\/6a5f1b22f2b0da4930137e316b49f145dd554cff64d4fb5c4612215febdcd031.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/1658\/1c4f88ad1c70a1caec2fa15e16d9d018515f02fe557ed99bc2815efc16777c71.png",
+          "id": 1658,
+          "name": "ilo",
+          "short_name": "ilo"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18338434,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 4,
+        "great": 742
+      },
+      "total_score_without_mods": 988781,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 5047676789,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 12147277,
+      "accuracy": 0.996425,
+      "build_id": null,
+      "ended_at": "2025-06-23T18:21:12Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4859710513,
+      "legacy_total_score": 24917648,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 378.306,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1006184,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/12147277?1754578061.png",
+        "country_code": "TH",
+        "default_group": "default",
+        "id": 12147277,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "-Kedama",
+        "country": {
+          "code": "TH",
+          "name": "Thailand"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/12147277\/2607a41cf82f39937624b006ccaad867520d20a715bdd39d53f98bebd9faf561.gif",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/12147277\/2607a41cf82f39937624b006ccaad867520d20a715bdd39d53f98bebd9faf561.gif",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/4440\/e2f3de37a8476b1cecf77ed0938af6a02bbc7e7e64808e7f9da97e70acca8ffe.jpeg",
+          "id": 4440,
+          "name": "VRZO",
+          "short_name": "VRZO"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18295804,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 5,
+        "great": 741
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1131827808,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 1504556,
+      "accuracy": 0.995532,
+      "build_id": null,
+      "ended_at": "2021-02-02T15:04:35Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 3452502509,
+      "legacy_total_score": 24879154,
+      "max_combo": 1334,
+      "passed": true,
+      "pp": 376.004,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1003845,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/1504556?1730203167.jpeg",
+        "country_code": "JP",
+        "default_group": "default",
+        "id": 1504556,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": true,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T09:04:04+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "L4plus1",
+        "country": {
+          "code": "JP",
+          "name": "Japan"
+        },
+        "cover": {
+          "custom_url": null,
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/5\/395c011121ca45b2ab30bd6fdd5d12483acca063bfb75ccae96d88da4304a1fb.jpeg",
+          "id": "5"
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/15377\/c2d2075fb79f6421bed9b85bd8c3f0b4f1ca57c9ef3e5ea27f4619b88cb1dd62.jpeg",
+          "id": 15377,
+          "name": "Alliance of Valiant Arms",
+          "short_name": "AVA"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18295695,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 5,
+        "great": 741
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 731733020,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 3245028,
+      "accuracy": 0.995532,
+      "build_id": null,
+      "ended_at": "2019-03-09T16:48:25Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 2754929901,
+      "legacy_total_score": 24877642,
+      "max_combo": 1334,
+      "passed": true,
+      "pp": 376.004,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1003839,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/3245028?1759581293.jpeg",
+        "country_code": "PL",
+        "default_group": "default",
+        "id": 3245028,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "DudsonZ",
+        "country": {
+          "code": "PL",
+          "name": "Poland"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3245028\/3a969287ef20d119520788397dce56a8a93740ce6124086fa45643b07fe271d5.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3245028\/3a969287ef20d119520788397dce56a8a93740ce6124086fa45643b07fe271d5.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/473\/3ae5cfe12ab632f7bdfb0e41901efce9d9d5b7af939690a8a8f57252caf1ec68.jpeg",
+          "id": 473,
+          "name": "Blacklisted",
+          "short_name": "PERM"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18291211,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "SD"
+        },
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 5,
+        "great": 741
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1253928761,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 8472976,
+      "accuracy": 0.995532,
+      "build_id": null,
+      "ended_at": "2021-05-19T09:35:46Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 3669756942,
+      "legacy_total_score": 24879233,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 376.085,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1003593,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/8472976?1758361949.png",
+        "country_code": "KR",
+        "default_group": "default",
+        "id": 8472976,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T07:57:24+00:00",
+        "pm_friends_only": true,
+        "profile_colour": null,
+        "username": "hyeok2044",
+        "country": {
+          "code": "KR",
+          "name": "South Korea"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/8472976\/7e9dc16a19285fc6c9424f91f171d15212c8ccdcd79b485a83be6092bf7c0b09.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/8472976\/7e9dc16a19285fc6c9424f91f171d15212c8ccdcd79b485a83be6092bf7c0b09.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/323\/102cf4f116fb607a45d7a34c42caf4aec32fe75419aa1dd094a07f1e6519ebbe.jpeg",
+          "id": 323,
+          "name": "Washed Up",
+          "short_name": "NOOB"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18279018,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 5,
+        "great": 741
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 2407607519,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 9211924,
+      "accuracy": 0.995532,
+      "build_id": null,
+      "ended_at": "2024-02-25T15:48:07Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4590319305,
+      "legacy_total_score": 24830671,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 376.085,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1002924,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/9211924?1760741031.png",
+        "country_code": "NO",
+        "default_group": "default",
+        "id": 9211924,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T00:39:11+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Melvr",
+        "country": {
+          "code": "NO",
+          "name": "Norway"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9211924\/a373bec4f295ce837ab876c4fac1489923452c2e4435e159406d124ea2987a38.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9211924\/a373bec4f295ce837ab876c4fac1489923452c2e4435e159406d124ea2987a38.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/2816\/49db45d6f71cda1a719f1f07f2ce9ce6d98a67367c72e9ff2c36b59c50e254a2.png",
+          "id": 2816,
+          "name": "Grease Monkey",
+          "short_name": "MANK"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18268557,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 4,
+        "miss": 1,
+        "great": 741
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1730085278,
+      "rank": "A",
+      "type": "solo_score",
+      "user_id": 3533958,
+      "accuracy": 0.995085,
+      "build_id": null,
+      "ended_at": "2023-06-06T21:24:16Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4451149742,
+      "legacy_total_score": 24836651,
+      "max_combo": 1333,
+      "passed": true,
+      "pp": 343.556,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1002350,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/3533958?1748748713.jpeg",
+        "country_code": "US",
+        "default_group": "bng",
+        "id": 3533958,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T06:25:51+00:00",
+        "pm_friends_only": false,
+        "profile_colour": "#A347EB",
+        "username": "fieryrage",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3533958\/9784b12545632555c96f5266e4b57343258da3b96e755e1b1e6cb6463dfbbac4.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/3533958\/9784b12545632555c96f5266e4b57343258da3b96e755e1b1e6cb6463dfbbac4.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/179\/9b6e18ee2da440f1192e53f4dad700f8784663e391ae0db81cf29958bfd6f698.png",
+          "id": 179,
+          "name": "Arklane",
+          "short_name": "Ark"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18250003,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 6,
+        "great": 740
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1068463369,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 11604978,
+      "accuracy": 0.994638,
+      "build_id": null,
+      "ended_at": "2020-11-25T18:05:08Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 3339521397,
+      "legacy_total_score": 24914642,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 374.003,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1001332,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/11604978?1760288575.jpeg",
+        "country_code": "NL",
+        "default_group": "default",
+        "id": 11604978,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-16T22:52:45+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "perthed again",
+        "country": {
+          "code": "NL",
+          "name": "Netherlands"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/11604978\/afb8b4a57b47ab3790f4515e2e1e01a6828c76620478add2feffd9938076864d.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/11604978\/afb8b4a57b47ab3790f4515e2e1e01a6828c76620478add2feffd9938076864d.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/29092\/e1d71ace95d0a125e8180826b015a3a39f06d2bb89d83ef8ea1a8b037f9aed25.png",
+          "id": 29092,
+          "name": "BUNGALOW",
+          "short_name": "2O11"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18244517,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 6,
+        "great": 740
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 994097160,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 7108275,
+      "accuracy": 0.994638,
+      "build_id": null,
+      "ended_at": "2020-08-21T10:27:02Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 3206321318,
+      "legacy_total_score": 24814946,
+      "max_combo": 1332,
+      "passed": true,
+      "pp": 373.761,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1001031,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/7108275?1759807809.jpeg",
+        "country_code": "ID",
+        "default_group": "default",
+        "id": 7108275,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "i love uma",
+        "country": {
+          "code": "ID",
+          "name": "Indonesia"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7108275\/15efe76359162a3e36c89fd1964cea2d7342b89a7ffeed03ba1b9f2cef33822c.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7108275\/15efe76359162a3e36c89fd1964cea2d7342b89a7ffeed03ba1b9f2cef33822c.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/1779\/acccfd9b1efd047a63bbbbe911f57c84e294fe9d2375866eca7788a263b5e40a.png",
+          "id": 1779,
+          "name": "Harse Drip",
+          "short_name": "HORS"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18244499,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 6,
+        "great": 740
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 3221979593,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 12904237,
+      "accuracy": 0.994638,
+      "build_id": null,
+      "ended_at": "2024-07-26T05:18:16Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4659273232,
+      "legacy_total_score": 24814432,
+      "max_combo": 1332,
+      "passed": true,
+      "pp": 373.761,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1001030,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/12904237?1758405918.jpeg",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 12904237,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T05:08:44+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "kuromi",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/12904237\/3556f779c805181d391239e6d35f1208bb3251335a4032cb69f61633bfac6ee6.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/12904237\/3556f779c805181d391239e6d35f1208bb3251335a4032cb69f61633bfac6ee6.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/784\/c55a5c4d7845388297276aca6cf58377f444c66919452407ec578cf31de04331.jpeg",
+          "id": 784,
+          "name": "EMPATHS",
+          "short_name": "God"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18244225,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 6,
+        "great": 740
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 3082766523,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 7629976,
+      "accuracy": 0.994638,
+      "build_id": null,
+      "ended_at": "2024-06-30T08:38:41Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4647685877,
+      "legacy_total_score": 24827513,
+      "max_combo": 1334,
+      "passed": true,
+      "pp": 373.921,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1001015,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/7629976?1759986723.jpeg",
+        "country_code": "UA",
+        "default_group": "default",
+        "id": 7629976,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "asta is cute",
+        "country": {
+          "code": "UA",
+          "name": "Ukraine"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7629976\/b03c87a1b8ddaf3f1b67f437d30e6a2a527aef706fb19a4d1bdd71b290250125.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7629976\/b03c87a1b8ddaf3f1b67f437d30e6a2a527aef706fb19a4d1bdd71b290250125.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/1119\/c615f5c28f94973e50f5e7222a052bd25834d0a5dce454d1f9c18b075cdd917f.jpeg",
+          "id": 1119,
+          "name": "chocomint FanClub",
+          "short_name": "Cook"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18233818,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 3,
+        "miss": 2,
+        "great": 741
+      },
+      "total_score_without_mods": 983141,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 3963420387,
+      "rank": "A",
+      "type": "solo_score",
+      "user_id": 9869794,
+      "accuracy": 0.994638,
+      "build_id": null,
+      "ended_at": "2024-12-04T10:37:57Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4731849724,
+      "legacy_total_score": 24663476,
+      "max_combo": 1327,
+      "passed": true,
+      "pp": 326.669,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 1000444,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/9869794?1734729895.jpeg",
+        "country_code": "ES",
+        "default_group": "default",
+        "id": 9869794,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T06:47:46+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "BabyScylla",
+        "country": {
+          "code": "ES",
+          "name": "Spain"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9869794\/6bf024f7dce632797b884893e40d217de703d18c92fb36f54cdec72439fa8713.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/9869794\/6bf024f7dce632797b884893e40d217de703d18c92fb36f54cdec72439fa8713.png",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18233199,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [
+        {
+          "acronym": "MR"
+        }
+      ],
+      "statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "total_score_without_mods": 1000410,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 5227179145,
+      "rank": "X",
+      "type": "solo_score",
+      "user_id": 8660293,
+      "accuracy": 1,
+      "build_id": 8066,
+      "ended_at": "2025-07-30T10:29:59Z",
+      "has_replay": true,
+      "is_perfect_combo": true,
+      "legacy_perfect": true,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1337,
+      "passed": true,
+      "pp": null,
+      "ruleset_id": 0,
+      "started_at": "2025-07-30T10:27:41Z",
+      "total_score": 1000410,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/8660293?1734885081.jpeg",
+        "country_code": "TW",
+        "default_group": "default",
+        "id": 8660293,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "willy0214",
+        "country": {
+          "code": "TW",
+          "name": "Taiwan"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/8660293\/fc0112a591c8eafe0050a3c488ebe91c7d8af2f64a1dc919050abe96a7c5544a.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/8660293\/fc0112a591c8eafe0050a3c488ebe91c7d8af2f64a1dc919050abe96a7c5544a.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/3265\/15a36306b951f7611ad1b85fbd340dd9e0b9909ec7cd6a5b6e128c26e0ff15a6.png",
+          "id": 3265,
+          "name": "Spinesnight fanclub",
+          "short_name": "Tofu"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18216048,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        }
+      ],
+      "statistics": {
+        "ok": 9,
+        "miss": 1,
+        "great": 736,
+        "ignore_hit": 334,
+        "ignore_miss": 5,
+        "large_bonus": 5,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 330
+      },
+      "total_score_without_mods": 942895,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 4456924965,
+      "rank": "A",
+      "type": "solo_score",
+      "user_id": 10902307,
+      "accuracy": 0.990412,
+      "build_id": 7896,
+      "ended_at": "2025-03-04T15:22:47Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1274,
+      "passed": true,
+      "pp": 346.004,
+      "ruleset_id": 0,
+      "started_at": "2025-03-04T15:20:29Z",
+      "total_score": 999469,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/10902307?1739502704.jpeg",
+        "country_code": "LV",
+        "default_group": "default",
+        "id": 10902307,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": "2025-10-14T12:04:31+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "UselessJohn",
+        "country": {
+          "code": "LV",
+          "name": "Latvia"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10902307\/7575b44af155d63f335cc65506d7fa58a17f520f7f60f5ea573764cd78fdef5d.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10902307\/7575b44af155d63f335cc65506d7fa58a17f520f7f60f5ea573764cd78fdef5d.jpeg",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18195253,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 7,
+        "great": 739
+      },
+      "total_score_without_mods": 981061,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 4596416362,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 12145220,
+      "accuracy": 0.993744,
+      "build_id": null,
+      "ended_at": "2025-03-29T17:12:52Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4807278140,
+      "legacy_total_score": 24782548,
+      "max_combo": 1331,
+      "passed": true,
+      "pp": 371.654,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 998328,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/12145220?1748104610.png",
+        "country_code": "GR",
+        "default_group": "default",
+        "id": 12145220,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T13:53:15+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Nekkid",
+        "country": {
+          "code": "GR",
+          "name": "Greece"
+        },
+        "cover": {
+          "custom_url": null,
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/2\/f5142b64b60002f6314b22c775195950105908e149037f4de78efc0e0f28d442.jpeg",
+          "id": "2"
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/1984\/66ce275a82e6aa4ed616746636497d401ae0600d7d995c75fe093a0ebbbf958f.jpeg",
+          "id": 1984,
+          "name": "Astegosauroi",
+          "short_name": "ASTG"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18193849,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 7,
+        "great": 739
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 771646310,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 7477458,
+      "accuracy": 0.993744,
+      "build_id": null,
+      "ended_at": "2019-06-06T12:54:39Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 2822764058,
+      "legacy_total_score": 24760366,
+      "max_combo": 1331,
+      "passed": true,
+      "pp": 371.654,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 998251,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/7477458?1721732701.jpeg",
+        "country_code": "AU",
+        "default_group": "default",
+        "id": 7477458,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": "2025-10-16T08:28:13+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Jordan The Bear",
+        "country": {
+          "code": "AU",
+          "name": "Australia"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7477458\/b7a56eb9b34b957f782dbd4cf2d0d36f1aaec28a6728d8b513c86c4d75d57e53.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7477458\/b7a56eb9b34b957f782dbd4cf2d0d36f1aaec28a6728d8b513c86c4d75d57e53.jpeg",
+          "id": null
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18181383,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 7,
+        "great": 739
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1442725294,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 7503114,
+      "accuracy": 0.993744,
+      "build_id": null,
+      "ended_at": "2021-12-18T08:00:17Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 3993253879,
+      "legacy_total_score": 24807835,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 371.974,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 997567,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/7503114?1661880580.png",
+        "country_code": "FI",
+        "default_group": "default",
+        "id": 7503114,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Sampo",
+        "country": {
+          "code": "FI",
+          "name": "Finland"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7503114\/a3fd5056bc2d7c27dd42deee0ff92523f38ce10a69a12b5a50565791f2e164e3.gif",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7503114\/a3fd5056bc2d7c27dd42deee0ff92523f38ce10a69a12b5a50565791f2e164e3.gif",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/1956\/498c7df50d60e99c4d10321040d69b1db4cf628e30d9363dda63a1bdec3e21c9.png",
+          "id": 1956,
+          "name": "KEMO HEAVEN",
+          "short_name": "KEMO"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18157489,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [
+        {
+          "acronym": "MR",
+          "settings": {
+            "reflection": "1"
+          }
+        }
+      ],
+      "statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "ignore_miss": 3,
+        "large_bonus": 5,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 332
+      },
+      "total_score_without_mods": 996256,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 4456357528,
+      "rank": "S",
+      "type": "solo_score",
+      "user_id": 1023489,
+      "accuracy": 0.998935,
+      "build_id": 7893,
+      "ended_at": "2025-03-04T13:23:03Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": null,
+      "ruleset_id": 0,
+      "started_at": "2025-03-04T13:20:44Z",
+      "total_score": 996256,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/1023489?1738357822.jpeg",
+        "country_code": "DE",
+        "default_group": "default",
+        "id": 1023489,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T07:07:51+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "respektive",
+        "country": {
+          "code": "DE",
+          "name": "Germany"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/1023489\/141f880e61d88cf7bbe8f1a56bdb7999fe45b966da585da460aacb68a134c8b4.gif",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/1023489\/141f880e61d88cf7bbe8f1a56bdb7999fe45b966da585da460aacb68a134c8b4.gif",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/730\/4776d3ce4d9455102bb598bcdb6241fc381b548d9e6cf7d98d2f30debc27e374.png",
+          "id": 730,
+          "name": "Konata 4 Life",
+          "short_name": "kona"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18145697,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 8,
+        "great": 738
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1757596601,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 16817965,
+      "accuracy": 0.992851,
+      "build_id": null,
+      "ended_at": "2023-08-17T13:37:36Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4491521532,
+      "legacy_total_score": 24749003,
+      "max_combo": 1332,
+      "passed": true,
+      "pp": 369.758,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 995609,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/16817965?1758367232.png",
+        "country_code": "KZ",
+        "default_group": "default",
+        "id": 16817965,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": null,
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Kamensh1k",
+        "country": {
+          "code": "KZ",
+          "name": "Kazakhstan"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/16817965\/24ba0296dab8ac3c60e3e1d2a1d34a7eca5efc51e9d133ef9c41b0b1131fa54b.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/16817965\/24ba0296dab8ac3c60e3e1d2a1d34a7eca5efc51e9d133ef9c41b0b1131fa54b.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/588\/9f310afb74d64f2fdacc05bf5892e691f07ccf636a614aa8f6bc3ca2b8f7d260.jpeg",
+          "id": 588,
+          "name": "TRANQUILO",
+          "short_name": "TQ"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18136566,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 5,
+        "miss": 2,
+        "great": 739
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1624482993,
+      "rank": "A",
+      "type": "solo_score",
+      "user_id": 4673649,
+      "accuracy": 0.992851,
+      "build_id": null,
+      "ended_at": "2022-10-07T18:44:07Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4288244413,
+      "legacy_total_score": 24618513,
+      "max_combo": 1326,
+      "passed": true,
+      "pp": 322.714,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 995108,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/4673649?1758453336.jpeg",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 4673649,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T08:32:04+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "LUNAISTABBY",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/4673649\/d4422eb1a1a7dc07bf90d0fe04a0463316a34901aace8d661842f752680259d2.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/4673649\/d4422eb1a1a7dc07bf90d0fe04a0463316a34901aace8d661842f752680259d2.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/281\/5466d67d92f1932daadecf23dc358aa2c5025a2d67c1a077165a0a444ab8e051.png",
+          "id": 281,
+          "name": "Oregonians",
+          "short_name": "OR"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18119233,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [],
+      "statistics": {
+        "ok": 2,
+        "great": 744,
+        "ignore_hit": 334,
+        "ignore_miss": 1,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 333
+      },
+      "total_score_without_mods": 994157,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 5226084358,
+      "rank": "S",
+      "type": "solo_score",
+      "user_id": 10665363,
+      "accuracy": 0.998047,
+      "build_id": 8066,
+      "ended_at": "2025-07-30T03:32:50Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 362.835,
+      "ruleset_id": 0,
+      "started_at": "2025-07-30T03:30:32Z",
+      "total_score": 994157,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/10665363?1734231591.png",
+        "country_code": "AU",
+        "default_group": "default",
+        "id": 10665363,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T07:20:15+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "JGLF",
+        "country": {
+          "code": "AU",
+          "name": "Australia"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10665363\/727789ea59d46773f6e666d6a95474a9255641c4cab1037a86e1c27382f799a2.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10665363\/727789ea59d46773f6e666d6a95474a9255641c4cab1037a86e1c27382f799a2.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/481\/6b6d8df6a7f0b2675a1db89a4edc5647dd3c826a1a5cb6f0e26b3ca823dcea4b.jpeg",
+          "id": 481,
+          "name": "gnag",
+          "short_name": "gnag"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18117411,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [],
+      "statistics": {
+        "ok": 2,
+        "great": 744,
+        "ignore_hit": 334,
+        "ignore_miss": 3,
+        "large_bonus": 4,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 333
+      },
+      "total_score_without_mods": 994057,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 5423997268,
+      "rank": "S",
+      "type": "solo_score",
+      "user_id": 11172360,
+      "accuracy": 0.998047,
+      "build_id": 8185,
+      "ended_at": "2025-09-08T03:53:27Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 362.835,
+      "ruleset_id": 0,
+      "started_at": "2025-09-08T03:51:09Z",
+      "total_score": 994057,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/11172360?1760429835.png",
+        "country_code": "NZ",
+        "default_group": "default",
+        "id": 11172360,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": true,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T09:01:22+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "she gon pay me",
+        "country": {
+          "code": "NZ",
+          "name": "New Zealand"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/11172360\/905e13c782a2e7637e3834b3789717a738f50fb1cd51011608caaab09aae66c1.png",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/11172360\/905e13c782a2e7637e3834b3789717a738f50fb1cd51011608caaab09aae66c1.png",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/73\/43a531498915024c27c10ee7e542c4f5286a465cbaf745d7dd5685f8e2eb6aeb.gif",
+          "id": 73,
+          "name": "wa",
+          "short_name": "wa"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18116791,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [],
+      "statistics": {
+        "ok": 2,
+        "great": 744,
+        "ignore_hit": 334,
+        "ignore_miss": 3,
+        "large_bonus": 4,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 333
+      },
+      "total_score_without_mods": 994023,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 5153613884,
+      "rank": "S",
+      "type": "solo_score",
+      "user_id": 5250173,
+      "accuracy": 0.998047,
+      "build_id": 8066,
+      "ended_at": "2025-07-15T14:04:17Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1336,
+      "passed": true,
+      "pp": 362.835,
+      "ruleset_id": 0,
+      "started_at": "2025-07-15T14:01:59Z",
+      "total_score": 994023,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/5250173?1743312363.jpeg",
+        "country_code": "CN",
+        "default_group": "default",
+        "id": 5250173,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T17:16:38+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "wuwedver",
+        "country": {
+          "code": "CN",
+          "name": "China"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/5250173\/df73253151d25cfa1db71b2424d9dc9f24347ebbb8e53c176953b69ce2ec844c.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/5250173\/df73253151d25cfa1db71b2424d9dc9f24347ebbb8e53c176953b69ce2ec844c.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/256\/378e89285a137bd9495da97a6eec32d577c16c75ad3a9a7bae212896d1ae367a.jpeg",
+          "id": 256,
+          "name": "Structured Query Language",
+          "short_name": "SQL"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18101190,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 9,
+        "great": 737
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 931783696,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 2086138,
+      "accuracy": 0.991957,
+      "build_id": null,
+      "ended_at": "2020-05-24T21:28:26Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 3097569179,
+      "legacy_total_score": 24793575,
+      "max_combo": 1332,
+      "passed": true,
+      "pp": 367.832,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 993167,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/2086138?1736516233.jpeg",
+        "country_code": "RO",
+        "default_group": "default",
+        "id": 2086138,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": true,
+        "is_supporter": false,
+        "last_visit": "2025-10-18T09:03:08+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "_AfterWind",
+        "country": {
+          "code": "RO",
+          "name": "Romania"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/2086138\/a83615d229d608bac4106a771eb212253879268f7535c1acc8e8927cf214df7b.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/4\/2fd772ad175c5687370e0aab50799a84adef7d0fff3f97dccfa5c94384ebb8af.jpeg",
+          "id": "4"
+        },
+        "team": null
+      }
+    },
+    {
+      "classic_total_score": 18094829,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 9,
+        "great": 737
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1717415825,
+      "rank": "SH",
+      "type": "solo_score",
+      "user_id": 8408501,
+      "accuracy": 0.991957,
+      "build_id": null,
+      "ended_at": "2023-05-06T06:52:12Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4432122054,
+      "legacy_total_score": 24679055,
+      "max_combo": 1328,
+      "passed": true,
+      "pp": 367.522,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 992818,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/8408501?1621810026.jpeg",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 8408501,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-09-30T03:52:01+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Bread_Instead",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/8408501\/38490a157fb1fe32eb980d170ae0003ce4ccc13e0bab8949e9104829d3b40adc.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/8408501\/38490a157fb1fe32eb980d170ae0003ce4ccc13e0bab8949e9104829d3b40adc.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/1115\/c4ac027910950c44d4208eb9ee87eca1c34dda9f5c74f803fcd406708cd9c58e.gif",
+          "id": 1115,
+          "name": "mrow :3",
+          "short_name": "grrr"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18079884,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [
+        {
+          "acronym": "MR",
+          "settings": {
+            "reflection": "1"
+          }
+        }
+      ],
+      "statistics": {
+        "ok": 2,
+        "great": 744,
+        "ignore_hit": 334,
+        "ignore_miss": 2,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 332
+      },
+      "total_score_without_mods": 991998,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 5229398020,
+      "rank": "S",
+      "type": "solo_score",
+      "user_id": 7205256,
+      "accuracy": 0.997514,
+      "build_id": 8135,
+      "ended_at": "2025-07-30T19:21:36Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": null,
+      "ruleset_id": 0,
+      "started_at": "2025-07-30T19:19:15Z",
+      "total_score": 991998,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/7205256?1727475226.jpeg",
+        "country_code": "SE",
+        "default_group": "default",
+        "id": 7205256,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": false,
+        "last_visit": "2025-10-17T19:07:53+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "TheNexusGamer",
+        "country": {
+          "code": "SE",
+          "name": "Sweden"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7205256\/903c32f2580707baedbff61b658deadefc36fc553d96fdd805a65e2dc1edf361.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/7205256\/903c32f2580707baedbff61b658deadefc36fc553d96fdd805a65e2dc1edf361.jpeg",
+          "id": null
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/2952\/6e00f4a57c873ee75940db491457c726a3e071c6c8b30ded1810bbb70f5ffa3d.png",
+          "id": 2952,
+          "name": "The Shit Missers",
+          "short_name": "TSM"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18076020,
+      "preserve": true,
+      "processed": false,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "ignore_hit": 334,
+        "large_bonus": 6,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 334
+      },
+      "mods": [],
+      "statistics": {
+        "ok": 2,
+        "great": 744,
+        "ignore_hit": 334,
+        "ignore_miss": 7,
+        "large_bonus": 1,
+        "small_bonus": 11,
+        "large_tick_hit": 257,
+        "slider_tail_hit": 332
+      },
+      "total_score_without_mods": 991786,
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 4906355175,
+      "rank": "S",
+      "type": "solo_score",
+      "user_id": 4458239,
+      "accuracy": 0.997514,
+      "build_id": 7980,
+      "ended_at": "2025-05-27T01:31:20Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": null,
+      "legacy_total_score": 0,
+      "max_combo": 1335,
+      "passed": true,
+      "pp": 362.539,
+      "ruleset_id": 0,
+      "started_at": "2025-05-27T01:29:03Z",
+      "total_score": 991786,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/4458239?1756563908.jpeg",
+        "country_code": "US",
+        "default_group": "default",
+        "id": 4458239,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-18T03:49:57+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "ampy",
+        "country": {
+          "code": "US",
+          "name": "United States"
+        },
+        "cover": {
+          "custom_url": null,
+          "url": "https:\/\/assets.ppy.sh\/user-cover-presets\/3\/32ddb3eb261e38a82067f9ef4ea96c12f6abf8bd228e6413330f9d351420301b.jpeg",
+          "id": "3"
+        },
+        "team": {
+          "flag_url": "https:\/\/assets.ppy.sh\/teams\/flag\/1779\/acccfd9b1efd047a63bbbbe911f57c84e294fe9d2375866eca7788a263b5e40a.png",
+          "id": 1779,
+          "name": "Harse Drip",
+          "short_name": "HORS"
+        }
+      }
+    },
+    {
+      "classic_total_score": 18059034,
+      "preserve": true,
+      "processed": true,
+      "ranked": true,
+      "maximum_statistics": {
+        "great": 746,
+        "legacy_combo_increase": 591
+      },
+      "mods": [
+        {
+          "acronym": "HD"
+        },
+        {
+          "acronym": "CL"
+        }
+      ],
+      "statistics": {
+        "ok": 2,
+        "miss": 5,
+        "great": 739
+      },
+      "beatmap_id": 131891,
+      "best_id": null,
+      "id": 1619235863,
+      "rank": "A",
+      "type": "solo_score",
+      "user_id": 10778261,
+      "accuracy": 0.99151,
+      "build_id": null,
+      "ended_at": "2022-09-26T14:22:30Z",
+      "has_replay": true,
+      "is_perfect_combo": false,
+      "legacy_perfect": false,
+      "legacy_score_id": 4279927083,
+      "legacy_total_score": 24553662,
+      "max_combo": 1327,
+      "passed": true,
+      "pp": 281.258,
+      "ruleset_id": 0,
+      "started_at": null,
+      "total_score": 990854,
+      "replay": true,
+      "current_user_attributes": {
+        "pin": null
+      },
+      "user": {
+        "avatar_url": "https:\/\/a.ppy.sh\/10778261?1759755477.jpeg",
+        "country_code": "RO",
+        "default_group": "default",
+        "id": 10778261,
+        "is_active": true,
+        "is_bot": false,
+        "is_deleted": false,
+        "is_online": false,
+        "is_supporter": true,
+        "last_visit": "2025-10-17T23:03:41+00:00",
+        "pm_friends_only": false,
+        "profile_colour": null,
+        "username": "Razei",
+        "country": {
+          "code": "RO",
+          "name": "Romania"
+        },
+        "cover": {
+          "custom_url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10778261\/ed1bc7c5e7ec873fea1d7c9d304f771453972ec56c5edd417e1ce454f3ce30b6.jpeg",
+          "url": "https:\/\/assets.ppy.sh\/user-profile-covers\/10778261\/ed1bc7c5e7ec873fea1d7c9d304f771453972ec56c5edd417e1ce454f3ce30b6.jpeg",
+          "id": null
+        },
+        "team": null
+      }
+    }
+  ]
+}
