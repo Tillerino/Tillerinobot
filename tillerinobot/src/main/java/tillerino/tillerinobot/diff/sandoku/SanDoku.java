@@ -24,7 +24,7 @@ public interface SanDoku {
 	/**
 	 * Once changes in SanDoku have been deployed and values need to be recalculated, bump this version!
 	 */
-	int VERSION = 2;
+	int VERSION = 3;
 
 	static ProcessorApi defaultClient(URI baseUri) {
 		return WebResourceFactory.newResource(ProcessorApi.class, JerseyClientBuilder.createClient().target(baseUri));

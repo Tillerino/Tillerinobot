@@ -218,13 +218,9 @@ class WireMockUpdater {
     // System.out.println(osuApiV2.getBeatmap(FREEDOM_DIVE, 0));
     // System.out.println(osuApiV2.getBeatmapTop(FREEDOM_DIVE, 0));
 
-    beatmapDownloader.getActualBeatmap(BEST_FRIENDS);
-    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 0L));
-    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 64));
-    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 80));
-    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 1024));
-    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 1032));
-    System.out.println(osuApiV2.getBeatmapTop(BEST_FRIENDS, 0));
+    // beatmapDownloader.getActualBeatmap(BEST_FRIENDS);
+    System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 0L));
+    // System.out.println(osuApiV2.getBeatmapTop(BEST_FRIENDS, 0));
 
     // beatmapDownloader.getActualBeatmap(FLASHLIGHT);
     // System.out.println(osuApiV2.getBeatmap(FLASHLIGHT, 0));

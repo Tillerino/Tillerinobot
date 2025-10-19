@@ -4,6 +4,7 @@ import com.github.omkelderman.sandoku.DiffResult;
 import com.github.omkelderman.sandoku.ProcessorApi;
 import com.github.omkelderman.sandoku.ScoreInfo;
 import dagger.Component;
+import dagger.Provides;
 import jakarta.ws.rs.BadRequestException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -21,19 +22,33 @@ import org.mapstruct.factory.Mappers;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.ppaddict.mockmodules.BeatmapDownloaderMockModule;
+import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.OsuApiV2;
 import tillerino.tillerinobot.OsuApiV2Test;
 import tillerino.tillerinobot.data.ApiScore;
-import tillerino.tillerinobot.data.DiffEstimate.DiffEstimateToBeatmapImplMapper;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
+import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
 
 @ExtendWith(SoftAssertionsExtension.class)
-public class PpTestManual {
-  @Component(modules = {OsuApiV2Test.Module.class, BeatmapDownloaderMockModule.class})
+public class PpTestManual extends AbstractDatabaseTest {
+  @Component(modules = {OsuApiV2Test.Module.class, BeatmapDownloaderMockModule.class, DockeredMysqlModule.class,
+                        Module.class, BeatmapsServiceImpl.Module.class})
   @Singleton
   interface Injector {
     void inject(PpTestManual t);
+  }
+
+  @dagger.Module
+  interface Module {
+    @dagger.Binds
+    OsuApi osuApi(OsuApiV2 v2);
+
+    @Provides
+    static ProcessorApi sanDoku() {
+      return SanDoku.defaultClient(URI.create("http://localhost:8080"));
+    }
   }
 
   {
@@ -41,9 +56,11 @@ public class PpTestManual {
   }
 
   @Inject OsuApiV2 api;
-  ProcessorApi sanDoku = SanDoku.defaultClient(URI.create("http://localhost:8080"));
+  @Inject ProcessorApi sanDoku;
 
   @Inject BeatmapDownloader beatmapDownloader;
+
+  @Inject DiffEstimateProvider diffEstimateProvider;
 
   @Test
   void testBigBlack(SoftAssertions softly) throws Exception {
@@ -54,7 +71,7 @@ public class PpTestManual {
   @Test
   void testSongCompilationIV(SoftAssertions softly) throws Exception {
     // https://osu.ppy.sh/beatmapsets/2347113#osu/5047712
-    testBeatmapTop(softly, 5047712, 0, 2.5, 2.5);
+    testBeatmapTop(softly, 5047712, 10504284, 2.5, 2.5);
   }
 
   @Test
@@ -90,20 +107,17 @@ public class PpTestManual {
         continue;
       }
 
-      long mods = Mods.fixNC(score.getMods());
+      long mods = score.getMods();
       String modsShort = "%s (%s)".formatted(
           Mods.toShortNamesContinuous(Mods.getMods(mods & ~Mods.getMask(Mods.Lazer))),
           Mods.Lazer.is(mods) ? "Lazer" : "Stable");
-      DiffResult diff = sanDoku.processorCalcDiff(0, (int) Beatmap.getDiffMods(mods), false, beatmapBytes);
-      BeatmapImpl beatmap = DiffEstimateToBeatmapImplMapper.INSTANCE.toBeatmap(diff);
 
       AtomicReference<Double> sanDokuPp = new AtomicReference<>();
-      Thread thread = new Thread(() -> {
-        sanDokuPp.set(fetchSanDokuPp(score, (int) mods, diff.getBeatmapMd5(), beatmapBytes));
-      });
+      Thread thread = new Thread(() -> sanDokuPp.set(getSanDokuPp(beatmapBytes, mods, score)));
       thread.start();
 
-      double ourPp = new OsuPerformanceCalculator().CreatePerformanceAttributes(score, beatmap).total();
+      PercentageEstimates estimates = diffEstimateProvider.getEstimates(0, beatmapid, score.getMods());
+      double ourPp = estimates.getPP(score.getCount100(), score.getCount50(), score.getMaxCombo(), score.getCountMiss());
       thread.join();
 
       softly.assertThat(ourPp)
@@ -119,12 +133,12 @@ public class PpTestManual {
     }
   }
 
-  private double fetchSanDokuPp(ApiScore score, int mods, String beatmapMd5, byte[] beatmapBytes) {
-    mods = mods & ~(int) Mods.getMask(Mods.Perfect); // Perfect trips up SanDoku
+  private double getSanDokuPp(byte[] beatmapBytes, long mods, ApiScore score) {
+    mods = Mods.fixNC(mods) & ~ Mods.getMask(Mods.Perfect); // Perfect and DT trip up SanDoku
     try {
       // cache with exact mods for immediate pp query
-      sanDoku.processorCalcDiff(0, mods, true, beatmapBytes);
-      return sanDoku.processorCalcPp(beatmapMd5, 0, mods, Mapper.INSTANCE.toSanDoku(score)).getPp();
+      DiffResult diff = sanDoku.processorCalcDiff(0, (int) mods, true, beatmapBytes);
+      return sanDoku.processorCalcPp(diff.getBeatmapMd5(), 0, (int) mods, Mapper.INSTANCE.toSanDoku(score)).getPp();
     } catch (BadRequestException e) {
       System.out.println(SanDoku.unwrapError(e));
       throw e;

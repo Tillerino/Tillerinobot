@@ -3,6 +3,8 @@ package tillerino.tillerinobot.diff;
 import com.github.omkelderman.sandoku.DiffCalcResult;
 import com.github.omkelderman.sandoku.DiffResult;
 import com.github.omkelderman.sandoku.ProcessorApi;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import jakarta.ws.rs.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -16,10 +18,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ClientErrorException;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.slf4j.MDC;
@@ -28,6 +26,9 @@ import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister;
 import org.tillerino.mormon.Persister.Action;
+import org.tillerino.osuApiModel.GameModes;
+import org.tillerino.osuApiModel.types.GameMode;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BeatmapId;
@@ -113,6 +114,9 @@ public class DiffEstimateProvider {
 			}
 			try {
 				estimate = DiffEstimateProvider.calculateDiffEstimate(beatmapid, diffMods, beatmaps, calculator);
+				if (estimate.failure != null) {
+					log.error(estimate.failure);
+				}
 			} finally {
 				calculatorSemaphore.release();
 			}
@@ -152,6 +156,7 @@ public class DiffEstimateProvider {
 
 		DiffResult sanDoku;
 		try {
+			System.out.println("Requesting from SanDoku " + beatmapid + " " + mods);
 			sanDoku = calculator.processorCalcDiff(0, (int) mods, false, actualBeatmap.getBytes(StandardCharsets.UTF_8));
 			DiffCalcResult r = sanDoku.getDiffCalcResult();
 			if (r.getSliderCount() + r.getHitCircleCount() + r.getSpinnerCount() == 0) {
@@ -164,8 +169,13 @@ public class DiffEstimateProvider {
 		} catch (InternalServerErrorException | ClientErrorException e) {
 			estimate.failure = "SanDoku failed: " + e.getResponse();
 			return estimate;
+		} catch (ProcessingException e) {
+			log.error("San doku communication error", e);
+			estimate.failure = "SanDoku communication error: " + e.getMessage();
+			return estimate;
 		}
 
+		System.out.println("jlkfsd");
 		DiffEstimate.DiffEstimateToBeatmapImplMapper.INSTANCE.map(sanDoku, estimate);
 		estimate.success = true;
 
@@ -221,5 +231,28 @@ public class DiffEstimateProvider {
 			}
 			return false;
 		}
+	}
+
+	public PercentageEstimates getEstimates(@GameMode int gameMode, @BeatmapId int beatmapId, @BitwiseMods long mods)
+			throws NoEstimatesException, SQLException, IOException, InterruptedException {
+		if(gameMode != GameModes.OSU) {
+			throw new NoEstimatesException();
+		}
+
+		try(var __ = PhaseTimer.timeTask("loadOrCalculateEstimates");
+				Database database = dbm.getDatabase()) {
+			// try to load with these exact mods
+			BeatmapImpl diffEstimate = loadOrCalculate(database, beatmapId, mods);
+
+			if(diffEstimate != null) {
+				return new PercentageEstimatesImpl(diffEstimate, mods);
+			}
+
+			throw new NoEstimatesException();
+		}
+	}
+
+	public static class NoEstimatesException extends Exception {
+		private static final long serialVersionUID = 1L;
 	}
 }

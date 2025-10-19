@@ -14,21 +14,21 @@ import lombok.Builder;
 @SuppressFBWarnings("NM")
 public record BeatmapImpl(
 		@BitwiseMods long modsUsed,
-		float OverallDifficulty,
-		float ApproachRate,
+		double OverallDifficulty,
+		double ApproachRate,
 		int HitCircleCount,
 		int SliderCount,
 		int SpinnerCount,
-		float StarDiff,
+		double StarDiff,
 		int MaxCombo,
-		float AimDifficulty,
-		float AimDifficultSliderCount,
-		float SpeedDifficulty,
-		float SpeedNoteCount,
-		float SliderFactor,
-		float AimDifficultStrainCount,
-		float SpeedDifficultStrainCount,
-		float FlashlightDifficulty) {
+		double AimDifficulty,
+		double AimDifficultSliderCount,
+		double SpeedDifficulty,
+		double SpeedNoteCount,
+		double SliderFactor,
+		double AimDifficultStrainCount,
+		double SpeedDifficultStrainCount,
+		double FlashlightDifficulty) {
 
 
 	public int getObjectCount() {

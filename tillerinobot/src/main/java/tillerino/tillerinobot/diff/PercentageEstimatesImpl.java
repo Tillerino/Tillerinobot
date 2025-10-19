@@ -36,7 +36,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 
 	@Override
 	public double getPP(int x100, int x50, int combo, int misses) {
-		int x300 = beatmap.getObjectCount() - x50 - x100;
+		int x300 = beatmap.getObjectCount() - x50 - x100 - misses;
 
 		OsuApiScore fakeScore = new OsuApiScore();
 		fakeScore.setMaxCombo(combo);
@@ -44,6 +44,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 		fakeScore.setCount100(x100);
 		fakeScore.setCount50(x50);
 		fakeScore.setCountMiss(misses);
+		fakeScore.setMods(mods);
 
 		OsuPerformanceAttributes attributes =
 				new OsuPerformanceCalculator().CreatePerformanceAttributes(fakeScore, beatmap);
