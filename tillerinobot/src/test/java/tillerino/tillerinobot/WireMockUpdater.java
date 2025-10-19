@@ -35,6 +35,13 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
  */
 class WireMockUpdater {
 
+  public static final int TILLERINO = 2070907;
+  public static final int FREEDOM_DIVE = 129891;
+  public static final int BEST_FRIENDS = 328472;
+  public static final int FLASHLIGHT = 663567;
+  public static final int BIG_BLACK = 131891;
+  public static final int SONG_COMPILATION = 5047712;
+
   @dagger.Component(modules = {UpdateModule.class, UrlsModule.class})
   @Singleton
   interface UpdateInjector {
@@ -119,7 +126,8 @@ class WireMockUpdater {
     new File(mappingsFileSource.getPath()).mkdirs();
     wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
         .fileSource(fileSource)
-        .mappingSource(new JsonFileMappingsSource(mappingsFileSource, new FilenameMaker())));
+        .mappingSource(new JsonFileMappingsSource(mappingsFileSource, new FilenameMaker()))
+        .port(0));
     wireMockServer.start();
   }
 
@@ -184,24 +192,43 @@ class WireMockUpdater {
     rateLimiter.startSchedulingPermits(Executors.newScheduledThreadPool(1, Thread.ofVirtual().factory()));
     rateLimiter.setThreadPriority(RateLimiter.REQUEST);
 
-    // System.out.println(osuApiV1.getUser(2070907, 0));
-    // System.out.println(osuApiV1.getUserTop(2070907, 0, 50));
+    // System.out.println(osuApiV1.getUser(TILLERINO, 0));
+    // System.out.println(osuApiV1.getUserTop(TILLERINO, 0, 50));
     // System.out.println(osuApiV1.getUser("Tillerino", 0));
-    // System.out.println(osuApiV1.getUserRecent(2070907, 0));
-    // System.out.println(osuApiV1.getBeatmap(131891, 0));
+    // System.out.println(osuApiV1.getUserRecent(TILLERINO, 0));
+    // System.out.println(osuApiV1.getBeatmap(BIG_BLACK, 0));
 
-    // System.out.println(osuApiV2.getUser(2070907, 0));
-    // System.out.println(osuApiV2.getUserTop(2070907, 0, 50));
+    // System.out.println(osuApiV2.getUser(TILLERINO, 0));
+    // System.out.println(osuApiV2.getUserTop(TILLERINO, 0, 50));
     // System.out.println(osuApiV2.getUser("Tillerino", 0));
-    // System.out.println(osuApiV2.getUserRecent(2070907, 0));
-    // System.out.println(osuApiV2.getBeatmap(131891, 0));
-    // System.out.println(osuApiV2.getBeatmap(131891, 16));
-    // System.out.println(osuApiV2.getBeatmapTop(131891, 0));
-    // System.out.println(osuApiV2.getBeatmap(5047712, 0));
-    // System.out.println(osuApiV2.getBeatmap(5047712, 16));
-    System.out.println(osuApiV2.getBeatmap(5047712, 64));
-    // System.out.println(osuApiV2.getBeatmapTop(5047712, 0));
-    // beatmapDownloader.getActualBeatmap(131891);
+    // System.out.println(osuApiV2.getUserRecent(TILLERINO, 0));
+
+    // beatmapDownloader.getActualBeatmap(BIG_BLACK);
+    // System.out.println(osuApiV2.getBeatmap(BIG_BLACK, 0));
+    // System.out.println(osuApiV2.getBeatmap(BIG_BLACK, 16));
+    // System.out.println(osuApiV2.getBeatmapTop(BIG_BLACK, 0));
+
+    // beatmapDownloader.getActualBeatmap(SONG_COMPILATION);
+    // System.out.println(osuApiV2.getBeatmap(SONG_COMPILATION, 0));
+    // System.out.println(osuApiV2.getBeatmap(SONG_COMPILATION, 16));
+    // System.out.println(osuApiV2.getBeatmap(SONG_COMPILATION, 64));
+    // System.out.println(osuApiV2.getBeatmapTop(SONG_COMPILATION, 0));
+
+    // beatmapDownloader.getActualBeatmap(FREEDOM_DIVE);
+    // System.out.println(osuApiV2.getBeatmap(FREEDOM_DIVE, 0));
+    // System.out.println(osuApiV2.getBeatmapTop(FREEDOM_DIVE, 0));
+
+    beatmapDownloader.getActualBeatmap(BEST_FRIENDS);
+    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 0L));
+    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 64));
+    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 80));
+    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 1024));
+    // System.out.println(osuApiV2.getBeatmap(BEST_FRIENDS, 1032));
+    System.out.println(osuApiV2.getBeatmapTop(BEST_FRIENDS, 0));
+
+    // beatmapDownloader.getActualBeatmap(FLASHLIGHT);
+    // System.out.println(osuApiV2.getBeatmap(FLASHLIGHT, 0));
+    // System.out.println(osuApiV2.getBeatmapTop(FLASHLIGHT, 0));
   }
 
   /**

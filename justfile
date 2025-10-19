@@ -37,3 +37,10 @@ outdated-java:
   {{mvn}} versions:display-property-updates {{updates-flags}} && { grep -- "->" updates.txt */updates.txt */*/updates.txt | sed 's/\.\+/./g'; }
   {{mvn}} versions:display-dependency-updates {{updates-flags}} && { grep -- "->" updates.txt */updates.txt */*/updates.txt | sed 's/\.\+/./g'; }
   rm updates.txt */updates.txt */*/updates.txt
+
+san-doku-build-and-run:
+  docker build -t san-doku 'https://github.com/omkelderman/SanDoku.git#2025.710.0-lazer'
+  docker run --rm -it -p 8080:8080 san-doku
+
+san-doku-get-spec:
+  curl -f http://localhost:8080/swagger/v1/swagger.json > tillerinobot/src/main/openapi/san-doku.json

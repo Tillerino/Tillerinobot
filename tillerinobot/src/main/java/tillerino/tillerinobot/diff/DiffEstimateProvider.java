@@ -1,5 +1,8 @@
 package tillerino.tillerinobot.diff;
 
+import com.github.omkelderman.sandoku.DiffCalcResult;
+import com.github.omkelderman.sandoku.DiffResult;
+import com.github.omkelderman.sandoku.ProcessorApi;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -38,8 +41,6 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.DiffEstimate;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
-import tillerino.tillerinobot.diff.sandoku.SanDokuResponse;
-import tillerino.tillerinobot.diff.sandoku.SanDokuResponse.SanDokuDiffCalcResult;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 
@@ -56,7 +57,7 @@ public class DiffEstimateProvider {
 
 	private final OsuApi downloader;
 
-	private final SanDoku calculator;
+	private final ProcessorApi calculator;
 
 	private final DatabaseManager dbm;
 
@@ -129,7 +130,7 @@ public class DiffEstimateProvider {
 	}
 
 	private static DiffEstimate calculateDiffEstimate(@BeatmapId int beatmapid, @BitwiseMods long mods,
-			BeatmapsService beatmaps, SanDoku calculator) {
+			BeatmapsService beatmaps, ProcessorApi calculator) {
 	
 		BeatmapResource beatmap = beatmaps.byId(beatmapid);
 		DiffEstimate estimate = new DiffEstimate(beatmapid, mods);
@@ -149,11 +150,11 @@ public class DiffEstimateProvider {
 			return estimate;
 		}
 
-		SanDokuResponse sanDoku;
+		DiffResult sanDoku;
 		try {
-			sanDoku = calculator.getDiff(0, mods, actualBeatmap.getBytes(StandardCharsets.UTF_8));
-			SanDokuDiffCalcResult r = sanDoku.diffCalcResult();
-			if (r.sliderCount() + r.hitCircleCount() + r.spinnerCount() == 0) {
+			sanDoku = calculator.processorCalcDiff(0, (int) mods, false, actualBeatmap.getBytes(StandardCharsets.UTF_8));
+			DiffCalcResult r = sanDoku.getDiffCalcResult();
+			if (r.getSliderCount() + r.getHitCircleCount() + r.getSpinnerCount() == 0) {
 				estimate.failure = "Beatmap has no objects.";
 				return estimate;
 			}
@@ -165,7 +166,7 @@ public class DiffEstimateProvider {
 			return estimate;
 		}
 
-		DiffEstimate.DiffEstimateToBeatmapImplMapper.INSTANCE.map(sanDoku.toBeatmap(), estimate);
+		DiffEstimate.DiffEstimateToBeatmapImplMapper.INSTANCE.map(sanDoku, estimate);
 		estimate.success = true;
 
 		return estimate;

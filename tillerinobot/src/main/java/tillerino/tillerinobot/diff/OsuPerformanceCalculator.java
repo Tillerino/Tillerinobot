@@ -1,6 +1,9 @@
-package tillerino.tillerinobot.diff;// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// This is AI-translated, stripped down, and manually adjusted from the C# source
 
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
+
+package tillerino.tillerinobot.diff;
 
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiScore;
@@ -47,11 +50,11 @@ public class OsuPerformanceCalculator
     private int totalSuccessfulHits;
     private int totalImperfectHits;
 
-    protected OsuPerformanceAttributes CreatePerformanceAttributes(OsuApiScore score, BeatmapImpl attributes,
-        boolean classic)
+    protected OsuPerformanceAttributes CreatePerformanceAttributes(OsuApiScore score, BeatmapImpl attributes)
     {
         BeatmapImpl osuAttributes = attributes;
-        usingClassicSliderAccuracy = classic;
+        // old stable scores are not marked as classic, so we add that distinction
+        usingClassicSliderAccuracy = !Mods.Lazer.is(score.getMods()) || Mods.Classic.is(score.getMods());
 
         accuracy = OsuApiScore.getAccuracy(score.getCount300(), score.getCount100(), score.getCount50(), score.getCountMiss());
         scoreMaxCombo = score.getMaxCombo();
@@ -66,15 +69,23 @@ public class OsuPerformanceCalculator
         totalSuccessfulHits = countGreat + countOk + countMeh;
         totalImperfectHits = countOk + countMeh + countMiss;
 
+        overallDifficulty = attributes.OverallDifficulty();
+        approachRate = attributes.ApproachRate();
+
+        ApplyToTrack(score);
+        ApplyToDifficulty(score);
+
         OsuHitWindows hitWindows = new OsuHitWindows();
-        hitWindows.SetDifficulty(osuAttributes.OverallDifficulty());
+        hitWindows.SetDifficulty(overallDifficulty);
 
-        greatHitWindow = hitWindows.great;
-        okHitWindow = hitWindows.ok;
-        mehHitWindow = hitWindows.meh;
+        greatHitWindow = hitWindows.great / clockRate;
+        okHitWindow = hitWindows.ok / clockRate;
+        mehHitWindow = hitWindows.meh / clockRate;
 
-        overallDifficulty = osuAttributes.OverallDifficulty();
-        approachRate = osuAttributes.approachRate();
+        double preempt = IBeatmapDifficultyInfo.DifficultyRange(approachRate, 1800, 1200, 450) / clockRate;
+
+        overallDifficulty = (79.5 - greatHitWindow) / 6;
+        approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
         if (osuAttributes.SliderCount() > 0)
         {
@@ -152,7 +163,7 @@ public class OsuPerformanceCalculator
 
         double aimDifficulty = attributes.AimDifficulty();
 
-        if (attributes.SliderCount() > 0 && attributes.AimDifficultySliderCount() > 0)
+        if (attributes.SliderCount() > 0 && attributes.AimDifficultSliderCount() > 0)
         {
             double estimateImproperlyFollowedDifficultSliders;
 
@@ -160,16 +171,16 @@ public class OsuPerformanceCalculator
             {
                 // When the score is considered classic (regardless if it was made on old client or not) we consider all missing combo to be dropped difficult sliders
                 int maximumPossibleDroppedSliders = totalImperfectHits;
-                estimateImproperlyFollowedDifficultSliders = Math.min(Math.max(Math.min(maximumPossibleDroppedSliders, attributes.MaxCombo() - scoreMaxCombo), 0), attributes.AimDifficultySliderCount());
+                estimateImproperlyFollowedDifficultSliders = Math.min(Math.max(Math.min(maximumPossibleDroppedSliders, attributes.MaxCombo() - scoreMaxCombo), 0), attributes.AimDifficultSliderCount());
             }
             else
             {
                 // We add tick misses here since they too mean that the player didn't follow the slider properly
                 // We however aren't adding misses here because missing slider heads has a harsh penalty by itself and doesn't mean that the rest of the slider wasn't followed properly
-                estimateImproperlyFollowedDifficultSliders = Math.min(Math.max(countSliderEndsDropped + countSliderTickMiss, 0), attributes.AimDifficultySliderCount());
+                estimateImproperlyFollowedDifficultSliders = Math.min(Math.max(countSliderEndsDropped + countSliderTickMiss, 0), attributes.AimDifficultSliderCount());
             }
 
-            double sliderNerfFactor = (1 - attributes.SliderFactor()) * Math.pow(1 - estimateImproperlyFollowedDifficultSliders / attributes.AimDifficultySliderCount(), 3) + attributes.SliderFactor();
+            double sliderNerfFactor = (1 - attributes.SliderFactor()) * Math.pow(1 - estimateImproperlyFollowedDifficultSliders / attributes.AimDifficultSliderCount(), 3) + attributes.SliderFactor();
             aimDifficulty *= sliderNerfFactor;
         }
 
@@ -180,7 +191,7 @@ public class OsuPerformanceCalculator
         aimValue *= lengthBonus;
 
         if (effectiveMissCount > 0)
-            aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultyStrainCount());
+            aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount());
 
         double approachRateFactor = 0.0;
         if (approachRate > 10.33)
@@ -220,7 +231,7 @@ public class OsuPerformanceCalculator
         speedValue *= lengthBonus;
 
         if (effectiveMissCount > 0)
-            speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultyStrainCount());
+            speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount());
 
         double approachRateFactor = 0.0;
         if (approachRate > 10.33)
@@ -238,7 +249,7 @@ public class OsuPerformanceCalculator
         }
         else*/ if (Mods.Hidden.is(score.getMods()) /* || "traceable" */)
         {
-            // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs
+            // We want to give more reward for lower AR when it comes to aimDifficulty and HD. This nerfs high AR and buffs
             // lower AR.
             speedValue *= 1.0 + 0.04 * (12.0 - approachRate);
         }
@@ -303,7 +314,7 @@ public class OsuPerformanceCalculator
         if (!Mods.Flashlight.is(score.getMods()))
             return 0.0;
 
-        double flashlightValue = 0; // TODO Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
+        double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty());
 
         // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
         if (effectiveMissCount > 0)
@@ -311,11 +322,11 @@ public class OsuPerformanceCalculator
 
         flashlightValue *= getComboScalingFactor(attributes);
 
-        // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
+        // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlightDifficulty radius.
         flashlightValue *= 0.7 + 0.1 * Math.min(1.0, totalHits / 200.0) +
                 (totalHits > 200 ? 0.2 * Math.min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
-        // Scale the flashlight value with accuracy _slightly_.
+        // Scale the flashlightDifficulty value with accuracy _slightly_.
         flashlightValue *= 0.5 + accuracy / 2.0;
         // It is important to also consider accuracy difficulty when doing that.
         flashlightValue *= 0.98 + Math.pow(Math.max(0, overallDifficulty), 2) / 2500;
@@ -336,7 +347,7 @@ public class OsuPerformanceCalculator
         double speedNoteCount = attributes.SpeedNoteCount();
         speedNoteCount += (totalHits - attributes.SpeedNoteCount()) * 0.1;
 
-        // Assume worst case: all mistakes were on speed notes
+        // Assume worst case: all mistakes were on speedDifficulty notes
         double relevantCountMiss = Math.min(countMiss, speedNoteCount);
         double relevantCountMeh = Math.min(countMeh, speedNoteCount - relevantCountMiss);
         double relevantCountOk = Math.min(countOk, speedNoteCount - relevantCountMiss - relevantCountMeh);
@@ -396,7 +407,8 @@ public class OsuPerformanceCalculator
         return deviation;
     }
 
-    // Calculates multiplier for speed to account for improper tapping based on the deviation and speed difficulty
+
+    // Calculates multiplier for speedDifficulty to account for improper tapping based on the deviation and speedDifficulty difficulty
     // https://www.desmos.com/calculator/dmogdhzofn
     private double calculateSpeedHighDeviationNerf(BeatmapImpl attributes)
     {
@@ -433,5 +445,25 @@ public class OsuPerformanceCalculator
     private double getComboScalingFactor(BeatmapImpl attributes)
     {
         return attributes.MaxCombo() <= 0 ? 1.0 : Math.min(Math.pow(scoreMaxCombo, 0.8) / Math.pow(attributes.MaxCombo(), 0.8), 1.0);
+    }
+
+    private void ApplyToDifficulty(OsuApiScore score) {
+        if (Mods.HardRock.is(score.getMods())) {
+            overallDifficulty = Math.min(10, overallDifficulty * 1.4);
+            approachRate = Math.min(10, approachRate * 1.4);
+        }
+        if (Mods.Easy.is(score.getMods())) {
+            overallDifficulty = overallDifficulty / 2;
+            approachRate = approachRate / 2;
+        }
+    }
+
+    private void ApplyToTrack(OsuApiScore score) {
+        if (Mods.DoubleTime.is(score.getMods()) || Mods.Nightcore.is(score.getMods())) {
+            clockRate *= 1.5;
+        }
+        if (Mods.HalfTime.is(score.getMods())) {
+            clockRate *= 0.75;
+        }
     }
 }

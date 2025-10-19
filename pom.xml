@@ -298,7 +298,7 @@
 			<dependency>
 				<groupId>com.github.tillerino</groupId>
 				<artifactId>osu-api-connector</artifactId>
-				<version>0.18.1</version>
+				<version>0.18.2-SNAPSHOT</version>
 				<exclusions>
 					<!-- replaced with spotbugs jar -->
 					<exclusion>

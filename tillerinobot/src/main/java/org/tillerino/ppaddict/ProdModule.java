@@ -1,21 +1,17 @@
 package org.tillerino.ppaddict;
 
+import com.github.omkelderman.sandoku.ProcessorApi;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import java.io.IOException;
 import java.net.URI;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeoutException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
-import org.tillerino.osuApiModel.v2.DownloaderV2;
-import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
-import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
@@ -66,7 +62,7 @@ public interface ProdModule {
   Recommender recommender(AllRecommenders allRecommenders);
 
   @Provides
-  static SanDoku sanDoku() {
+  static ProcessorApi sanDoku() {
     return SanDoku.defaultClient(URI.create(Optional.ofNullable(System.getenv("SAN_DOKU_URL")).orElse("http://san-doku:8080")));
   }
 

@@ -5,10 +5,10 @@
 
 package tillerino.tillerinobot.diff;
 
-public abstract class OsuStrainSkill
+/**
+ * Represents the skill required to memorise and hit every object in a map with the Flashlight mod enabled.
+ */
+public class Flashlight
 {
-    public static double DifficultyToPerformance(double difficulty)
-    {
-        return Math.pow(5.0 * Math.max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
-    }
+    public static double DifficultyToPerformance(double difficulty) { return 25 * Math.pow(difficulty, 2); }
 }

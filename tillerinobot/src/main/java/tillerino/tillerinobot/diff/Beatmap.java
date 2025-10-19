@@ -20,23 +20,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 //suppress all found Sonar warnings, since we are trying to copy C# code
 @SuppressWarnings({ "squid:S00100", "squid:S1214", "squid:S00115" })
 public interface Beatmap {
-	public enum EScoreVersion {
-		ScoreV1, ScoreV2
-	}
-
-	public static final int Aim = 0;
-	public static final int Speed = 1;
-	public static final int OD = 2;
-	public static final int AR = 3;
-	public static final int MaxCombo = 4;
-	public static final int SliderFactor = 5;
-	public static final int Flashlight = 6;
-	public static final int SpeedNoteCount = 7;
-	public static final int AimDifficultStrainCount = 8;
-	public static final int SpeedDifficultStrainCount = 9;
-
-	@BitwiseMods
-	static long diffMods = getMask(TouchDevice, HalfTime, DoubleTime, Easy, HardRock, Mods.Flashlight);
+	@BitwiseMods long diffMods = getMask(TouchDevice, HalfTime, DoubleTime, Easy, HardRock, Mods.Flashlight);
 
 	/**
 	 * returns only TD, HT, DT, EZ, HR, and FL, converting NC to DT. Also includes HD, but only if FL is present
@@ -60,27 +44,5 @@ public interface Beatmap {
 		}
 
 		return mods;
-	}
-
-	float DifficultyAttribute(@BitwiseMods long mods, int kind);
-
-	/**
-	 * normal circles, not sliders or spinners
-	 * 
-	 * @return
-	 */
-	int HitCircleCount();
-
-	default EScoreVersion ScoreVersion() {
-		// as of now, we don't care about score versions.
-		return null;
-	}
-
-	int SpinnerCount();
-
-	int SliderCount();
-
-	default int getObjectCount() {
-		return HitCircleCount() + SpinnerCount() + SliderCount();
 	}
 }

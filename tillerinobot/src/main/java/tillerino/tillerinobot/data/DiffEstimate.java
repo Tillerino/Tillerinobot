@@ -1,4 +1,5 @@
 package tillerino.tillerinobot.data;
+import com.github.omkelderman.sandoku.DiffResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -46,15 +47,21 @@ public class DiffEstimate {
 		DiffEstimateToBeatmapImplMapper INSTANCE = Mappers.getMapper(DiffEstimateToBeatmapImplMapper.class);
 
 		@Mapping(target = "modsUsed", source = "mods")
-		@Mapping(target = "AimDifficultyStrainCount", ignore = true)
-		@Mapping(target = "AimDifficultySliderCount", ignore = true)
-		@Mapping(target = "SpeedDifficultyStrainCount", ignore = true)
+		@Mapping(target = "AimDifficultStrainCount", source = "aimDifficultStrainCount")
+		@Mapping(target = "AimDifficultSliderCount", source = "aimDifficultSliderCount")
+		@Mapping(target = "SpeedDifficultStrainCount", source = "speedDifficultStrainCount")
 		@Mapping(target = "OverallDifficulty", source = "overallDifficulty")
+		@Mapping(target = "ApproachRate", source = "approachRate")
+		@Mapping(target = "FlashlightDifficulty", source = "flashlight")
 		@Mapping(target = "MaxCombo", source = "maxCombo")
 		@Mapping(target = "AimDifficulty", source = "aim")
 		@Mapping(target = "SpeedDifficulty", source = "speed")
 		@Mapping(target = "SpeedNoteCount", source = "speedNoteCount")
 		@Mapping(target = "SliderFactor", source = "sliderFactor")
+		@Mapping(target = "HitCircleCount", source = "circleCount")
+		@Mapping(target = "SliderCount", source = "sliderCount")
+		@Mapping(target = "SpinnerCount", source = "spinnerCount")
+		@Mapping(target = "StarDiff", source = "starDiff")
 		BeatmapImpl map(DiffEstimate estimate);
 
 		@Mapping(target = "beatmapid", ignore = true)
@@ -64,13 +71,28 @@ public class DiffEstimate {
 		@Mapping(target = "calculated", ignore = true)
 		@Mapping(target = "dataVersion", ignore = true)
 		@Mapping(target = "md5", ignore = true)
-		@Mapping(target = "overallDifficulty", source = "OverallDifficulty")
-		@Mapping(target = "maxCombo", source = "MaxCombo")
-		@Mapping(target = "aim", source = "AimDifficulty")
-		@Mapping(target = "speed", source = "SpeedDifficulty")
-		@Mapping(target = "sliderFactor", source = "SliderFactor")
-		@Mapping(target = "speedNoteCount", source = "SpeedNoteCount")
-		void map(BeatmapImpl beatmap, @MappingTarget DiffEstimate database);
+		@Mapping(target = "overallDifficulty", source = "diffResult.beatmapProps.overallDifficulty")
+		@Mapping(target = "approachRate", source = "diffResult.beatmapProps.approachRate")
+		@Mapping(target = "starDiff", source = "diffResult.diffCalcResult.starRating")
+		@Mapping(target = "maxCombo", source = "diffResult.diffCalcResult.maxCombo")
+		@Mapping(target = "aim", source = "diffResult.diffCalcResult.aimDifficulty")
+		@Mapping(target = "speed", source = "diffResult.diffCalcResult.speedDifficulty")
+		@Mapping(target = "flashlight", source = "diffResult.diffCalcResult.flashlightDifficulty")
+		@Mapping(target = "sliderFactor", source = "diffResult.diffCalcResult.sliderFactor")
+		@Mapping(target = "speedNoteCount", source = "diffResult.diffCalcResult.speedNoteCount")
+		@Mapping(target = "aimDifficultStrainCount", source = "diffResult.diffCalcResult.aimDifficultStrainCount")
+		@Mapping(target = "aimDifficultSliderCount", source = "diffResult.diffCalcResult.aimDifficultSliderCount")
+		@Mapping(target = "speedDifficultStrainCount", source = "diffResult.diffCalcResult.speedDifficultStrainCount")
+		@Mapping(target = "circleCount", source = "diffResult.diffCalcResult.hitCircleCount")
+		@Mapping(target = "sliderCount", source = "diffResult.diffCalcResult.sliderCount")
+		@Mapping(target = "spinnerCount", source = "diffResult.diffCalcResult.spinnerCount")
+		void map(DiffResult diffResult, @MappingTarget DiffEstimate database);
+
+		default BeatmapImpl toBeatmap(DiffResult diffResult) {
+			DiffEstimate estimate = new DiffEstimate();
+			map(diffResult, estimate);
+			return map(estimate);
+		}
 	}
 
 	// all fields are public because Mapstruct <> lombok is broken
@@ -94,6 +116,10 @@ public class DiffEstimate {
 	public double sliderFactor;
 
 	public double speedNoteCount;
+
+	public double aimDifficultStrainCount;
+	public double aimDifficultSliderCount;
+	public double speedDifficultStrainCount;
 
 	public double approachRate;
 	public double overallDifficulty;

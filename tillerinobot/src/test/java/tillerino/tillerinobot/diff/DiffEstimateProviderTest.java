@@ -6,6 +6,9 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.github.omkelderman.sandoku.DiffCalcResult;
+import com.github.omkelderman.sandoku.DiffResult;
+import com.github.omkelderman.sandoku.ProcessorApi;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
@@ -36,8 +39,6 @@ import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiBeatmapTest;
 import tillerino.tillerinobot.data.DiffEstimate;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
-import tillerino.tillerinobot.diff.sandoku.SanDokuResponse;
-import tillerino.tillerinobot.diff.sandoku.SanDokuResponse.SanDokuDiffCalcResult;
 import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
@@ -52,8 +53,8 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 
 		@dagger.Provides
 		@Singleton
-		static SanDoku sanDoku() {
-			return mock(SanDoku.class);
+		static ProcessorApi sanDoku() {
+			return mock(ProcessorApi.class);
 		}
 
 		@dagger.Provides
@@ -73,7 +74,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 	}
 
 	@Inject
-	SanDoku sanDoku;
+	ProcessorApi sanDoku;
 	@Inject
 	OsuApi downloader;
 	@Inject
@@ -109,7 +110,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			assertThat(provider.loadOrCalculate(database, 123, 0)).isNotNull();
 
 			// MD5 not changed, so only one invocation
-			verify(sanDoku, only()).getDiff(0, 0, beatmapContent.getBytes());
+			verify(sanDoku, only()).processorCalcDiff(0, 0, false, beatmapContent.getBytes());
 		}
 
 		// check that background maintenance wouldn't update this
@@ -148,7 +149,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			assertThat(provider.loadOrCalculate(database, 123, 0)).isNotNull();
 
 			// MD5 not changed, so only one invocation
-			verify(sanDoku, only()).getDiff(0, 0, beatmapContent.getBytes());
+			verify(sanDoku, only()).processorCalcDiff(0, 0, false, beatmapContent.getBytes());
 		}
 	}
 
@@ -163,7 +164,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			assertThat(provider.loadOrCalculate(database, 123, 0)).isNotNull();
 
 			// MD5 not changed, so only one invocation
-			verify(sanDoku, only()).getDiff(0, 0, "bla".getBytes());
+			verify(sanDoku, only()).processorCalcDiff(0, 0, false, "bla".getBytes());
 		}
 	}
 
@@ -223,7 +224,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			runAsyncAndWait(provider::updateDiffEstimatesAndWait); // since we downloaded, this won't sleep because it hasn't exhausted all beatmaps.
 			verify(beatmapDownloader).getActualBeatmap(123);
 			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{123} and mods = \{0L}").hasValueSatisfying(
-					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", (double) 1.919f));
+					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 1.919));
 		}
 	}
 
@@ -241,20 +242,20 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
 			runAsyncAndWait(provider::updateDiffEstimates);
 
 			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{123} and mods = \{0L}").hasValueSatisfying(
-					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", (double) 1.919f));
+					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 1.919));
 			assertThat(database.selectUnique(DiffEstimate.class)."where beatmapid = \{456} and mods = \{0L}").hasValueSatisfying(
-					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", (double) 1.919f));
+					diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 1.919));
 		}
 	}
 
 	private void mockSanDokuResponse(String beatmapContent, double aim) {
-		SanDokuResponse response = SanDokuResponse.builder()
-				.diffCalcResult(SanDokuDiffCalcResult.builder()
-						.aim(aim)
+		DiffResult response = new DiffResult()
+				.diffCalcResult(new DiffCalcResult()
+						.aimDifficulty(aim)
 						.hitCircleCount(1)
-						.build())
-				.build();
-		when(sanDoku.getDiff(0, 0, beatmapContent.getBytes())).thenReturn(response);
+						.sliderCount(2)
+						.spinnerCount(3));
+		when(sanDoku.processorCalcDiff(0, 0, false, beatmapContent.getBytes())).thenReturn(response);
 	}
 
 	private <E extends Exception> void runAsyncAndWait(FailableRunnable<E> r) throws Exception {

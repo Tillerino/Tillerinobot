@@ -1,0 +1,27 @@
+{
+  "id" : "f97342a0-5ce9-4ed6-939f-540a43f566ff",
+  "name" : "osu_129891",
+  "request" : {
+    "url" : "/osu/129891",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "osu_129891-f97342a0-5ce9-4ed6-939f-540a43f566ff.txt",
+    "headers" : {
+      "Date" : "Sun, 19 Oct 2025 09:25:10 GMT",
+      "Content-Type" : "text/plain;charset=UTF-8",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Disposition" : "attachment; filename=\"xi - FREEDOM DiVE (Nakagawa-Kanon) [FOUR DIMENSIONS].osu\"",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "990f3a006917e0cd-MUC"
+    }
+  },
+  "uuid" : "f97342a0-5ce9-4ed6-939f-540a43f566ff",
+  "persistent" : true,
+  "insertionIndex" : 27
+}

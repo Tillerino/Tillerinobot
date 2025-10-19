@@ -151,15 +151,15 @@ public class TestBackend implements BotBackend {
 
 		BeatmapImpl cBeatmap = BeatmapImpl.builder()
 				.modsUsed(Beatmap.getDiffMods(mods))
-				.starDiff((float) beatmap.getStarDifficulty())
+				.StarDiff((float) beatmap.getStarDifficulty())
 				.AimDifficulty((float) beatmap.getStarDifficulty() / 2)
 				.SpeedDifficulty((float) beatmap.getStarDifficulty() / 2)
 				.SliderFactor(1f)
-				.approachRate((float) beatmap.getApproachRate())
+				.ApproachRate((float) beatmap.getApproachRate())
 				.OverallDifficulty((float) beatmap.getOverallDifficulty())
 				.MaxCombo(beatmap.getMaxCombo())
-				.circleCount(200)
-				.spinnerCount(10)
+				.HitCircleCount(200)
+				.SpinnerCount(10)
 				.build();
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, mods);
 

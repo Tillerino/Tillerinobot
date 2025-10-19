@@ -1,0 +1,27 @@
+{
+  "id" : "2411c8c5-d400-4f2f-aa98-290eba7343b3",
+  "name" : "osu_328472",
+  "request" : {
+    "url" : "/osu/328472",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "osu_328472-2411c8c5-d400-4f2f-aa98-290eba7343b3.txt",
+    "headers" : {
+      "Date" : "Sun, 19 Oct 2025 10:37:31 GMT",
+      "Content-Type" : "text/plain;charset=UTF-8",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Disposition" : "attachment; filename=\"Fujijo Seitokai Shikkou-bu - Best FriendS -TV Size- (Flask) [Fycho's Insane].osu\"",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "990fa3fb8acf70a8-MUC"
+    }
+  },
+  "uuid" : "2411c8c5-d400-4f2f-aa98-290eba7343b3",
+  "persistent" : true,
+  "insertionIndex" : 35
+}
