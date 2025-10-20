@@ -28,12 +28,12 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <guice.version>6.0.0</guice.version>
         <jaxb.api.version>2.3.1</jaxb.api.version>
-        <spotbugs.version>4.8.5</spotbugs.version>
-        <spotbugs.plugin.version>4.8.3.1</spotbugs.plugin.version>
+        <spotbugs.version>4.9.8</spotbugs.version>
+        <spotbugs.plugin.version>4.9.8.1</spotbugs.plugin.version>
         <project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
         <mockito.version>5.19.0</mockito.version>
         <rabbitmq.version>5.26.0</rabbitmq.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
         <mysql-connector-java.version>9.4.0</mysql-connector-java.version>
         <jax-rs.version>4.0.0</jax-rs.version>
         <rest-assured.version>5.5.6</rest-assured.version>
@@ -529,13 +529,12 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <release>21</release>
+                    <source>25</source>
+                    <target>25</target>
+                    <release>25</release>
                     <encoding>UTF-8</encoding>
                     <compilerArgs>
                         <compilerArg>-parameters</compilerArg>
-                        <compilerArg>--enable-preview</compilerArg>
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <annotationProcessorPath>
@@ -592,16 +591,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>--enable-preview</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <argLine>--enable-preview</argLine>
-                </configuration>
                 <executions>
                     <execution>
                         <id>run-integration-test</id>
