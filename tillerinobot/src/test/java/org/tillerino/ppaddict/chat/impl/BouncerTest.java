@@ -10,35 +10,34 @@ import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestClock;
 
 public class BouncerTest {
-	Clock clock = new TestClock();
+    Clock clock = new TestClock();
 
-	Bouncer bouncer = new Bouncer(clock);
+    Bouncer bouncer = new Bouncer(clock);
 
-	@Test
-	public void testEnter() throws Exception {
-		assertTrue(bouncer.tryEnter("nick", 1));
-		assertThat(bouncer.get("nick")).contains(new SemaphorePayload(1, 0, 0, false));
-	}
+    @Test
+    public void testEnter() throws Exception {
+        assertTrue(bouncer.tryEnter("nick", 1));
+        assertThat(bouncer.get("nick")).contains(new SemaphorePayload(1, 0, 0, false));
+    }
 
-	@Test
-	public void testRepeatedDenied() throws Exception {
-		assertTrue(bouncer.tryEnter("it's a me", 1));
-		assertFalse(bouncer.tryEnter("it's a me", 2));
-		assertThat(bouncer.get("it's a me").get()).hasFieldOrPropertyWithValue("attemptsSinceEntered", 1);
-	}
+    @Test
+    public void testRepeatedDenied() throws Exception {
+        assertTrue(bouncer.tryEnter("it's a me", 1));
+        assertFalse(bouncer.tryEnter("it's a me", 2));
+        assertThat(bouncer.get("it's a me").get()).hasFieldOrPropertyWithValue("attemptsSinceEntered", 1);
+    }
 
-	@Test
-	public void testOkAfterLeaving() throws Exception {
-		assertTrue(bouncer.tryEnter("it's a me", 1));
-		assertTrue(bouncer.exit("it's a me", 1));
-		assertTrue(bouncer.tryEnter("it's a me", 2));
-	}
+    @Test
+    public void testOkAfterLeaving() throws Exception {
+        assertTrue(bouncer.tryEnter("it's a me", 1));
+        assertTrue(bouncer.exit("it's a me", 1));
+        assertTrue(bouncer.tryEnter("it's a me", 2));
+    }
 
-	@Test
-	public void testFalseExit() throws Exception {
-		assertFalse(bouncer.exit("it's a me", 1));
-		assertTrue(bouncer.tryEnter("it's a me", 1));
-		assertFalse(bouncer.exit("it's a me", 2));
-	}
-
+    @Test
+    public void testFalseExit() throws Exception {
+        assertFalse(bouncer.exit("it's a me", 1));
+        assertTrue(bouncer.tryEnter("it's a me", 1));
+        assertFalse(bouncer.exit("it's a me", 2));
+    }
 }

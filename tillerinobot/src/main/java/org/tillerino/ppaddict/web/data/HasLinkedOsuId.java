@@ -1,12 +1,12 @@
 package org.tillerino.ppaddict.web.data;
 
 import javax.annotation.CheckForNull;
-
 import org.tillerino.osuApiModel.types.UserId;
 
 public interface HasLinkedOsuId {
-	@CheckForNull
-	@UserId Integer getLinkedOsuId();
+    @CheckForNull
+    @UserId
+    Integer getLinkedOsuId();
 
-	void setLinkedOsuId(@UserId Integer osuId);
+    void setLinkedOsuId(@UserId Integer osuId);
 }

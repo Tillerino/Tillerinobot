@@ -3,13 +3,11 @@ package tillerino.tillerinobot.handlers;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
+import lombok.Value;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
-
-import lombok.Value;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
@@ -20,38 +18,37 @@ import tillerino.tillerinobot.lang.Language;
 
 @Value
 public class RecentHandler implements CommandHandler {
-	BotBackend backend;
+    BotBackend backend;
 
-	@Override
-	public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language language)
-			throws UserException, IOException, SQLException, InterruptedException {
-		if (!command.equalsIgnoreCase("now")) {
-			return null;
-		}
-		
-		if(userData.getHearts() <= 0) {
-			return null;
-		}
+    @Override
+    public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language language)
+            throws UserException, IOException, SQLException, InterruptedException {
+        if (!command.equalsIgnoreCase("now")) {
+            return null;
+        }
 
-		List<ApiScore> recentPlays = backend.getRecentPlays(apiUser.getUserId());
-		if (recentPlays.isEmpty()) {
-			throw new UserException(language.noRecentPlays());
-		}
+        if (userData.getHearts() <= 0) {
+            return null;
+        }
 
-		OsuApiScore score = recentPlays.get(0);
+        List<ApiScore> recentPlays = backend.getRecentPlays(apiUser.getUserId());
+        if (recentPlays.isEmpty()) {
+            throw new UserException(language.noRecentPlays());
+        }
 
-		final BeatmapMeta estimates = backend.loadBeatmap(score.getBeatmapId(), score.getMods(), language);
+        OsuApiScore score = recentPlays.get(0);
 
-		if (estimates == null) {
-			throw new UserException(language.unknownBeatmap());
-		}
-		if (estimates.getMods() != score.getMods()) {
-			throw new UserException(language.noInformationForMods());
-		}
+        final BeatmapMeta estimates = backend.loadBeatmap(score.getBeatmapId(), score.getMods(), language);
 
-		userData.setLastSongInfo(estimates.getBeatmapWithMods());
-		return new Success(estimates.formInfoMessage(false, true, null,
-				userData.getHearts(), score.getAccuracy(), null, null));
-	}
+        if (estimates == null) {
+            throw new UserException(language.unknownBeatmap());
+        }
+        if (estimates.getMods() != score.getMods()) {
+            throw new UserException(language.noInformationForMods());
+        }
 
+        userData.setLastSongInfo(estimates.getBeatmapWithMods());
+        return new Success(
+                estimates.formInfoMessage(false, true, null, userData.getHearts(), score.getAccuracy(), null, null));
+    }
 }

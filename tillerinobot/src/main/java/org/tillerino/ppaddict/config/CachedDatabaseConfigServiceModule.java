@@ -1,13 +1,15 @@
 package org.tillerino.ppaddict.config;
 
-import javax.inject.Named;
-
 import dagger.Binds;
 import dagger.Module;
+import javax.inject.Named;
 
 @Module
 public interface CachedDatabaseConfigServiceModule {
-	@Binds ConfigService cached(CachingConfigService c);
+    @Binds
+    ConfigService cached(CachingConfigService c);
 
-	@Binds @Named("uncached") ConfigService uncached(DatabaseConfigService c);
+    @Binds
+    @Named("uncached")
+    ConfigService uncached(DatabaseConfigService c);
 }

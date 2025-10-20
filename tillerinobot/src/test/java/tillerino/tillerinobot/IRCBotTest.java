@@ -8,14 +8,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import dagger.Component;
+import jakarta.ws.rs.InternalServerErrorException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,9 +43,6 @@ import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
-
-import dagger.Component;
-import jakarta.ws.rs.InternalServerErrorException;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -55,220 +52,264 @@ import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
 public class IRCBotTest extends AbstractDatabaseTest {
-	@Singleton
-	@Component(modules = {DockeredMysqlModule.class, TestBackend.Module.class, LiveActivityMockModule.class,
-												GameChatResponseQueueMockModule.class, OsuApiV2Sometimes.Module.class,
-												OsuApiV1Test.Module.class, OsuApiV2Test.Module.class, CachedDatabaseConfigServiceModule.class,
-												Clock.Module.class})
-	interface Injector {
-		void inject(IRCBotTest t);
-	}
-	{
-		DaggerIRCBotTest_Injector.create().inject(this);
-	}
+    @Singleton
+    @Component(
+            modules = {
+                DockeredMysqlModule.class,
+                TestBackend.Module.class,
+                LiveActivityMockModule.class,
+                GameChatResponseQueueMockModule.class,
+                OsuApiV2Sometimes.Module.class,
+                OsuApiV1Test.Module.class,
+                OsuApiV2Test.Module.class,
+                CachedDatabaseConfigServiceModule.class,
+                Clock.Module.class
+            })
+    interface Injector {
+        void inject(IRCBotTest t);
+    }
 
-	protected PrivateAction action(String nick, String action) {
-		return preprocess(new PrivateAction(123, nick, 456, action));
-	}
+    {
+        DaggerIRCBotTest_Injector.create().inject(this);
+    }
 
-	protected PrivateMessage message(String nick, String message) {
-		return preprocess(new PrivateMessage(123, nick, 456, message));
-	}
+    protected PrivateAction action(String nick, String action) {
+        return preprocess(new PrivateAction(123, nick, 456, action));
+    }
 
-	static <T extends GameChatEvent> T preprocess(T event) {
-		event.getMeta().setMdc(MdcUtils.getSnapshot());
-		event.getMeta().setTimer(new PhaseTimer());
-		return event;
-	}
+    protected PrivateMessage message(String nick, String message) {
+        return preprocess(new PrivateMessage(123, nick, 456, message));
+    }
 
-	protected Joined join(String nick) {
-		return new Joined(123, nick, 456);
-	}
+    static <T extends GameChatEvent> T preprocess(T event) {
+        event.getMeta().setMdc(MdcUtils.getSnapshot());
+        event.getMeta().setTimer(new PhaseTimer());
+        return event;
+    }
 
-	@RegisterExtension
-	public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
+    protected Joined join(String nick) {
+        return new Joined(123, nick, 456);
+    }
 
-	RateLimiter rateLimiter = new RateLimiter();
+    @RegisterExtension
+    public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
 
-	TestOsutrackDownloader osuTrackDownloader = spy(new TestOsutrackDownloader());
+    RateLimiter rateLimiter = new RateLimiter();
 
-	@Inject TestBackend backend;
-	@Inject IrcNameResolver resolver;
-	@Inject RecommendationsManager recommendationsManager;
-	@Inject LiveActivity liveActivity;
-	@Inject Recommender rec;
-	@Inject UserDataManager userDataManager;
-	@Inject OsuApiV1 osuApiV1;
-	@Inject OsuApiV2 osuApiV2;
+    TestOsutrackDownloader osuTrackDownloader = spy(new TestOsutrackDownloader());
 
-	/**
-	 * Contains the messages and actions sent by the bot. At the end of each
-	 * test, it must be empty or the test fails.
-	 */
-	@Inject GameChatResponseQueue queue;
+    @Inject
+    TestBackend backend;
 
-	boolean printResponses = false;
+    @Inject
+    IrcNameResolver resolver;
 
-	private IRCBot bot;
+    @Inject
+    RecommendationsManager recommendationsManager;
 
-	@BeforeEach
-	public void initMocks() throws Exception {
-		mockQueuePrint();
+    @Inject
+    LiveActivity liveActivity;
 
-		this.recommendationsManager = spy(recommendationsManager);
-		this.resolver = spy(this.resolver);
-		this.bot = new IRCBot(this.backend, recommendationsManager, userDataManager,
-				resolver, osuTrackDownloader, rateLimiter,
-				liveActivity, queue);
-	}
+    @Inject
+    Recommender rec;
 
-	void mockQueuePrint() throws InterruptedException {
-		doAnswer(x -> {
-			if (printResponses) {
-				System.out.printf("sending %s in response to %s%n", x.getArguments()[0], x.getArguments()[1]);
-			}
-			return null;
-		}).when(queue).onResponse(any(), any());
-	}
+    @Inject
+    UserDataManager userDataManager;
 
-	@AfterEach
-	public void tearDown() {
-		verifyNoMoreInteractions(queue);
-	}
-	
-	@Test
-	public void testVersionMessage() throws Exception {
-		backend.hintUser("user", false, 0, 0);
-		backend.setLastVisitedVersion("user", 0);
-		
-		verifyResponse(bot, message("user", "!recommend"), new Message(IRCBot.VERSION_MESSAGE).then(singleResponse()));
-		verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.CURRENT_VERSION));
+    @Inject
+    OsuApiV1 osuApiV1;
 
-		verifyResponse(bot, message("user", "!recommend"), singleResponse());
-	}
-	
-	@Test
-	public void testWrongStrings() throws Exception {
-		backend.hintUser("user", false, 100, 1000);
-		turnOffVersionMessage();
+    @Inject
+    OsuApiV2 osuApiV2;
 
-		verifyResponse(bot, message("user", "!recommend"), successContaining("http://osu.ppy.sh"));
-		verifyResponse(bot, message("user", "!r"), successContaining("http://osu.ppy.sh"));
-		verifyResponse(bot, message("user", "!recccomend"), messageContaining("!help"));
-		verifyResponse(bot, message("user", "!halp"), successContaining("twitter"));
-		verifyResponse(bot, message("user", "!feq"), successContaining("FAQ"));
-	}
+    /**
+     * Contains the messages and actions sent by the bot. At the end of each test, it must be empty or the test fails.
+     */
+    @Inject
+    GameChatResponseQueue queue;
 
-	/**
-	 * Just checks that nothing crashes without an actual command.
-	 */
-	@Test
-	public void testNoCommand() throws Exception {
-		backend.hintUser("user", false, 100, 1000);
-		turnOffVersionMessage();
+    boolean printResponses = false;
 
-		verifyResponse(bot, message("user", "no command"), GameChatResponse.none());
-	}
+    private IRCBot bot;
 
-	@Test
-	public void testWelcomeIfDonator() throws Exception {
-		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
-		
-		this.backend.hintUser("TheDonator", true, 1, 1);
-		int userid = resolver.getIDByUserName("TheDonator");
+    @BeforeEach
+    public void initMocks() throws Exception {
+        mockQueuePrint();
 
-		ApiUser osuApiUser = mock(ApiUser.class);
-		doReturn("TheDonator").when(osuApiUser).getUserName();
-		doReturn(userid).when(osuApiUser).getUserId();
+        this.recommendationsManager = spy(recommendationsManager);
+        this.resolver = spy(this.resolver);
+        this.bot = new IRCBot(
+                this.backend,
+                recommendationsManager,
+                userDataManager,
+                resolver,
+                osuTrackDownloader,
+                rateLimiter,
+                liveActivity,
+                queue);
+    }
 
-		doReturn(osuApiUser).when(backend).getUser(eq(userid), anyLong());
-		doReturn(1).when(backend).getDonator(userid);
+    void mockQueuePrint() throws InterruptedException {
+        doAnswer(x -> {
+                    if (printResponses) {
+                        System.out.printf("sending %s in response to %s%n", x.getArguments()[0], x.getArguments()[1]);
+                    }
+                    return null;
+                })
+                .when(queue)
+                .onResponse(any(), any());
+    }
 
-		doReturn(System.currentTimeMillis() - 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, preprocess(join("TheDonator")), new Message("beep boop"));
+    @AfterEach
+    public void tearDown() {
+        verifyNoMoreInteractions(queue);
+    }
 
-		doReturn(System.currentTimeMillis() - 10 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, preprocess(join("TheDonator")), new Message("Welcome back, TheDonator."));
+    @Test
+    public void testVersionMessage() throws Exception {
+        backend.hintUser("user", false, 0, 0);
+        backend.setLastVisitedVersion("user", 0);
 
-		doReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator, "));
+        verifyResponse(bot, message("user", "!recommend"), new Message(IRCBot.VERSION_MESSAGE).then(singleResponse()));
+        verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.CURRENT_VERSION));
 
-		doReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
-		verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator")
-				.then(messageContaining("so long").then(messageContaining("back"))));
-	}
+        verifyResponse(bot, message("user", "!recommend"), singleResponse());
+    }
 
-	@Test
-	public void testHugs() throws Exception {
-		turnOffVersionMessage();
+    @Test
+    public void testWrongStrings() throws Exception {
+        backend.hintUser("user", false, 100, 1000);
+        turnOffVersionMessage();
 
-		backend.hintUser("donator", true, 0, 0);
+        verifyResponse(bot, message("user", "!recommend"), successContaining("http://osu.ppy.sh"));
+        verifyResponse(bot, message("user", "!r"), successContaining("http://osu.ppy.sh"));
+        verifyResponse(bot, message("user", "!recccomend"), messageContaining("!help"));
+        verifyResponse(bot, message("user", "!halp"), successContaining("twitter"));
+        verifyResponse(bot, message("user", "!feq"), successContaining("FAQ"));
+    }
 
-		verifyResponse(bot, message("donator", "I need a hug :("),
-				new Message("Come here, you!").then(new Action("hugs donator")));
-	}
-	
-	@Test
-	public void testComplaint() throws Exception {
-		turnOffVersionMessage();
+    /** Just checks that nothing crashes without an actual command. */
+    @Test
+    public void testNoCommand() throws Exception {
+        backend.hintUser("user", false, 100, 1000);
+        turnOffVersionMessage();
 
-		backend.hintUser("user", false, 0, 1000);
+        verifyResponse(bot, message("user", "no command"), GameChatResponse.none());
+    }
 
-		verifyResponse(bot, message("user", "!r"), anyResponse());
+    @Test
+    public void testWelcomeIfDonator() throws Exception {
+        doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
 
-		verifyResponse(bot, message("user", "!complain"), successContaining("complaint"));
-	}
+        this.backend.hintUser("TheDonator", true, 1, 1);
+        int userid = resolver.getIDByUserName("TheDonator");
 
-	@Test
-	public void testResetHandler() throws Exception {
-		turnOffVersionMessage();
+        ApiUser osuApiUser = mock(ApiUser.class);
+        doReturn("TheDonator").when(osuApiUser).getUserName();
+        doReturn(userid).when(osuApiUser).getUserId();
 
-		backend.hintUser("user", false, 0, 1000);
-		
-		verifyResponse(bot, message("user", "!reset"), anyResponse());
+        doReturn(osuApiUser).when(backend).getUser(eq(userid), anyLong());
+        doReturn(1).when(backend).getDonator(userid);
 
-		Integer id = resolver.resolveIRCName("user");
+        doReturn(System.currentTimeMillis() - 1000).when(backend).getLastActivity(any(OsuApiUser.class));
+        verifyResponse(bot, preprocess(join("TheDonator")), new Message("beep boop"));
 
-		verify(recommendationsManager).forgetRecommendations(id);
-	}
+        doReturn(System.currentTimeMillis() - 10 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
+        verifyResponse(bot, preprocess(join("TheDonator")), new Message("Welcome back, TheDonator."));
 
-	@Test
-	public void testProperEmptySamplerHandling() throws Exception {
-		doReturn(List.of(new BareRecommendation(1, 0, null, null, 0)))
-			.when(rec).loadRecommendations(any(), Mockito.argThat(Collection::isEmpty), any(), anyBoolean(), anyLong());
-		doReturn(Collections.emptyList())
-			.when(rec).loadRecommendations(any(), Mockito.argThat(l -> !l.isEmpty()), any(), anyBoolean(), anyLong());
-		doReturn(Collections.emptyList()).when(rec).loadTopPlays(1);
+        doReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000)
+                .when(backend)
+                .getLastActivity(any(OsuApiUser.class));
+        verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator, "));
 
-		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion("user");
+        doReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000)
+                .when(backend)
+                .getLastActivity(any(OsuApiUser.class));
+        verifyResponse(
+                bot,
+                preprocess(join("TheDonator")),
+                messageContaining("TheDonator")
+                        .then(messageContaining("so long").then(messageContaining("back"))));
+    }
 
-		backend.hintUser("user", false, 0, 1000);
+    @Test
+    public void testHugs() throws Exception {
+        turnOffVersionMessage();
 
-		verifyResponse(bot, message("user", "!r"), successContaining("/b/1"));
+        backend.hintUser("donator", true, 0, 0);
 
-		verifyResponse(bot, message("user", "!r"), messageContaining("!reset"));
+        verifyResponse(
+                bot,
+                message("donator", "I need a hug :("),
+                new Message("Come here, you!").then(new Action("hugs donator")));
+    }
 
-		verifyResponse(bot, message("user", "!r"), messageContaining("!reset"));
+    @Test
+    public void testComplaint() throws Exception {
+        turnOffVersionMessage();
 
-		verifyResponse(bot, message("user", "!reset"), anyResponse());
+        backend.hintUser("user", false, 0, 1000);
 
-		verifyResponse(bot, message("user", "!r"), successContaining("/b/1"));
-	}
+        verifyResponse(bot, message("user", "!r"), anyResponse());
 
-	@Test
-	public void testGammaDefault() throws Exception {
-		turnOffVersionMessage();
-		backend.hintUser("user", false, 75000, 1000);
+        verifyResponse(bot, message("user", "!complain"), successContaining("complaint"));
+    }
 
-		verifyResponse(bot, message("user", "!R"), anyResponse());
+    @Test
+    public void testResetHandler() throws Exception {
+        turnOffVersionMessage();
 
-		verify(rec).loadRecommendations(Mockito.anyList(), any(),
-				eq(Model.GAMMA10), anyBoolean(), anyLong());
-	}
+        backend.hintUser("user", false, 0, 1000);
 
-    private static final GameChatResponse OSUTRACK_RESPONSE_WITH_SPACE = new Success("Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/has+space osu!track].");
-    private static final GameChatResponse OSUTRACK_RESPONSE_FARTOWNIK = new Success("Rank: -3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track].")
-            .then(new Message("2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.06pp; [https://osu.ppy.sh/b/693195 #89]: 331.89pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."));
+        verifyResponse(bot, message("user", "!reset"), anyResponse());
+
+        Integer id = resolver.resolveIRCName("user");
+
+        verify(recommendationsManager).forgetRecommendations(id);
+    }
+
+    @Test
+    public void testProperEmptySamplerHandling() throws Exception {
+        doReturn(List.of(new BareRecommendation(1, 0, null, null, 0)))
+                .when(rec)
+                .loadRecommendations(any(), Mockito.argThat(Collection::isEmpty), any(), anyBoolean(), anyLong());
+        doReturn(Collections.emptyList())
+                .when(rec)
+                .loadRecommendations(any(), Mockito.argThat(l -> !l.isEmpty()), any(), anyBoolean(), anyLong());
+        doReturn(Collections.emptyList()).when(rec).loadTopPlays(1);
+
+        doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion("user");
+
+        backend.hintUser("user", false, 0, 1000);
+
+        verifyResponse(bot, message("user", "!r"), successContaining("/b/1"));
+
+        verifyResponse(bot, message("user", "!r"), messageContaining("!reset"));
+
+        verifyResponse(bot, message("user", "!r"), messageContaining("!reset"));
+
+        verifyResponse(bot, message("user", "!reset"), anyResponse());
+
+        verifyResponse(bot, message("user", "!r"), successContaining("/b/1"));
+    }
+
+    @Test
+    public void testGammaDefault() throws Exception {
+        turnOffVersionMessage();
+        backend.hintUser("user", false, 75000, 1000);
+
+        verifyResponse(bot, message("user", "!R"), anyResponse());
+
+        verify(rec).loadRecommendations(Mockito.anyList(), any(), eq(Model.GAMMA10), anyBoolean(), anyLong());
+    }
+
+    private static final GameChatResponse OSUTRACK_RESPONSE_WITH_SPACE = new Success(
+            "Rank: +0 (+0.00 pp) in 0 plays. | View detailed data on [https://ameobea.me/osutrack/user/has+space osu!track].");
+    private static final GameChatResponse OSUTRACK_RESPONSE_FARTOWNIK = new Success(
+                    "Rank: -3 (+26.25 pp) in 1568 plays. | View detailed data on [https://ameobea.me/osutrack/user/fartownik osu!track].")
+            .then(
+                    new Message(
+                            "2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.06pp; [https://osu.ppy.sh/b/693195 #89]: 331.89pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."));
 
     private void hintOsutrackUsers() {
         backend.hintUser("oliebol", false, 125000, 1000, 2756335);
@@ -285,189 +326,198 @@ public class IRCBotTest extends AbstractDatabaseTest {
         verifyResponse(bot, message("has space", "!u"), OSUTRACK_RESPONSE_WITH_SPACE);
     }
 
-	@Test
-	public void testOsutrackOliebolQueryFartownik() throws Exception {
-		turnOffVersionMessage();
-		hintOsutrackUsers();
-
-		verifyResponse(bot, message("oliebol", "!u fartownik"), OSUTRACK_RESPONSE_FARTOWNIK);
-	}
-
-	@Test
-	public void testOsutrackOliebolQueryNonExistendUser() throws Exception {
-		turnOffVersionMessage();
-		hintOsutrackUsers();
-
-		verifyResponse(bot, message("oliebol", "!u doesnotexist"), new Success("User doesnotexist does not exist"));
-	}
-
-	@Test
-	public void testOsutrackFartownik() throws Exception {
-		turnOffVersionMessage();
+    @Test
+    public void testOsutrackOliebolQueryFartownik() throws Exception {
+        turnOffVersionMessage();
         hintOsutrackUsers();
 
-		verifyResponse(bot, message("fartownik", "!u"), OSUTRACK_RESPONSE_FARTOWNIK);
-	}
+        verifyResponse(bot, message("oliebol", "!u fartownik"), OSUTRACK_RESPONSE_FARTOWNIK);
+    }
 
-	@Test
-	public void testOsutrackUnknown() throws Exception {
-		turnOffVersionMessage();
-		hintOsutrackUsers();
+    @Test
+    public void testOsutrackOliebolQueryNonExistendUser() throws Exception {
+        turnOffVersionMessage();
+        hintOsutrackUsers();
 
-		verifyResponse(bot, message("unknown", "!u"), new Message("osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/"));
-	}
+        verifyResponse(bot, message("oliebol", "!u doesnotexist"), new Success("User doesnotexist does not exist"));
+    }
 
-	@Test
-	public void testOsutrackServerError() throws Exception {
-		turnOffVersionMessage();
-		backend.hintUser("unknown", false, 125000, 1000, 1234);
-		doThrow(new InternalServerErrorException()).when(osuTrackDownloader).getUpdate(1234);
+    @Test
+    public void testOsutrackFartownik() throws Exception {
+        turnOffVersionMessage();
+        hintOsutrackUsers();
 
-		verifyResponse(bot, message("unknown", "!u"), new Message("osu!track doesn't seem to be working right now. Maybe try your luck on the website: https://ameobea.me/osutrack/"));
-	}
+        verifyResponse(bot, message("fartownik", "!u"), OSUTRACK_RESPONSE_FARTOWNIK);
+    }
 
-	void turnOffVersionMessage() throws SQLException, UserException {
-		doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
-	}
+    @Test
+    public void testOsutrackUnknown() throws Exception {
+        turnOffVersionMessage();
+        hintOsutrackUsers();
 
-	@Test
-	public void testAutomaticNameChangeRemapping() throws Exception {
-		doReturn(user(1, "user1 old")).when(backend).downloadUser("user1_old");
-		doReturn(user(1, "user1 old")).when(backend).getUser(eq(1), anyLong());
-		assertEquals(1, (int) bot.getUserOrThrow("user1_old").getUserId());
+        verifyResponse(
+                bot,
+                message("unknown", "!u"),
+                new Message(
+                        "osu!track doesn't know you. Try searching for your user here first: https://ameobea.me/osutrack/"));
+    }
 
-		// meanwhile, user 1 changed her name
-		doReturn(user(1, "user1 new")).when(backend).getUser(eq(1), anyLong());
-		// and user 2 hijacked her old name
-		doReturn(user(2, "user1 old")).when(backend).downloadUser("user1_old");
+    @Test
+    public void testOsutrackServerError() throws Exception {
+        turnOffVersionMessage();
+        backend.hintUser("unknown", false, 125000, 1000, 1234);
+        doThrow(new InternalServerErrorException()).when(osuTrackDownloader).getUpdate(1234);
 
-		assertEquals(2, (int) bot.getUserOrThrow("user1_old").getUserId());
-		assertEquals(1, (int) bot.getUserOrThrow("user1_new").getUserId());
-	}
+        verifyResponse(
+                bot,
+                message("unknown", "!u"),
+                new Message(
+                        "osu!track doesn't seem to be working right now. Maybe try your luck on the website: https://ameobea.me/osutrack/"));
+    }
 
-	@Test
-	public void testMaintenanceOnSight() throws Exception {
-		doReturn(18).when(resolver).resolveIRCName("aRareUserAppears");
-		doAnswer(x -> null).when(backend).registerActivity(eq(18), anyLong());
+    void turnOffVersionMessage() throws SQLException, UserException {
+        doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
+    }
 
-		Sighted event = preprocess(new Sighted(12, "aRareUserAppears", 15));
-		bot.onEvent(event);
-		verify(queue).onResponse(GameChatResponse.none(), event);
-		verify(backend, timeout(1000)).registerActivity(18, 15);
-	}
+    @Test
+    public void testAutomaticNameChangeRemapping() throws Exception {
+        doReturn(user(1, "user1 old")).when(backend).downloadUser("user1_old");
+        doReturn(user(1, "user1 old")).when(backend).getUser(eq(1), anyLong());
+        assertEquals(1, (int) bot.getUserOrThrow("user1_old").getUserId());
 
-	@Test
-	public void testNp() throws Exception {
-		backend.hintUser("user", false, 1000, 1000);
-		turnOffVersionMessage();
-		verifyResponse(bot, action("user", "is listening to [https://osu.ppy.sh/b/125 map]"), successContaining("pp"));
-	}
+        // meanwhile, user 1 changed her name
+        doReturn(user(1, "user1 new")).when(backend).getUser(eq(1), anyLong());
+        // and user 2 hijacked her old name
+        doReturn(user(2, "user1 old")).when(backend).downloadUser("user1_old");
 
-	@Test
-	public void maintenance() throws Exception {
-		doThrow(MaintenanceException.class).when(rec).loadTopPlays(1);
-		backend.hintUser("user", false, 1000, 1000);
-		turnOffVersionMessage();
-		verifyResponse(bot, message("user", "!r"), messageContaining("maintenance"));
-	}
+        assertEquals(2, (int) bot.getUserOrThrow("user1_old").getUserId());
+        assertEquals(1, (int) bot.getUserOrThrow("user1_new").getUserId());
+    }
 
-	@Test
-	public void v2ApiTriggersUpdate() throws Exception {
-		turnOffVersionMessage();
+    @Test
+    public void testMaintenanceOnSight() throws Exception {
+        doReturn(18).when(resolver).resolveIRCName("aRareUserAppears");
+        doAnswer(x -> null).when(backend).registerActivity(eq(18), anyLong());
 
-		backend.hintUser("user", false, 1000, 1000, 2070907);
-		verifyResponse(bot, message("user", "!set v2 on"), messageContaining("v2 API: ON"));
-		verify(osuApiV2).getUserTop(2070907, 0, 50);
-	}
+        Sighted event = preprocess(new Sighted(12, "aRareUserAppears", 15));
+        bot.onEvent(event);
+        verify(queue).onResponse(GameChatResponse.none(), event);
+        verify(backend, timeout(1000)).registerActivity(18, 15);
+    }
 
-	ApiUser user(@UserId int id, @OsuName String name) {
-		ApiUser user = new ApiUser();
-		user.setUserId(id);
-		user.setUserName(name);
-		return user;
-	}
+    @Test
+    public void testNp() throws Exception {
+        backend.hintUser("user", false, 1000, 1000);
+        turnOffVersionMessage();
+        verifyResponse(bot, action("user", "is listening to [https://osu.ppy.sh/b/125 map]"), successContaining("pp"));
+    }
 
-	private static GameChatResponse anyResponse() {
-		return new GameChatResponse() {
-			@Override
-			public boolean equals(Object arg0) {
-				return true;
-			}
+    @Test
+    public void maintenance() throws Exception {
+        doThrow(MaintenanceException.class).when(rec).loadTopPlays(1);
+        backend.hintUser("user", false, 1000, 1000);
+        turnOffVersionMessage();
+        verifyResponse(bot, message("user", "!r"), messageContaining("maintenance"));
+    }
 
-			@Override
-			public String toString() {
-				return "Any response";
-			}
+    @Test
+    public void v2ApiTriggersUpdate() throws Exception {
+        turnOffVersionMessage();
 
-			@Override
-			public Iterable<GameChatResponse> flatten() {
-				throw new NotImplementedException("nono");
-			}
-		};
-	}
+        backend.hintUser("user", false, 1000, 1000, 2070907);
+        verifyResponse(bot, message("user", "!set v2 on"), messageContaining("v2 API: ON"));
+        verify(osuApiV2).getUserTop(2070907, 0, 50);
+    }
 
-	private static GameChatResponse singleResponse() {
-		return new GameChatResponse() {
-			@Override
-			public boolean equals(Object arg0) {
-				return arg0 != null && !(arg0 instanceof ResponseList);
-			}
+    ApiUser user(@UserId int id, @OsuName String name) {
+        ApiUser user = new ApiUser();
+        user.setUserId(id);
+        user.setUserName(name);
+        return user;
+    }
 
-			@Override
-			public String toString() {
-				return "Any single response";
-			}
+    private static GameChatResponse anyResponse() {
+        return new GameChatResponse() {
+            @Override
+            public boolean equals(Object arg0) {
+                return true;
+            }
 
-			@Override
-			public Iterable<GameChatResponse> flatten() {
-				throw new NotImplementedException("nono");
-			}
-		};
-	}
+            @Override
+            public String toString() {
+                return "Any response";
+            }
 
-	private static GameChatResponse messageContaining(String s) {
-		return new GameChatResponse() {
-			@Override
-			public boolean equals(Object arg0) {
-				return arg0 instanceof Message msg && msg.content().contains(s);
-			}
+            @Override
+            public Iterable<GameChatResponse> flatten() {
+                throw new NotImplementedException("nono");
+            }
+        };
+    }
 
-			@Override
-			public String toString() {
-				return "Message containing " + s;
-			}
+    private static GameChatResponse singleResponse() {
+        return new GameChatResponse() {
+            @Override
+            public boolean equals(Object arg0) {
+                return arg0 != null && !(arg0 instanceof ResponseList);
+            }
 
-			@Override
-			public Iterable<GameChatResponse> flatten() {
-				throw new NotImplementedException("nono");
-			}
-		};
-	}
+            @Override
+            public String toString() {
+                return "Any single response";
+            }
 
-	private static GameChatResponse successContaining(String s) {
-		return new GameChatResponse() {
-			@Override
-			public boolean equals(Object arg0) {
-				return arg0 instanceof Success suc && suc.content().contains(s);
-			}
+            @Override
+            public Iterable<GameChatResponse> flatten() {
+                throw new NotImplementedException("nono");
+            }
+        };
+    }
 
-			@Override
-			public String toString() {
-				return "Success containing " + s;
-			}
+    private static GameChatResponse messageContaining(String s) {
+        return new GameChatResponse() {
+            @Override
+            public boolean equals(Object arg0) {
+                return arg0 instanceof Message msg && msg.content().contains(s);
+            }
 
-			@Override
-			public Iterable<GameChatResponse> flatten() {
-				throw new NotImplementedException("nono");
-			}
-		};
-	}
+            @Override
+            public String toString() {
+                return "Message containing " + s;
+            }
 
-	private void verifyResponse(IRCBot bot, GameChatEvent event, GameChatResponse response) throws InterruptedException {
-		verifyNoMoreInteractions(queue);
-		reset(queue);
-		mockQueuePrint();
-		bot.onEvent(event);
-		verify(queue).onResponse(response, event);
-	}
+            @Override
+            public Iterable<GameChatResponse> flatten() {
+                throw new NotImplementedException("nono");
+            }
+        };
+    }
+
+    private static GameChatResponse successContaining(String s) {
+        return new GameChatResponse() {
+            @Override
+            public boolean equals(Object arg0) {
+                return arg0 instanceof Success suc && suc.content().contains(s);
+            }
+
+            @Override
+            public String toString() {
+                return "Success containing " + s;
+            }
+
+            @Override
+            public Iterable<GameChatResponse> flatten() {
+                throw new NotImplementedException("nono");
+            }
+        };
+    }
+
+    private void verifyResponse(IRCBot bot, GameChatEvent event, GameChatResponse response)
+            throws InterruptedException {
+        verifyNoMoreInteractions(queue);
+        reset(queue);
+        mockQueuePrint();
+        bot.onEvent(event);
+        verify(queue).onResponse(response, event);
+    }
 }

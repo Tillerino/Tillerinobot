@@ -2,7 +2,7 @@ package tillerino.tillerinobot.handlers.options;
 
 import tillerino.tillerinobot.UserDataManager.UserData;
 
-public class WelcomeOptionHandler extends BooleanOptionHandler{
+public class WelcomeOptionHandler extends BooleanOptionHandler {
     public WelcomeOptionHandler() {
         super("Welcome Message", "welcome", null, 1);
     }

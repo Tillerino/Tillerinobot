@@ -9,29 +9,30 @@ import org.tillerino.ppaddict.rabbit.RemoteLiveActivity;
 
 public class LiveActivityIT extends AbstractLiveActivityEndpointTest {
 
-	@RegisterExtension
-	public static RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
+    @RegisterExtension
+    public static RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
 
-	private RemoteLiveActivity push;
+    private RemoteLiveActivity push;
 
-	@BeforeEach
-	@Override
-	public void setUp() throws Exception {
-		push = RabbitMqConfiguration.liveActivity(rabbit.getConnection());
-		super.setUp();
-	}
-	@Override
-	protected int port() {
-		return LiveContainer.getLive().getMappedPort(8080);
-	}
+    @BeforeEach
+    @Override
+    public void setUp() throws Exception {
+        push = RabbitMqConfiguration.liveActivity(rabbit.getConnection());
+        super.setUp();
+    }
 
-	@Override
-	protected String host() {
-		return LiveContainer.getLive().getHost();
-	}
+    @Override
+    protected int port() {
+        return LiveContainer.getLive().getMappedPort(8080);
+    }
 
-	@Override
-	protected LiveActivity push() {
-		return push;
-	}
+    @Override
+    protected String host() {
+        return LiveContainer.getLive().getHost();
+    }
+
+    @Override
+    protected LiveActivity push() {
+        return push;
+    }
 }

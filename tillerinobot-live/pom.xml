@@ -1,6 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.tillerino.osu</groupId>
@@ -49,6 +48,15 @@
         <profile>
             <id>rust</id>
             <build>
+                <resources>
+                    <resource>
+                        <targetPath>${project.basedir}/target/release</targetPath>
+                        <directory>${project.basedir}/target/x86_64-unknown-linux-musl/release</directory>
+                        <includes>
+                            <include>main</include>
+                        </includes>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -56,10 +64,10 @@
                         <executions>
                             <execution>
                                 <id>build-rust</id>
-                                <phase>generate-resources</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                                 <configuration>
                                     <executable>cargo</executable>
                                     <arguments>
@@ -73,15 +81,6 @@
                         </executions>
                     </plugin>
                 </plugins>
-                <resources>
-                    <resource>
-                        <directory>${project.basedir}/target/x86_64-unknown-linux-musl/release</directory>
-                        <targetPath>${project.basedir}/target/release</targetPath>
-                        <includes>
-                            <include>main</include>
-                        </includes>
-                    </resource>
-                </resources>
             </build>
         </profile>
     </profiles>

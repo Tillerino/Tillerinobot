@@ -1,13 +1,10 @@
 package tillerino.tillerinobot.osutrack;
 
-import java.util.List;
-
-import org.tillerino.osuApiModel.types.GameMode;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.util.List;
 import lombok.Data;
+import org.tillerino.osuApiModel.types.GameMode;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data

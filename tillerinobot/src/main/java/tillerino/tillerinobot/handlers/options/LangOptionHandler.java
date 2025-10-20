@@ -1,5 +1,9 @@
 package tillerino.tillerinobot.handlers.options;
 
+import static java.util.stream.Collectors.joining;
+
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.UserDataManager.UserData;
@@ -7,11 +11,6 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.handlers.OptionsHandler;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.joining;
 
 public class LangOptionHandler extends OptionHandler {
     public LangOptionHandler() {

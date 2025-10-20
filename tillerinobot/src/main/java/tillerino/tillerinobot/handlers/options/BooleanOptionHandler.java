@@ -2,24 +2,22 @@ package tillerino.tillerinobot.handlers.options;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.tillerino.osuApiModel.OsuApiUser;
-import org.tillerino.ppaddict.chat.GameChatResponse;
-
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 public abstract class BooleanOptionHandler extends OptionHandler {
-    protected BooleanOptionHandler(@Nonnull String description, @Nonnull String optionName, @Nullable String shortOptionName, int minHearts) {
+    protected BooleanOptionHandler(
+            @Nonnull String description, @Nonnull String optionName, @Nullable String shortOptionName, int minHearts) {
         super(description, optionName, shortOptionName, minHearts);
     }
 
     @Override
     protected void handleSet(String value, UserData userData, OsuApiUser apiUser, Language lang)
-        throws UserException, SQLException, IOException {
+            throws UserException, SQLException, IOException {
         handleSetBoolean(parseBoolean(value, lang), userData);
     }
 

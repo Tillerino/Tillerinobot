@@ -1,22 +1,18 @@
 package tillerino.tillerinobot.rest;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-
+import java.io.IOException;
+import java.sql.SQLException;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
-
-import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.IrcNameResolver;
 
 @Singleton

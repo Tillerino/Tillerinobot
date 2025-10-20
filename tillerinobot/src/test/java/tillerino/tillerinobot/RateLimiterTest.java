@@ -8,92 +8,91 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 public class RateLimiterTest {
-	private static ExecutorService exec = Executors.newCachedThreadPool();
+    private static ExecutorService exec = Executors.newCachedThreadPool();
 
-	@AfterAll
-	public static void stopExec() {
-		exec.shutdownNow();
-	}
+    @AfterAll
+    public static void stopExec() {
+        exec.shutdownNow();
+    }
 
-	@Test
-	public void testOnlyHigh() throws Exception {
-		RateLimiter limiter = new RateLimiter();
-		AtomicInteger high = new AtomicInteger();
-		AtomicInteger low = new AtomicInteger();
+    @Test
+    public void testOnlyHigh() throws Exception {
+        RateLimiter limiter = new RateLimiter();
+        AtomicInteger high = new AtomicInteger();
+        AtomicInteger low = new AtomicInteger();
 
-		CountDownLatch bothReady = new CountDownLatch(2);
-		exec.submit(() -> {
-			limiter.setThreadPriority(RateLimiter.REQUEST);
-			bothReady.countDown();
-			for (;;) {
-				limiter.limitRate();
-				high.incrementAndGet();
-			}
-		});
-		exec.submit(() -> {
-			limiter.setThreadPriority(RateLimiter.MAINTENANCE);
-			bothReady.countDown();
-			for (;;) {
-				limiter.limitRate();
-				low.incrementAndGet();
-			}
-		});
-		bothReady.await();
-		IntStream.range(0, 100).forEach(x -> limiter.addPermit());
-		while (high.get() + low.get() < 100) {
-			Thread.sleep(10);
-		}
-		assertEquals(100, high.get());
-	}
+        CountDownLatch bothReady = new CountDownLatch(2);
+        exec.submit(() -> {
+            limiter.setThreadPriority(RateLimiter.REQUEST);
+            bothReady.countDown();
+            for (; ; ) {
+                limiter.limitRate();
+                high.incrementAndGet();
+            }
+        });
+        exec.submit(() -> {
+            limiter.setThreadPriority(RateLimiter.MAINTENANCE);
+            bothReady.countDown();
+            for (; ; ) {
+                limiter.limitRate();
+                low.incrementAndGet();
+            }
+        });
+        bothReady.await();
+        IntStream.range(0, 100).forEach(x -> limiter.addPermit());
+        while (high.get() + low.get() < 100) {
+            Thread.sleep(10);
+        }
+        assertEquals(100, high.get());
+    }
 
-	@Test
-	public void testSplit() throws Exception {
-		RateLimiter limiter = new RateLimiter();
-		AtomicInteger high = new AtomicInteger();
-		AtomicInteger low = new AtomicInteger();
+    @Test
+    public void testSplit() throws Exception {
+        RateLimiter limiter = new RateLimiter();
+        AtomicInteger high = new AtomicInteger();
+        AtomicInteger low = new AtomicInteger();
 
-		CyclicBarrier barrier = new CyclicBarrier(2);
+        CyclicBarrier barrier = new CyclicBarrier(2);
 
-		exec.submit(() -> {
-			limiter.setThreadPriority(RateLimiter.REQUEST);
-			for (;;) {
-				barrier.await();
-				limiter.limitRate();
-				high.incrementAndGet();
-			}
-		});
-		exec.submit(() -> {
-			limiter.setThreadPriority(RateLimiter.EVENT);
-			for (;;) {
-				limiter.limitRate();
-				low.incrementAndGet();
-			}
-		});
-		/*
-		 * We add 200 permits. In this time, the high thread will request 100
-		 * permits. This is ensured by the cyclic barrier.
-		 */
-		IntStream.range(0, 100).forEach(x -> {
-			try {
-				barrier.await();
-				limiter.addPermit();
-				limiter.addPermit();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-		/*
-		 * Since the high thread only takes 100 permits and the high permit
-		 * queue as a capacity of 50, the lower thread gets 50 permits.
-		 */
-		while (high.get() + low.get() < 150) {
-			Thread.sleep(10);
-		}
-		assertEquals(100, high.get());
-	} 
+        exec.submit(() -> {
+            limiter.setThreadPriority(RateLimiter.REQUEST);
+            for (; ; ) {
+                barrier.await();
+                limiter.limitRate();
+                high.incrementAndGet();
+            }
+        });
+        exec.submit(() -> {
+            limiter.setThreadPriority(RateLimiter.EVENT);
+            for (; ; ) {
+                limiter.limitRate();
+                low.incrementAndGet();
+            }
+        });
+        /*
+         * We add 200 permits. In this time, the high thread will request 100
+         * permits. This is ensured by the cyclic barrier.
+         */
+        IntStream.range(0, 100).forEach(x -> {
+            try {
+                barrier.await();
+                limiter.addPermit();
+                limiter.addPermit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        /*
+         * Since the high thread only takes 100 permits and the high permit
+         * queue as a capacity of 50, the lower thread gets 50 permits.
+         */
+        while (high.get() + low.get() < 150) {
+            Thread.sleep(10);
+        }
+        assertEquals(100, high.get());
+    }
 }

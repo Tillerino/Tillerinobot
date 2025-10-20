@@ -6,79 +6,77 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 
 public class NumericPropertyPredicateTest {
-	@Test
-	public void testOkay() throws Exception {
-		RecommendationPredicate predicate = new NumericPropertyPredicate<>(
-				"w/e", new TitleLength(), 3, true, 3, true);
+    @Test
+    public void testOkay() throws Exception {
+        RecommendationPredicate predicate = new NumericPropertyPredicate<>("w/e", new TitleLength(), 3, true, 3, true);
 
-		OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
-		when(okayBeatmap.getTitle()).thenReturn("hai");
-		BareRecommendation rec = new BareRecommendation(0, 0, null, null, 0);
+        OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
+        when(okayBeatmap.getTitle()).thenReturn("hai");
+        BareRecommendation rec = new BareRecommendation(0, 0, null, null, 0);
 
-		assertTrue(predicate.test(rec, okayBeatmap));
+        assertTrue(predicate.test(rec, okayBeatmap));
 
-		OsuApiBeatmap tooLongBeatmap = mock(OsuApiBeatmap.class);
-		when(tooLongBeatmap.getTitle()).thenReturn("weeeeeeeeee");
+        OsuApiBeatmap tooLongBeatmap = mock(OsuApiBeatmap.class);
+        when(tooLongBeatmap.getTitle()).thenReturn("weeeeeeeeee");
 
-		assertFalse(predicate.test(rec, tooLongBeatmap));
+        assertFalse(predicate.test(rec, tooLongBeatmap));
 
-		OsuApiBeatmap tooShortBeatmap = mock(OsuApiBeatmap.class);
-		when(tooShortBeatmap.getTitle()).thenReturn("m");
+        OsuApiBeatmap tooShortBeatmap = mock(OsuApiBeatmap.class);
+        when(tooShortBeatmap.getTitle()).thenReturn("m");
 
-		assertFalse(predicate.test(rec, tooShortBeatmap));
+        assertFalse(predicate.test(rec, tooShortBeatmap));
 
-		RecommendationPredicate predicateExcl = new NumericPropertyPredicate<>(
-				"w/e", new TitleLength(), 3, false, 11, false);
-		
-		assertFalse(predicateExcl.test(rec, okayBeatmap));
-		
-		assertFalse(predicateExcl.test(rec, tooLongBeatmap));
+        RecommendationPredicate predicateExcl =
+                new NumericPropertyPredicate<>("w/e", new TitleLength(), 3, false, 11, false);
 
-		RecommendationPredicate predicateHuge = new NumericPropertyPredicate<>(
-				"w/e", new TitleLength(), 1, false, 15, false);
-		
-		assertTrue(predicateHuge.test(rec, okayBeatmap));
-}
+        assertFalse(predicateExcl.test(rec, okayBeatmap));
 
-	@Test
-	public void testMods() throws Exception {
-		RecommendationPredicate predicate = new NumericPropertyPredicate<>(
-				"w/e", new TitleLength(), 2, true, 5, true);
+        assertFalse(predicateExcl.test(rec, tooLongBeatmap));
 
-		OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
-		when(okayBeatmap.getTitle()).thenReturn("hai");
-		BareRecommendation okayRec = new BareRecommendation(0, 0, null, null, 0);
+        RecommendationPredicate predicateHuge =
+                new NumericPropertyPredicate<>("w/e", new TitleLength(), 1, false, 15, false);
 
-		assertTrue(predicate.test(okayRec, okayBeatmap));
+        assertTrue(predicateHuge.test(rec, okayBeatmap));
+    }
 
-		BareRecommendation moddedRec = new BareRecommendation(0, 1, null, null, 0);
+    @Test
+    public void testMods() throws Exception {
+        RecommendationPredicate predicate = new NumericPropertyPredicate<>("w/e", new TitleLength(), 2, true, 5, true);
 
-		assertFalse(predicate.test(moddedRec, okayBeatmap));
-	}
+        OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
+        when(okayBeatmap.getTitle()).thenReturn("hai");
+        BareRecommendation okayRec = new BareRecommendation(0, 0, null, null, 0);
 
-	@Test
-	public void testContradiction() throws Exception {
-		RecommendationPredicate predicate1 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 2, true, 5, true);
+        assertTrue(predicate.test(okayRec, okayBeatmap));
 
-		RecommendationPredicate predicate2 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 6, true, 7, true);
+        BareRecommendation moddedRec = new BareRecommendation(0, 1, null, null, 0);
 
-		RecommendationPredicate predicate3 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 7, true, 9, true);
-		RecommendationPredicate predicate4 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 7, false, 9, true);
+        assertFalse(predicate.test(moddedRec, okayBeatmap));
+    }
 
-		assertTrue(predicate1.contradicts(predicate2));
-		assertTrue(predicate2.contradicts(predicate1));
+    @Test
+    public void testContradiction() throws Exception {
+        RecommendationPredicate predicate1 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 2, true, 5, true);
 
-		assertFalse(predicate1.contradicts(predicate1));
-		assertFalse(predicate2.contradicts(predicate2));
+        RecommendationPredicate predicate2 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 6, true, 7, true);
 
-		assertFalse(predicate2.contradicts(predicate3));
-		assertFalse(predicate3.contradicts(predicate2));
+        RecommendationPredicate predicate3 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 7, true, 9, true);
+        RecommendationPredicate predicate4 =
+                new NumericPropertyPredicate<>("w/e", new TitleLength(), 7, false, 9, true);
 
-		assertTrue(predicate2.contradicts(predicate4));
-		assertTrue(predicate4.contradicts(predicate2));
-	}
+        assertTrue(predicate1.contradicts(predicate2));
+        assertTrue(predicate2.contradicts(predicate1));
+
+        assertFalse(predicate1.contradicts(predicate1));
+        assertFalse(predicate2.contradicts(predicate2));
+
+        assertFalse(predicate2.contradicts(predicate3));
+        assertFalse(predicate3.contradicts(predicate2));
+
+        assertTrue(predicate2.contradicts(predicate4));
+        assertTrue(predicate4.contradicts(predicate2));
+    }
 }

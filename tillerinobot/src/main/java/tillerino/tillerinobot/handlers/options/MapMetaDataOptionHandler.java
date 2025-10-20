@@ -2,7 +2,7 @@ package tillerino.tillerinobot.handlers.options;
 
 import tillerino.tillerinobot.UserDataManager.UserData;
 
-public class MapMetaDataOptionHandler extends BooleanOptionHandler{
+public class MapMetaDataOptionHandler extends BooleanOptionHandler {
     public MapMetaDataOptionHandler() {
         super("Show map metadata on recommendations", "r-metadata", null, 0);
     }

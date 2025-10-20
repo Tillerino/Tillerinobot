@@ -11,10 +11,9 @@ public class OsutrackDownloader {
     //   |   _____________________________________________________________________________________|_
     //    \_/_______________________________________________________________________________________/
     private static final String OSUTRACK_API_BASE = "https://osutrack-api.ameo.dev/";
-    private static final OsutrackApi OSUTRACK_API = WebResourceFactory.newResource(OsutrackApi.class, ClientBuilder
-            .newClient()
-            .target(OSUTRACK_API_BASE)
-            .queryParam("mode", 0));
+    private static final OsutrackApi OSUTRACK_API = WebResourceFactory.newResource(
+            OsutrackApi.class,
+            ClientBuilder.newClient().target(OSUTRACK_API_BASE).queryParam("mode", 0));
 
     protected void completeUpdateObject(UpdateResult updateResult) {
         for (Highscore highscore : updateResult.getNewHighscores()) {

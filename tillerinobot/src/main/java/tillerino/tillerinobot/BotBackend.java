@@ -1,17 +1,10 @@
 package tillerino.tillerinobot;
 
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.tillerino.mormon.Database;
-import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
@@ -19,108 +12,104 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
-
-import lombok.RequiredArgsConstructor;
-import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
 
 public interface BotBackend {
-	/**
-	 * @param beatmapid
-	 * @param mods
-	 *            mods for {@link PercentageEstimates}. These might be ignored
-	 *            if they can't be satisfied
-	 * @return null if not found
-	 * @throws SQLException
-	 * @throws IOException
-	 * @throws UserException
-	 * @throws InterruptedException 
-	 */
-	@CheckForNull
-	BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang) throws SQLException, IOException, UserException, InterruptedException;
+    /**
+     * @param beatmapid
+     * @param mods mods for {@link PercentageEstimates}. These might be ignored if they can't be satisfied
+     * @return null if not found
+     * @throws SQLException
+     * @throws IOException
+     * @throws UserException
+     * @throws InterruptedException
+     */
+    @CheckForNull
+    BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang)
+            throws SQLException, IOException, UserException, InterruptedException;
 
-	/**
-	 * @param nick
-	 * @return the last version of the bot that was visited by this user. -1 if
-	 *         no information available.
-	 * @throws SQLException
-	 * @throws UserException
-	 */
-	int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
-	
-	void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
+    /**
+     * @param nick
+     * @return the last version of the bot that was visited by this user. -1 if no information available.
+     * @throws SQLException
+     * @throws UserException
+     */
+    int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
 
-	/**
-	 * Get a user's information. If the user is not known in the database, the data will be downloaded from the osu API.
-	 *
-	 * @param userid user id
-	 * @param maxAge Maximum age of the information in milliseconds.
-	 *          If there is cached information in the database which is younger, the cached information will be returned.
-	 *          Otherwise, fresh data will be downloaded and cached.
-	 *          If <= 0, any cached information, if available, will be returned. 
-	 * @return null if the user can't be found at the osu API
-	 * @throws SQLException
-	 * @throws IOException API exception
-	 */
-	@CheckForNull
-	ApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException;
+    void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
 
-	/**
-	 * Registers activity of a user. This information is not historized, i.e. a
-	 * single value is updated and the previous value is therefore erased. This
-	 * information is used to decide when to update top-scores of the users.
-	 *
-	 * The implementation is reasonably fast and can be called frequently.
-	 * It does not download anything from the API and is unrelated to {@link #getUser(int, long)}.
-	 *
-	 * @param userid osu user ID of a real user. It is not required that the user is known via {@link #getUser(int, long)}.
-	 * @param timestamp when the user was sighted
-	 * @throws SQLException only on connection errors
-	 */
-	void registerActivity(@UserId int userid, @MillisSinceEpoch long timestamp) throws SQLException;
-	
-	long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
+    /**
+     * Get a user's information. If the user is not known in the database, the data will be downloaded from the osu API.
+     *
+     * @param userid user id
+     * @param maxAge Maximum age of the information in milliseconds. If there is cached information in the database
+     *     which is younger, the cached information will be returned. Otherwise, fresh data will be downloaded and
+     *     cached. If <= 0, any cached information, if available, will be returned.
+     * @return null if the user can't be found at the osu API
+     * @throws SQLException
+     * @throws IOException API exception
+     */
+    @CheckForNull
+    ApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException;
 
-	/**
-	 * Checks if a user is a donator/patron.
-	 *
-	 * @return a positive value if the user is a donator/patron.
-	 */
-	int getDonator(@UserId int user) throws SQLException, IOException;
+    /**
+     * Registers activity of a user. This information is not historized, i.e. a single value is updated and the previous
+     * value is therefore erased. This information is used to decide when to update top-scores of the users.
+     *
+     * <p>The implementation is reasonably fast and can be called frequently. It does not download anything from the API
+     * and is unrelated to {@link #getUser(int, long)}.
+     *
+     * @param userid osu user ID of a real user. It is not required that the user is known via {@link #getUser(int,
+     *     long)}.
+     * @param timestamp when the user was sighted
+     * @throws SQLException only on connection errors
+     */
+    void registerActivity(@UserId int userid, @MillisSinceEpoch long timestamp) throws SQLException;
 
-	/**
-	 * links the given user to a Patreon account using a token string.
-	 * 
-	 * @param token a token that was emailed to the Patron.
-	 * @param user osu account to link to
-	 * @return the name of the Patreon account that current user was linked to, or null if the token was not valid
-	 */
-	@CheckForNull
-	String tryLinkToPatreon(String token, OsuApiUser user);
+    long getLastActivity(@Nonnull OsuApiUser user) throws SQLException;
 
-	/**
-	 * Retrieves the last plays from this user. These don't have pp and might be failed attempts.
-	 *
-	 * @param userid
-	 * @return sorted from most recent to oldest
-	 * @throws IOException
-	 */
-	@Nonnull List<ApiScore> getRecentPlays(@UserId int userid) throws IOException;
+    /**
+     * Checks if a user is a donator/patron.
+     *
+     * @return a positive value if the user is a donator/patron.
+     */
+    int getDonator(@UserId int user) throws SQLException, IOException;
 
-	@CheckForNull
-	ApiUser downloadUser(String userName) throws IOException, SQLException;
+    /**
+     * links the given user to a Patreon account using a token string.
+     *
+     * @param token a token that was emailed to the Patron.
+     * @param user osu account to link to
+     * @return the name of the Patreon account that current user was linked to, or null if the token was not valid
+     */
+    @CheckForNull
+    String tryLinkToPatreon(String token, OsuApiUser user);
 
-	interface BeatmapsLoader {
-		/**
-		 * Retreives beatmap. Implementation hint: this might be called a *lot* when
-		 * checking recommendation predicates and should probably be cached.
-		 * 
-		 * @param beatmapId
-		 * @return null if not found
-		 */
-		@CheckForNull OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId, @BitwiseMods long mods) throws SQLException, IOException;
-	}
+    /**
+     * Retrieves the last plays from this user. These don't have pp and might be failed attempts.
+     *
+     * @param userid
+     * @return sorted from most recent to oldest
+     * @throws IOException
+     */
+    @Nonnull
+    List<ApiScore> getRecentPlays(@UserId int userid) throws IOException;
+
+    @CheckForNull
+    ApiUser downloadUser(String userName) throws IOException, SQLException;
+
+    interface BeatmapsLoader {
+        /**
+         * Retreives beatmap. Implementation hint: this might be called a *lot* when checking recommendation predicates
+         * and should probably be cached.
+         *
+         * @param beatmapId
+         * @return null if not found
+         */
+        @CheckForNull
+        OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId, @BitwiseMods long mods) throws SQLException, IOException;
+    }
 }
