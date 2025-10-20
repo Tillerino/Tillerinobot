@@ -1,20 +1,5 @@
 package org.tillerino.ppaddict.client;
 
-import java.util.Date;
-
-import javax.annotation.CheckForNull;
-
-import org.tillerino.ppaddict.client.HelpElements.E;
-import org.tillerino.ppaddict.client.HelpElements.HasHelpElements;
-import org.tillerino.ppaddict.client.dialogs.Side;
-import org.tillerino.ppaddict.client.dialogs.WelcomeDialog;
-import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
-import org.tillerino.ppaddict.client.services.UserDataService;
-import org.tillerino.ppaddict.client.services.UserDataServiceAsync;
-import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
-import org.tillerino.ppaddict.shared.InitialData;
-import org.tillerino.ppaddict.shared.Searches;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -30,197 +15,210 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.Date;
+import javax.annotation.CheckForNull;
+import org.tillerino.ppaddict.client.HelpElements.E;
+import org.tillerino.ppaddict.client.HelpElements.HasHelpElements;
+import org.tillerino.ppaddict.client.dialogs.Side;
+import org.tillerino.ppaddict.client.dialogs.WelcomeDialog;
+import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
+import org.tillerino.ppaddict.client.services.UserDataService;
+import org.tillerino.ppaddict.client.services.UserDataServiceAsync;
+import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
+import org.tillerino.ppaddict.shared.InitialData;
+import org.tillerino.ppaddict.shared.Searches;
 
 public class Main extends Composite implements HasHelpElements {
 
-  private static MainUiBinder uiBinder = GWT.create(MainUiBinder.class);
-  @UiField
-  DockLayoutPanel maindock;
-  @UiField
-  Hyperlink helpLink;
-  @UiField
-  HorizontalPanel controlsPanel;
-  @UiField
-  UserBox userBox;
+    private static MainUiBinder uiBinder = GWT.create(MainUiBinder.class);
 
-  @UiField
-  Hyperlink beatmapsNaviLink;
-  @UiField
-  Hyperlink recommendationsNaviLink;
+    @UiField
+    DockLayoutPanel maindock;
 
-  interface MainUiBinder extends UiBinder<Widget, Main> {
-  }
+    @UiField
+    Hyperlink helpLink;
 
-  @CheckForNull
-  AllBeatmapsTable beatmapsTable;
+    @UiField
+    HorizontalPanel controlsPanel;
 
-  RecommendationsView recommendations;
+    @UiField
+    UserBox userBox;
 
-  private UserDataServiceAsync userDataService = GWT.create(UserDataService.class);
+    @UiField
+    Hyperlink beatmapsNaviLink;
 
-  public Main() {
-    initWidget(uiBinder.createAndBindUi(this));
+    @UiField
+    Hyperlink recommendationsNaviLink;
 
-    help = new HelpElements(helpLink);
+    interface MainUiBinder extends UiBinder<Widget, Main> {}
 
-    help.addElement(this);
-    help.addElement(userBox);
+    @CheckForNull
+    AllBeatmapsTable beatmapsTable;
 
-    userBox.setHelpButton(help);
+    RecommendationsView recommendations;
 
-    recommendations = new RecommendationsView(userBox);
-    help.addElement(recommendations);
+    private UserDataServiceAsync userDataService = GWT.create(UserDataService.class);
 
-    Window.addResizeHandler(new ResizeHandler() {
-      @Override
-      public void onResize(ResizeEvent event) {
-        if (beatmapsTable != null && beatmapsTable.isAttached()) {
-          beatmapsTable.dock.forceLayout();
+    public Main() {
+        initWidget(uiBinder.createAndBindUi(this));
+
+        help = new HelpElements(helpLink);
+
+        help.addElement(this);
+        help.addElement(userBox);
+
+        userBox.setHelpButton(help);
+
+        recommendations = new RecommendationsView(userBox);
+        help.addElement(recommendations);
+
+        Window.addResizeHandler(new ResizeHandler() {
+            @Override
+            public void onResize(ResizeEvent event) {
+                if (beatmapsTable != null && beatmapsTable.isAttached()) {
+                    beatmapsTable.dock.forceLayout();
+                }
+                if (recommendations != null && recommendations.isAttached()) {
+                    recommendations.dock.forceLayout();
+                }
+            }
+        });
+
+        controlsPanel.getElement().getStyle().setPosition(Position.RELATIVE);
+
+        System.out.println("requesting initial data");
+
+        BeatmapRangeRequest request = createRequest();
+
+        userDataService.getInitialData(request, new AbstractAsyncCallback<InitialData>() {
+            @Override
+            public void process(InitialData result) {
+                beatmapsTable = new AllBeatmapsTable(result);
+
+                help.addElement(beatmapsTable);
+
+                userBox.addLoadHandler(recommendations);
+                userBox.setData(result.userData);
+
+                /*
+                 * add the load handler AFTER the table was loaded with the initial data, otherwise there
+                 * would be double loading
+                 */
+                userBox.addLoadHandler(beatmapsTable);
+                beatmapsTable.addBundleHandler(userBox.getBundleHandler());
+                maindock.add(beatmapsTable);
+            }
+        });
+    }
+
+    @CheckForNull
+    private BeatmapRangeRequest createRequest() {
+        if (Window.Location.getParameter("s") != null) {
+            try {
+                int s = Integer.parseInt(Window.Location.getParameter("s"));
+                BeatmapRangeRequest request = new BeatmapRangeRequest();
+                request.getSearches().setSetId(s);
+                return request;
+            } catch (NumberFormatException e) {
+                // okay, try something else
+            }
         }
-        if (recommendations != null && recommendations.isAttached()) {
-          recommendations.dock.forceLayout();
+
+        if (Window.Location.getParameter("b") != null) {
+            try {
+                int b = Integer.parseInt(Window.Location.getParameter("b"));
+                BeatmapRangeRequest request = new BeatmapRangeRequest();
+                request.getSearches().setBeatmapId(b);
+                return request;
+            } catch (NumberFormatException e) {
+                // okay, try something else
+            }
         }
-      }
-    });
 
-    controlsPanel.getElement().getStyle().setPosition(Position.RELATIVE);
-
-    System.out.println("requesting initial data");
-
-    BeatmapRangeRequest request = createRequest();
-
-    userDataService.getInitialData(request, new AbstractAsyncCallback<InitialData>() {
-      @Override
-      public void process(InitialData result) {
-        beatmapsTable = new AllBeatmapsTable(result);
-
-        help.addElement(beatmapsTable);
-
-        userBox.addLoadHandler(recommendations);
-        userBox.setData(result.userData);
-
-        /*
-         * add the load handler AFTER the table was loaded with the initial data, otherwise there
-         * would be double loading
-         */
-        userBox.addLoadHandler(beatmapsTable);
-        beatmapsTable.addBundleHandler(userBox.getBundleHandler());
-        maindock.add(beatmapsTable);
-      }
-    });
-  }
-
-  @CheckForNull
-  private BeatmapRangeRequest createRequest() {
-    if (Window.Location.getParameter("s") != null) {
-      try {
-        int s = Integer.parseInt(Window.Location.getParameter("s"));
-        BeatmapRangeRequest request = new BeatmapRangeRequest();
-        request.getSearches().setSetId(s);
-        return request;
-      } catch (NumberFormatException e) {
-        // okay, try something else
-      }
+        return null;
     }
 
-    if (Window.Location.getParameter("b") != null) {
-      try {
-        int b = Integer.parseInt(Window.Location.getParameter("b"));
-        BeatmapRangeRequest request = new BeatmapRangeRequest();
-        request.getSearches().setBeatmapId(b);
-        return request;
-      } catch (NumberFormatException e) {
-        // okay, try something else
-      }
+    public static final int VERSION = 5;
+    public static final String VERSION_MESSAGE = " We removed the possibility to login with Twitter."
+            + " If you used to log in with a Twitter account which was linked your account to an osu! account, just login with the osu! account directly and all your settings and data will be right there."
+            + " Data and settings of unlinked Twitter accounts are no longer available."
+            + " If you super urgently absolutely totally really need to recover your settings and data, please contact us and we'll figure something out.";
+
+    @Override
+    protected void onLoad() {
+        displayWelcomeMessage();
     }
 
-    return null;
-  }
+    void displayWelcomeMessage() {
+        String cookie = Cookies.getCookie("welcomeDisplayed");
+        if (cookie != null) {
+            try {
+                int visitedVersion = Integer.parseInt(cookie);
+                if (visitedVersion == VERSION) {
+                    return;
+                }
+            } catch (NumberFormatException e) {
 
-  public static final int VERSION = 5;
-  public static final String VERSION_MESSAGE =
-      " We removed the possibility to login with Twitter."
-      + " If you used to log in with a Twitter account which was linked your account to an osu! account, just login with the osu! account directly and all your settings and data will be right there."
-      + " Data and settings of unlinked Twitter accounts are no longer available."
-      + " If you super urgently absolutely totally really need to recover your settings and data, please contact us and we'll figure something out.";
-
-  @Override
-  protected void onLoad() {
-    displayWelcomeMessage();
-  }
-
-  void displayWelcomeMessage() {
-    String cookie = Cookies.getCookie("welcomeDisplayed");
-    if (cookie != null) {
-      try {
-        int visitedVersion = Integer.parseInt(cookie);
-        if (visitedVersion == VERSION) {
-          return;
+            }
         }
-      } catch (NumberFormatException e) {
 
-      }
+        WelcomeDialog welcomeDialog = new WelcomeDialog();
+        welcomeDialog.setVersionMessage(VERSION_MESSAGE);
+        welcomeDialog.center();
+
+        Date expires = new Date(System.currentTimeMillis() + 365l * 86400 * 1000);
+        Cookies.setCookie("welcomeDisplayed", String.valueOf(VERSION), expires);
+    }
+    ;
+
+    HelpElements help;
+
+    @UiHandler("helpLink")
+    void onHelpLinkClick(ClickEvent event) {
+        help.showHelp();
     }
 
-    WelcomeDialog welcomeDialog = new WelcomeDialog();
-    welcomeDialog.setVersionMessage(VERSION_MESSAGE);
-    welcomeDialog.center();
+    @UiHandler("beatmapsNaviLink")
+    void onBeatmapsNaviLinkClick(ClickEvent event) {
+        if (userBox.getData() == null) {
+            return;
+        }
 
-    Date expires = new Date(System.currentTimeMillis() + 365l * 86400 * 1000);
-    Cookies.setCookie("welcomeDisplayed", String.valueOf(VERSION), expires);
-  };
+        if (maindock.getWidgetIndex(beatmapsTable) < 0) {
+            maindock.remove(recommendations);
 
-  HelpElements help;
-
-  @UiHandler("helpLink")
-  void onHelpLinkClick(ClickEvent event) {
-    help.showHelp();
-  }
-
-  @UiHandler("beatmapsNaviLink")
-  void onBeatmapsNaviLinkClick(ClickEvent event) {
-    if (userBox.getData() == null) {
-      return;
+            maindock.add(beatmapsTable);
+        } else {
+            Searches searches = beatmapsTable.provider.getRequest().getSearches();
+            if (searches.getBeatmapId() != null || searches.getSetId() != null) {
+                Window.Location.assign("/");
+            }
+        }
     }
 
-    if (maindock.getWidgetIndex(beatmapsTable) < 0) {
-      maindock.remove(recommendations);
+    @UiHandler("recommendationsNaviLink")
+    void onRecommendationsNaviLinkClick(ClickEvent event) {
+        if (userBox.getData() == null) {
+            return;
+        }
 
-      maindock.add(beatmapsTable);
-    } else {
-      Searches searches = beatmapsTable.provider.getRequest().getSearches();
-      if (searches.getBeatmapId() != null || searches.getSetId() != null) {
-        Window.Location.assign("/");
-      }
-    }
-  }
+        if (maindock.getWidgetIndex(recommendations) < 0) {
+            maindock.remove(beatmapsTable);
 
-  @UiHandler("recommendationsNaviLink")
-  void onRecommendationsNaviLinkClick(ClickEvent event) {
-    if (userBox.getData() == null) {
-      return;
+            maindock.add(recommendations);
+        }
     }
 
-    if (maindock.getWidgetIndex(recommendations) < 0) {
-      maindock.remove(beatmapsTable);
-
-      maindock.add(recommendations);
+    @Override
+    public void showHelp(HelpElements elements) {
+        if (!recommendations.isAttached()) {
+            elements.positionAndShow(E.RECOMMEND_BUTTON, recommendationsNaviLink.getElement(), Side.BELOW_RIGHT, null);
+        } else if (recommendations.loggedIn && recommendations.linked) {
+            help.positionAndShow(E.RECOMMEND_HELP, recommendationsNaviLink.getElement(), Side.RIGHT_BELOW, null);
+        }
     }
-  }
 
-  @Override
-  public void showHelp(HelpElements elements) {
-    if (!recommendations.isAttached()) {
-      elements.positionAndShow(E.RECOMMEND_BUTTON, recommendationsNaviLink.getElement(),
-          Side.BELOW_RIGHT, null);
-    } else if (recommendations.loggedIn && recommendations.linked) {
-      help.positionAndShow(E.RECOMMEND_HELP, recommendationsNaviLink.getElement(),
-          Side.RIGHT_BELOW, null);
-    }
-  }
-
-  public native static void sendPageView(String location) /*-{
+    public static native void sendPageView(String location) /*-{
 		$wnd.ga('send', 'pageview', location);
   }-*/;
-
 }

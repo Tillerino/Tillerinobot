@@ -27,11 +27,13 @@ public class OsuOauthApi extends DefaultApi20 {
     public String getAuthorizationUrl(OAuthConfig config) {
         // Append scope if present
         if (config.hasScope()) {
-            return String.format(SCOPED_AUTHORIZE_URL, config.getApiKey(),
-                    OAuthEncoder.encode(config.getCallback()), OAuthEncoder.encode(config.getScope()));
+            return String.format(
+                    SCOPED_AUTHORIZE_URL,
+                    config.getApiKey(),
+                    OAuthEncoder.encode(config.getCallback()),
+                    OAuthEncoder.encode(config.getScope()));
         } else {
-            return String.format(AUTHORIZE_URL, config.getApiKey(),
-                    OAuthEncoder.encode(config.getCallback()));
+            return String.format(AUTHORIZE_URL, config.getApiKey(), OAuthEncoder.encode(config.getCallback()));
         }
     }
 
@@ -39,7 +41,6 @@ public class OsuOauthApi extends DefaultApi20 {
     public Verb getAccessTokenVerb() {
         return Verb.POST;
     }
-
 
     @Override
     public OAuthService createService(OAuthConfig config) {
@@ -74,7 +75,6 @@ public class OsuOauthApi extends DefaultApi20 {
             request.addBodyParameter(GRANT_TYPE, GRANT_TYPE_AUTHORIZATION_CODE);
             Response response = request.send();
             return api.getAccessTokenExtractor().extract(response.getBody());
-
         }
     }
 }

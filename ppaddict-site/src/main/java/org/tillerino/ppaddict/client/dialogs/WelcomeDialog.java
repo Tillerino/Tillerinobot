@@ -9,22 +9,21 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class WelcomeDialog extends PopupPanel {
 
-  private static WelcomeDialogUiBinder uiBinder = GWT.create(WelcomeDialogUiBinder.class);
+    private static WelcomeDialogUiBinder uiBinder = GWT.create(WelcomeDialogUiBinder.class);
 
-  interface WelcomeDialogUiBinder extends UiBinder<VerticalPanel, WelcomeDialog> {
-  }
+    interface WelcomeDialogUiBinder extends UiBinder<VerticalPanel, WelcomeDialog> {}
 
-  @UiField
-  HTMLPanel versionMessagePanel;
+    @UiField
+    HTMLPanel versionMessagePanel;
 
-  public WelcomeDialog() {
-    add(uiBinder.createAndBindUi(this));
+    public WelcomeDialog() {
+        add(uiBinder.createAndBindUi(this));
 
-    setGlassEnabled(true);
-    setAutoHideEnabled(true);
-  }
+        setGlassEnabled(true);
+        setAutoHideEnabled(true);
+    }
 
-  public void setVersionMessage(String message) {
-    versionMessagePanel.getElement().setInnerHTML(message);
-  }
+    public void setVersionMessage(String message) {
+        versionMessagePanel.getElement().setInnerHTML(message);
+    }
 }

@@ -6,39 +6,38 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CustomDataGrid<T> extends DataGrid<T> {
-  public static interface MyDataGridResources extends DataGrid.Resources {
-    @Override
-    public Style dataGridStyle();
+    public static interface MyDataGridResources extends DataGrid.Resources {
+        @Override
+        public Style dataGridStyle();
+
+        @Override
+        public ImageResource dataGridSortAscending();
+
+        @Override
+        public ImageResource dataGridSortDescending();
+    }
+
+    public CustomDataGrid(int pageSize, com.google.gwt.user.cellview.client.DataGrid.Resources resources) {
+        super(pageSize, resources);
+    }
 
     @Override
-    public ImageResource dataGridSortAscending();
+    public Widget getWidget() {
+        return super.getWidget();
+    }
 
     @Override
-    public ImageResource dataGridSortDescending();
-  }
+    public TableSectionElement getTableFootElement() {
+        return super.getTableFootElement();
+    }
 
-  public CustomDataGrid(int pageSize,
-      com.google.gwt.user.cellview.client.DataGrid.Resources resources) {
-    super(pageSize, resources);
-  }
+    @Override
+    public TableSectionElement getTableBodyElement() {
+        return super.getTableBodyElement();
+    }
 
-  @Override
-  public Widget getWidget() {
-    return super.getWidget();
-  }
-
-  @Override
-  public TableSectionElement getTableFootElement() {
-    return super.getTableFootElement();
-  }
-
-  @Override
-  public TableSectionElement getTableBodyElement() {
-    return super.getTableBodyElement();
-  }
-
-  @Override
-  public TableSectionElement getTableHeadElement() {
-    return super.getTableHeadElement();
-  }
+    @Override
+    public TableSectionElement getTableHeadElement() {
+        return super.getTableHeadElement();
+    }
 }

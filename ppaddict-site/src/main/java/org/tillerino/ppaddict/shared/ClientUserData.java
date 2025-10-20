@@ -1,53 +1,42 @@
 package org.tillerino.ppaddict.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.List;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-
 import org.tillerino.ppaddict.web.types.PpaddictId;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
- * An instance of this class is always available, even if the user is not logged in. It is used to
- * carry any information about the user to the frontend. It should be seen as a combination of
- * 
+ * An instance of this class is always available, even if the user is not logged in. It is used to carry any information
+ * about the user to the frontend. It should be seen as a combination of
+ *
  * @author Tillerino
  */
 public class ClientUserData implements IsSerializable {
-  /**
-   * null if not logged in. will change from openid to osu! name
-   */
-  @CheckForNull
-  public String nickname;
+    /** null if not logged in. will change from openid to osu! name */
+    @CheckForNull
+    public String nickname;
 
-  public boolean isOsuName = false;
+    public boolean isOsuName = false;
 
-  @CheckForNull
-  public @PpaddictId String id;
+    @CheckForNull
+    public @PpaddictId String id;
 
-  /**
-   * null if not logged in.
-   */
-  @CheckForNull
-  public String logoutURL;
+    /** null if not logged in. */
+    @CheckForNull
+    public String logoutURL;
 
-  /**
-   * null if logged in.
-   */
-  @CheckForNull
-  public List<String> loginElements;
+    /** null if logged in. */
+    @CheckForNull
+    public List<String> loginElements;
 
-  /**
-   * null if not logged in.
-   */
-  @Nonnull
-  public Settings settings = new Settings();
+    /** null if not logged in. */
+    @Nonnull
+    public Settings settings = new Settings();
 
-  public static final int BEATMAP_COMMENT_LENGTH = 64;
+    public static final int BEATMAP_COMMENT_LENGTH = 64;
 
-  public boolean isLoggedIn() {
-    return nickname != null;
-  }
+    public boolean isLoggedIn() {
+        return nickname != null;
+    }
 }
