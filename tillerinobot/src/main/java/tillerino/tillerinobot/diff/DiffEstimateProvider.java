@@ -1,9 +1,10 @@
 package tillerino.tillerinobot.diff;
 
+import static org.tillerino.osuApiModel.Mods.*;
+
 import com.github.omkelderman.sandoku.DiffCalcResult;
 import com.github.omkelderman.sandoku.DiffResult;
 import com.github.omkelderman.sandoku.ProcessorApi;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import jakarta.ws.rs.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +28,7 @@ import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.GameModes;
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.types.GameMode;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.OsuApi;
@@ -52,6 +54,8 @@ import tillerino.tillerinobot.rest.BeatmapsService;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DiffEstimateProvider {
+	@BitwiseMods public static final long diffMods = getMask(TouchDevice, HalfTime, DoubleTime, Easy, HardRock, Flashlight);
+
 	public final Semaphore calculatorSemaphore = new Semaphore(10, true);
 
 	private final BeatmapsService beatmaps;
@@ -98,7 +102,7 @@ public class DiffEstimateProvider {
 			cachedBeatmap = ApiBeatmap.loadOrDownload(database, beatmapid, 0, cachedBeatmap.getApproved() == OsuApiBeatmap.APPROVED ? 24 * 60 * 60 * 1000 : 10000, downloader);
 		}
 
-		final long diffMods = Beatmap.getDiffMods(originalMods);
+		final long diffMods = getDiffMods(originalMods);
 		if (cachedBeatmap == null) {
 			// doesn't never existed or was deleted
 			var _ = database.deleteFrom(DiffEstimate.class)."where beatmapid = \{beatmapid} and mods = \{diffMods}";
@@ -175,7 +179,6 @@ public class DiffEstimateProvider {
 			return estimate;
 		}
 
-		System.out.println("jlkfsd");
 		DiffEstimate.DiffEstimateToBeatmapImplMapper.INSTANCE.map(sanDoku, estimate);
 		estimate.success = true;
 
@@ -250,6 +253,30 @@ public class DiffEstimateProvider {
 
 			throw new NoEstimatesException();
 		}
+	}
+
+	/**
+	 * returns only TD, HT, DT, EZ, HR, and FL, converting NC to DT. Also includes HD, but only if FL is present
+	 * @param mods
+	 * @return
+	 */
+	@SuppressFBWarnings(value = "TQ", justification = "Producer")
+	public static @BitwiseMods long getDiffMods(@BitwiseMods long mods) {
+		if(Nightcore.is(mods)) {
+			mods |= getMask(DoubleTime);
+			mods ^= getMask(Nightcore);
+		}
+
+		boolean hdfl = Mods.Flashlight.is(mods) && Hidden.is(mods);
+
+		mods = mods & diffMods;
+
+		if(hdfl) {
+			// re-apply HD if used in combination with FL
+			mods |= getMask(Hidden);
+		}
+
+		return mods;
 	}
 
 	public static class NoEstimatesException extends Exception {

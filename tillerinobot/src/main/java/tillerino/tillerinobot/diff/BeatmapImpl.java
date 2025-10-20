@@ -9,9 +9,6 @@ import lombok.Builder;
  * Difficulty attributes from san-doku required for pp calc.
  */
 @Builder
-// suppress warning about case-insensitive field collision, because we cannot change the names in CBeatmap
-@SuppressWarnings("squid:S1845")
-@SuppressFBWarnings("NM")
 public record BeatmapImpl(
 		@BitwiseMods long modsUsed,
 		double OverallDifficulty,

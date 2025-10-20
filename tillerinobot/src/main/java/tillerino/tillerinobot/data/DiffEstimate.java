@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.BeatmapImpl;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
 
 import java.sql.SQLException;
@@ -132,7 +133,7 @@ public class DiffEstimate {
 	public int spinnerCount;
 
 	public DiffEstimate(@BeatmapId int beatmapid, @BitwiseMods long mods) {
-		mods = tillerino.tillerinobot.diff.Beatmap.getDiffMods(mods);
+		mods = DiffEstimateProvider.getDiffMods(mods);
 
 		this.beatmapid = beatmapid;
 		this.mods = mods;
