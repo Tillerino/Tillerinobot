@@ -1,4 +1,5 @@
 // This is AI-translated, stripped down, and manually adjusted from the C# source
+// spotless:off
 
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
@@ -29,3 +30,5 @@ public class OsuHitWindows
         meh = Math.floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, MEH_WINDOW_RANGE)) - 0.5;
     }
 }
+
+// spotless:on

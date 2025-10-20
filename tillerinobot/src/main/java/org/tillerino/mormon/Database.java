@@ -91,7 +91,7 @@ public record Database(Connection connection) implements AutoCloseable {
 		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
 		return st -> {
 			try (PreparedStatement ps = prepareStatement(
-					STR."select \{mapping.fields()} from `\{mapping.table()}`",
+					"select " + mapping.fields() + " from `" + mapping.table() + "`",
 					st)) {
 				ResultSet set = ps.executeQuery();
 				return IteratorUtils.toList(new ResultSetIterator<>(set, mapping));
@@ -103,7 +103,7 @@ public record Database(Connection connection) implements AutoCloseable {
 		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
 		return st -> {
 			try (PreparedStatement ps = prepareStatement(
-					STR."select \{mapping.fields()} from `\{mapping.table()}`",
+					"select " + mapping.fields() + " from `" + mapping.table() + "`",
 					st)) {
 				ResultSet set = ps.executeQuery();
 				ResultSetIterator<T> iterator = new ResultSetIterator<>(set, mapping);
@@ -151,7 +151,7 @@ public record Database(Connection connection) implements AutoCloseable {
 		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
 		return st -> {
 			try (PreparedStatement ps = prepareStatement(
-					STR."delete from `\{mapping.table()}`",
+					"delete from `" + mapping.table() + "`",
 					st)) {
 				return ps.executeUpdate();
 			}
