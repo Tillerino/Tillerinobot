@@ -1,0 +1,27 @@
+{
+  "id" : "44f59895-a743-4f60-8377-4d4c1e70b24f",
+  "name" : "osu_131891",
+  "request" : {
+    "url" : "/osu/131891",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "osu_131891-44f59895-a743-4f60-8377-4d4c1e70b24f.txt",
+    "headers" : {
+      "Date" : "Fri, 03 Oct 2025 14:27:42 GMT",
+      "Content-Type" : "text/plain;charset=UTF-8",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Disposition" : "attachment; filename=\"The Quick Brown Fox - The Big Black (Blue Dragon) [WHO'S AFRAID OF THE BIG BLACK].osu\"",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "988d1f2e1ebb9275-MUC"
+    }
+  },
+  "uuid" : "44f59895-a743-4f60-8377-4d4c1e70b24f",
+  "persistent" : true,
+  "insertionIndex" : 14
+}

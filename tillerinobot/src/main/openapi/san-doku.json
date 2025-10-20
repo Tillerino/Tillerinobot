@@ -1,0 +1,554 @@
+{
+  "x-generator": "NSwag v14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))",
+  "swagger": "2.0",
+  "info": {
+    "title": "SanDoku",
+    "version": "v1"
+  },
+  "host": "localhost:8080",
+  "schemes": [
+    "http"
+  ],
+  "produces": [
+    "text/plain",
+    "application/json",
+    "text/json"
+  ],
+  "paths": {
+    "/diff": {
+      "post": {
+        "tags": [
+          "Processor"
+        ],
+        "summary": "Process a .osu file and calculate all difficulty properties of the map",
+        "operationId": "Processor_CalcDiff",
+        "consumes": [
+          "text/osu"
+        ],
+        "parameters": [
+          {
+            "name": "beatmap",
+            "in": "body",
+            "description": "The contents of an .osu file, must be the correct Content-Type, optionally supports Content-Encoding \"gzip\" and \"br\"",
+            "schema": {
+              "type": "string",
+              "format": "byte"
+            },
+            "x-nullable": true
+          },
+          {
+            "type": "integer",
+            "name": "mode",
+            "in": "query",
+            "description": "Override game mode",
+            "x-schema": {
+              "$ref": "#/definitions/LegacyGameMode"
+            },
+            "x-nullable": true,
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "type": "integer",
+            "name": "mods",
+            "in": "query",
+            "description": "Optionally provide mods",
+            "format": "int32",
+            "default": 0,
+            "x-nullable": false
+          },
+          {
+            "type": "boolean",
+            "name": "storeResultInCacheForPpCalc",
+            "in": "query",
+            "description": "set to true if you intend to run pp calc for this map+mode+mods combination later on",
+            "default": false,
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DiffResult"
+            }
+          },
+          "400": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ValidationProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "/pp": {
+      "post": {
+        "tags": [
+          "Processor"
+        ],
+        "summary": "Calculate PP of a certain score.",
+        "operationId": "Processor_CalcPp",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "name": "scoreInfo",
+            "in": "body",
+            "description": "info about the score to calculate",
+            "schema": {
+              "$ref": "#/definitions/ScoreInfo"
+            },
+            "x-nullable": true
+          },
+          {
+            "type": "string",
+            "name": "beatmapMd5",
+            "in": "query",
+            "description": "the beatmap hash of the beatmap used, this beatmap needs to have been run through the /diff endpoint first to be remembered internally",
+            "x-nullable": false
+          },
+          {
+            "type": "integer",
+            "name": "mode",
+            "in": "query",
+            "description": "mode used, defaults to osu!",
+            "x-schema": {
+              "$ref": "#/definitions/LegacyGameMode"
+            },
+            "default": 0,
+            "x-nullable": false,
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "type": "integer",
+            "name": "mods",
+            "in": "query",
+            "description": "mods used, defaults to NoMod",
+            "format": "int32",
+            "default": 0,
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/PpOutput"
+            }
+          },
+          "400": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ValidationProblemDetails"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DiffResult": {
+      "type": "object",
+      "required": [
+        "beatmapGameMode",
+        "beatmapMd5",
+        "gameModeUsed",
+        "modsUsed",
+        "diffCalcResult",
+        "beatmapProps"
+      ],
+      "properties": {
+        "beatmapGameMode": {
+          "$ref": "#/definitions/LegacyGameMode"
+        },
+        "beatmapMd5": {
+          "type": "string"
+        },
+        "gameModeUsed": {
+          "$ref": "#/definitions/LegacyGameMode"
+        },
+        "modsUsed": {
+          "$ref": "#/definitions/LegacyMods"
+        },
+        "diffCalcResult": {
+          "$ref": "#/definitions/DiffCalcResult"
+        },
+        "beatmapProps": {
+          "$ref": "#/definitions/BeatmapProps"
+        }
+      }
+    },
+    "LegacyGameMode": {
+      "type": "integer",
+      "description": "",
+      "x-enumNames": [
+        "Osu",
+        "Taiko",
+        "Catch",
+        "Mania"
+      ],
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "LegacyMods": {
+      "type": "integer",
+      "description": ""
+    },
+    "DiffCalcResult": {
+      "type": "object",
+      "required": [
+        "starRating",
+        "maxCombo",
+        "aimDifficulty",
+        "aimDifficultSliderCount",
+        "speedDifficulty",
+        "speedNoteCount",
+        "flashlightDifficulty",
+        "sliderFactor",
+        "aimDifficultStrainCount",
+        "speedDifficultStrainCount",
+        "drainRate",
+        "hitCircleCount",
+        "sliderCount",
+        "spinnerCount",
+        "rhythmDifficulty",
+        "readingDifficulty",
+        "colourDifficulty",
+        "staminaDifficulty",
+        "monoStaminaFactor",
+        "rhythmTopStrains",
+        "colourTopStrains",
+        "staminaTopStrains"
+      ],
+      "properties": {
+        "starRating": {
+          "type": "number",
+          "description": "The combined star rating of all skills.\nUsed by all.\nATTRIB_ID_DIFFICULTY = 11",
+          "format": "double"
+        },
+        "maxCombo": {
+          "type": "integer",
+          "description": "The maximum achievable combo.\nUsed by all.\nATTRIB_ID_MAX_COMBO = 9",
+          "format": "int32"
+        },
+        "aimDifficulty": {
+          "type": "number",
+          "description": "The difficulty corresponding to the aim skill.\nUsed by osu.\nATTRIB_ID_AIM = 1",
+          "format": "double"
+        },
+        "aimDifficultSliderCount": {
+          "type": "number",
+          "description": "The number of Sliders weighted by difficulty.\nUsed by osu.\nATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT = 31.",
+          "format": "double"
+        },
+        "speedDifficulty": {
+          "type": "number",
+          "description": "The difficulty corresponding to the speed skill.\nUsed by osu.\nATTRIB_ID_SPEED = 3.",
+          "format": "double"
+        },
+        "speedNoteCount": {
+          "type": "number",
+          "description": "The number of clickable objects weighted by difficulty.\nRelated to SpeedDifficulty.\nUsed by osu.\nATTRIB_ID_SPEED_NOTE_COUNT = 21.",
+          "format": "double"
+        },
+        "flashlightDifficulty": {
+          "type": "number",
+          "description": "The difficulty corresponding to the flashlight skill.\nUsed by osu.\nATTRIB_ID_FLASHLIGHT = 17",
+          "format": "double"
+        },
+        "sliderFactor": {
+          "type": "number",
+          "description": "Describes how much of AimDifficulty is contributed to by hitcircles or sliders.\nA value closer to 1.0 indicates most of AimDifficulty is contributed by hitcircles.\nA value closer to 0.0 indicates most of AimDifficulty is contributed by sliders.\nUsed by osu.\nATTRIB_ID_SLIDER_FACTOR = 19",
+          "format": "double"
+        },
+        "aimDifficultStrainCount": {
+          "type": "number",
+          "description": "Used by osu.\nATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT = 25",
+          "format": "double"
+        },
+        "speedDifficultStrainCount": {
+          "type": "number",
+          "description": "Used by osu\nATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT = 23",
+          "format": "double"
+        },
+        "drainRate": {
+          "type": "number",
+          "description": "Used by osu",
+          "format": "double"
+        },
+        "hitCircleCount": {
+          "type": "integer",
+          "description": "Used by osu",
+          "format": "int32"
+        },
+        "sliderCount": {
+          "type": "integer",
+          "description": "Used by osu",
+          "format": "int32"
+        },
+        "spinnerCount": {
+          "type": "integer",
+          "description": "Used by osu",
+          "format": "int32"
+        },
+        "rhythmDifficulty": {
+          "type": "number",
+          "description": "The difficulty corresponding to the rhythm skill.\nUsed by taiko.\nATTRIB_ID_RHYTHM_DIFFICULTY = 43",
+          "format": "double"
+        },
+        "readingDifficulty": {
+          "type": "number",
+          "description": "The difficulty corresponding to the reading skill.\nUsed by taiko.",
+          "format": "double"
+        },
+        "colourDifficulty": {
+          "type": "number",
+          "description": "The difficulty corresponding to the colour skill.\nUsed by taiko.",
+          "format": "double"
+        },
+        "staminaDifficulty": {
+          "type": "number",
+          "description": "The difficulty corresponding to the stamina skill.\nUsed by taiko.",
+          "format": "double"
+        },
+        "monoStaminaFactor": {
+          "type": "number",
+          "description": "The ratio of stamina difficulty from mono-color (single colour) streams to total stamina difficulty.\nUsed by taiko.\nATTRIB_ID_MONO_STAMINA_FACTOR = 29",
+          "format": "double"
+        },
+        "rhythmTopStrains": {
+          "type": "number",
+          "description": "Used by taiko.",
+          "format": "double"
+        },
+        "colourTopStrains": {
+          "type": "number",
+          "description": "Used by taiko.",
+          "format": "double"
+        },
+        "staminaTopStrains": {
+          "type": "number",
+          "description": "Used by taiko.",
+          "format": "double"
+        }
+      }
+    },
+    "BeatmapProps": {
+      "type": "object",
+      "required": [
+        "drainRate",
+        "circleSize",
+        "overallDifficulty",
+        "approachRate",
+        "sliderMultiplier",
+        "sliderTickRate"
+      ],
+      "properties": {
+        "drainRate": {
+          "type": "number",
+          "format": "float"
+        },
+        "circleSize": {
+          "type": "number",
+          "format": "float"
+        },
+        "overallDifficulty": {
+          "type": "number",
+          "format": "float"
+        },
+        "approachRate": {
+          "type": "number",
+          "format": "float"
+        },
+        "sliderMultiplier": {
+          "type": "number",
+          "format": "double"
+        },
+        "sliderTickRate": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ValidationProblemDetails": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/HttpValidationProblemDetails"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {},
+          "required": [
+            "errors"
+          ],
+          "properties": {
+            "traceId": {
+              "type": "string"
+            },
+            "errors": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "HttpValidationProblemDetails": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProblemDetails"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {},
+          "required": [
+            "errors"
+          ],
+          "properties": {
+            "errors": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ProblemDetails": {
+      "type": "object",
+      "additionalProperties": {},
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "instance": {
+          "type": "string"
+        }
+      }
+    },
+    "PpOutput": {
+      "type": "object",
+      "required": [
+        "attributes"
+      ],
+      "properties": {
+        "pp": {
+          "type": "number",
+          "format": "double"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PpDisplayAttribute"
+          }
+        }
+      }
+    },
+    "PpDisplayAttribute": {
+      "type": "object",
+      "required": [
+        "propertyName",
+        "displayName"
+      ],
+      "properties": {
+        "propertyName": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ScoreInfo": {
+      "type": "object",
+      "required": [
+        "maxCombo",
+        "totalScore",
+        "count50",
+        "count100",
+        "count300",
+        "countMiss",
+        "countKatu",
+        "countGeki"
+      ],
+      "properties": {
+        "maxCombo": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalScore": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "count50": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "count100": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "count300": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "countMiss": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "countKatu": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "countGeki": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}

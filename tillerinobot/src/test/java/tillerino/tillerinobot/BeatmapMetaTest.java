@@ -2,7 +2,6 @@ package tillerino.tillerinobot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
@@ -16,12 +15,12 @@ public class BeatmapMetaTest {
 	public void testFuturePpSwitch() throws Exception {
 		BeatmapMeta meta = fakeBeatmapMeta(101);
 		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 100pp | 95%: 31pp | 98%: 62pp | 99%: 76pp | 100%: 101pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   future you: 101pp | 95%: 53pp | 98%: 110pp | 99%: 136pp | 100%: 181pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
 				meta.formInfoMessage(true, true, null, -1, null, null, null));
 
-		meta = fakeBeatmapMeta(110);
+		meta = fakeBeatmapMeta(200);
 		assertEquals(
-				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 31pp | 98%: 62pp | 99%: 76pp | 100%: 101pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
+				"[http://osu.ppy.sh/b/69 Artist - Title [Version]] DT   95%: 53pp | 98%: 110pp | 99%: 136pp | 100%: 181pp | 1:14 ★ 2.68 ♫ 630 AR10.33 OD9.08",
 				meta.formInfoMessage(true, true, null, -1, null, null, null));
 	}
 
@@ -46,17 +45,17 @@ public class BeatmapMetaTest {
 		beatmap.setMaxCombo(100);
 		BeatmapImpl cBeatmap = BeatmapImpl.builder()
 				.modsUsed(64)
-				.speed(1.45f)
-				.aim(1.45f)
-				.circleCount(200)
-				.sliderCount(40)
-				.spinnerCount(10)
-				.approachRate(10.33f)
-				.overallDifficulty(9.08f)
-				.maxCombo(100)
-				.starDiff(2.68f)
+				.SpeedDifficulty(1.45f)
+				.AimDifficulty(1.45f)
+				.HitCircleCount(200)
+				.SliderCount(40)
+				.SpinnerCount(10)
+				.ApproachRate(10.33f)
+				.OverallDifficulty(9.08f)
+				.MaxCombo(100)
+				.StarDiff(2.68f)
 				.build();
-		beatmap.setStarDifficulty(cBeatmap.starDiff());
+		beatmap.setStarDifficulty(cBeatmap.StarDiff());
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, Mods.getMask(Mods.DoubleTime));
 		return new BeatmapMeta(beatmap, personalPp, estimates);
 	}

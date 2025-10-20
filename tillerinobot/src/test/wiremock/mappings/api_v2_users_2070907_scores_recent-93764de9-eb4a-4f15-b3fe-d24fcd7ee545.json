@@ -1,0 +1,33 @@
+{
+  "id" : "93764de9-eb4a-4f15-b3fe-d24fcd7ee545",
+  "name" : "api_v2_users_2070907_scores_recent",
+  "request" : {
+    "url" : "/api/v2/users/2070907/scores/recent?mode=osu&limit=10",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "[]",
+    "headers" : {
+      "Date" : "Sat, 18 Oct 2025 09:04:31 GMT",
+      "Content-Type" : "application/json",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1196",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "9906de60bc3ee0cb-MUC"
+    }
+  },
+  "uuid" : "93764de9-eb4a-4f15-b3fe-d24fcd7ee545",
+  "persistent" : true,
+  "insertionIndex" : 11
+}

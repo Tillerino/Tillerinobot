@@ -1,0 +1,34 @@
+{
+  "id" : "88060215-f17b-4b95-8eab-7f19bc5fbaba",
+  "name" : "api_v2_beatmaps_129891",
+  "request" : {
+    "url" : "/api/v2/beatmaps/129891",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"beatmapset_id\":39804,\"difficulty_rating\":7.45,\"id\":129891,\"mode\":\"osu\",\"status\":\"approved\",\"total_length\":258,\"user_id\":87065,\"version\":\"FOUR DIMENSIONS\",\"accuracy\":8,\"ar\":9,\"bpm\":222.22,\"convert\":false,\"count_circles\":1646,\"count_sliders\":335,\"count_spinners\":2,\"cs\":4,\"deleted_at\":null,\"drain\":6,\"hit_length\":226,\"is_scoreable\":true,\"last_updated\":\"2014-05-18T17:22:14Z\",\"mode_int\":0,\"passcount\":323081,\"playcount\":10100219,\"ranked\":2,\"url\":\"https:\\/\\/osu.ppy.sh\\/beatmaps\\/129891\",\"checksum\":\"da8aae79c8f3306b5d65ec951874a7fb\",\"beatmapset\":{\"artist\":\"xi\",\"artist_unicode\":\"xi\",\"covers\":{\"cover\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/cover.jpg?1650612317\",\"cover@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/cover@2x.jpg?1650612317\",\"card\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/card.jpg?1650612317\",\"card@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/card@2x.jpg?1650612317\",\"list\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/list.jpg?1650612317\",\"list@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/list@2x.jpg?1650612317\",\"slimcover\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/slimcover.jpg?1650612317\",\"slimcover@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/39804\\/covers\\/slimcover@2x.jpg?1650612317\"},\"creator\":\"Nakagawa-Kanon\",\"favourite_count\":8302,\"genre_id\":2,\"hype\":null,\"id\":39804,\"language_id\":5,\"nsfw\":false,\"offset\":0,\"play_count\":21748781,\"preview_url\":\"\\/\\/b.ppy.sh\\/preview\\/39804.mp3\",\"source\":\"BMS\",\"spotlight\":false,\"status\":\"approved\",\"title\":\"FREEDOM DiVE\",\"title_unicode\":\"FREEDOM DiVE\",\"track_id\":5864,\"user_id\":87065,\"video\":false,\"bpm\":222.22,\"can_be_hyped\":false,\"deleted_at\":null,\"discussion_enabled\":true,\"discussion_locked\":false,\"is_scoreable\":true,\"last_updated\":\"2012-06-23T03:19:39Z\",\"legacy_thread_url\":\"https:\\/\\/osu.ppy.sh\\/community\\/forums\\/topics\\/66915\",\"nominations_summary\":{\"current\":0,\"eligible_main_rulesets\":[\"taiko\"],\"required_meta\":{\"main_ruleset\":2,\"non_main_ruleset\":1}},\"ranked\":2,\"ranked_date\":\"2012-06-23T16:42:35Z\",\"rating\":9.56386,\"storyboard\":false,\"submitted_date\":\"2011-11-14T16:46:32Z\",\"tags\":\"parousia onosakihito kirisaki_hayashi\",\"availability\":{\"download_disabled\":false,\"more_information\":null},\"ratings\":[0,134,8,8,16,22,25,68,116,326,4766]},\"current_user_playcount\":0,\"failtimes\":{\"fail\":[234,922,18947,1999975,273247,52828,326306,208884,40510,658453,2156901,166519,101041,217824,59366,176466,101320,4714,3035,672,1918,77209,3608,744,146758,7788,4315,139782,50322,10719,62009,74561,175,151,883,2818,1573,599,426,2797,15983,2913,6205,18842,12086,1295,11740,23493,15788,3672,2434,4645,6330,2562,11996,1928,6797,85,95,100,88,96,232,1811,1395,1671,3260,2389,1968,3130,2598,2464,3127,6095,3268,3785,5523,2988,101,122,141,263,124,2093,1514,250,2095,2151,632,513,666,5429,3097,9256,3122,1049,338,415,570,22497],\"exit\":[2134,3056,52507,348703,158630,56387,78252,114474,60928,81162,174032,105464,50835,108358,75213,68500,51419,16825,23859,13779,7015,57671,16444,6623,38296,22719,16967,27652,47304,15621,18655,101559,28858,7379,2671,3749,3504,1477,1224,3389,4891,6115,7124,9292,8389,6730,8870,10192,10541,8373,3065,7528,5756,4617,5759,2727,24025,14754,3707,1658,956,515,416,382,535,1581,1877,2871,3599,3255,3647,4486,5691,5062,2793,5151,3849,9140,8327,2053,681,383,237,6880,1451,826,4670,2098,1210,973,1274,3940,2170,5127,2346,2166,1732,4312,6327,29694]},\"max_combo\":2385,\"owners\":[{\"id\":87065,\"username\":\"Nakagawa-Kanon\"}]}",
+    "headers" : {
+      "Date" : "Sat, 18 Oct 2025 14:18:34 GMT",
+      "Content-Type" : "application/json",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1199",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "9908aa5348b3f311-MUC"
+    }
+  },
+  "uuid" : "88060215-f17b-4b95-8eab-7f19bc5fbaba",
+  "persistent" : true,
+  "insertionIndex" : 25
+}

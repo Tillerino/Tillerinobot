@@ -1,0 +1,27 @@
+{
+  "id" : "4dabaf00-7d22-45ef-b602-7c59f84f2bcd",
+  "name" : "osu_5047712",
+  "request" : {
+    "url" : "/osu/5047712",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "osu_5047712-4dabaf00-7d22-45ef-b602-7c59f84f2bcd.txt",
+    "headers" : {
+      "Date" : "Sun, 19 Oct 2025 08:41:50 GMT",
+      "Content-Type" : "text/plain;charset=UTF-8",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Disposition" : "attachment; filename=\"Various Artists - Songs Compilation VI (Sotarks) [Collab Extra].osu\"",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "990efa8b1b3da60f-MUC"
+    }
+  },
+  "uuid" : "4dabaf00-7d22-45ef-b602-7c59f84f2bcd",
+  "persistent" : true,
+  "insertionIndex" : 26
+}

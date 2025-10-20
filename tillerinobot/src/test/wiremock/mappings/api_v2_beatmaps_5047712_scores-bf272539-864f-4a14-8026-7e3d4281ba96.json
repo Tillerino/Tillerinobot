@@ -1,0 +1,34 @@
+{
+  "id" : "bf272539-864f-4a14-8026-7e3d4281ba96",
+  "name" : "api_v2_beatmaps_5047712_scores",
+  "request" : {
+    "url" : "/api/v2/beatmaps/5047712/scores?mode=osu",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "api_v2_beatmaps_5047712_scores-bf272539-864f-4a14-8026-7e3d4281ba96.json",
+    "headers" : {
+      "Date" : "Sat, 18 Oct 2025 09:46:54 GMT",
+      "Content-Type" : "application/json",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1197",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "99071c75bb9de0dd-MUC"
+    }
+  },
+  "uuid" : "bf272539-864f-4a14-8026-7e3d4281ba96",
+  "persistent" : true,
+  "insertionIndex" : 16
+}

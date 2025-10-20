@@ -4,6 +4,7 @@ import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -77,7 +78,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
     dbm.persist(new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)), Action.INSERT);
     beatmap.setBeatmapId(12);
     beatmap.setFileMd5(md5Hex(newContent));
-    when(downloader.getActualBeatmap(12)).thenReturn(newContent);
+    doReturn(newContent).when(downloader).getActualBeatmap(12);
     assertEquals("world", resource.getFile());
   }
 
@@ -86,7 +87,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
     String correctContent = "correct";
     beatmap.setBeatmapId(12);
     beatmap.setFileMd5(md5Hex(correctContent));
-    when(downloader.getActualBeatmap(12)).thenReturn("wrong content");
+    doReturn("wrong content").when(downloader).getActualBeatmap(12);
     try {
       resource.getFile();
       fail("should have thrown");

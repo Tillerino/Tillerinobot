@@ -6,64 +6,29 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Builder;
 
 /**
- * This class implements {@link Beatmap} which is the interface that the
- * translated pp calculation uses to get info about the beatmap.
+ * Difficulty attributes from san-doku required for pp calc.
  */
 @Builder
-// suppress warning about case-insensitive field collision, because we cannot change the names in CBeatmap
-@SuppressWarnings("squid:S1845")
-@SuppressFBWarnings("NM")
 public record BeatmapImpl(
 		@BitwiseMods long modsUsed,
-		float starDiff,
-		float aim,
-		float speed,
-		float overallDifficulty,
-		float approachRate,
-		int maxCombo,
-		float sliderFactor,
-		float flashlight,
-		float speedNoteCount,
-		int circleCount,
-		int spinnerCount,
-		int sliderCount) implements Beatmap {
-	
+		double OverallDifficulty,
+		double ApproachRate,
+		int HitCircleCount,
+		int SliderCount,
+		int SpinnerCount,
+		double StarDiff,
+		int MaxCombo,
+		double AimDifficulty,
+		double AimDifficultSliderCount,
+		double SpeedDifficulty,
+		double SpeedNoteCount,
+		double SliderFactor,
+		double AimDifficultStrainCount,
+		double SpeedDifficultStrainCount,
+		double FlashlightDifficulty) {
 
-	@Override
-	public float DifficultyAttribute(long mods, int kind) {
-		if (Beatmap.getDiffMods(mods) != modsUsed) {
-			throw new IllegalArgumentException("Unexpected mods " + mods + ". Was loaded with " + modsUsed);
-		}
-
-		return switch (kind) {
-			case Beatmap.Aim -> aim;
-			case Beatmap.Speed -> speed;
-			case Beatmap.OD -> overallDifficulty;
-			case Beatmap.AR -> approachRate;
-			case Beatmap.MaxCombo -> maxCombo;
-			case Beatmap.SliderFactor -> sliderFactor;
-			case Beatmap.Flashlight -> flashlight;
-			case Beatmap.SpeedNoteCount -> speedNoteCount;
-			default -> throw new IllegalArgumentException("Unexpected kind: " + kind);
-		};
-	}
-
-	@Override
-	public int NumHitCircles() {
-		return circleCount;
-	}
-
-	@Override
-	public int NumSpinners() {
-		return spinnerCount;
-	}
-
-	@Override
-	public int NumSliders() {
-		return sliderCount;
-	}
 
 	public int getObjectCount() {
-		return circleCount + sliderCount + spinnerCount;
+		return HitCircleCount + SliderCount + SpinnerCount;
 	}
 }

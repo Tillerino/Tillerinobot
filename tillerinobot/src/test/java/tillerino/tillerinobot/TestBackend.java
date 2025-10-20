@@ -42,10 +42,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
-import tillerino.tillerinobot.diff.Beatmap;
-import tillerino.tillerinobot.diff.BeatmapImpl;
-import tillerino.tillerinobot.diff.PercentageEstimates;
-import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
+import tillerino.tillerinobot.diff.*;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
@@ -150,16 +147,16 @@ public class TestBackend implements BotBackend {
     OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid, 0L);
 
 		BeatmapImpl cBeatmap = BeatmapImpl.builder()
-				.modsUsed(Beatmap.getDiffMods(mods))
-				.starDiff((float) beatmap.getStarDifficulty())
-				.aim((float) beatmap.getStarDifficulty() / 2)
-				.speed((float) beatmap.getStarDifficulty() / 2)
-				.sliderFactor(1f)
-				.approachRate((float) beatmap.getApproachRate())
-				.overallDifficulty((float) beatmap.getOverallDifficulty())
-				.maxCombo(beatmap.getMaxCombo())
-				.circleCount(200)
-				.spinnerCount(10)
+				.modsUsed(DiffEstimateProvider.getDiffMods(mods))
+				.StarDiff((float) beatmap.getStarDifficulty())
+				.AimDifficulty((float) beatmap.getStarDifficulty() / 2)
+				.SpeedDifficulty((float) beatmap.getStarDifficulty() / 2)
+				.SliderFactor(1f)
+				.ApproachRate((float) beatmap.getApproachRate())
+				.OverallDifficulty((float) beatmap.getOverallDifficulty())
+				.MaxCombo(beatmap.getMaxCombo())
+				.HitCircleCount(200)
+				.SpinnerCount(10)
 				.build();
 		PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, mods);
 

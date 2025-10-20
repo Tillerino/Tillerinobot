@@ -1,5 +1,6 @@
 package tillerino.tillerinobot.diff;
 
+import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 
 import lombok.Getter;
@@ -18,50 +19,51 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
 
 	@Override
 	public double getPP(double acc) {
-		AccuracyDistribution dist;
 		try {
-			dist = AccuracyDistribution.model(beatmap.getObjectCount(), 0, acc);
+			return getPP(acc, beatmap.MaxCombo(), 0);
 		} catch (UserException e) {
 			// this should have been allowed to get here.
 			throw new RuntimeException(e);
 		}
-
-		OsuScore score = new OsuScore((int) beatmap.DifficultyAttribute(getMods(), Beatmap.MaxCombo),
-				dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(), getMods());
-
-		return score.getPP(beatmap);
 	}
 
 	@Override
 	public double getPP(double acc, int combo, int misses) throws UserException {
 		AccuracyDistribution dist = AccuracyDistribution.model(beatmap.getObjectCount(), misses, acc);
 
-		OsuScore score = new OsuScore(combo, dist.getX300(), dist.getX100(), dist.getX50(), dist.getMiss(),
-				getMods());
-
-		return score.getPP(beatmap);
+		return getPP(dist.getX100(), dist.getX50(), combo, dist.getMiss());
 	}
 
 	@Override
 	public double getPP(int x100, int x50, int combo, int misses) {
-		int x300 = beatmap.getObjectCount() - x50 - x100;
-		OsuScore score = new OsuScore(combo, x300, x100, x50, misses, getMods());
+		int x300 = beatmap.getObjectCount() - x50 - x100 - misses;
 
-		return score.getPP(beatmap);
+		OsuApiScore fakeScore = new OsuApiScore();
+		fakeScore.setMaxCombo(combo);
+		fakeScore.setCount300(x300);
+		fakeScore.setCount100(x100);
+		fakeScore.setCount50(x50);
+		fakeScore.setCountMiss(misses);
+		fakeScore.setMods(mods);
+
+		OsuPerformanceAttributes attributes =
+				new OsuPerformanceCalculator().CreatePerformanceAttributes(fakeScore, beatmap);
+
+		return attributes.total();
 	}
 
 	@Override
 	public double getStarDiff() {
-		return beatmap.starDiff();
+		return beatmap.StarDiff();
 	}
 
 	@Override
 	public double getApproachRate() {
-		return beatmap.approachRate();
+		return beatmap.ApproachRate();
 	}
 
 	@Override
 	public double getOverallDifficulty() {
-		return beatmap.overallDifficulty();
+		return beatmap.OverallDifficulty();
 	}
 }

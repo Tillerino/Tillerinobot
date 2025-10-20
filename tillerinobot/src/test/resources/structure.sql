@@ -122,12 +122,12 @@ CREATE TABLE `botconfig` (
 --
 
 CREATE TABLE `diffestimates` (
-  `beatmapid` int(11) NOT NULL,
-  `mods` bigint(20) NOT NULL,
+  `beatmapid` int NOT NULL,
+  `mods` bigint NOT NULL,
   `success` tinyint(1) NOT NULL,
-  `failure` tinytext COLLATE utf8_unicode_ci,
-  `calculated` bigint(20) NOT NULL,
-  `dataVersion` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+  `failure` mediumtext COLLATE utf8mb3_unicode_ci,
+  `calculated` bigint NOT NULL,
+  `dataVersion` tinyint UNSIGNED NOT NULL DEFAULT '0',
   `md5` char(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'notset',
   `aim` double NOT NULL,
   `speed` double NOT NULL,
@@ -137,12 +137,14 @@ CREATE TABLE `diffestimates` (
   `speedNoteCount` double NOT NULL DEFAULT '-1' COMMENT 'Added with https://github.com/Tillerino/Tillerinobot/pull/218',
   `approachRate` float NOT NULL DEFAULT '-1',
   `overallDifficulty` float NOT NULL DEFAULT '-1',
-  `maxMaxCombo` int(11) DEFAULT '0',
-  `circleCount` int(11) NOT NULL,
-  `sliderCount` int(11) NOT NULL DEFAULT '-1',
-  `spinnerCount` int(11) NOT NULL DEFAULT '-1' COMMENT 'added later',
-  `allObjectsCount` int(11) NOT NULL DEFAULT '-1' COMMENT 'to be removed'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `maxMaxCombo` int DEFAULT '0',
+  `circleCount` int NOT NULL,
+  `sliderCount` int NOT NULL DEFAULT '-1',
+  `spinnerCount` int NOT NULL DEFAULT '-1' COMMENT 'added later',
+  `aimDifficultStrainCount` double NOT NULL DEFAULT '-1',
+  `aimDifficultSliderCount` double NOT NULL DEFAULT '-1',
+  `speedDifficultStrainCount` double NOT NULL DEFAULT '-1'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 -- --------------------------------------------------------
 

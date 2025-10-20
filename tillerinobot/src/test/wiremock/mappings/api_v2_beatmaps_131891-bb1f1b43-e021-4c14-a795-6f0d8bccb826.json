@@ -1,0 +1,34 @@
+{
+  "id" : "bb1f1b43-e021-4c14-a795-6f0d8bccb826",
+  "name" : "api_v2_beatmaps_131891",
+  "request" : {
+    "url" : "/api/v2/beatmaps/131891",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"beatmapset_id\":41823,\"difficulty_rating\":6.86,\"id\":131891,\"mode\":\"osu\",\"status\":\"approved\",\"total_length\":139,\"user_id\":19048,\"version\":\"WHO'S AFRAID OF THE BIG BLACK\",\"accuracy\":7,\"ar\":10,\"bpm\":360.3,\"convert\":false,\"count_circles\":410,\"count_sliders\":334,\"count_spinners\":2,\"cs\":4,\"deleted_at\":null,\"drain\":5,\"hit_length\":112,\"is_scoreable\":true,\"last_updated\":\"2014-05-18T17:22:23Z\",\"mode_int\":0,\"passcount\":3601057,\"playcount\":38915601,\"ranked\":2,\"url\":\"https:\\/\\/osu.ppy.sh\\/beatmaps\\/131891\",\"checksum\":\"2d687e5ee79f3862ad0c60651471cdcc\",\"beatmapset\":{\"artist\":\"The Quick Brown Fox\",\"artist_unicode\":\"The Quick Brown Fox\",\"covers\":{\"cover\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/cover.jpg?1650610126\",\"cover@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/cover@2x.jpg?1650610126\",\"card\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/card.jpg?1650610126\",\"card@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/card@2x.jpg?1650610126\",\"list\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/list.jpg?1650610126\",\"list@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/list@2x.jpg?1650610126\",\"slimcover\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/slimcover.jpg?1650610126\",\"slimcover@2x\":\"https:\\/\\/assets.ppy.sh\\/beatmaps\\/41823\\/covers\\/slimcover@2x.jpg?1650610126\"},\"creator\":\"Blue Dragon\",\"favourite_count\":12453,\"genre_id\":10,\"hype\":null,\"id\":41823,\"language_id\":2,\"nsfw\":false,\"offset\":0,\"play_count\":39790870,\"preview_url\":\"\\/\\/b.ppy.sh\\/preview\\/41823.mp3\",\"source\":\"\",\"spotlight\":false,\"status\":\"approved\",\"title\":\"The Big Black\",\"title_unicode\":\"The Big Black\",\"track_id\":null,\"user_id\":19048,\"video\":false,\"bpm\":360.3,\"can_be_hyped\":false,\"deleted_at\":null,\"discussion_enabled\":true,\"discussion_locked\":false,\"is_scoreable\":true,\"last_updated\":\"2012-02-19T05:05:41Z\",\"legacy_thread_url\":\"https:\\/\\/osu.ppy.sh\\/community\\/forums\\/topics\\/70065\",\"nominations_summary\":{\"current\":0,\"eligible_main_rulesets\":[\"osu\"],\"required_meta\":{\"main_ruleset\":2,\"non_main_ruleset\":1}},\"ranked\":2,\"ranked_date\":\"2012-02-19T05:51:54Z\",\"rating\":9.32026,\"storyboard\":true,\"submitted_date\":\"2011-12-24T00:34:33Z\",\"tags\":\"onosakihito speedcore renard lapfox\",\"availability\":{\"download_disabled\":false,\"more_information\":null},\"ratings\":[0,664,50,38,20,85,118,241,389,841,12267]},\"current_user_playcount\":0,\"failtimes\":{\"fail\":[1208,144,135,933,646,186,2552,2228,490797,3437220,2704564,8996173,414644,176508,509645,993532,1404983,1989564,1906021,634700,351254,430225,68302,47828,39642,211451,145193,196650,35788,165,145,156,160,143,159,161,15458,58863,56996,27668,67645,198738,112262,9801,4250,7399,1370,1111,12680,17393,8412,5440,21467,37775,21624,8110,2833,2753,728,7088,2094,155,149,197,153,151,155,527,44719,135575,85668,50182,28446,62677,27776,5427,2407,5213,6302,17233,12199,21091,25253,4640,27141,14253,31424,49241,30318,52063,144505,30112,20207,42395,21430,215881,35255,6401,44701,165028],\"exit\":[88,100,105,108,748,61197,19323,12142,14587,198781,514938,379877,329039,54005,169796,273191,290650,331988,235855,105196,119629,272365,90866,69722,69000,123943,125024,87425,347946,462649,156199,60988,34978,22891,10713,6292,10289,33644,29889,17680,38135,54194,39383,20204,9437,14712,12856,7998,22923,66422,26899,14535,14076,18667,25164,28459,31954,32909,12318,15353,145349,152912,61060,28097,17603,9794,5389,4102,24984,35770,19870,12621,18306,17261,12470,10306,15805,19805,22456,34659,28073,21114,16225,10912,12649,10079,16738,22131,28250,39992,52493,20343,23805,36186,21642,44790,33616,16399,27054,271448]},\"max_combo\":1337,\"owners\":[{\"id\":19048,\"username\":\"Froslass\"}]}",
+    "headers" : {
+      "Date" : "Sat, 18 Oct 2025 09:04:31 GMT",
+      "Content-Type" : "application/json",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1193",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "9906de652bbfe0c9-MUC"
+    }
+  },
+  "uuid" : "bb1f1b43-e021-4c14-a795-6f0d8bccb826",
+  "persistent" : true,
+  "insertionIndex" : 9
+}

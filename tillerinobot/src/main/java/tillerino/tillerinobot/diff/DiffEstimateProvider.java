@@ -1,5 +1,11 @@
 package tillerino.tillerinobot.diff;
 
+import static org.tillerino.osuApiModel.Mods.*;
+
+import com.github.omkelderman.sandoku.DiffCalcResult;
+import com.github.omkelderman.sandoku.DiffResult;
+import com.github.omkelderman.sandoku.ProcessorApi;
+import jakarta.ws.rs.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -13,10 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ClientErrorException;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.slf4j.MDC;
@@ -25,6 +27,10 @@ import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister;
 import org.tillerino.mormon.Persister.Action;
+import org.tillerino.osuApiModel.GameModes;
+import org.tillerino.osuApiModel.Mods;
+import org.tillerino.osuApiModel.types.GameMode;
+import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.OsuApi;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BeatmapId;
@@ -38,8 +44,6 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.DiffEstimate;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
-import tillerino.tillerinobot.diff.sandoku.SanDokuResponse;
-import tillerino.tillerinobot.diff.sandoku.SanDokuResponse.SanDokuDiffCalcResult;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 
@@ -50,13 +54,15 @@ import tillerino.tillerinobot.rest.BeatmapsService;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DiffEstimateProvider {
+	@BitwiseMods public static final long diffMods = getMask(TouchDevice, HalfTime, DoubleTime, Easy, HardRock, Flashlight);
+
 	public final Semaphore calculatorSemaphore = new Semaphore(10, true);
 
 	private final BeatmapsService beatmaps;
 
 	private final OsuApi downloader;
 
-	private final SanDoku calculator;
+	private final ProcessorApi calculator;
 
 	private final DatabaseManager dbm;
 
@@ -96,7 +102,7 @@ public class DiffEstimateProvider {
 			cachedBeatmap = ApiBeatmap.loadOrDownload(database, beatmapid, 0, cachedBeatmap.getApproved() == OsuApiBeatmap.APPROVED ? 24 * 60 * 60 * 1000 : 10000, downloader);
 		}
 
-		final long diffMods = Beatmap.getDiffMods(originalMods);
+		final long diffMods = getDiffMods(originalMods);
 		if (cachedBeatmap == null) {
 			// doesn't never existed or was deleted
 			var _ = database.deleteFrom(DiffEstimate.class)."where beatmapid = \{beatmapid} and mods = \{diffMods}";
@@ -112,6 +118,9 @@ public class DiffEstimateProvider {
 			}
 			try {
 				estimate = DiffEstimateProvider.calculateDiffEstimate(beatmapid, diffMods, beatmaps, calculator);
+				if (estimate.failure != null) {
+					log.error(estimate.failure);
+				}
 			} finally {
 				calculatorSemaphore.release();
 			}
@@ -129,7 +138,7 @@ public class DiffEstimateProvider {
 	}
 
 	private static DiffEstimate calculateDiffEstimate(@BeatmapId int beatmapid, @BitwiseMods long mods,
-			BeatmapsService beatmaps, SanDoku calculator) {
+			BeatmapsService beatmaps, ProcessorApi calculator) {
 	
 		BeatmapResource beatmap = beatmaps.byId(beatmapid);
 		DiffEstimate estimate = new DiffEstimate(beatmapid, mods);
@@ -149,11 +158,12 @@ public class DiffEstimateProvider {
 			return estimate;
 		}
 
-		SanDokuResponse sanDoku;
+		DiffResult sanDoku;
 		try {
-			sanDoku = calculator.getDiff(0, mods, actualBeatmap.getBytes(StandardCharsets.UTF_8));
-			SanDokuDiffCalcResult r = sanDoku.diffCalcResult();
-			if (r.sliderCount() + r.hitCircleCount() + r.spinnerCount() == 0) {
+			System.out.println("Requesting from SanDoku " + beatmapid + " " + mods);
+			sanDoku = calculator.processorCalcDiff(0, (int) mods, false, actualBeatmap.getBytes(StandardCharsets.UTF_8));
+			DiffCalcResult r = sanDoku.getDiffCalcResult();
+			if (r.getSliderCount() + r.getHitCircleCount() + r.getSpinnerCount() == 0) {
 				estimate.failure = "Beatmap has no objects.";
 				return estimate;
 			}
@@ -163,9 +173,13 @@ public class DiffEstimateProvider {
 		} catch (InternalServerErrorException | ClientErrorException e) {
 			estimate.failure = "SanDoku failed: " + e.getResponse();
 			return estimate;
+		} catch (ProcessingException e) {
+			log.error("San doku communication error", e);
+			estimate.failure = "SanDoku communication error: " + e.getMessage();
+			return estimate;
 		}
 
-		DiffEstimate.DiffEstimateToBeatmapImplMapper.INSTANCE.map(sanDoku.toBeatmap(), estimate);
+		DiffEstimate.DiffEstimateToBeatmapImplMapper.INSTANCE.map(sanDoku, estimate);
 		estimate.success = true;
 
 		return estimate;
@@ -220,5 +234,52 @@ public class DiffEstimateProvider {
 			}
 			return false;
 		}
+	}
+
+	public PercentageEstimates getEstimates(@GameMode int gameMode, @BeatmapId int beatmapId, @BitwiseMods long mods)
+			throws NoEstimatesException, SQLException, IOException, InterruptedException {
+		if(gameMode != GameModes.OSU) {
+			throw new NoEstimatesException();
+		}
+
+		try(var __ = PhaseTimer.timeTask("loadOrCalculateEstimates");
+				Database database = dbm.getDatabase()) {
+			// try to load with these exact mods
+			BeatmapImpl diffEstimate = loadOrCalculate(database, beatmapId, mods);
+
+			if(diffEstimate != null) {
+				return new PercentageEstimatesImpl(diffEstimate, mods);
+			}
+
+			throw new NoEstimatesException();
+		}
+	}
+
+	/**
+	 * returns only TD, HT, DT, EZ, HR, and FL, converting NC to DT. Also includes HD, but only if FL is present
+	 * @param mods
+	 * @return
+	 */
+	@SuppressFBWarnings(value = "TQ", justification = "Producer")
+	public static @BitwiseMods long getDiffMods(@BitwiseMods long mods) {
+		if(Nightcore.is(mods)) {
+			mods |= getMask(DoubleTime);
+			mods ^= getMask(Nightcore);
+		}
+
+		boolean hdfl = Mods.Flashlight.is(mods) && Hidden.is(mods);
+
+		mods = mods & diffMods;
+
+		if(hdfl) {
+			// re-apply HD if used in combination with FL
+			mods |= getMask(Hidden);
+		}
+
+		return mods;
+	}
+
+	public static class NoEstimatesException extends Exception {
+		private static final long serialVersionUID = 1L;
 	}
 }

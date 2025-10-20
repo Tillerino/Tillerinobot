@@ -1,0 +1,27 @@
+{
+  "id" : "8588497a-2e91-448a-99b3-7ccdda87913e",
+  "name" : "osu_663567",
+  "request" : {
+    "url" : "/osu/663567",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "osu_663567-8588497a-2e91-448a-99b3-7ccdda87913e.txt",
+    "headers" : {
+      "Date" : "Sun, 19 Oct 2025 09:40:41 GMT",
+      "Content-Type" : "text/plain;charset=UTF-8",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Disposition" : "attachment; filename=\"DJ Fresh (feat. Ellie Goulding) - Flashlight (Radio Edit) (Frey) [HOS' Easy].osu\"",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "990f50bec9dcd3aa-MUC"
+    }
+  },
+  "uuid" : "8588497a-2e91-448a-99b3-7ccdda87913e",
+  "persistent" : true,
+  "insertionIndex" : 34
+}

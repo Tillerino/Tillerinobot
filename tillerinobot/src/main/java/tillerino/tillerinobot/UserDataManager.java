@@ -35,7 +35,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.data.BotUserData;
-import tillerino.tillerinobot.diff.Beatmap;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 import tillerino.tillerinobot.util.IsMutable;
@@ -61,7 +61,7 @@ public class UserDataManager {
 			}
 
 			public BeatmapWithMods diffMods() {
-				return new BeatmapWithMods(beatmap, Beatmap.getDiffMods(mods));
+				return new BeatmapWithMods(beatmap, DiffEstimateProvider.getDiffMods(mods));
 			}
 		}
 

@@ -1,0 +1,34 @@
+{
+  "id" : "883593d9-b9a5-4333-b986-930142d9b0e7",
+  "name" : "api_v2_users_2070907",
+  "request" : {
+    "url" : "/api/v2/users/2070907?mode=osu&key=id",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer osu-oauth-mock-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "api_v2_users_2070907-883593d9-b9a5-4333-b986-930142d9b0e7.json",
+    "headers" : {
+      "Date" : "Sat, 18 Oct 2025 09:04:29 GMT",
+      "Content-Type" : "application/json",
+      "Server" : "cloudflare",
+      "X-Content-Type-Options" : "nosniff",
+      "Cache-Control" : "no-cache, private",
+      "X-Ratelimit-Limit" : "1200",
+      "X-Ratelimit-Remaining" : "1199",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options" : "SAMEORIGIN",
+      "vary" : "accept-encoding",
+      "cf-cache-status" : "DYNAMIC",
+      "CF-RAY" : "9906de575a0c927e-MUC"
+    }
+  },
+  "uuid" : "883593d9-b9a5-4333-b986-930142d9b0e7",
+  "persistent" : true,
+  "insertionIndex" : 14
+}
