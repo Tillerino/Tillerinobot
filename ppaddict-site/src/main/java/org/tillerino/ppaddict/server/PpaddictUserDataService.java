@@ -39,7 +39,7 @@ public class PpaddictUserDataService {
   public Optional<PersistentUserData> loadUserData(@PpaddictId String identifier) {
     Optional<PpaddictUser> userMaybe;
     try {
-      userMaybe = dbm.selectUnique(PpaddictUser.class)."where identifier = \{identifier}";
+      userMaybe = dbm.selectUnique(PpaddictUser.class).execute("where identifier = ", identifier);
     } catch (SQLException e) {
       throw new RuntimeException("Error loading user", e);
     }
@@ -58,7 +58,7 @@ public class PpaddictUserDataService {
   }
 
   public void saveUserData(@PpaddictId String identifier, PersistentUserData userData) throws SQLException {
-    PpaddictUser row = dbm.selectUnique(PpaddictUser.class)."where identifier = \{identifier}".orElse(new PpaddictUser(identifier, null, null));
+    PpaddictUser row = dbm.selectUnique(PpaddictUser.class).execute("where identifier = ", identifier).orElse(new PpaddictUser(identifier, null, null));
     if (row.getForward() != null) {
       saveUserData(row.getForward(), userData);
     } else {
@@ -93,7 +93,7 @@ public class PpaddictUserDataService {
    */
   public Optional<String> tryLinkToPpaddict(String token, @UserId int osuUserId)
       throws SQLException {
-    Optional<PpaddictLinkKey> validLink = dbm.selectUnique(PpaddictLinkKey.class)."where linkKey = \{token}"
+    Optional<PpaddictLinkKey> validLink = dbm.selectUnique(PpaddictLinkKey.class).execute("where linkKey = ", token)
         .filter(l -> l.getExpires() > clock.currentTimeMillis())
         .filter(link -> !link.getIdentifier().startsWith("osu:")
         // don't chain links
@@ -102,7 +102,7 @@ public class PpaddictUserDataService {
       return Optional.empty();
     }
     PpaddictLinkKey link = validLink.get();
-    PpaddictUser authenticatedUser = dbm.selectUnique(PpaddictUser.class)."where identifier = \{link.getIdentifier()}"
+    PpaddictUser authenticatedUser = dbm.selectUnique(PpaddictUser.class).execute("where identifier = ", link.getIdentifier())
         .orElseGet(() -> new PpaddictUser(link.getIdentifier(), null, null));
     if (authenticatedUser.getForward() != null) {
       // don't change existing forwards
