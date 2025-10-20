@@ -36,7 +36,7 @@ public class IrcNameResolverTest extends AbstractDatabaseTest {
 		backend.hintUser("anybody", false, 1000, 1000);
 		assertNotNull(resolver.resolveIRCName("anybody"));
 
-		assertThat(db.selectUnique(UserNameMapping.class)."where userName = \{"anybody"}")
+		assertThat(db.selectUnique(UserNameMapping.class).execute("where userName = ", "anybody"))
 				.hasValueSatisfying(m -> assertThat(m.getUserid()).isEqualTo(1));
 	}
 

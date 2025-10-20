@@ -74,7 +74,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 	@Override
 	public String getFile() {
 		try {
-			ActualBeatmap found = dbm.selectUnique(ActualBeatmap.class)."where beatmapid = \{beatmap.getBeatmapId()}".orElse(null);
+			ActualBeatmap found = dbm.selectUnique(ActualBeatmap.class).execute("where beatmapid = ", beatmap.getBeatmapId()).orElse(null);
 			if (found != null) {
 				if (found.getHash() == null || found.getHash().isEmpty()) {
 					found.setHash(md5Hex(found.decompressedContent()));
@@ -123,7 +123,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 						String.format("Hash does not match. Expected: %s Actual: %s", beatmap.getFileMd5(), hash),
 						Status.FORBIDDEN);
 			}
-			ActualBeatmap found = dbm.selectUnique(ActualBeatmap.class)."where beatmapid = \{beatmap.getBeatmapId()}".orElse(null);
+			ActualBeatmap found = dbm.selectUnique(ActualBeatmap.class).execute("where beatmapid = ", beatmap.getBeatmapId()).orElse(null);
 			if (found == null) {
 				found = new ActualBeatmap();
 				found.setBeatmapid(beatmap.getBeatmapId());

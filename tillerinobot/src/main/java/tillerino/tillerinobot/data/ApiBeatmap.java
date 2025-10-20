@@ -72,7 +72,7 @@ public class ApiBeatmap extends OsuApiBeatmap {
 			}
 
 			if(beatmap == null) {
-				var _ = database.deleteFrom(ApiBeatmap.class)."where `beatmapId` = \{beatmapid} and `mods` = \{mods}";
+				var _ = database.deleteFrom(ApiBeatmap.class).execute("where `beatmapId` = ", beatmapid, " and `mods` = ", mods);
 				return null;
 			}
 			

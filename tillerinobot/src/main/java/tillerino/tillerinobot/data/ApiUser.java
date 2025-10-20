@@ -38,7 +38,7 @@ public class ApiUser extends OsuApiUser {
 	public static ApiUser loadOrDownload(Database database, @UserId int userid, long maxAge, OsuApi downloader) throws SQLException, IOException {
 		ApiUser user;
 		try (var _ = PhaseTimer.timeTask("loadUser")) {
-			user = database.selectUnique(ApiUser.class)."where userId = \{userid}".orElse(null);
+			user = database.selectUnique(ApiUser.class).execute("where userId = ", userid).orElse(null);
 		}
 
 		if(user == null || (maxAge > 0 && user.downloaded < System.currentTimeMillis() - maxAge)) {

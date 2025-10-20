@@ -105,7 +105,7 @@ public class DiffEstimateProvider {
 		final long diffMods = getDiffMods(originalMods);
 		if (cachedBeatmap == null) {
 			// doesn't never existed or was deleted
-			var _ = database.deleteFrom(DiffEstimate.class)."where beatmapid = \{beatmapid} and mods = \{diffMods}";
+			var _ = database.deleteFrom(DiffEstimate.class).execute("where beatmapid = ", beatmapid, " and mods = ", diffMods);
 			return null;
 		}
 

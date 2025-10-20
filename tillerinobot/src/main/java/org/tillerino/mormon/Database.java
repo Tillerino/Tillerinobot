@@ -4,13 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.io.IOUtils;
 import org.tillerino.mormon.Mapping.FieldManager;
 import org.tillerino.mormon.Persister.Action;
 
@@ -34,13 +34,30 @@ public record Database(Connection connection) implements AutoCloseable {
 		return connection.prepareStatement(query);
 	}
 
-	private PreparedStatement prepareStatement(String prefix, int startIndex, StringTemplate st) throws SQLException {
-		String query = prefix + " " + String.join("?", st.fragments());
-		PreparedStatement ps = connection.prepareStatement(query);
+	private PreparedStatement prepareStatement(String prefix, Object... query) throws SQLException {
+		List<String> literals = new ArrayList<>();
+		List<Object> parameters = new ArrayList<>();
+
+		for (int i = 0; i < query.length; i++) {
+			if (i % 2 == 0) {
+				if (!(query[i] instanceof String s)) {
+					throw new IllegalArgumentException("Argument " + i + " not a string");
+				}
+				literals.add(s);
+			} else {
+				parameters.add(query[i]);
+			}
+		}
+
+		String questionMarkQuery = prefix + " " + String.join("?", literals);
+		if (literals.size() == parameters.size()) {
+			questionMarkQuery += "?";
+		}
+		PreparedStatement ps = connection.prepareStatement(questionMarkQuery);
 
 		try {
-			int index = startIndex;
-			for (Object value : st.values()) {
+			int index = 1;
+			for (Object value : parameters) {
 				if (value == null) {
 					ps.setNull(index++, java.sql.Types.NULL);
 					continue;
@@ -70,24 +87,24 @@ public record Database(Connection connection) implements AutoCloseable {
 		return ps;
 	}
 
-	public <T> StringTemplate.Processor<List<T>, SQLException> selectList(Class<T> cls) {
+	public <T> UnpreparedStatement<List<T>> selectList(Class<T> cls) {
 		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
 		return st -> {
 			try (PreparedStatement ps = prepareStatement(
 					STR."select \{mapping.fields()} from `\{mapping.table()}`",
-					1, st)) {
+					st)) {
 				ResultSet set = ps.executeQuery();
 				return IteratorUtils.toList(new ResultSetIterator<>(set, mapping));
 			}
 		};
 	}
 
-	public <T> StringTemplate.Processor<Optional<T>, SQLException> selectUnique(Class<T> cls) {
+	public <T> UnpreparedStatement<Optional<T>> selectUnique(Class<T> cls) {
 		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
 		return st -> {
 			try (PreparedStatement ps = prepareStatement(
 					STR."select \{mapping.fields()} from `\{mapping.table()}`",
-					1, st)) {
+					st)) {
 				ResultSet set = ps.executeQuery();
 				ResultSetIterator<T> iterator = new ResultSetIterator<>(set, mapping);
 				if (!iterator.hasNext()) {
@@ -130,12 +147,12 @@ public record Database(Connection connection) implements AutoCloseable {
 		}
 	}
 
-	public <T> StringTemplate.Processor<Integer, SQLException> deleteFrom(Class<T> cls) {
+	public <T> UnpreparedStatement<Integer> deleteFrom(Class<T> cls) {
 		Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
 		return st -> {
 			try (PreparedStatement ps = prepareStatement(
 					STR."delete from `\{mapping.table()}`",
-					1, st)) {
+					st)) {
 				return ps.executeUpdate();
 			}
 		};
@@ -179,5 +196,9 @@ public record Database(Connection connection) implements AutoCloseable {
 	public void close() throws SQLException {
 		// We get a pooled connection, so this close just returns the connection to the pool.
 		connection.close();
+	}
+
+	public interface UnpreparedStatement<T> {
+		T execute(Object... query) throws SQLException;
 	}
 }

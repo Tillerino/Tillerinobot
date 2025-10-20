@@ -92,7 +92,7 @@ public class Player {
 	
 	public static Player getPlayer(Database database, @UserId int userid) throws SQLException {
 		{
-			Optional<Player> player = database.selectUnique(Player.class)."where userid = \{userid}";
+			Optional<Player> player = database.selectUnique(Player.class).execute("where userid = ", userid);
 			if (player.isPresent())
 				return player.get();
 		}

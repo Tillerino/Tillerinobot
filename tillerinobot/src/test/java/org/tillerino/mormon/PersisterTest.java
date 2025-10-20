@@ -40,11 +40,11 @@ public class PersisterTest extends AbstractDatabaseTest {
 		db.connection().createStatement().execute(SimpleKey.TABLE_DEF);
 		db.truncate(SimpleKey.class); // clean up from previous tests
 
-		assertEquals(0, (int) db.deleteFrom(SimpleKey.class)."where myKey = \{2070907}");
+		assertEquals(0, (int) db.deleteFrom(SimpleKey.class).execute("where myKey = ", 2070907));
 
 		db.persist(new SimpleKey(2070907, "more"), Action.INSERT);
 
-		assertEquals(1, (int) db.deleteFrom(SimpleKey.class)."where myKey = \{2070907}");
+		assertEquals(1, (int) db.deleteFrom(SimpleKey.class).execute("where myKey = ", 2070907));
 	}
 
 	@Test

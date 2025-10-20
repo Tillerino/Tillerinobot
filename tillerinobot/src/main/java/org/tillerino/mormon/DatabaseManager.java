@@ -19,6 +19,7 @@ import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.tillerino.mormon.Database.UnpreparedStatement;
 import org.tillerino.mormon.Persister.Action;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -88,18 +89,18 @@ public class DatabaseManager implements AutoCloseable {
 		pool.close();
 	}
 
-	public <T> StringTemplate.Processor<List<T>, SQLException> selectList(Class<T> cls) {
+	public <T> UnpreparedStatement<List<T>> selectList(Class<T> cls) {
 		return st -> {
 			try (Database db = getDatabase()) {
-				return db.selectList(cls).process(st);
+				return db.selectList(cls).execute(st);
 			}
 		};
 	}
 
-	public <T> StringTemplate.Processor<Optional<T>, SQLException> selectUnique(Class<T> cls) {
+	public <T> UnpreparedStatement<Optional<T>> selectUnique(Class<T> cls) {
 		return st -> {
 			try (Database db = getDatabase()) {
-				return db.selectUnique(cls).process(st);
+				return db.selectUnique(cls).execute(st);
 			}
 		};
 	}
