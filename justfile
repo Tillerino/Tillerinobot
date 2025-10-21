@@ -11,6 +11,7 @@ clean-verify:
 
 # Do more stupid things, faster :sunglasses:
 clean-verify-fast:
+  mvn validate # spotless check first to prevent disappointments
   mvn clean verify -T 3 -P rust
 
 # Install the JARs into the Maven repository without testing anything.

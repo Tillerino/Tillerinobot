@@ -54,6 +54,9 @@ public abstract class AbstractDatabaseTest {
 
     @AfterEach
     public void closeEntityManager() throws SQLException {
-        db.close();
+        if (db != null) {
+            db.close();
+        }
+        dbm.close();
     }
 }

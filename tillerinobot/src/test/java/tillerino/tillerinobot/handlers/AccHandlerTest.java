@@ -7,33 +7,52 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import dagger.Component;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
-import org.tillerino.ppaddict.chat.LiveActivity;
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
+import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
-public class AccHandlerTest {
-    BotBackend backend = mock(BotBackend.class);
-    UserData userData = mock(UserData.class);
-    PercentageEstimates percentageEstimates = mock(PercentageEstimates.class);
-    LiveActivity liveActivity = mock(LiveActivity.class);
-    OsuApiBeatmap beatmap = new OsuApiBeatmap();
+public class AccHandlerTest extends AbstractDatabaseTest {
+    @Component(modules = {TestBackend.Module.class, LiveActivityMockModule.class, DockeredMysqlModule.class})
+    @Singleton
+    interface Injector {
+        void inject(AccHandlerTest t);
+    }
+
+    {
+        DaggerAccHandlerTest_Injector.create().inject(this);
+    }
+
+    @Inject
+    UserDataManager userDataManager;
+
+    @Inject
+    TestBackend backend;
+
+    @Inject
+    AccHandler accHandler;
+
+    UserData userData;
 
     @BeforeEach
-    public void setup() throws Exception {
-        when(backend.loadBeatmap(anyInt(), anyLong(), any()))
-                .thenReturn(new BeatmapMeta(beatmap, null, percentageEstimates));
+    void setUp() throws Exception {
+        backend.hintUser("user", false, 123, 123.0);
+        userData = spy(userDataManager.loadUserData(1));
+        userData.setLastSongInfo(new BeatmapWithMods(0, 0));
     }
 
     @Test
@@ -50,40 +69,34 @@ public class AccHandlerTest {
 
     @Test
     public void testSimple() throws Exception {
-        beatmap.setMaxCombo(100);
-        AccHandler accHandler = new AccHandler(backend, liveActivity);
-
-        when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
         assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).content())
                 .contains("800x");
+        verify(backend).loadBeatmap(eq(0), eq(0L), any());
+    }
+
+    @Test
+    public void testLazer() throws Exception {
+        userData.setV2(true);
+        assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).content())
+                .contains("800x");
+        verify(backend).loadBeatmap(eq(0), eq(Mods.getMask(Mods.Lazer)), any());
     }
 
     @Test
     public void testLargeNumber() throws Exception {
-        when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
-
         when(backend.loadBeatmap(anyInt(), anyLong(), any())).thenReturn(new BeatmapMeta(null, null, null));
-        assertThatThrownBy(() -> new AccHandler(backend, liveActivity)
-                        .handle("acc 99 80000000000000000000x 1m", null, userData, new Default()))
+        assertThatThrownBy(() -> accHandler.handle("acc 99 80000000000000000000x 1m", null, userData, new Default()))
                 .hasMessageContaining("800000000000");
     }
 
     @Test
     public void testAccTooLow() throws Exception {
-        beatmap.setMaxCombo(100);
-        AccHandler accHandler = new AccHandler(backend, liveActivity);
-
-        when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
         assertThatThrownBy(() -> accHandler.handle("acc 16.4", null, userData, new Default()))
                 .hasMessageContaining("Invalid accuracy");
     }
 
     @Test
     public void testAccJustHighEnough() throws Exception {
-        beatmap.setMaxCombo(100);
-        AccHandler accHandler = new AccHandler(backend, liveActivity);
-
-        when(userData.getLastSongInfo()).thenReturn(new BeatmapWithMods(0, 0));
         assertThat(((Success) accHandler.handle("acc 17 800x 1m", null, userData, null)).content())
                 .contains("800x");
     }

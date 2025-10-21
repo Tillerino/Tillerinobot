@@ -3,22 +3,25 @@ package tillerino.tillerinobot.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import dagger.Component;
-import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
-import tillerino.tillerinobot.TestBackend;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
 
-public class NPHandlerTest {
-    @Component(modules = {TestBackend.Module.class, LiveActivityMockModule.class})
+class NPHandlerTest extends AbstractDatabaseTest {
+    @Component(modules = {TestBackend.Module.class, LiveActivityMockModule.class, DockeredMysqlModule.class})
     @Singleton
     interface Injector {
         void inject(NPHandlerTest t);
@@ -29,10 +32,24 @@ public class NPHandlerTest {
     }
 
     @Inject
+    UserDataManager userDataManager;
+
+    @Inject
+    TestBackend backend;
+
+    @Inject
     NPHandler handler;
 
+    UserData userData;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        backend.hintUser("user", false, 123, 123.0);
+        userData = spy(userDataManager.loadUserData(1));
+    }
+
     @Test
-    public void testMatcher() throws Exception {
+    void testMatcher() {
         // old style
         assertTrue(NPHandler.npPattern
                 .matcher("is listening to [https://osu.ppy.sh/b/123 title]")
@@ -51,38 +68,56 @@ public class NPHandlerTest {
     }
 
     @Test
-    public void testOldStyle() throws Exception {
-        assertThat(handler.handle(
-                        "is editing [https://osu.ppy.sh/b/123 title]", null, mock(UserData.class), new Default()))
-                .isNotNull()
+    void testOldStyle() throws Exception {
+        assertThat(handler.handle("is editing [https://osu.ppy.sh/b/123 title]", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Success.class);
     }
 
     @Test
-    public void testNewStyle() throws Exception {
-        for (String cmd : Arrays.asList(
-                "is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]",
-                // game mode is optional?
-                "is listening to [https://osu.ppy.sh/beatmapsets/1158561#2419085 AliA - Kakurenbo]")) {
-            assertThat(handler.handle(cmd, null, mock(UserData.class), new Default()))
-                    .isNotNull()
-                    .isInstanceOf(GameChatResponse.Success.class);
-        }
+    void testNewStyleEditing() throws Exception {
+        assertThat(handler.handle(
+                        "is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]", null, userData, new Default()))
+                .isInstanceOf(GameChatResponse.Success.class);
+        verify(backend).loadBeatmap(eq(123), eq(0L), any());
     }
 
     @Test
-    public void testSetIdOldStyle() throws Exception {
-        assertThatThrownBy(
-                        () -> handler.handle("is editing [https://osu.ppy.sh/s/123 title]", null, null, new Default()))
+    void testNewStyleListening() throws Exception {
+        // game mode is optional?
+        assertThat(handler.handle(
+                        "is listening to [https://osu.ppy.sh/beatmapsets/1158561#2419085 AliA - Kakurenbo]",
+                        null,
+                        userData,
+                        new Default()))
+                .isInstanceOf(GameChatResponse.Success.class);
+        verify(backend).loadBeatmap(eq(2419085), eq(0L), any());
+    }
+
+    @Test
+    void testSetIdOldStyle() {
+        assertThatThrownBy(() ->
+                        handler.handle("is editing [https://osu.ppy.sh/s/123 title]", null, userData, new Default()))
                 .isInstanceOf(UserException.class)
                 .hasMessage(new Default().isSetId());
     }
 
     @Test
-    public void testSetIdNewStyle() throws Exception {
+    void testSetIdNewStyle() {
         assertThatThrownBy(() -> handler.handle(
-                        "is editing [https://osu.ppy.sh/beatmapsets/361035 title]", null, null, new Default()))
+                        "is editing [https://osu.ppy.sh/beatmapsets/361035 title]", null, userData, new Default()))
                 .isInstanceOf(UserException.class)
                 .hasMessage(new Default().isSetId());
+    }
+
+    @Test
+    void testLazerNp() throws Exception {
+        userData.setV2(true);
+        assertThat(handler.handle(
+                        "is listening to [https://osu.ppy.sh/beatmapsets/361035#osu/955737 title]",
+                        null,
+                        userData,
+                        new Default()))
+                .isInstanceOf(GameChatResponse.Success.class);
+        verify(backend).loadBeatmap(eq(955737), eq(Mods.getMask(Mods.Lazer)), any());
     }
 }

@@ -44,6 +44,7 @@ public class AccHandler implements CommandHandler {
         if (lastSongInfo == null) {
             throw new UserException(lang.noLastSongInfo());
         }
+        lastSongInfo = lastSongInfo.withMods(userData.addLazer(lastSongInfo.mods()));
         BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.beatmap(), lastSongInfo.mods(), lang);
         if (beatmap == null) {
             throw new RareUserException(lang.excuseForError());

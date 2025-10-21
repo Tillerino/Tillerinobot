@@ -14,6 +14,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -22,10 +23,12 @@ import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.With;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Persister.Action;
+import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
@@ -190,6 +193,13 @@ public class UserDataManager {
         public void setV2(boolean v2) {
             changed |= v2 != this.v2;
             this.v2 = v2;
+        }
+
+        public @BitwiseMods long addLazer(@BitwiseMods long mods) {
+            if (v2) {
+                return Mods.getMask(ListUtils.union(Mods.getMods(mods), List.of(Mods.Lazer)));
+            }
+            return mods;
         }
 
         @Override
