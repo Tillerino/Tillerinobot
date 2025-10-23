@@ -14,23 +14,8 @@ import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
-import tillerino.tillerinobot.diff.PercentageEstimates;
-import tillerino.tillerinobot.lang.Language;
 
 public interface BotBackend {
-    /**
-     * @param beatmapid
-     * @param mods mods for {@link PercentageEstimates}. These might be ignored if they can't be satisfied
-     * @return null if not found
-     * @throws SQLException
-     * @throws IOException
-     * @throws UserException
-     * @throws InterruptedException
-     */
-    @CheckForNull
-    BeatmapMeta loadBeatmap(@BeatmapId int beatmapid, @BitwiseMods long mods, Language lang)
-            throws SQLException, IOException, UserException, InterruptedException;
-
     /**
      * @param nick
      * @return the last version of the bot that was visited by this user. -1 if no information available.

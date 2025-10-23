@@ -34,12 +34,15 @@ import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.GameMode;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
+import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.DiffEstimate;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
+import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 
@@ -272,6 +275,25 @@ public class DiffEstimateProvider {
             }
 
             throw new NoEstimatesException();
+        }
+    }
+
+    public BeatmapMeta loadBeatmap(final @BeatmapId int beatmapid, @BitwiseMods long mods, Language lang)
+            throws SQLException, IOException, UserException, InterruptedException {
+        ApiBeatmap beatmap;
+        long diffMods = DiffEstimateProvider.getDiffMods(mods);
+        try (Database database = dbm.getDatabase(); ) {
+            beatmap = ApiBeatmap.loadOrDownload(database, beatmapid, diffMods, 7l * 24 * 60 * 60 * 1000, downloader);
+        } catch (SQLException e) {
+            throw new SQLException("exception loading beatmap " + beatmapid + " mods " + diffMods, e);
+        }
+
+        if (beatmap == null) return null;
+
+        try {
+            return new BeatmapMeta(beatmap, null, getEstimates(beatmap.getMode(), beatmap.getBeatmapId(), mods));
+        } catch (NoEstimatesException e) {
+            return null;
         }
     }
 

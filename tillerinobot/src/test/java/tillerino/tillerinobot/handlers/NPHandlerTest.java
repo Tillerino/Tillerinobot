@@ -18,6 +18,7 @@ import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Default;
 
 class NPHandlerTest extends AbstractDatabaseTest {
@@ -39,6 +40,9 @@ class NPHandlerTest extends AbstractDatabaseTest {
 
     @Inject
     NPHandler handler;
+
+    @Inject
+    DiffEstimateProvider diffEstimateProvider;
 
     UserData userData;
 
@@ -78,7 +82,7 @@ class NPHandlerTest extends AbstractDatabaseTest {
         assertThat(handler.handle(
                         "is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Success.class);
-        verify(backend).loadBeatmap(eq(123), eq(0L), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(123), eq(0L), any());
     }
 
     @Test
@@ -90,7 +94,7 @@ class NPHandlerTest extends AbstractDatabaseTest {
                         userData,
                         new Default()))
                 .isInstanceOf(GameChatResponse.Success.class);
-        verify(backend).loadBeatmap(eq(2419085), eq(0L), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(2419085), eq(0L), any());
     }
 
     @Test
@@ -118,6 +122,6 @@ class NPHandlerTest extends AbstractDatabaseTest {
                         userData,
                         new Default()))
                 .isInstanceOf(GameChatResponse.Success.class);
-        verify(backend).loadBeatmap(eq(955737), eq(Mods.getMask(Mods.Lazer)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(955737), eq(Mods.getMask(Mods.Lazer)), any());
     }
 }

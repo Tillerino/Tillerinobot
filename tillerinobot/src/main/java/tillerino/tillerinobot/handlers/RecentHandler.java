@@ -14,11 +14,13 @@ import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.ApiScore;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 
 @Value
 public class RecentHandler implements CommandHandler {
     BotBackend backend;
+    DiffEstimateProvider diffEstimateProvider;
 
     @Override
     public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language language)
@@ -36,9 +38,9 @@ public class RecentHandler implements CommandHandler {
             throw new UserException(language.noRecentPlays());
         }
 
-        OsuApiScore score = recentPlays.get(0);
+        OsuApiScore score = recentPlays.getFirst();
 
-        final BeatmapMeta estimates = backend.loadBeatmap(score.getBeatmapId(), score.getMods(), language);
+        final BeatmapMeta estimates = diffEstimateProvider.loadBeatmap(score.getBeatmapId(), score.getMods(), language);
 
         if (estimates == null) {
             throw new UserException(language.unknownBeatmap());

@@ -17,6 +17,7 @@ import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Default;
 
 class WithHandlerTest extends AbstractDatabaseTest {
@@ -39,6 +40,9 @@ class WithHandlerTest extends AbstractDatabaseTest {
     @Inject
     WithHandler handler;
 
+    @Inject
+    DiffEstimateProvider diffEstimateProvider;
+
     UserData userData;
 
     @BeforeEach
@@ -53,7 +57,7 @@ class WithHandlerTest extends AbstractDatabaseTest {
     void testBasicWithCommand() throws Exception {
         assertThat(handler.handle("with HD", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Message.class);
-        verify(backend).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden)), any());
     }
 
     @Test
@@ -61,14 +65,14 @@ class WithHandlerTest extends AbstractDatabaseTest {
         userData.setV2(true);
         assertThat(handler.handle("with HD", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Message.class);
-        verify(backend).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.Lazer)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.Lazer)), any());
     }
 
     @Test
     void testWithMultipleMods() throws Exception {
         assertThat(handler.handle("with HDHR", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Message.class);
-        verify(backend).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.HardRock)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.HardRock)), any());
     }
 
     @Test

@@ -12,19 +12,18 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WithHandler implements CommandHandler {
-    private final BotBackend backend;
-
     private final LiveActivity live;
+    private final DiffEstimateProvider diffEstimateProvider;
 
     @Override
     public GameChatResponse handle(String originalMessage, OsuApiUser apiUser, UserData userData, Language lang)
@@ -46,7 +45,7 @@ public class WithHandler implements CommandHandler {
             throw new UserException(lang.malformattedMods(message));
         }
         mods = userData.addLazer(mods);
-        BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.beatmap(), mods, lang);
+        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(lastSongInfo.beatmap(), mods, lang);
         if (beatmap == null) {
             throw new RareUserException(lang.excuseForError());
         }

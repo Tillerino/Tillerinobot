@@ -35,13 +35,13 @@ import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.data.Player;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
 import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
@@ -54,7 +54,6 @@ import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RecommendationsManager {
-    private final BotBackend backend;
     private final DatabaseManager dbm;
     private final RecommendationRequestParser parser;
     private final BeatmapsLoader beatmapsLoader;
@@ -62,6 +61,7 @@ public class RecommendationsManager {
     private final OsuApi osuApi;
     private final Clock clock;
     private final ConfigService config;
+    private final DiffEstimateProvider diffEstimateProvider;
 
     private final Cache<Integer, Recommendation> lastRecommendation =
             CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
@@ -139,11 +139,11 @@ public class RecommendationsManager {
 
         BeatmapMeta loadBeatmap;
         if (sample.mods() < 0) {
-            loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
+            loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, 0, lang);
         } else {
-            loadBeatmap = backend.loadBeatmap(beatmapid, sample.mods(), lang);
+            loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, sample.mods(), lang);
             if (loadBeatmap == null) {
-                loadBeatmap = backend.loadBeatmap(beatmapid, 0, lang);
+                loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, 0, lang);
             }
         }
         if (loadBeatmap == null) {

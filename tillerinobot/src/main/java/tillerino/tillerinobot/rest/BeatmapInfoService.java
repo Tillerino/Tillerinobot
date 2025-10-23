@@ -32,16 +32,16 @@ import lombok.RequiredArgsConstructor;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BeatmapInfoService implements BeatmapDifficulties {
-    private final BotBackend backend;
+    private final DiffEstimateProvider diffEstimateProvider;
 
     private final ExecutorService executorService = createExec();
 
@@ -62,7 +62,8 @@ public class BeatmapInfoService implements BeatmapDifficulties {
                         @Override
                         public BeatmapMeta call() throws SQLException, InterruptedException {
                             try {
-                                BeatmapMeta beatmap = backend.loadBeatmap(key.beatmap(), key.mods(), new Default());
+                                BeatmapMeta beatmap =
+                                        diffEstimateProvider.loadBeatmap(key.beatmap(), key.mods(), new Default());
 
                                 if (beatmap == null) {
                                     throw new NotFoundException("Beatmap " + key.beatmap() + " not found.");

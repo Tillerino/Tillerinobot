@@ -13,19 +13,18 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AccHandler implements CommandHandler {
-    private final BotBackend backend;
-
     private final LiveActivity live;
+    private final DiffEstimateProvider diffEstimateProvider;
 
     static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
     static Pattern superExtended =
@@ -45,7 +44,7 @@ public class AccHandler implements CommandHandler {
             throw new UserException(lang.noLastSongInfo());
         }
         lastSongInfo = lastSongInfo.withMods(userData.addLazer(lastSongInfo.mods()));
-        BeatmapMeta beatmap = backend.loadBeatmap(lastSongInfo.beatmap(), lastSongInfo.mods(), lang);
+        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(lastSongInfo.beatmap(), lastSongInfo.mods(), lang);
         if (beatmap == null) {
             throw new RareUserException(lang.excuseForError());
         }

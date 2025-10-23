@@ -24,6 +24,7 @@ import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Default;
 
 public class AccHandlerTest extends AbstractDatabaseTest {
@@ -45,6 +46,9 @@ public class AccHandlerTest extends AbstractDatabaseTest {
 
     @Inject
     AccHandler accHandler;
+
+    @Inject
+    DiffEstimateProvider diffEstimateProvider;
 
     UserData userData;
 
@@ -71,7 +75,7 @@ public class AccHandlerTest extends AbstractDatabaseTest {
     public void testSimple() throws Exception {
         assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).content())
                 .contains("800x");
-        verify(backend).loadBeatmap(eq(0), eq(0L), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(0), eq(0L), any());
     }
 
     @Test
@@ -79,12 +83,13 @@ public class AccHandlerTest extends AbstractDatabaseTest {
         userData.setV2(true);
         assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).content())
                 .contains("800x");
-        verify(backend).loadBeatmap(eq(0), eq(Mods.getMask(Mods.Lazer)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(0), eq(Mods.getMask(Mods.Lazer)), any());
     }
 
     @Test
     public void testLargeNumber() throws Exception {
-        when(backend.loadBeatmap(anyInt(), anyLong(), any())).thenReturn(new BeatmapMeta(null, null, null));
+        when(diffEstimateProvider.loadBeatmap(anyInt(), anyLong(), any()))
+                .thenReturn(new BeatmapMeta(null, null, null));
         assertThatThrownBy(() -> accHandler.handle("acc 99 80000000000000000000x 1m", null, userData, new Default()))
                 .hasMessageContaining("800000000000");
     }

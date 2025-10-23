@@ -17,11 +17,11 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Language;
 
@@ -40,9 +40,8 @@ public class NPHandler implements CommandHandler {
             + "|\\+HardRock|\\+SuddenDeath|\\+Perfect|\\+DoubleTime|\\+Nightcore|\\+Hidden|\\+Flashlight"
             + "|~Relax~|~AutoPilot~|-SpunOut|\\|Autoplay\\|" + "))*)");
 
-    private final BotBackend backend;
-
     private final LiveActivity live;
+    private final DiffEstimateProvider diffEstimateProvider;
 
     @Override
     public GameChatResponse handle(String message, OsuApiUser apiUser, UserData userData, Language lang)
@@ -56,7 +55,7 @@ public class NPHandler implements CommandHandler {
         MdcUtils.getLong(MdcUtils.MDC_EVENT).ifPresent(eventId -> live.propagateMessageDetails(eventId, "/np"));
 
         pair = pair.withMods(userData.addLazer(pair.mods()));
-        BeatmapMeta beatmap = backend.loadBeatmap(pair.beatmap(), pair.mods(), lang);
+        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(pair.beatmap(), pair.mods(), lang);
 
         if (beatmap == null) {
             throw new UserException(lang.unknownBeatmap());

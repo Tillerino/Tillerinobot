@@ -36,6 +36,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.ComplaintHandler;
 import tillerino.tillerinobot.handlers.DebugHandler;
@@ -81,21 +82,22 @@ public class IRCBot implements GameChatEventConsumer {
             OsutrackDownloader osutrackDownloader,
             RateLimiter rateLimiter,
             LiveActivity liveActivity,
-            GameChatResponseQueue queue) {
+            GameChatResponseQueue queue,
+            DiffEstimateProvider diffEstimateProvider) {
         this.backend = backend;
         this.userDataManager = userDataManager;
         this.resolver = resolver;
         this.osutrackDownloader = osutrackDownloader;
         this.rateLimiter = rateLimiter;
         this.queue = queue;
-        this.npHandler = new NPHandler(backend, liveActivity);
+        this.npHandler = new NPHandler(liveActivity, diffEstimateProvider);
 
         commandHandlers.add(new ResetHandler(manager));
         commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend), userDataManager, manager));
-        commandHandlers.add(new AccHandler(backend, liveActivity));
-        commandHandlers.add(new WithHandler(backend, liveActivity));
+        commandHandlers.add(new AccHandler(liveActivity, diffEstimateProvider));
+        commandHandlers.add(new WithHandler(liveActivity, diffEstimateProvider));
         commandHandlers.add(new RecommendHandler(manager, liveActivity));
-        commandHandlers.add(new RecentHandler(backend));
+        commandHandlers.add(new RecentHandler(backend, diffEstimateProvider));
         commandHandlers.add(new DebugHandler(backend, resolver));
         commandHandlers.add(new HelpHandler());
         commandHandlers.add(new ComplaintHandler(manager));

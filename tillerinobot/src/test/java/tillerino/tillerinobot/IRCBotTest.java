@@ -44,6 +44,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.data.ApiUser;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
@@ -117,10 +118,10 @@ public class IRCBotTest extends AbstractDatabaseTest {
     UserDataManager userDataManager;
 
     @Inject
-    OsuApiV1 osuApiV1;
+    OsuApiV2 osuApiV2;
 
     @Inject
-    OsuApiV2 osuApiV2;
+    DiffEstimateProvider diffEstimateProvider;
 
     /**
      * Contains the messages and actions sent by the bot. At the end of each test, it must be empty or the test fails.
@@ -146,7 +147,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
                 osuTrackDownloader,
                 rateLimiter,
                 liveActivity,
-                queue);
+                queue,
+                diffEstimateProvider);
     }
 
     void mockQueuePrint() throws InterruptedException {

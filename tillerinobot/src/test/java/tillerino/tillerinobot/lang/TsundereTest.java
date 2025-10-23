@@ -29,11 +29,11 @@ public class TsundereTest {
         BotBackend backend = mock(BotBackend.class);
         RecommendHandler handler = new RecommendHandler(
                 new RecommendationsManager(
-                        backend,
                         null,
                         new RecommendationRequestParser(backend),
                         new TestBackend.TestBeatmapsLoader(),
                         mock(Recommender.class),
+                        null,
                         null,
                         null,
                         null),

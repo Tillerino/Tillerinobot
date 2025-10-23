@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -82,6 +83,8 @@ public class TestBackend implements BotBackend {
 
     BeatmapsLoader loader;
 
+    DiffEstimateProvider diffEstimateProvider;
+
     @Getter
     static Map<Integer, Integer> setIds = new HashMap<>();
 
@@ -98,9 +101,13 @@ public class TestBackend implements BotBackend {
     }
 
     @Inject
-    public TestBackend(@Named("tillerinobot.test.persistentBackend") boolean serialize, BeatmapsLoader loader) {
+    public TestBackend(
+            @Named("tillerinobot.test.persistentBackend") boolean serialize,
+            BeatmapsLoader loader,
+            DiffEstimateProvider diffEstimateProvider) {
         this.serialize = serialize;
         this.loader = loader;
+        this.diffEstimateProvider = diffEstimateProvider;
         if (serialize) {
             try (Reader reader =
                     new InputStreamReader(new BufferedInputStream(new FileInputStream("tillerinobot-db.json")))) {
@@ -125,27 +132,6 @@ public class TestBackend implements BotBackend {
     }
 
     private Database database = new Database();
-
-    @Override
-    public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang) throws SQLException, IOException {
-        OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid, 0L);
-
-        BeatmapImpl cBeatmap = BeatmapImpl.builder()
-                .modsUsed(DiffEstimateProvider.getDiffMods(mods))
-                .StarDiff((float) beatmap.getStarDifficulty())
-                .AimDifficulty((float) beatmap.getStarDifficulty() / 2)
-                .SpeedDifficulty((float) beatmap.getStarDifficulty() / 2)
-                .SliderFactor(1f)
-                .ApproachRate((float) beatmap.getApproachRate())
-                .OverallDifficulty((float) beatmap.getOverallDifficulty())
-                .MaxCombo(beatmap.getMaxCombo())
-                .HitCircleCount(200)
-                .SpinnerCount(10)
-                .build();
-        PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, mods);
-
-        return new BeatmapMeta(beatmap, null, estimates);
-    }
 
     public void hintUser(String username, boolean isDonator, int rank, double pp) {
         hintUser(username, isDonator, rank, pp, database.userNames.size() + 1);
@@ -209,7 +195,7 @@ public class TestBackend implements BotBackend {
     }
 
     private List<BeatmapMeta> findBeatmaps(final double equivalentPp, long requestMods, boolean nomod)
-            throws SQLException, IOException {
+            throws SQLException, IOException, InterruptedException, UserException {
         ArrayList<Long> mods = new ArrayList<>();
         if (requestMods == 0) {
             mods.add(0l);
@@ -226,7 +212,7 @@ public class TestBackend implements BotBackend {
         List<BeatmapMeta> maps = new ArrayList<>();
         for (int i : setIds.keySet()) {
             for (long m : mods) {
-                BeatmapMeta meta = loadBeatmap(i, m, null);
+                BeatmapMeta meta = diffEstimateProvider.loadBeatmap(i, m, null);
                 if (Math.abs(1 - meta.getEstimates().getPP(.98) / equivalentPp) < .15) {
                     maps.add(meta);
                 }
@@ -294,6 +280,7 @@ public class TestBackend implements BotBackend {
         private final TestBackend backend;
 
         @Override
+        @SneakyThrows({UserException.class, InterruptedException.class})
         public List<TopPlay> loadTopPlays(int userId) throws SQLException, MaintenanceException, IOException {
             OsuApiUser user = backend.getUser(userId, 0);
             final double equivalent = user.getPp() / 20;
@@ -308,6 +295,7 @@ public class TestBackend implements BotBackend {
         }
 
         @Override
+        @SneakyThrows({InterruptedException.class})
         public Collection<BareRecommendation> loadRecommendations(
                 List<TopPlay> topPlays, Collection<Integer> exclude, Model model, boolean nomod, long requestMods)
                 throws SQLException, IOException, UserException {
@@ -345,8 +333,8 @@ public class TestBackend implements BotBackend {
     public interface Module {
         @dagger.Provides
         @Singleton
-        static TestBackend testBackend(BeatmapsLoader loader) {
-            return spy(new TestBackend(false, loader));
+        static TestBackend testBackend(BeatmapsLoader loader, DiffEstimateProvider diffEstimateProvider) {
+            return spy(new TestBackend(false, loader, diffEstimateProvider));
         }
 
         @dagger.Provides
@@ -360,5 +348,33 @@ public class TestBackend implements BotBackend {
 
         @dagger.Binds
         BeatmapsLoader l(TestBeatmapsLoader b);
+
+        @dagger.Provides
+        @Singleton
+        static DiffEstimateProvider diffEstimateProvider(BeatmapsLoader loader) {
+            return spy(new DiffEstimateProvider(null, null, null, null) {
+                @Override
+                public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
+                        throws SQLException, IOException {
+                    OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid, 0L);
+
+                    BeatmapImpl cBeatmap = BeatmapImpl.builder()
+                            .modsUsed(DiffEstimateProvider.getDiffMods(mods))
+                            .StarDiff((float) beatmap.getStarDifficulty())
+                            .AimDifficulty((float) beatmap.getStarDifficulty() / 2)
+                            .SpeedDifficulty((float) beatmap.getStarDifficulty() / 2)
+                            .SliderFactor(1f)
+                            .ApproachRate((float) beatmap.getApproachRate())
+                            .OverallDifficulty((float) beatmap.getOverallDifficulty())
+                            .MaxCombo(beatmap.getMaxCombo())
+                            .HitCircleCount(200)
+                            .SpinnerCount(10)
+                            .build();
+                    PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, mods);
+
+                    return new BeatmapMeta(beatmap, null, estimates);
+                }
+            });
+        }
     }
 }
