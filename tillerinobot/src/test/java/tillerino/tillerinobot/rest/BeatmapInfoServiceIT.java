@@ -14,8 +14,7 @@ import org.tillerino.ppaddict.mockmodules.BeatmapsServiceMockModule;
 import org.tillerino.ppaddict.mockmodules.GameChatClientMockModule;
 import org.tillerino.ppaddict.rest.AuthenticationServiceImpl.RemoteAuthenticationModule;
 import org.tillerino.ppaddict.util.TestClock;
-import tillerino.tillerinobot.AbstractDatabaseTest;
-import tillerino.tillerinobot.TestBackend;
+import tillerino.tillerinobot.*;
 
 public class BeatmapInfoServiceIT extends AbstractDatabaseTest {
     @Singleton
@@ -27,7 +26,10 @@ public class BeatmapInfoServiceIT extends AbstractDatabaseTest {
                 TestClock.Module.class,
                 TestBackend.Module.class,
                 GameChatClientMockModule.class,
-                BeatmapsServiceMockModule.class
+                BeatmapsServiceMockModule.class,
+                OsuApiV2Sometimes.Module.class,
+                OsuApiV1Test.Module.class,
+                OsuApiV2Test.Module.class
             })
     interface Injector {
         void inject(BeatmapInfoServiceIT t);

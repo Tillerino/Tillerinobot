@@ -36,6 +36,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.handlers.AccHandler;
 import tillerino.tillerinobot.handlers.ComplaintHandler;
@@ -71,6 +72,7 @@ public class IRCBot implements GameChatEventConsumer {
     private final RateLimiter rateLimiter;
     private final GameChatResponseQueue queue;
     private final NPHandler npHandler;
+    private final PullThrough pullThrough;
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
     @Inject
@@ -83,7 +85,8 @@ public class IRCBot implements GameChatEventConsumer {
             RateLimiter rateLimiter,
             LiveActivity liveActivity,
             GameChatResponseQueue queue,
-            DiffEstimateProvider diffEstimateProvider) {
+            DiffEstimateProvider diffEstimateProvider,
+            PullThrough pullThrough) {
         this.backend = backend;
         this.userDataManager = userDataManager;
         this.resolver = resolver;
@@ -91,17 +94,18 @@ public class IRCBot implements GameChatEventConsumer {
         this.rateLimiter = rateLimiter;
         this.queue = queue;
         this.npHandler = new NPHandler(liveActivity, diffEstimateProvider);
+        this.pullThrough = pullThrough;
 
         commandHandlers.add(new ResetHandler(manager));
         commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend), userDataManager, manager));
         commandHandlers.add(new AccHandler(liveActivity, diffEstimateProvider));
         commandHandlers.add(new WithHandler(liveActivity, diffEstimateProvider));
         commandHandlers.add(new RecommendHandler(manager, liveActivity));
-        commandHandlers.add(new RecentHandler(backend, diffEstimateProvider));
-        commandHandlers.add(new DebugHandler(backend, resolver));
+        commandHandlers.add(new RecentHandler(pullThrough, diffEstimateProvider));
+        commandHandlers.add(new DebugHandler(pullThrough, resolver));
         commandHandlers.add(new HelpHandler());
         commandHandlers.add(new ComplaintHandler(manager));
-        commandHandlers.add(new OsuTrackHandler(osutrackDownloader, backend));
+        commandHandlers.add(new OsuTrackHandler(osutrackDownloader, pullThrough));
     }
 
     private GameChatResponse processPrivateAction(PrivateAction action) throws InterruptedException {
@@ -365,7 +369,7 @@ public class IRCBot implements GameChatEventConsumer {
 
         OsuApiUser apiUser;
         try {
-            apiUser = backend.getUser(userid, 0);
+            apiUser = pullThrough.getUser(userid, 0);
         } catch (IOException e) {
             if (isTimeout(e)) {
                 log.debug("osu api timeout while getting user {} (welcomeIfDonator)", userid);
@@ -426,7 +430,7 @@ public class IRCBot implements GameChatEventConsumer {
         }
 
         if (userId != null) {
-            OsuApiUser apiUser = backend.getUser(userId, 60 * 60 * 1000L);
+            OsuApiUser apiUser = pullThrough.getUser(userId, 60 * 60 * 1000L);
 
             if (apiUser != null) {
                 String apiUserIrcName = IrcNameResolver.getIrcUserName(apiUser);

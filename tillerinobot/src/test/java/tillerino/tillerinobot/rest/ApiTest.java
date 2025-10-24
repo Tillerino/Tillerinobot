@@ -41,9 +41,8 @@ import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import org.tillerino.ppaddict.util.TestClock;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
-import tillerino.tillerinobot.FakeAuthenticationService;
-import tillerino.tillerinobot.TestBackend;
 
 /** Tests the Tillerinobot API on a live HTTP server including authentication. */
 public class ApiTest {
@@ -54,7 +53,8 @@ public class ApiTest {
                 TestBackend.Module.class,
                 TestClock.Module.class,
                 BeatmapsServiceMockModule.class,
-                GameChatClientMockModule.class
+                GameChatClientMockModule.class,
+                OsuApiV1Test.Module.class
             })
     @Singleton
     interface Injector {
@@ -76,6 +76,9 @@ public class ApiTest {
 
         @Binds
         AuthenticationService authenticationService(FakeAuthenticationService fakeAuthenticationService);
+
+        @Binds
+        OsuApi osuApi(OsuApiV1 osuApiV1);
     }
 
     {

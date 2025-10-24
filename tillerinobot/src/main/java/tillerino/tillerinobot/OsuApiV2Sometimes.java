@@ -59,7 +59,7 @@ public class OsuApiV2Sometimes implements OsuApi {
     }
 
     @dagger.Module
-    interface Module {
+    public interface Module {
         @dagger.Binds
         OsuApi osuApi(OsuApiV2Sometimes osuApiV2Sometimes);
     }

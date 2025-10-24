@@ -5,16 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.PullThrough;
 
 public class DebugHandlerTest {
-    BotBackend backend = Mockito.mock(BotBackend.class);
+    PullThrough pullThrough = Mockito.mock(PullThrough.class);
 
     IrcNameResolver resolver = Mockito.mock(IrcNameResolver.class);
 
-    DebugHandler handler = new DebugHandler(backend, resolver);
+    DebugHandler handler = new DebugHandler(pullThrough, resolver);
 
     UserData userData = new UserData();
 

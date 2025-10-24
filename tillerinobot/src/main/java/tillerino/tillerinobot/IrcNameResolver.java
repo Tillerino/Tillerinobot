@@ -18,6 +18,7 @@ import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.data.UserNameMapping;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -26,7 +27,7 @@ import tillerino.tillerinobot.data.UserNameMapping;
 public class IrcNameResolver {
     private final DatabaseManager dbm;
 
-    private final BotBackend backend;
+    private final PullThrough pullThrough;
 
     private final Cache<String, Integer> resolvedIRCNames =
             CacheBuilder.newBuilder().maximumSize(100000).build();
@@ -86,7 +87,7 @@ public class IrcNameResolver {
 
             OsuApiUser user;
             try {
-                user = backend.downloadUser(userName);
+                user = pullThrough.downloadUser(userName);
             } catch (IOException e) {
                 if (IRCBot.isTimeout(e) && mapping.getUserid() > 0) {
                     log.debug("timeout downloading user " + userName + "; return stale id.");
@@ -121,7 +122,7 @@ public class IrcNameResolver {
      */
     @CheckForNull
     public OsuApiUser resolveManually(@UserId int userId) throws SQLException, IOException {
-        OsuApiUser user = backend.getUser(userId, 1l);
+        OsuApiUser user = pullThrough.getUser(userId, 1l);
         if (user == null) {
             return null;
         }
@@ -159,7 +160,7 @@ public class IrcNameResolver {
      */
     @CheckForNull
     public OsuApiUser redownloadUser(@IRCName String ircName) throws IOException, SQLException {
-        OsuApiUser apiUser = backend.downloadUser(ircName);
+        OsuApiUser apiUser = pullThrough.downloadUser(ircName);
         if (apiUser == null) {
             setMapping(ircName, -1);
         } else {

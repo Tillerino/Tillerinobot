@@ -8,10 +8,18 @@ import dagger.Component;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.junit.jupiter.api.Test;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.data.UserNameMapping;
 
 public class IrcNameResolverTest extends AbstractDatabaseTest {
-    @Component(modules = {DockeredMysqlModule.class, TestBackend.Module.class})
+    @Component(
+            modules = {
+                DockeredMysqlModule.class,
+                TestBackend.Module.class,
+                OsuApiV2Sometimes.Module.class,
+                OsuApiV1Test.Module.class,
+                OsuApiV2Test.Module.class
+            })
     @Singleton
     interface Injector {
         void inject(IrcNameResolverTest t);
@@ -26,6 +34,9 @@ public class IrcNameResolverTest extends AbstractDatabaseTest {
 
     @Inject
     IrcNameResolver resolver;
+
+    @Inject
+    PullThrough pullThrough;
 
     @Test
     public void testBasic() throws Exception {
@@ -44,7 +55,7 @@ public class IrcNameResolverTest extends AbstractDatabaseTest {
         backend.hintUser("this_underscore space_bullshit", false, 1000, 1000);
         assertNull(resolver.resolveIRCName("this_underscore_space_bullshit"));
         resolver.resolveManually(
-                backend.downloadUser("this_underscore space_bullshit").getUserId());
+                pullThrough.downloadUser("this_underscore space_bullshit").getUserId());
         assertNotNull(resolver.resolveIRCName("this_underscore_space_bullshit"));
     }
 }

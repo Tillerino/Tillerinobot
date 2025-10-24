@@ -5,23 +5,19 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
-import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.CommandHandler;
-import tillerino.tillerinobot.IrcNameResolver;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Language;
 
-@Value
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @SuppressFBWarnings("TQ")
 public class DebugHandler implements CommandHandler {
-    private final BotBackend backend;
+    private final PullThrough pullThrough;
 
     private final IrcNameResolver resolver;
 
@@ -41,11 +37,11 @@ public class DebugHandler implements CommandHandler {
                     .or(CommandHandler.alwaysHandling(
                             "getUserByIdCached ",
                             (command, apiUser, userData, l) ->
-                                    new Success(command + " is " + backend.getUser(Integer.parseInt(command), 0l))))
+                                    new Success(command + " is " + pullThrough.getUser(Integer.parseInt(command), 0l))))
                     .or(CommandHandler.alwaysHandling(
                             "getUserByIdFresh ",
-                            (command, apiUser, userData, l) ->
-                                    new Success(command + " is " + backend.getUser(Integer.parseInt(command), 1l))));
+                            (command, apiUser, userData, l) -> new Success(
+                                    command + " is " + pullThrough.getUser(Integer.parseInt(command), 1l))));
             GameChatResponse response =
                     commands.handle(debugCommand.substring(DEBUG.length()), debugApiUser, debugUserData, lang);
             if (response != null) {

@@ -26,6 +26,7 @@ import org.tillerino.ppaddict.util.Clock;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.BeatmapsLoader;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
+import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.recommendations.AllRecommenders;
 import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
@@ -59,6 +60,12 @@ public interface ProdModule {
 
     @Binds
     Recommender recommender(AllRecommenders allRecommenders);
+
+    @Provides
+    @Singleton
+    static OsutrackDownloader osutrackDownloader() {
+        return new OsutrackDownloader();
+    }
 
     @Provides
     static ProcessorApi sanDoku() {

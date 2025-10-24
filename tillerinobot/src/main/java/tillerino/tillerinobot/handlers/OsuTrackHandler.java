@@ -17,10 +17,10 @@ import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.util.MdcUtils;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.osutrack.Highscore;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
@@ -28,14 +28,14 @@ import tillerino.tillerinobot.osutrack.UpdateResult;
 
 public class OsuTrackHandler extends CommandHandler.WithShorthand {
     private final OsutrackDownloader osutrackDownloader;
-    private final BotBackend backend;
+    private final PullThrough pullThrough;
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "injection")
     @Inject
-    public OsuTrackHandler(OsutrackDownloader osutrackDownloader, BotBackend backend) {
+    public OsuTrackHandler(OsutrackDownloader osutrackDownloader, PullThrough pullThrough) {
         super("update");
         this.osutrackDownloader = osutrackDownloader;
-        this.backend = backend;
+        this.pullThrough = pullThrough;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             userId = apiUser.getUserId();
         } else {
             // query someone else
-            OsuApiUser otherApiUser = backend.downloadUser(remaining);
+            OsuApiUser otherApiUser = pullThrough.downloadUser(remaining);
             if (otherApiUser == null) {
                 return new Success(String.format("User %s does not exist", remaining));
             }

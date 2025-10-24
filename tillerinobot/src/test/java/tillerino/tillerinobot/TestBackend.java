@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import dagger.Provides;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -33,12 +34,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.mockito.Mockito;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.*;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -173,12 +176,6 @@ public class TestBackend implements BotBackend {
     }
 
     @Override
-    public ApiUser getUser(int userid, long maxAge) throws SQLException, IOException {
-        User user = database.users.get(userid);
-        return user.apiUser;
-    }
-
-    @Override
     public void registerActivity(int userid, long timestamp) throws SQLException {
         database.users.get(userid).lastActivity = timestamp;
         writeDatabase();
@@ -227,20 +224,6 @@ public class TestBackend implements BotBackend {
         return null;
     }
 
-    @Override
-    public List<ApiScore> getRecentPlays(int userid) throws IOException {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public ApiUser downloadUser(String userName) throws IOException, SQLException {
-        Integer userid = database.userNames.get(userName);
-        if (userid == null) {
-            return null;
-        }
-        return database.users.get(userid).apiUser;
-    }
-
     @Singleton
     @NoArgsConstructor(onConstructor_ = @Inject)
     public static class TestBeatmapsLoader implements BeatmapsLoader {
@@ -278,11 +261,13 @@ public class TestBackend implements BotBackend {
     @RequiredArgsConstructor(onConstructor = @__(@Inject))
     public static class TestRecommender implements Recommender {
         private final TestBackend backend;
+        private final PullThrough pullThrough;
+        private final OsuApi downloader;
 
         @Override
         @SneakyThrows({UserException.class, InterruptedException.class})
         public List<TopPlay> loadTopPlays(int userId) throws SQLException, MaintenanceException, IOException {
-            OsuApiUser user = backend.getUser(userId, 0);
+            OsuApiUser user = pullThrough.getUser(userId, 0);
             final double equivalent = user.getPp() / 20;
             List<BeatmapMeta> maps = backend.findBeatmaps(equivalent, 0, false);
             List<TopPlay> plays = new ArrayList<>();
@@ -339,8 +324,8 @@ public class TestBackend implements BotBackend {
 
         @dagger.Provides
         @Singleton
-        static Recommender recommender(TestBackend backend) {
-            return spy(new TestRecommender(backend));
+        static Recommender recommender(TestBackend backend, PullThrough pullThrough, OsuApi downloader) {
+            return spy(new TestRecommender(backend, pullThrough, downloader));
         }
 
         @dagger.Binds
@@ -373,6 +358,32 @@ public class TestBackend implements BotBackend {
                     PercentageEstimates estimates = new PercentageEstimatesImpl(cBeatmap, mods);
 
                     return new BeatmapMeta(beatmap, null, estimates);
+                }
+            });
+        }
+
+        @Provides
+        @Singleton
+        static PullThrough pullThrough(TestBackend backend) {
+            return Mockito.spy(new PullThrough(null, null) {
+                @Override
+                public ApiUser getUser(int userid, long maxAge) {
+                    User user = backend.database.users.get(userid);
+                    return user.apiUser;
+                }
+
+                @Override
+                public ApiUser downloadUser(String userName) {
+                    Integer userid = backend.database.userNames.get(userName);
+                    if (userid == null) {
+                        return null;
+                    }
+                    return backend.database.users.get(userid).apiUser;
+                }
+
+                @Override
+                public List<ApiScore> getRecentPlays(int userid) {
+                    return Collections.emptyList();
                 }
             });
         }

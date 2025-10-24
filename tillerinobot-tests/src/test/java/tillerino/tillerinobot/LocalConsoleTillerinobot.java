@@ -48,6 +48,7 @@ import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.Result;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
@@ -210,6 +211,7 @@ public class LocalConsoleTillerinobot {
         final @Named("messagePreprocessor") GameChatEventConsumer preprocessor;
         final BotBackend backend;
         final IrcNameResolver resolver;
+        final PullThrough pullThrough;
 
         final AtomicBoolean running = new AtomicBoolean(true);
         String username;
@@ -249,7 +251,7 @@ public class LocalConsoleTillerinobot {
                 final double pp = Double.parseDouble(scanner.nextLine());
 
                 testBackend.hintUser(username, donator, rank, pp);
-                resolver.resolveManually(backend.downloadUser(username).getUserId());
+                resolver.resolveManually(pullThrough.downloadUser(username).getUserId());
             }
 
             System.out.println("Welcome to the Tillerinobot simulator");

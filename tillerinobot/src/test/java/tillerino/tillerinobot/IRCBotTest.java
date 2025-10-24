@@ -44,6 +44,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.data.ApiUser;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -67,6 +68,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
                 Clock.Module.class
             })
     interface Injector {
+
         void inject(IRCBotTest t);
     }
 
@@ -129,6 +131,12 @@ public class IRCBotTest extends AbstractDatabaseTest {
     @Inject
     GameChatResponseQueue queue;
 
+    @Inject
+    PullThrough pullThrough;
+
+    @Inject
+    OsuApi downloader;
+
     boolean printResponses = false;
 
     private IRCBot bot;
@@ -148,7 +156,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
                 rateLimiter,
                 liveActivity,
                 queue,
-                diffEstimateProvider);
+                diffEstimateProvider,
+                pullThrough);
     }
 
     void mockQueuePrint() throws InterruptedException {
@@ -210,7 +219,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
         doReturn("TheDonator").when(osuApiUser).getUserName();
         doReturn(userid).when(osuApiUser).getUserId();
 
-        doReturn(osuApiUser).when(backend).getUser(eq(userid), anyLong());
+        doReturn(osuApiUser).when(pullThrough).getUser(eq(userid), anyLong());
         doReturn(1).when(backend).getDonator(userid);
 
         doReturn(System.currentTimeMillis() - 1000).when(backend).getLastActivity(any(OsuApiUser.class));
@@ -383,14 +392,14 @@ public class IRCBotTest extends AbstractDatabaseTest {
 
     @Test
     public void testAutomaticNameChangeRemapping() throws Exception {
-        doReturn(user(1, "user1 old")).when(backend).downloadUser("user1_old");
-        doReturn(user(1, "user1 old")).when(backend).getUser(eq(1), anyLong());
+        doReturn(user(1, "user1 old")).when(pullThrough).downloadUser("user1_old");
+        doReturn(user(1, "user1 old")).when(pullThrough).getUser(eq(1), anyLong());
         assertEquals(1, (int) bot.getUserOrThrow("user1_old").getUserId());
 
         // meanwhile, user 1 changed her name
-        doReturn(user(1, "user1 new")).when(backend).getUser(eq(1), anyLong());
+        doReturn(user(1, "user1 new")).when(pullThrough).getUser(eq(1), anyLong());
         // and user 2 hijacked her old name
-        doReturn(user(2, "user1 old")).when(backend).downloadUser("user1_old");
+        doReturn(user(2, "user1 old")).when(pullThrough).downloadUser("user1_old");
 
         assertEquals(2, (int) bot.getUserOrThrow("user1_old").getUserId());
         assertEquals(1, (int) bot.getUserOrThrow("user1_new").getUserId());

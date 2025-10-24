@@ -20,7 +20,7 @@ public interface AuthenticationService {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class Authorization {
+    class Authorization {
         private boolean admin;
     }
 
@@ -37,7 +37,7 @@ public interface AuthenticationService {
     /**
      * Creates a new API key for an osu user.
      *
-     * @param adminKey admin key of the application. This key must be authorized for key creation.
+     * @param apiKey admin key of the application. This key must be authorized for key creation.
      * @param osuUserId id of the user to create an API key for. Any existing key is revoked.
      * @return the new API key
      */

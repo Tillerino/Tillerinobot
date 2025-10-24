@@ -29,6 +29,7 @@ import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.util.Clock;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.GivenRecommendation;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Default;
 
 public class RecommendationsManagerTest extends AbstractDatabaseTest {
@@ -59,13 +60,16 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
     @Inject
     Recommender recommender;
 
+    @Inject
+    PullThrough pullThrough;
+
     OsuApiUser user;
 
     @BeforeEach
     public void createUser() throws SQLException, IOException {
         backend.hintUser("donator", true, 1, 1000);
 
-        user = backend.downloadUser("donator");
+        user = pullThrough.downloadUser("donator");
     }
 
     @Test
@@ -182,7 +186,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
     @Test
     public void gamma7NotRestricted() throws Exception {
         backend.hintUser("guy", false, 123, 123);
-        user = backend.downloadUser("guy");
+        user = pullThrough.downloadUser("guy");
         assertThat(manager.getRecommendation(user, "gamma7", new Default())).isNotNull();
     }
 
@@ -204,7 +208,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
     private void runShift(String mode, int limit)
             throws IOException, SQLException, UserException, InterruptedException {
         backend.hintUser("guy", true, 123, 1000);
-        user = backend.downloadUser("guy");
+        user = pullThrough.downloadUser("guy");
 
         List<TopPlay> topPlays = new ArrayList<>(recommender.loadTopPlays(user.getUserId()));
         assertThat(topPlays).hasSize(50);

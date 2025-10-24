@@ -9,17 +9,17 @@ import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.ApiScore;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 
 @Value
 public class RecentHandler implements CommandHandler {
-    BotBackend backend;
+    PullThrough pullThrough;
     DiffEstimateProvider diffEstimateProvider;
 
     @Override
@@ -33,7 +33,7 @@ public class RecentHandler implements CommandHandler {
             return null;
         }
 
-        List<ApiScore> recentPlays = backend.getRecentPlays(apiUser.getUserId());
+        List<ApiScore> recentPlays = pullThrough.getRecentPlays(apiUser.getUserId());
         if (recentPlays.isEmpty()) {
             throw new UserException(language.noRecentPlays());
         }

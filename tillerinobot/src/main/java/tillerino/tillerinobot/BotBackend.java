@@ -2,18 +2,12 @@ package tillerino.tillerinobot;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
-import org.tillerino.osuApiModel.types.BeatmapId;
-import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
-import tillerino.tillerinobot.data.ApiScore;
-import tillerino.tillerinobot.data.ApiUser;
 
 public interface BotBackend {
     /**
@@ -25,20 +19,6 @@ public interface BotBackend {
     int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
 
     void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
-
-    /**
-     * Get a user's information. If the user is not known in the database, the data will be downloaded from the osu API.
-     *
-     * @param userid user id
-     * @param maxAge Maximum age of the information in milliseconds. If there is cached information in the database
-     *     which is younger, the cached information will be returned. Otherwise, fresh data will be downloaded and
-     *     cached. If <= 0, any cached information, if available, will be returned.
-     * @return null if the user can't be found at the osu API
-     * @throws SQLException
-     * @throws IOException API exception
-     */
-    @CheckForNull
-    ApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException;
 
     /**
      * Registers activity of a user. This information is not historized, i.e. a single value is updated and the previous
@@ -72,17 +52,4 @@ public interface BotBackend {
      */
     @CheckForNull
     String tryLinkToPatreon(String token, OsuApiUser user);
-
-    /**
-     * Retrieves the last plays from this user. These don't have pp and might be failed attempts.
-     *
-     * @param userid
-     * @return sorted from most recent to oldest
-     * @throws IOException
-     */
-    @Nonnull
-    List<ApiScore> getRecentPlays(@UserId int userid) throws IOException;
-
-    @CheckForNull
-    ApiUser downloadUser(String userName) throws IOException, SQLException;
 }

@@ -62,6 +62,7 @@ import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestRecommender;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.Recommender;
@@ -199,6 +200,11 @@ public class FullBotTest extends AbstractDatabaseTest {
         @Singleton
         static DiffEstimateProvider diffEstimateProvider(BeatmapsLoader beatmapsLoader) {
             return TestBackend.Module.diffEstimateProvider(beatmapsLoader);
+        }
+
+        @Provides
+        static PullThrough pullThrough(TestBackend backend) {
+            return TestBackend.Module.pullThrough(backend);
         }
     }
 
