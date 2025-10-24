@@ -11,20 +11,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuth10aServiceImpl;
 import org.scribe.oauth.OAuthService;
 import org.tillerino.ppaddict.server.auth.implementations.OauthServiceIdentifier;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AuthLeaveService extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     public static final String PATH = "/authleave";
 
-    @Inject
-    @AuthenticatorServices
-    List<AuthenticatorService> services;
+    private final @AuthenticatorServices List<AuthenticatorService> services;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

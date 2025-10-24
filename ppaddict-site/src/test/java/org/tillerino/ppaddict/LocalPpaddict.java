@@ -1,12 +1,10 @@
 package org.tillerino.ppaddict;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.daggeradapter.DaggerAdapter;
-import com.google.inject.servlet.GuiceServletContextListener;
-import com.google.inject.servlet.ServletModule;
+import dagger.Component;
+import dagger.Module;
 import io.undertow.Undertow;
 import java.sql.SQLException;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.tillerino.mormon.DatabaseManager;
@@ -24,28 +22,30 @@ import tillerino.tillerinobot.MysqlContainer;
 
 /** Starts ppaddict locally on port 8080 with a fake backend. */
 public class LocalPpaddict {
+    @Inject
+    PpaddictContextConfigurator configurator;
+
     public static void main(String[] args) throws Exception {
+        LocalPpaddict localPpaddict = new LocalPpaddict();
+        DaggerLocalPpaddict_Injector.create().inject(localPpaddict);
+
         MysqlContainer.MysqlDatabaseLifecycle.createSchema();
         Undertow server = Undertow.builder()
                 .addHttpListener(8080, "localhost")
-                .setHandler(PpaddictModule.createGuiceFilterPathHandler(
-                        new GuiceServletContextListener() {
-                            @Override
-                            protected Injector getInjector() {
-                                return Guice.createInjector(new ServletModule() {
-                                    @Override
-                                    protected void configureServlets() {
-                                        serve(FakeAuthenticatorWebsite.PATH).with(FakeAuthenticatorWebsite.class);
-                                        serve("/showErrorPage").with(ProducesError.class);
-                                        install(new PpaddictModule());
-
-                                        install(DaggerAdapter.from(Module.class));
-                                    }
-                                });
-                            }
-                        }.getClass()))
+                .setHandler(PpaddictModule.createFilterPathHandler(deploymentInfo -> {
+                    localPpaddict.configurator.configureUndertow(deploymentInfo);
+                    PpaddictContextConfigurator.addServlet(deploymentInfo, "/showErrorPage", new ProducesError());
+                    PpaddictContextConfigurator.addServlet(
+                            deploymentInfo, FakeAuthenticatorWebsite.PATH, new FakeAuthenticatorWebsite());
+                }))
                 .build();
         server.start();
+    }
+
+    @Component(modules = Module.class)
+    @Singleton
+    interface Injector {
+        void inject(LocalPpaddict t);
     }
 
     @dagger.Module(

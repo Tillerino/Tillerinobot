@@ -17,6 +17,8 @@ import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
@@ -39,44 +41,40 @@ import org.tillerino.ppaddict.shared.PpaddictException;
 import org.tillerino.ppaddict.shared.PpaddictException.NotLoggedIn;
 import org.tillerino.ppaddict.shared.Settings;
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.OsuApi;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UserDataServiceImpl extends RemoteServiceServlet implements UserDataService {
     static Logger log = LoggerFactory.getLogger(UserDataServiceImpl.class);
 
-    @Inject
-    PpaddictBackend backend;
+    private final PpaddictBackend backend;
 
-    @Inject
-    BotBackend botBackend;
+    private final BotBackend botBackend;
 
-    @Inject
-    AuthLogoutService logoutService;
+    @Setter
+    private AuthLogoutService logoutService;
 
-    @Inject
     BeatmapTableServiceImpl beatmapTableService;
 
-    @Inject
-    AuthLeaveService leaveService;
+    private final AuthLeaveService leaveService;
 
-    @Inject
-    @AuthenticatorServices
-    List<AuthenticatorService> authServices;
+    private final @AuthenticatorServices List<AuthenticatorService> authServices;
 
-    @Inject
-    RecommendationsManager recommendationsManager;
+    private final RecommendationsManager recommendationsManager;
 
-    @Inject
-    AuthenticationService apiAuthenticationService;
+    private final AuthenticationService apiAuthenticationService;
 
-    @Inject
-    @Named("ppaddict.apiauth.key")
-    String apiAuthKey;
+    private final @Named("ppaddict.apiauth.key") String apiAuthKey;
 
-    @Inject
-    PpaddictUserDataService ppaddictUserDataService;
+    private final PpaddictUserDataService ppaddictUserDataService;
+
+    private final PullThrough pullThrough;
+
+    private final OsuApi downloader;
 
     public static final String CREDENTIALS_SESSION_KEY = "ppaddict.auth.credentials";
     public static final String CREDENTIALS_COOKIE_KEY = "ppaddict.auth.cookie";
@@ -190,7 +188,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
             if (linkedId != null) {
                 try {
-                    OsuApiUser user = botBackend.getUser(linkedId, 0);
+                    OsuApiUser user = pullThrough.getUser(linkedId, 0);
                     data.nickname = user != null ? user.getUserName() : "(user not found)";
                 } catch (SQLException | IOException e) {
                     throw ExceptionsUtil.getLoggedWrappedException(log, e);
@@ -240,7 +238,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
         if (s.getRecommendationsParameters() != null) {
             try {
                 recommendationsManager.parseSamplerSettings(
-                        botBackend.getUser(data.getLinkedOsuIdOrThrow(), 0),
+                        pullThrough.getUser(data.getLinkedOsuIdOrThrow(), 0),
                         s.getRecommendationsParameters(),
                         new Default());
             } catch (Exception e) {

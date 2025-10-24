@@ -13,12 +13,17 @@ import org.tillerino.ppaddict.server.UserDataServiceImpl;
 
 @Singleton
 public class AuthLogoutService extends HttpServlet {
-    @Inject
-    UserDataServiceImpl userDataService;
+    private final UserDataServiceImpl userDataService;
 
     private static final long serialVersionUID = 1L;
 
     public static final String PATH = "/authlogout";
+
+    @Inject
+    public AuthLogoutService(UserDataServiceImpl userDataService) {
+        this.userDataService = userDataService;
+        userDataService.setLogoutService(this);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
@@ -17,33 +18,33 @@ import org.tillerino.ppaddict.shared.Beatmap;
 import org.tillerino.ppaddict.shared.PpaddictException;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.Recommendation;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RecommendationsServiceImpl extends RemoteServiceServlet implements RecommendationsService {
     static final long serialVersionUID = 1L;
     Logger log = LoggerFactory.getLogger(RecommendationsServiceImpl.class);
 
-    @Inject
-    UserDataServiceImpl userDataService;
+    private final UserDataServiceImpl userDataService;
 
-    @Inject
-    BotBackend botBackend;
+    private final BotBackend botBackend;
 
-    @Inject
-    RecommendationsManager recommendationsManager;
+    private final RecommendationsManager recommendationsManager;
 
-    @Inject
-    BeatmapTableServiceImpl beatmapTableService;
+    private final BeatmapTableServiceImpl beatmapTableService;
 
-    @Inject
-    DiffEstimateProvider diffEstimateProvider;
+    private final DiffEstimateProvider diffEstimateProvider;
+    private final PullThrough pullThrough;
+    private final OsuApi downloader;
 
     @Override
     public List<Beatmap> getRecommendations() throws PpaddictException {
@@ -85,7 +86,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
         }
 
         try {
-            OsuApiUser apiUser = botBackend.getUser(osuId, 0);
+            OsuApiUser apiUser = pullThrough.getUser(osuId, 0);
             for (int i = 0; i < 100 && recommendations.size() < 10; i++) {
                 try {
                     Recommendation recommendation = recommendationsManager.getRecommendation(
@@ -124,7 +125,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
                     userDataService.getServerUserData(userDataService.getCredentialsOrThrow(getThreadLocalRequest()));
             int osuId = linkedData.getLinkedOsuIdOrThrow();
             recommendationsManager.hideRecommendation(osuId, beatmapid, longMods);
-            OsuApiUser apiUser = botBackend.getUser(osuId, 0);
+            OsuApiUser apiUser = pullThrough.getUser(osuId, 0);
             Recommendation recommendation = null;
             for (int i = 0; i < 10; i++) {
                 try {

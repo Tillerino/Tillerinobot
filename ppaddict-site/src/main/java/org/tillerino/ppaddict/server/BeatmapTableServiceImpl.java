@@ -20,8 +20,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.client.services.BeatmapTableService;
@@ -40,32 +38,27 @@ import org.tillerino.ppaddict.shared.BeatmapRangeRequest.Sort;
 import org.tillerino.ppaddict.shared.PpaddictException;
 import org.tillerino.ppaddict.shared.Settings;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.PercentageEstimates;
-import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 /** The server-side implementation of the RPC service. */
 @Singleton
 public class BeatmapTableServiceImpl extends RemoteServiceServlet implements BeatmapTableService {
     private static final long serialVersionUID = 1L;
 
-    Logger log = LoggerFactory.getLogger(BeatmapTableServiceImpl.class);
+    private final UserDataServiceImpl userDataService;
 
-    @Inject
-    UserDataServiceImpl userDataService;
-
-    @Inject
-    PpaddictBackend backend;
-
-    @Inject
-    BotBackend botBackend;
-
-    @Inject
-    RecommendationsManager recommendationsManager;
+    private final PpaddictBackend backend;
 
     private final Cache<BeatmapsCacheKey, List<BeatmapData>> requestCache =
             CacheBuilder.newBuilder().softValues().maximumSize(100).build();
+
+    @Inject
+    public BeatmapTableServiceImpl(UserDataServiceImpl userDataService, PpaddictBackend backend) {
+        this.userDataService = userDataService;
+        this.backend = backend;
+        userDataService.beatmapTableService = this;
+    }
 
     @Override
     public BeatmapBundle getRange(final BeatmapRangeRequest request) throws PpaddictException {
@@ -289,7 +282,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     /**
      * Returns a sorted view of a list.
      *
-     * @param not modified. Modifications of this object will affect the returned value.
+     * @param selection not modified. Modifications of this object will affect the returned value.
      * @param property the property to sort by. This is only evaluated once per item.
      */
     static List<BeatmapData> sortedView(List<BeatmapData> selection, ToDoubleFunction<? super BeatmapData> property) {
@@ -424,13 +417,11 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     private static ToDoubleFunction<BeatmapData> getComparator(
             final Sort sortBy, final BeatmapFilterSettings settings) {
         return switch (sortBy) {
-            case EXPECTED -> value -> value.getEstimates().getPP(settings.getLowAccuracy() / 100);
-            case PERFECT -> value -> value.getEstimates().getPP(settings.getHighAccuracy() / 100);
-            case BPM -> value -> value.getBeatmap().getBpm(value.getEstimates().getMods());
-            case LENGTH ->
-                value -> value.getBeatmap().getTotalLength(value.getEstimates().getMods());
-            case STAR_DIFF -> value -> value.getEstimates().getStarDiff();
-            default -> null;
+            case EXPECTED -> v -> v.getEstimates().getPP(settings.getLowAccuracy() / 100);
+            case PERFECT -> v -> v.getEstimates().getPP(settings.getHighAccuracy() / 100);
+            case BPM -> v -> v.getBeatmap().getBpm(v.getEstimates().getMods());
+            case LENGTH -> v -> v.getBeatmap().getTotalLength(v.getEstimates().getMods());
+            case STAR_DIFF -> v -> v.getEstimates().getStarDiff();
         };
     }
 

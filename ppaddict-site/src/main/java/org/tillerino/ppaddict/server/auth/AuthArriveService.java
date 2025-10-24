@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.scribe.model.Token;
@@ -17,17 +18,15 @@ import org.tillerino.ppaddict.server.UserDataServiceImpl;
 
 @Singleton
 @Slf4j
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AuthArriveService extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     public static final String PATH = "/autharrive";
 
-    @Inject
-    @AuthenticatorServices
-    List<AuthenticatorService> services;
+    private final @AuthenticatorServices List<AuthenticatorService> services;
 
-    @Inject
-    UserDataServiceImpl userDataService;
+    private final UserDataServiceImpl userDataService;
 
     static final String AUTH_RETURN_TO_SESSION_KEY = "ppaddict.auth.returnTo";
     static final String AUTH_REQUEST_TOKEN_SESSION_KEY = "ppaddict.auth.requestToken";
