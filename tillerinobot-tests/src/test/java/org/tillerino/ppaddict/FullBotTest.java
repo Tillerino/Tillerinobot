@@ -59,7 +59,7 @@ import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import tillerino.tillerinobot.*;
-import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
+import tillerino.tillerinobot.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestRecommender;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;

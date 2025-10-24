@@ -48,7 +48,6 @@ import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.Result;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
-import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;

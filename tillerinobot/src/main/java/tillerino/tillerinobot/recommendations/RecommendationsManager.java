@@ -35,7 +35,7 @@ import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
+import tillerino.tillerinobot.BeatmapsLoader;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import tillerino.tillerinobot.BotBackend.BeatmapsLoader;
 import tillerino.tillerinobot.data.ApiBeatmap;
 
 @Singleton

@@ -85,16 +85,4 @@ public interface BotBackend {
 
     @CheckForNull
     ApiUser downloadUser(String userName) throws IOException, SQLException;
-
-    interface BeatmapsLoader {
-        /**
-         * Retreives beatmap. Implementation hint: this might be called a *lot* when checking recommendation predicates
-         * and should probably be cached.
-         *
-         * @param beatmapId
-         * @return null if not found
-         */
-        @CheckForNull
-        OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId, @BitwiseMods long mods) throws SQLException, IOException;
-    }
 }
