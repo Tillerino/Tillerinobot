@@ -20,6 +20,7 @@ import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.Recommendation;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
@@ -33,9 +34,6 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
     UserDataServiceImpl userDataService;
 
     @Inject
-    PpaddictBackend backend;
-
-    @Inject
     BotBackend botBackend;
 
     @Inject
@@ -43,6 +41,9 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
 
     @Inject
     BeatmapTableServiceImpl beatmapTableService;
+
+    @Inject
+    DiffEstimateProvider diffEstimateProvider;
 
     @Override
     public List<Beatmap> getRecommendations() throws PpaddictException {
@@ -64,7 +65,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
         for (GivenRecommendation givenRecommendation : givenRecommendations) {
             final BeatmapMeta meta;
             try {
-                meta = botBackend.loadBeatmap(
+                meta = diffEstimateProvider.loadBeatmap(
                         givenRecommendation.getBeatmapid(), givenRecommendation.getMods(), new Default());
             } catch (SQLException | IOException | InterruptedException e) {
                 throw ExceptionsUtil.getLoggedWrappedException(log, e);

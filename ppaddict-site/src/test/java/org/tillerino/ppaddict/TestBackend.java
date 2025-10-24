@@ -26,6 +26,8 @@ import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Default;
 
 /**
@@ -36,11 +38,11 @@ import tillerino.tillerinobot.lang.Default;
  */
 @Singleton
 public class TestBackend implements PpaddictBackend {
-    private final tillerino.tillerinobot.TestBackend botBackend;
+    private final DiffEstimateProvider diffEstimateProvider;
 
     @Inject
-    public TestBackend(tillerino.tillerinobot.TestBackend backend) {
-        this.botBackend = backend;
+    public TestBackend(DiffEstimateProvider diffEstimateProvider) {
+        this.diffEstimateProvider = diffEstimateProvider;
 
         try (Reader reader = new InputStreamReader(new BufferedInputStream(new FileInputStream("ppaddict-db.json")))) {
             database = new ObjectMapper().readValue(reader, Database.class);
@@ -89,13 +91,13 @@ public class TestBackend implements PpaddictBackend {
         for (Integer id : tillerino.tillerinobot.TestBackend.getSetIds().keySet()) {
             for (long mods : new long[] {0, getMask(Hidden, HardRock), getMask(DoubleTime)}) {
                 try {
-                    final BeatmapMeta meta = botBackend.loadBeatmap(id, mods, new Default());
+                    final BeatmapMeta meta = diffEstimateProvider.loadBeatmap(id, mods, new Default());
                     ret.put(
                             new BeatmapWithMods(id, mods),
                             new BeatmapData(
                                     meta.getEstimates(),
                                     OsuApiBeatmapForPpaddict.Mapper.INSTANCE.shrink(meta.getBeatmap())));
-                } catch (SQLException | IOException e) {
+                } catch (SQLException | IOException | InterruptedException | UserException e) {
                     throw new RuntimeException(e);
                 }
             }
