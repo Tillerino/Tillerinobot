@@ -26,7 +26,7 @@ public class RabbitMqContainer {
                 // this logger makes sure that we don't output old logs from the reusable container.
 
                 boolean trip = false;
-                String startup = LocalDateTime.now(ZoneId.of("UTC"))
+                final String startup = LocalDateTime.now(ZoneId.of("UTC"))
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
                 @Override

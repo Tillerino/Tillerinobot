@@ -41,7 +41,7 @@ public class DatabaseManager implements AutoCloseable {
         config.setMaxTotal(32);
         config.setMaxIdle(32);
         config.setLifo(true);
-        config.setSoftMinEvictableIdleTime(Duration.ofMinutes(1));
+        config.setSoftMinEvictableIdleDuration(Duration.ofMinutes(1));
         config.setJmxNameBase(
                 getClass().getPackage().getName() + ":type=" + getClass().getSimpleName() + ",name=");
 

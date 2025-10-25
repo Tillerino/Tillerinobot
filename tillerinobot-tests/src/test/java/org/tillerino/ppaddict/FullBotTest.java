@@ -87,7 +87,7 @@ public class FullBotTest extends AbstractDatabaseTest {
 
         private boolean connected = false;
 
-        private int botNumber;
+        private final int botNumber;
 
         private Client(int botNumber) {
             kitteh = KittehForNgircd.buildKittehClient("user" + botNumber);

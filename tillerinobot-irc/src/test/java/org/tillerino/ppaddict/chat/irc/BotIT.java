@@ -38,7 +38,7 @@ public class BotIT {
     private Client kitteh;
     private GameChatWriter writer;
     private GameChatClient gameChatClient;
-    private KittehListener listener = mock(KittehListener.class);
+    private final KittehListener listener = mock(KittehListener.class);
     private final List<ClientEvent> kittehEvents = new ArrayList<>();
 
     @BeforeEach

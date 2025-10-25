@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.UserDataManager.UserData;
@@ -82,7 +82,7 @@ public interface CommandHandler {
             @Override
             public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
                     throws UserException, IOException, SQLException, InterruptedException {
-                if (!StringUtils.startsWithIgnoreCase(command, start)) {
+                if (!Strings.CI.startsWith(command, start)) {
                     return null;
                 }
                 GameChatResponse response =
@@ -115,7 +115,7 @@ public interface CommandHandler {
             @Override
             public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
                     throws UserException, IOException, SQLException, InterruptedException {
-                if (!StringUtils.startsWithIgnoreCase(command, start)) {
+                if (!Strings.CI.startsWith(command, start)) {
                     return null;
                 }
                 return underlying.handle(command.substring(start.length()), apiUser, userData, lang);

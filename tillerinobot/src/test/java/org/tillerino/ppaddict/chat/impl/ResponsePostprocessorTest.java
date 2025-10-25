@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.err;
 import static org.tillerino.ppaddict.util.Result.ok;
 
+import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -49,9 +50,11 @@ public class ResponsePostprocessorTest {
 
     PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 
+    @AutoClose
+    AutoCloseable mocks = MockitoAnnotations.openMocks(this);
+
     @BeforeEach
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         when(writer.action(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
         when(writer.message(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
         event.getMeta().setTimer(new PhaseTimer());

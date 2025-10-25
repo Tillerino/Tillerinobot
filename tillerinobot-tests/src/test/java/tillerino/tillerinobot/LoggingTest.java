@@ -55,8 +55,6 @@ public class LoggingTest {
 
     private GameChatWriter out;
 
-    private TestBackend backend;
-
     @RegisterExtension
     public final MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
@@ -70,7 +68,7 @@ public class LoggingTest {
         in = injector.messagePreprocessor();
         out = injector.gameChatWriter();
         assertTrue(MockUtil.isMock(out));
-        backend = (TestBackend) injector.botBackend();
+        TestBackend backend = (TestBackend) injector.botBackend();
         exec.submit(injector.localGameChatEventQueue());
         exec.submit(injector.localGameChatResponseQueue());
 

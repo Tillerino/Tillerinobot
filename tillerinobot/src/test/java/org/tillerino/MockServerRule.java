@@ -59,7 +59,7 @@ public class MockServerRule implements BeforeEachCallback, AfterEachCallback {
     }
 
     public static String getExternalMockServerAddress() {
-        return "http://" + MOCK_SERVER.getContainerIpAddress() + ":" + MOCK_SERVER.getMappedPort(8080);
+        return "http://" + MOCK_SERVER.getHost() + ":" + MOCK_SERVER.getMappedPort(8080);
     }
 
     public static String getDockerMockServerAddress() {

@@ -20,9 +20,9 @@ import tillerino.tillerinobot.predicates.StarDiff;
 import tillerino.tillerinobot.recommendations.RecommendationRequest.Shift;
 
 public class RecommendationRequestParserTest {
-    private BotBackend backend = mock(BotBackend.class);
+    private final BotBackend backend = mock(BotBackend.class);
 
-    private RecommendationRequestParser recommendationRequestParser = new RecommendationRequestParser(backend);
+    private final RecommendationRequestParser recommendationRequestParser = new RecommendationRequestParser(backend);
 
     private RecommendationRequest parse(String settings) throws Exception {
         OsuApiUser user = new OsuApiUser();

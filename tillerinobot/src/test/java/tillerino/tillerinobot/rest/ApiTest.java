@@ -100,21 +100,24 @@ public class ApiTest {
             }
             if (addParam != null) {
                 try {
-                    URI uri = requestContext.getUri();
-                    uri = new URI(
-                            uri.getScheme(),
-                            uri.getUserInfo(),
-                            uri.getHost(),
-                            uri.getPort(),
-                            uri.getPath(),
-                            uri.getQuery() + (uri.getQuery().isEmpty() ? "" : "&") + addParam.getKey() + "="
-                                    + addParam.getValue(),
-                            uri.getFragment());
-                    requestContext.setUri(uri);
+                    requestContext.setUri(addParamToUri(requestContext.getUri()));
                 } catch (URISyntaxException e) {
                     throw new IOError(e);
                 }
             }
+        }
+
+        private URI addParamToUri(URI uri) throws URISyntaxException {
+            uri = new URI(
+                    uri.getScheme(),
+                    uri.getUserInfo(),
+                    uri.getHost(),
+                    uri.getPort(),
+                    uri.getPath(),
+                    uri.getQuery() + (uri.getQuery().isEmpty() ? "" : "&") + addParam.getKey() + "="
+                            + addParam.getValue(),
+                    uri.getFragment());
+            return uri;
         }
     }
 
@@ -133,7 +136,7 @@ public class ApiTest {
     @Inject
     LocalGameChatMetrics botInfo;
 
-    private GameChatClientMetrics remoteMetrics = new GameChatClientMetrics();
+    private final GameChatClientMetrics remoteMetrics = new GameChatClientMetrics();
 
     @Inject
     GameChatClient gameChatClient;
@@ -162,14 +165,16 @@ public class ApiTest {
         remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 31000); // thirty-one seconds ago
         assertThatThrownBy(() -> botStatus.isReceiving()).isInstanceOf(NotFoundException.class);
         assertThatOurLogs()
-                .hasOnlyOneElementSatisfying(mdc("apiPath", "botinfo/isReceiving")
+                .singleElement()
+                .satisfies(mdc("apiPath", "botinfo/isReceiving")
                         .andThen(mdc("apiStatus", "404"))
                         .andThen(mdc("osuApiRateBlockedTime", "0")));
         log.clear();
         remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 30000); // thirty seconds ago
         assertTrue(botStatus.isReceiving());
         assertThatOurLogs()
-                .hasOnlyOneElementSatisfying(mdc("apiPath", "botinfo/isReceiving")
+                .singleElement()
+                .satisfies(mdc("apiPath", "botinfo/isReceiving")
                         .andThen(mdc("apiStatus", "200"))
                         .andThen(mdc("osuApiRateBlockedTime", "0"))
                         .andThen(mdc("apiKey", null)));

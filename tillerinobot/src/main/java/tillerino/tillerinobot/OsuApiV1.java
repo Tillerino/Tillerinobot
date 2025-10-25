@@ -5,6 +5,7 @@ import jakarta.ws.rs.ServiceUnavailableException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -113,9 +114,9 @@ public class OsuApiV1 implements OsuApi {
                 if (!env.endsWith("/")) {
                     throw new MalformedURLException("osu API URL must end with a slash");
                 }
-                return new URL(env);
+                return URI.create(env).toURL();
             }
-            return new URL("https://osu.ppy.sh/api/");
+            return URI.create("https://osu.ppy.sh/api/").toURL();
         }
     }
 }

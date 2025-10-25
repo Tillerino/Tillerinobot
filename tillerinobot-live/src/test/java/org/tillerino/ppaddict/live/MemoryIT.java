@@ -60,7 +60,7 @@ public class MemoryIT {
         }
     }
 
-    private List<CollectingWebSocketClient> clients = new ArrayList<>();
+    private final List<CollectingWebSocketClient> clients = new ArrayList<>();
 
     @RegisterExtension
     public final RabbitMqContainerConnection rabbitMq = new RabbitMqContainerConnection(null);
@@ -70,8 +70,7 @@ public class MemoryIT {
     @BeforeEach
     public void setUp() throws Exception {
         source = RabbitMqConfiguration.liveActivity(rabbitMq.getConnection());
-        URI uri = new URI(
-                "ws://" + getLive().getContainerIpAddress() + ":" + getLive().getMappedPort(8080) + "/live/v0");
+        URI uri = new URI("ws://" + getLive().getHost() + ":" + getLive().getMappedPort(8080) + "/live/v0");
         log.info("Connecting clients");
         Thread.sleep(1000); // flaky without :/
         for (WebSocketClient webSocketClient : webSocketClients) {

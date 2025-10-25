@@ -31,7 +31,7 @@ public abstract class AbstractLiveActivityEndpointTest {
 
     private final WebSocketClient webSocketClient = new WebSocketClient();
 
-    private GenericWebSocketClient client = Mockito.mock(GenericWebSocketClient.class);
+    private final GenericWebSocketClient client = Mockito.mock(GenericWebSocketClient.class);
 
     protected abstract int port();
 

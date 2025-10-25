@@ -20,7 +20,7 @@ public class Persister<T> implements AutoCloseable {
         INSERT_DELAYED("INSERT DELAYED INTO"),
         REPLACE("REPLACE INTO"),
         ;
-        private String command;
+        private final String command;
 
         Action(String command) {
             this.command = command;

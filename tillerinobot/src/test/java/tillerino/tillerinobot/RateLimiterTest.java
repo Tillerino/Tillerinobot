@@ -12,7 +12,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 public class RateLimiterTest {
-    private static ExecutorService exec = Executors.newCachedThreadPool();
+    private static final ExecutorService exec = Executors.newCachedThreadPool();
 
     @AfterAll
     public static void stopExec() {

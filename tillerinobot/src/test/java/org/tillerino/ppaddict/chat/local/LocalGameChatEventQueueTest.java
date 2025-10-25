@@ -34,9 +34,9 @@ import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.IRCBot;
 
 public class LocalGameChatEventQueueTest {
-    private LocalGameChatMetrics botInfo = mock(LocalGameChatMetrics.class);
+    private final LocalGameChatMetrics botInfo = mock(LocalGameChatMetrics.class);
 
-    private IRCBot coreHandler = mock(IRCBot.class);
+    private final IRCBot coreHandler = mock(IRCBot.class);
 
     @RegisterExtension
     public final ExecutorServiceRule exec = new ExecutorServiceRule(() -> Executors.newFixedThreadPool(2));

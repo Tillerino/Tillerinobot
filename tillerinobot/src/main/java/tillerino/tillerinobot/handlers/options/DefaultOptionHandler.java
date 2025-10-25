@@ -2,8 +2,8 @@ package tillerino.tillerinobot.handlers.options;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
@@ -32,6 +32,6 @@ public class DefaultOptionHandler extends OptionHandler {
     @Nonnull
     @Override
     protected String getCurrentValue(UserDataManager.UserData userData) {
-        return StringUtils.defaultString(userData.getDefaultRecommendationOptions(), "-");
+        return Objects.toString(userData.getDefaultRecommendationOptions(), "-");
     }
 }
