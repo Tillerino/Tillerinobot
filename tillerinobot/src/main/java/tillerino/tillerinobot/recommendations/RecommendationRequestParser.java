@@ -93,9 +93,13 @@ public class RecommendationRequestParser {
             settingsBuilder.model(Model.GAMMA10);
             return true;
         }
+        if (getLevenshteinDistance(lowerCase, "gamma11") <= 2 && lowerCase.endsWith("11")) {
+            settingsBuilder.model(Model.GAMMA11);
+            return true;
+        }
         if (getLevenshteinDistance(lowerCase, "gamma") <= 2) {
             // backwards compatibility
-            settingsBuilder.model(Model.GAMMA9);
+            settingsBuilder.model(Model.GAMMA10);
             return true;
         }
         if (lowerCase.equals("nap")) {

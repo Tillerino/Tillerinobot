@@ -46,7 +46,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
          * @return an implementation of {@link BeatmapDownloader} which will load beatmaps from the class path. It will
          *     load /beatmaps/|beatmapid|.osu as UTF-8 and throw JAX-RS exceptions on errors.
          */
-        public static BeatmapDownloader createTestLoader(Class<?> cls) {
+        static BeatmapDownloader createTestLoader(Class<?> cls) {
             return beatmapid -> {
                 try (InputStream is = cls.getResourceAsStream("/beatmaps/" + beatmapid + ".osu")) {
                     if (is == null) {

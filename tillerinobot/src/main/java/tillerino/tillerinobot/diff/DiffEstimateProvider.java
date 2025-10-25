@@ -181,9 +181,10 @@ public class DiffEstimateProvider {
 
         DiffResult sanDoku;
         try {
-            System.out.println("Requesting from SanDoku " + beatmapid + " " + mods);
+            System.out.println("requesting from SanDoku " + beatmapid + " " + mods);
             sanDoku =
                     calculator.processorCalcDiff(0, (int) mods, false, actualBeatmap.getBytes(StandardCharsets.UTF_8));
+            System.out.println(".requested from SanDoku " + beatmapid + " " + mods);
             DiffCalcResult r = sanDoku.getDiffCalcResult();
             if (r.getSliderCount() + r.getHitCircleCount() + r.getSpinnerCount() == 0) {
                 estimate.failure = "Beatmap has no objects.";

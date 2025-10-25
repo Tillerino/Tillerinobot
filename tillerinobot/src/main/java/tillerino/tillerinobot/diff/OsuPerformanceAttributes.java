@@ -6,5 +6,5 @@ public record OsuPerformanceAttributes(
         double accuracy,
         double flashlight,
         double effectiveMissCount,
-        double speedDeviation,
+        Double speedDeviation,
         double total) {}

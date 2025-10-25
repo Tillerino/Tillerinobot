@@ -65,6 +65,13 @@ public class RecommendationRequestParserTest {
     }
 
     @Test
+    public void testGamma11Dt() throws Exception {
+        assertThat(parse("gamma11 dt"))
+                .hasFieldOrPropertyWithValue("model", Model.GAMMA11)
+                .hasFieldOrPropertyWithValue("requestedMods", 64L);
+    }
+
+    @Test
     public void testGamma8Dt() throws Exception {
         assertThat(parse("gamma8 dt"))
                 .hasFieldOrPropertyWithValue("model", Model.GAMMA8)
