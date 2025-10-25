@@ -26,7 +26,6 @@
         <wiremock.version>3.0.1</wiremock.version>
         <slf4j.version>2.0.13</slf4j.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <guice.version>6.0.0</guice.version>
         <jaxb.api.version>2.3.1</jaxb.api.version>
         <spotbugs.version>4.9.8</spotbugs.version>
         <spotbugs.plugin.version>4.9.8.1</spotbugs.plugin.version>
@@ -197,21 +196,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-                <version>${guice.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.inject.extensions</groupId>
-                <artifactId>guice-servlet</artifactId>
-                <version>${guice.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.inject.extensions</groupId>
-                <artifactId>guice-dagger-adapter</artifactId>
-                <version>${guice.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.dagger</groupId>
