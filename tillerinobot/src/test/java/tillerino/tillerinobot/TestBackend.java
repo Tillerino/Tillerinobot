@@ -94,10 +94,10 @@ public class TestBackend implements BotBackend {
     static {
         try (BufferedReader reader =
                 new BufferedReader(new InputStreamReader(TestBackend.class.getResourceAsStream("/beatmapIds.txt")))) {
-            for (String line; (line = reader.readLine()) != null; ) {
+            reader.lines().forEach(line -> {
                 String[] s = line.split("\t");
                 setIds.put(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
-            }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -251,7 +251,6 @@ public class TestBackend implements BotBackend {
     public static class TestRecommender implements Recommender {
         private final TestBackend backend;
         private final PullThrough pullThrough;
-        private final OsuApi downloader;
 
         @Override
         @SneakyThrows({UserException.class, InterruptedException.class})
@@ -313,8 +312,8 @@ public class TestBackend implements BotBackend {
 
         @dagger.Provides
         @Singleton
-        static Recommender recommender(TestBackend backend, PullThrough pullThrough, OsuApi downloader) {
-            return spy(new TestRecommender(backend, pullThrough, downloader));
+        static Recommender recommender(TestBackend backend, PullThrough pullThrough) {
+            return spy(new TestRecommender(backend, pullThrough));
         }
 
         @dagger.Binds
