@@ -21,6 +21,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.OsuApi;
 
+/** An osu! player who is not necessarily a bot user. */
 @Data
 @Table("players")
 @KeyColumn("userid")

@@ -137,6 +137,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
     @Inject
     OsuApi downloader;
 
+    @Inject
+    PlayerService playerService;
+
     boolean printResponses = false;
 
     private IRCBot bot;
@@ -157,7 +160,8 @@ public class IRCBotTest extends AbstractDatabaseTest {
                 liveActivity,
                 queue,
                 diffEstimateProvider,
-                pullThrough);
+                pullThrough,
+                playerService);
     }
 
     void mockQueuePrint() throws InterruptedException {
@@ -222,19 +226,21 @@ public class IRCBotTest extends AbstractDatabaseTest {
         doReturn(osuApiUser).when(pullThrough).getUser(eq(userid), anyLong());
         doReturn(1).when(backend).getDonator(userid);
 
-        doReturn(System.currentTimeMillis() - 1000).when(backend).getLastActivity(any(OsuApiUser.class));
+        doReturn(System.currentTimeMillis() - 1000).when(playerService).getLastActivity(any(OsuApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), new Message("beep boop"));
 
-        doReturn(System.currentTimeMillis() - 10 * 60 * 1000).when(backend).getLastActivity(any(OsuApiUser.class));
+        doReturn(System.currentTimeMillis() - 10 * 60 * 1000)
+                .when(playerService)
+                .getLastActivity(any(OsuApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), new Message("Welcome back, TheDonator."));
 
         doReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000)
-                .when(backend)
+                .when(playerService)
                 .getLastActivity(any(OsuApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator, "));
 
         doReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000)
-                .when(backend)
+                .when(playerService)
                 .getLastActivity(any(OsuApiUser.class));
         verifyResponse(
                 bot,
@@ -408,12 +414,12 @@ public class IRCBotTest extends AbstractDatabaseTest {
     @Test
     public void testMaintenanceOnSight() throws Exception {
         doReturn(18).when(resolver).resolveIRCName("aRareUserAppears");
-        doAnswer(x -> null).when(backend).registerActivity(eq(18), anyLong());
+        doAnswer(x -> null).when(playerService).registerActivity(eq(18), anyLong());
 
         Sighted event = preprocess(new Sighted(12, "aRareUserAppears", 15));
         bot.onEvent(event);
         verify(queue).onResponse(GameChatResponse.none(), event);
-        verify(backend, timeout(1000)).registerActivity(18, 15);
+        verify(playerService, timeout(1000)).registerActivity(18, 15);
     }
 
     @Test

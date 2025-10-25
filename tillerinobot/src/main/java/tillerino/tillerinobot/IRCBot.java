@@ -73,6 +73,7 @@ public class IRCBot implements GameChatEventConsumer {
     private final GameChatResponseQueue queue;
     private final NPHandler npHandler;
     private final PullThrough pullThrough;
+    private final PlayerService playerService;
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
     @Inject
@@ -86,7 +87,8 @@ public class IRCBot implements GameChatEventConsumer {
             LiveActivity liveActivity,
             GameChatResponseQueue queue,
             DiffEstimateProvider diffEstimateProvider,
-            PullThrough pullThrough) {
+            PullThrough pullThrough,
+            PlayerService playerService) {
         this.backend = backend;
         this.userDataManager = userDataManager;
         this.resolver = resolver;
@@ -95,6 +97,7 @@ public class IRCBot implements GameChatEventConsumer {
         this.queue = queue;
         this.npHandler = new NPHandler(liveActivity, diffEstimateProvider);
         this.pullThrough = pullThrough;
+        this.playerService = playerService;
 
         commandHandlers.add(new ResetHandler(manager));
         commandHandlers.add(new OptionsHandler(new RecommendationRequestParser(backend), userDataManager, manager));
@@ -388,7 +391,7 @@ public class IRCBot implements GameChatEventConsumer {
                 return GameChatResponse.none();
             }
 
-            long inactiveTime = System.currentTimeMillis() - backend.getLastActivity(apiUser);
+            long inactiveTime = System.currentTimeMillis() - playerService.getLastActivity(apiUser);
 
             GameChatResponse response = data.usingLanguage((Language lang) -> lang.welcomeUser(apiUser, inactiveTime));
 
@@ -409,7 +412,7 @@ public class IRCBot implements GameChatEventConsumer {
                 return;
             }
 
-            backend.registerActivity(userid, timestamp);
+            playerService.registerActivity(userid, timestamp);
         } catch (MaintenanceException e) {
             // ignore
         } catch (Exception e) {

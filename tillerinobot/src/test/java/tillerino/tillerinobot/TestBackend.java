@@ -176,17 +176,6 @@ public class TestBackend implements BotBackend {
     }
 
     @Override
-    public void registerActivity(int userid, long timestamp) throws SQLException {
-        database.users.get(userid).lastActivity = timestamp;
-        writeDatabase();
-    }
-
-    @Override
-    public long getLastActivity(OsuApiUser user) throws SQLException {
-        return database.users.get(user.getUserId()).lastActivity;
-    }
-
-    @Override
     public int getDonator(int user) throws SQLException, IOException {
         return database.users.get(user).isDonator ? 1 : 0;
     }
@@ -384,6 +373,23 @@ public class TestBackend implements BotBackend {
                 @Override
                 public List<ApiScore> getRecentPlays(int userid) {
                     return Collections.emptyList();
+                }
+            });
+        }
+
+        @Provides
+        @Singleton
+        static PlayerService playerService(TestBackend backend) {
+            return spy(new PlayerService(null) {
+                @Override
+                public void registerActivity(int userid, long timestamp) throws SQLException {
+                    backend.database.users.get(userid).lastActivity = timestamp;
+                    backend.writeDatabase();
+                }
+
+                @Override
+                public long getLastActivity(OsuApiUser user) throws SQLException {
+                    return backend.database.users.get(user.getUserId()).lastActivity;
                 }
             });
         }
