@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.Value;
 import org.mapstruct.factory.Mappers;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -50,12 +49,7 @@ public interface PpaddictBackend {
         }
     }
 
-    @Value
-    class BeatmapData {
-        PercentageEstimates estimates;
-
-        OsuApiBeatmapForPpaddict beatmap;
-    }
+    record BeatmapData(PercentageEstimates estimates, OsuApiBeatmapForPpaddict beatmap) {}
 
     @CheckForNull
     Credentials resolveCookie(String cookie) throws SQLException;

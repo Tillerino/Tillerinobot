@@ -8,8 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.client.services.RecommendationsService;
@@ -17,8 +16,6 @@ import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.Beatmap;
 import org.tillerino.ppaddict.shared.PpaddictException;
 import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.GivenRecommendation;
@@ -30,13 +27,10 @@ import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
+@Slf4j
 public class RecommendationsServiceImpl extends RemoteServiceServlet implements RecommendationsService {
     static final long serialVersionUID = 1L;
-    Logger log = LoggerFactory.getLogger(RecommendationsServiceImpl.class);
-
     private final UserDataServiceImpl userDataService;
-
-    private final BotBackend botBackend;
 
     private final RecommendationsManager recommendationsManager;
 
@@ -44,7 +38,6 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
 
     private final DiffEstimateProvider diffEstimateProvider;
     private final PullThrough pullThrough;
-    private final OsuApi downloader;
 
     @Override
     public List<Beatmap> getRecommendations() throws PpaddictException {
@@ -67,11 +60,9 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
             final BeatmapMeta meta;
             try {
                 meta = diffEstimateProvider.loadBeatmap(
-                        givenRecommendation.getBeatmapid(), givenRecommendation.getMods(), new Default());
+                        givenRecommendation.getBeatmapid(), givenRecommendation.getMods());
             } catch (SQLException | IOException | InterruptedException e) {
                 throw ExceptionsUtil.getLoggedWrappedException(log, e);
-            } catch (UserException e) {
-                continue;
             }
 
             if (meta == null) {
@@ -92,7 +83,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
                     Recommendation recommendation = recommendationsManager.getRecommendation(
                             apiUser, userData.getSettings().getRecommendationsParameters(), new Default());
 
-                    final BeatmapMeta meta = recommendation.beatmap;
+                    final BeatmapMeta meta = recommendation.beatmap();
 
                     if (meta.getBeatmap().getMaxCombo() <= 0) {
                         continue;
@@ -100,8 +91,8 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
 
                     recommendationsManager.saveGivenRecommendation(
                             osuId,
-                            recommendation.bareRecommendation.beatmapId(),
-                            recommendation.bareRecommendation.mods());
+                            recommendation.bareRecommendation().beatmapId(),
+                            recommendation.bareRecommendation().mods());
 
                     Beatmap beatmap = beatmapTableService.makeBeatmap(userData, meta);
 
@@ -140,8 +131,10 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
                 throw new PpaddictException("Could not get a recommendation. Pls contact @Tillerino or /u/Tillerino");
             }
             recommendationsManager.saveGivenRecommendation(
-                    osuId, recommendation.bareRecommendation.beatmapId(), recommendation.bareRecommendation.mods());
-            return beatmapTableService.makeBeatmap(linkedData, recommendation.beatmap);
+                    osuId,
+                    recommendation.bareRecommendation().beatmapId(),
+                    recommendation.bareRecommendation().mods());
+            return beatmapTableService.makeBeatmap(linkedData, recommendation.beatmap());
         } catch (SQLException | UserException | IOException | InterruptedException e) {
             throw ExceptionsUtil.getLoggedWrappedException(log, e);
         }

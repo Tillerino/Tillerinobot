@@ -49,7 +49,7 @@ import tillerino.tillerinobot.recommendations.RecommendationsManager;
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UserDataServiceImpl extends RemoteServiceServlet implements UserDataService {
-    static Logger log = LoggerFactory.getLogger(UserDataServiceImpl.class);
+    static final Logger log = LoggerFactory.getLogger(UserDataServiceImpl.class);
 
     private final PpaddictBackend backend;
 
@@ -121,7 +121,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
     public static class UserData {
         @Nonnull
-        ClientUserData userData;
+        final ClientUserData userData;
 
         @CheckForNull
         PersistentUserData persistentUserData;
@@ -345,9 +345,9 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
             return null;
         }
         Cookie c = null;
-        for (int i = 0; i < cookies.length; i++) {
-            if (cookies[i].getName().equals(CREDENTIALS_COOKIE_KEY)) {
-                c = cookies[i];
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(CREDENTIALS_COOKIE_KEY)) {
+                c = cookie;
             }
         }
         return c;

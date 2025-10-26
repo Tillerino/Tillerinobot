@@ -26,9 +26,7 @@ import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
-import tillerino.tillerinobot.lang.Default;
 
 /**
  * Backend test implementation. Not thread safe or anything. Serializes database to ppaddict-db.json file in working
@@ -62,7 +60,7 @@ public class TestBackend implements PpaddictBackend {
     }
 
     public static class Database {
-        public Map<String, Credentials> cookies = new HashMap<>();
+        public final Map<String, Credentials> cookies = new HashMap<>();
 
         public Map<String, PersistentUserData> userData = new HashMap<>();
 
@@ -91,13 +89,13 @@ public class TestBackend implements PpaddictBackend {
         for (Integer id : tillerino.tillerinobot.TestBackend.getSetIds().keySet()) {
             for (long mods : new long[] {0, getMask(Hidden, HardRock), getMask(DoubleTime)}) {
                 try {
-                    final BeatmapMeta meta = diffEstimateProvider.loadBeatmap(id, mods, new Default());
+                    final BeatmapMeta meta = diffEstimateProvider.loadBeatmap(id, mods);
                     ret.put(
                             new BeatmapWithMods(id, mods),
                             new BeatmapData(
                                     meta.getEstimates(),
                                     OsuApiBeatmapForPpaddict.Mapper.INSTANCE.shrink(meta.getBeatmap())));
-                } catch (SQLException | IOException | InterruptedException | UserException e) {
+                } catch (SQLException | IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }

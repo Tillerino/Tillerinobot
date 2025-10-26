@@ -33,9 +33,7 @@ public class FakeAuthenticatorService extends AbstractAuthenticatorService {
     @SuppressFBWarnings(value = "TQ", justification = "Producer")
     @Override
     public Credentials createUser(HttpServletRequest req, Token requestToken) {
-        Credentials credentials =
-                new Credentials(getIdentifier() + ":" + req.getParameter("username"), req.getParameter("username"));
-        return credentials;
+        return new Credentials(getIdentifier() + ":" + req.getParameter("username"), req.getParameter("username"));
     }
 
     @dagger.Module

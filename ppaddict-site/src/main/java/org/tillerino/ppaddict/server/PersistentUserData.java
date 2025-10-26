@@ -133,7 +133,7 @@ public class PersistentUserData implements HasLinkedOsuId {
             comments.remove(id + "-" + mods + "-" + old);
         }
 
-        if (comment.length() > 0) {
+        if (!comment.isEmpty()) {
             comments.add(id + "-" + mods + "-" + System.currentTimeMillis() + "-" + comment);
         }
     }

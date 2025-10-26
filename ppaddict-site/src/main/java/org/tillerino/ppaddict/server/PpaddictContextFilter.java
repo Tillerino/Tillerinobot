@@ -5,7 +5,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -19,9 +18,6 @@ import tillerino.tillerinobot.RateLimiter;
 @Slf4j
 public class PpaddictContextFilter implements Filter {
     private final RateLimiter rateLimiter;
-
-    @Override
-    public void destroy() {}
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -41,7 +37,4 @@ public class PpaddictContextFilter implements Filter {
             MDC.clear();
         }
     }
-
-    @Override
-    public void init(FilterConfig config) throws ServletException {}
 }

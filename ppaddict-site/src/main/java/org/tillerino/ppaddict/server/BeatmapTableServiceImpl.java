@@ -19,7 +19,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Value;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.client.services.BeatmapTableService;
@@ -124,24 +123,24 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         Collection<Predicate<BeatmapData>> predicates = new ArrayList<>();
         if (request.getSearches().getBeatmapId() != null) {
             int beatmapId = request.getSearches().getBeatmapId();
-            predicates.add(x -> x.getBeatmap().getBeatmapId() == beatmapId);
+            predicates.add(x -> x.beatmap().getBeatmapId() == beatmapId);
         }
         if (request.getSearches().getSetId() != null) {
             int setId = request.getSearches().getSetId();
-            predicates.add(x -> x.getBeatmap().getSetId() == setId);
+            predicates.add(x -> x.beatmap().getSetId() == setId);
         }
 
         /*
          * prepare search objects
          */
         String textSearchNeedle;
-        if (request.getSearches().getSearchText().length() > 0) {
+        if (!request.getSearches().getSearchText().isEmpty()) {
             textSearchNeedle = request.getSearches().getSearchText().trim().toLowerCase();
         } else {
             textSearchNeedle = null;
         }
         String commentSearchNeedle;
-        if (comments != null && request.getSearches().getSearchComment().length() > 0) {
+        if (comments != null && !request.getSearches().getSearchComment().isEmpty()) {
             commentSearchNeedle = request.getSearches().getSearchComment().toLowerCase();
         } else {
             commentSearchNeedle = null;
@@ -158,8 +157,8 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         }
         beatmaps:
         for (BeatmapData data : beatmaps.values()) {
-            OsuApiBeatmapForPpaddict apiBeatmap = data.getBeatmap();
-            PercentageEstimates estimate = data.getEstimates();
+            OsuApiBeatmapForPpaddict apiBeatmap = data.beatmap();
+            PercentageEstimates estimate = data.estimates();
 
             for (Predicate<BeatmapData> predicate : predicates) {
                 if (!predicate.test(data)) {
@@ -197,16 +196,16 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
             }
 
             if (useRangeFilters) {
-                if (request.aR.min != null && data.getEstimates().getApproachRate() * 100 < request.aR.min) {
+                if (request.aR.min != null && data.estimates().getApproachRate() * 100 < request.aR.min) {
                     continue;
                 }
-                if (request.aR.max != null && data.getEstimates().getApproachRate() * 100 > request.aR.max) {
+                if (request.aR.max != null && data.estimates().getApproachRate() * 100 > request.aR.max) {
                     continue;
                 }
-                if (request.oD.min != null && data.getEstimates().getOverallDifficulty() * 100 < request.oD.min) {
+                if (request.oD.min != null && data.estimates().getOverallDifficulty() * 100 < request.oD.min) {
                     continue;
                 }
-                if (request.oD.max != null && data.getEstimates().getOverallDifficulty() * 100 > request.oD.max) {
+                if (request.oD.max != null && data.estimates().getOverallDifficulty() * 100 > request.oD.max) {
                     continue;
                 }
                 if (request.cS.min != null && apiBeatmap.getCircleSize(estimate.getMods()) * 100 < request.cS.min) {
@@ -327,12 +326,12 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     public Beatmap makeBeatmap(PersistentUserData userData, BeatmapData data) {
         Settings settings = userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS;
 
-        OsuApiBeatmapForPpaddict apiBeatmap = data.getBeatmap();
-        PercentageEstimates estimates = data.getEstimates();
+        OsuApiBeatmapForPpaddict apiBeatmap = data.beatmap();
+        PercentageEstimates estimates = data.estimates();
         long mods = estimates.getMods();
 
         Beatmap beatmap = new Beatmap();
-        beatmap.approachRate = data.getEstimates().getApproachRate();
+        beatmap.approachRate = data.estimates().getApproachRate();
         beatmap.artist = apiBeatmap.getArtist();
         beatmap.beatmapid = apiBeatmap.getBeatmapId();
         beatmap.bpm = apiBeatmap.getBpm(mods);
@@ -349,9 +348,9 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
                 beatmap.personalization = pers;
             }
         }
-        beatmap.overallDiff = data.getEstimates().getOverallDifficulty();
+        beatmap.overallDiff = data.estimates().getOverallDifficulty();
         beatmap.setid = apiBeatmap.getSetId();
-        beatmap.starDifficulty = mods == 0 ? (Double) data.getEstimates().getStarDiff() : estimates.getStarDiff();
+        beatmap.starDifficulty = mods == 0 ? (Double) data.estimates().getStarDiff() : estimates.getStarDiff();
         beatmap.title = apiBeatmap.getTitle();
         beatmap.version = apiBeatmap.getVersion();
 
@@ -368,12 +367,7 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     public static String ago(long time) {
         long diff = System.currentTimeMillis() - time;
 
-        TreeMap<Long, String> times = new TreeMap<>(new Comparator<Long>() {
-            @Override
-            public int compare(Long o1, Long o2) {
-                return o2.compareTo(o1);
-            }
-        });
+        TreeMap<Long, String> times = new TreeMap<>(Comparator.reverseOrder());
 
         times.put(1000l, "second");
         times.put(60l * 1000l, "minute");
@@ -389,15 +383,11 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
 
                 String s;
 
-                if (value == 1l) {
-                    switch (entry.getValue()) {
-                        case "hour":
-                            s = "an";
-                            break;
-                        default:
-                            s = "a";
-                            break;
-                    }
+                if (value == 1L) {
+                    s = switch (entry.getValue()) {
+                        case "hour" -> "an";
+                        default -> "a";
+                    };
                 } else {
                     s = value + "";
                 }
@@ -417,11 +407,11 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     private static ToDoubleFunction<BeatmapData> getComparator(
             final Sort sortBy, final BeatmapFilterSettings settings) {
         return switch (sortBy) {
-            case EXPECTED -> v -> v.getEstimates().getPP(settings.getLowAccuracy() / 100);
-            case PERFECT -> v -> v.getEstimates().getPP(settings.getHighAccuracy() / 100);
-            case BPM -> v -> v.getBeatmap().getBpm(v.getEstimates().getMods());
-            case LENGTH -> v -> v.getBeatmap().getTotalLength(v.getEstimates().getMods());
-            case STAR_DIFF -> v -> v.getEstimates().getStarDiff();
+            case EXPECTED -> v -> v.estimates().getPP(settings.getLowAccuracy() / 100);
+            case PERFECT -> v -> v.estimates().getPP(settings.getHighAccuracy() / 100);
+            case BPM -> v -> v.beatmap().getBpm(v.estimates().getMods());
+            case LENGTH -> v -> v.beatmap().getTotalLength(v.estimates().getMods());
+            case STAR_DIFF -> v -> v.estimates().getStarDiff();
         };
     }
 
@@ -431,11 +421,6 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
         return makeBeatmap(userData, data);
     }
 
-    @Value
-    private static class BeatmapsCacheKey {
-        long generation;
-        BeatmapFilter request;
-        BeatmapFilterSettings settings;
-        Comments comments;
-    }
+    private record BeatmapsCacheKey(
+            long generation, BeatmapFilter request, BeatmapFilterSettings settings, Comments comments) {}
 }

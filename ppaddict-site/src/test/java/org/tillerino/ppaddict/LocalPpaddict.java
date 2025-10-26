@@ -1,7 +1,6 @@
 package org.tillerino.ppaddict;
 
 import dagger.Component;
-import dagger.Module;
 import io.undertow.Undertow;
 import java.sql.SQLException;
 import javax.inject.Inject;

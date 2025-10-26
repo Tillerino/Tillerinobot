@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.server.auth;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuth10aServiceImpl;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
@@ -65,6 +65,6 @@ public class AuthArriveService extends HttpServlet {
             return;
         }
 
-        resp.sendRedirect(StringUtils.defaultString(returnTo, "/"));
+        resp.sendRedirect(Objects.toString(returnTo, "/"));
     }
 }
