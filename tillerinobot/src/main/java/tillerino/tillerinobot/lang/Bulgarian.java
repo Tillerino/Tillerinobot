@@ -48,7 +48,7 @@ public class Bulgarian extends AbstractMutableLanguage {
             return new Message(" бип-боп");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message(" Хей, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("... ти ли си? Здрасти!"))
                     .then(new Message(" Радвам се да те видя пак. Една препоръка ще те заинтересува ли?"));

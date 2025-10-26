@@ -26,8 +26,9 @@ public class AccHandler implements CommandHandler {
     private final LiveActivity live;
     private final DiffEstimateProvider diffEstimateProvider;
 
-    static Pattern extended = Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
-    static Pattern superExtended =
+    static final Pattern extended =
+            Pattern.compile("(\\d+(?:\\.\\d+)?)%?\\s+(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
+    static final Pattern superExtended =
             Pattern.compile("(\\d+)x100\\s+(?:(\\d+)x50\\s+)?(\\d+)x\\s+(\\d+)m", Pattern.CASE_INSENSITIVE);
 
     @Override
@@ -44,7 +45,7 @@ public class AccHandler implements CommandHandler {
             throw new UserException(lang.noLastSongInfo());
         }
         lastSongInfo = lastSongInfo.withMods(userData.addLazer(lastSongInfo.mods()));
-        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(lastSongInfo.beatmap(), lastSongInfo.mods(), lang);
+        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(lastSongInfo.beatmap(), lastSongInfo.mods());
         if (beatmap == null) {
             throw new RareUserException(lang.excuseForError());
         }

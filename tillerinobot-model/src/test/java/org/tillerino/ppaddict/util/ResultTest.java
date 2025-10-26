@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 public class ResultTest {
-    ObjectMapper jackson = new ObjectMapper();
+    final ObjectMapper jackson = new ObjectMapper();
 
     @Test
     public void jackson() throws Exception {
         Result<String, Integer> r;
-        assertThat(jackson.writeValueAsString(r = Result.ok("hello"))).isEqualTo("{\"ok\":\"hello\"}");
-        assertThat(jackson.writeValueAsString(r = Result.err(123))).isEqualTo("{\"err\":123}");
+        assertThat(jackson.writeValueAsString(Result.ok("hello"))).isEqualTo("{\"ok\":\"hello\"}");
+        assertThat(jackson.writeValueAsString(Result.err(123))).isEqualTo("{\"err\":123}");
 
         r = jackson.readValue("{\"ok\":\"hello\"}", new TypeReference<>() {});
         assertThat(r).isEqualTo(Result.ok("hello"));

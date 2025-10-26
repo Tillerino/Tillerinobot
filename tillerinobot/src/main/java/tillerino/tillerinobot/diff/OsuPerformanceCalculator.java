@@ -9,6 +9,7 @@ package tillerino.tillerinobot.diff;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiScore;
 
+@SuppressWarnings("ALL")
 public class OsuPerformanceCalculator
 {
     public static final double PERFORMANCE_BASE_MULTIPLIER = 1.15; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.

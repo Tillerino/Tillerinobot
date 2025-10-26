@@ -84,15 +84,8 @@ public class RecommendationsManager {
     /**
      * get an ready-to-display recommendation
      *
-     * @param apiUser
      * @param message the remaining arguments ("r" or "recommend" were removed). null if an existing sampler should be
      *     reused.
-     * @param lang
-     * @return
-     * @throws UserException
-     * @throws SQLException
-     * @throws IOException
-     * @throws InterruptedException
      */
     public Recommendation getRecommendation(@Nonnull OsuApiUser apiUser, @CheckForNull String message, Language lang)
             throws UserException, SQLException, IOException, InterruptedException {
@@ -139,11 +132,11 @@ public class RecommendationsManager {
 
         BeatmapMeta loadBeatmap;
         if (sample.mods() < 0) {
-            loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, 0, lang);
+            loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, 0);
         } else {
-            loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, sample.mods(), lang);
+            loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, sample.mods());
             if (loadBeatmap == null) {
-                loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, 0, lang);
+                loadBeatmap = diffEstimateProvider.loadBeatmap(beatmapid, 0);
             }
         }
         if (loadBeatmap == null) {
@@ -230,9 +223,7 @@ public class RecommendationsManager {
             list.add(bareRecommendation);
         }
 
-        Collections.sort(
-                list,
-                Comparator.comparingDouble(BareRecommendation::probability).reversed());
+        list.sort(Comparator.comparingDouble(BareRecommendation::probability).reversed());
 
         int size = Math.min(list.size(), 1000);
         ArrayList<BareRecommendation> arrayList = new ArrayList<>(size);
@@ -245,7 +236,7 @@ public class RecommendationsManager {
     public void forgetRecommendations(@UserId int user) throws SQLException {
         try (Database db = dbm.getDatabase();
                 PreparedStatement statement =
-                        db.prepare("update givenrecommendations set forgotten = true where userid = ?"); ) {
+                        db.prepare("update givenrecommendations set forgotten = true where userid = ?")) {
             Loader.setParameters(statement, user);
             statement.executeUpdate();
         }
@@ -263,7 +254,6 @@ public class RecommendationsManager {
     /**
      * recommendations from the last four weeks
      *
-     * @param userid
      * @return ordered by date given from newest to oldest
      */
     public List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) throws SQLException {
@@ -271,7 +261,7 @@ public class RecommendationsManager {
                 Loader<GivenRecommendation> loader = db.loader(
                         GivenRecommendation.class,
                         "where userid = ? and `date` > ? and not forgotten order by `date` desc")) {
-            return loader.queryList(userid, System.currentTimeMillis() - 28l * 24 * 60 * 60 * 1000);
+            return loader.queryList(userid, System.currentTimeMillis() - 28L * 24 * 60 * 60 * 1000);
         }
     }
 
@@ -283,7 +273,7 @@ public class RecommendationsManager {
             throws SQLException {
         try (Database db = dbm.getDatabase();
                 PreparedStatement statement = db.prepare(
-                        "update givenrecommendations set hidden = true where userid = ? and beatmapid = ? and mods = ?"); ) {
+                        "update givenrecommendations set hidden = true where userid = ? and beatmapid = ? and mods = ?")) {
             Loader.setParameters(statement, userId, beatmapid, mods);
             statement.executeUpdate();
         }

@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import nl.altindag.log.model.LogEvent;
@@ -49,7 +48,7 @@ public class LoggingTest {
     public final ExecutorServiceRule exec =
             ExecutorServiceRule.cachedThreadPool("bot-root").interruptOnShutdown();
 
-    public TestClock clock = new TestClock();
+    public final TestClock clock = new TestClock();
 
     private GameChatEventConsumer in;
 
@@ -59,7 +58,7 @@ public class LoggingTest {
     public final MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         MDC.clear(); // it might be that there's some garbage from other tests in the MDC
         Injector injector = DaggerLocalConsoleTillerinobot_Injector.builder()
                 .clockModule(new ClockModule(clock))
@@ -76,11 +75,7 @@ public class LoggingTest {
         backend.hintUser("other-guy", true, 1000, 1000);
         backend.setLastVisitedVersion("irc-guy", IRCBot.CURRENT_VERSION);
 
-        doAnswer(x -> {
-                    return ok(new GameChatWriter.Response(14L));
-                })
-                .when(out)
-                .message(anyString(), any());
+        doAnswer(_ -> ok(new GameChatWriter.Response(14L))).when(out).message(anyString(), any());
         doReturn(ok(new GameChatWriter.Response(null))).when(out).action(any(), any());
     }
 
@@ -170,7 +165,7 @@ public class LoggingTest {
                 .satisfies(mdc("handler", null));
     }
 
-    private void processMessage(String user, String message) throws InterruptedException, IOException {
+    private void processMessage(String user, String message) throws InterruptedException {
         clock.advanceBy(456);
         PrivateMessage event = new PrivateMessage(123, user, 456, message);
         clock.advanceBy(15);
@@ -181,7 +176,7 @@ public class LoggingTest {
         assertThatOurLog().allSatisfy(mdc("event", "123")).allSatisfy(mdc("user", user));
     }
 
-    private void processAction(String user, String action) throws InterruptedException, IOException {
+    private void processAction(String user, String action) throws InterruptedException {
         clock.advanceBy(456);
         PrivateAction event = new PrivateAction(123, user, 456, action);
         clock.advanceBy(25);
@@ -193,17 +188,18 @@ public class LoggingTest {
     }
 
     private Consumer<LogEvent> sent(String messageStart) {
-        return mdc("state", "sent").andThen(e -> assertThat((e.getMessage())).startsWith("sent: " + messageStart));
+        return mdc("state", "sent")
+                .andThen(e -> assertThat((e.getFormattedMessage())).startsWith("sent: " + messageStart));
     }
 
     private Consumer<LogEvent> received(String message) {
         return mdc("state", "msg")
-                .andThen(event -> assertThat(event.getMessage()).isEqualTo("received: " + message));
+                .andThen(event -> assertThat(event.getFormattedMessage()).isEqualTo("received: " + message));
     }
 
     private Consumer<LogEvent> action(String message) {
         return mdc("state", "action")
-                .andThen(event -> assertThat(event.getMessage()).isEqualTo("action: " + message));
+                .andThen(event -> assertThat(event.getFormattedMessage()).isEqualTo("action: " + message));
     }
 
     private void awaitOurLogSize(long size) {

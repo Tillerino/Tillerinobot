@@ -1,9 +1,7 @@
 package tillerino.tillerinobot.handlers;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.sql.SQLException;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +23,7 @@ public class LinkPpaddictHandler implements CommandHandler {
 
     @Override
     public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
-            throws UserException, IOException, SQLException {
+            throws UserException {
         if (!TOKEN_PATTERN.matcher(command).matches()) {
             return null;
         }

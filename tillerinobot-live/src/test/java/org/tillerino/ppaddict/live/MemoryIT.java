@@ -42,9 +42,9 @@ public class MemoryIT {
     // turn this up for real testing
     private final int messages = 1000;
 
-    int chunkSize = 100;
+    final int chunkSize = 100;
 
-    int readerBufferSize = 100;
+    final int readerBufferSize = 100;
 
     private final List<WebSocketClient> webSocketClients = IntStream.range(0, numberOfClients)
             .mapToObj(x -> new WebSocketClient())
@@ -52,7 +52,7 @@ public class MemoryIT {
 
     @WebSocket
     public class CollectingWebSocketClient {
-        BlockingQueue<String> messages = new ArrayBlockingQueue<>(readerBufferSize);
+        final BlockingQueue<String> messages = new ArrayBlockingQueue<>(readerBufferSize);
 
         @OnWebSocketMessage
         public void message(String text) throws InterruptedException {

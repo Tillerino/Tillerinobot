@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -60,12 +59,12 @@ public class AccHandlerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testExtendedPattern() throws Exception {
+    public void testExtendedPattern() {
         assertTrue(AccHandler.extended.matcher("97.2 800x 1m").matches());
     }
 
     @Test
-    public void testExtendedPattern2() throws Exception {
+    public void testExtendedPattern2() {
         Matcher matcher = AccHandler.extended.matcher("97.2% 800x 11m");
         assertTrue(matcher.matches());
         assertEquals("11", matcher.group(3));
@@ -75,7 +74,7 @@ public class AccHandlerTest extends AbstractDatabaseTest {
     public void testSimple() throws Exception {
         assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).content())
                 .contains("800x");
-        verify(diffEstimateProvider).loadBeatmap(eq(0), eq(0L), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(0), eq(0L));
     }
 
     @Test
@@ -83,19 +82,18 @@ public class AccHandlerTest extends AbstractDatabaseTest {
         userData.setV2(true);
         assertThat(((Success) accHandler.handle("acc 97.5 800x 1m", null, userData, null)).content())
                 .contains("800x");
-        verify(diffEstimateProvider).loadBeatmap(eq(0), eq(Mods.getMask(Mods.Lazer)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(0), eq(Mods.getMask(Mods.Lazer)));
     }
 
     @Test
     public void testLargeNumber() throws Exception {
-        when(diffEstimateProvider.loadBeatmap(anyInt(), anyLong(), any()))
-                .thenReturn(new BeatmapMeta(null, null, null));
+        when(diffEstimateProvider.loadBeatmap(anyInt(), anyLong())).thenReturn(new BeatmapMeta(null, null, null));
         assertThatThrownBy(() -> accHandler.handle("acc 99 80000000000000000000x 1m", null, userData, new Default()))
                 .hasMessageContaining("800000000000");
     }
 
     @Test
-    public void testAccTooLow() throws Exception {
+    public void testAccTooLow() {
         assertThatThrownBy(() -> accHandler.handle("acc 16.4", null, userData, new Default()))
                 .hasMessageContaining("Invalid accuracy");
     }

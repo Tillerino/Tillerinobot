@@ -12,12 +12,10 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -33,10 +31,8 @@ import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.diff.PercentageEstimates;
-import tillerino.tillerinobot.lang.Default;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -46,35 +42,28 @@ public class BeatmapInfoService implements BeatmapDifficulties {
     private final ExecutorService executorService = createExec();
 
     private static ExecutorService createExec() {
-        ThreadPoolExecutor tpe =
-                new ThreadPoolExecutor(2, 2, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        ThreadPoolExecutor tpe = new ThreadPoolExecutor(2, 2, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         tpe.allowCoreThreadTimeOut(true);
         return tpe;
     }
 
-    LoadingCache<BeatmapWithMods, Future<BeatmapMeta>> cache = CacheBuilder.newBuilder()
+    final LoadingCache<BeatmapWithMods, Future<BeatmapMeta>> cache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
             .softValues()
-            .build(new CacheLoader<BeatmapWithMods, Future<BeatmapMeta>>() {
+            .build(new CacheLoader<>() {
                 @Override
                 public Future<BeatmapMeta> load(final BeatmapWithMods key) {
-                    return executorService.submit(new Callable<BeatmapMeta>() {
-                        @Override
-                        public BeatmapMeta call() throws SQLException, InterruptedException {
-                            try {
-                                BeatmapMeta beatmap =
-                                        diffEstimateProvider.loadBeatmap(key.beatmap(), key.mods(), new Default());
+                    return executorService.submit(() -> {
+                        try {
+                            BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(key.beatmap(), key.mods());
 
-                                if (beatmap == null) {
-                                    throw new NotFoundException("Beatmap " + key.beatmap() + " not found.");
-                                }
-
-                                return beatmap;
-                            } catch (IOException e) {
-                                throw RestUtils.getBadGateway(null);
-                            } catch (UserException e) {
-                                throw new NotFoundException(e.getMessage());
+                            if (beatmap == null) {
+                                throw new NotFoundException("Beatmap " + key.beatmap() + " not found.");
                             }
+
+                            return beatmap;
+                        } catch (IOException e) {
+                            throw RestUtils.getBadGateway(null);
                         }
                     });
                 }

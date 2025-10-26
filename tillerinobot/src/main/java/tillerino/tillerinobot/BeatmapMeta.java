@@ -92,15 +92,8 @@ public class BeatmapMeta {
 
             estimateMessage += " | " + secondsToMinuteColonSecond(getBeatmap().getTotalLength(getMods()));
 
-            Double starDiff = null;
-            if (getMods() == 0) {
-                starDiff = beatmap.getStarDifficulty();
-            } else {
-                starDiff = estimates.getStarDiff();
-            }
-            if (starDiff != null) {
-                estimateMessage += " ★ " + format.format(starDiff);
-            }
+            double starDiff = getMods() == 0 ? beatmap.getStarDifficulty() : estimates.getStarDiff();
+            estimateMessage += " ★ " + format.format(starDiff);
 
             estimateMessage += " ♫ " + format.format(getBeatmap().getBpm(getMods()));
             estimateMessage += " AR" + format.format(getBeatmap().getApproachRate(getMods()));

@@ -2,7 +2,6 @@ package org.tillerino.ppaddict.chat.impl;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -74,8 +73,8 @@ public class MessageHandlerScheduler implements GameChatEventConsumer {
                     TimeUnit.MILLISECONDS,
                     // synchronous queue has 0 size and will block submitter until a thread is ready
                     // to take the task
-                    new SynchronousQueue<Runnable>(),
-                    (ThreadFactory) r -> new Thread(group, r, "CoreHandler"));
+                    new SynchronousQueue<>(),
+                    r -> new Thread(group, r, "CoreHandler"));
         }
     }
 }

@@ -19,7 +19,7 @@ public class BeatmapsLoaderImpl implements BeatmapsLoader {
 
     @Override
     public OsuApiBeatmap getBeatmap(int beatmapId, long mods) throws SQLException, IOException {
-        try (Database database = databaseManager.getDatabase(); ) {
+        try (Database database = databaseManager.getDatabase()) {
             return ApiBeatmap.loadOrDownload(database, beatmapId, mods, 0, downloader);
         }
     }

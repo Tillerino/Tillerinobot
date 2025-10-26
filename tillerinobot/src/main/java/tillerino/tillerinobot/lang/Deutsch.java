@@ -41,7 +41,7 @@ public class Deutsch implements Language {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Willkommen zurück, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...bist du das? Ich erkenne dich kaum wieder!"))
                     .then(new Message("Schön, dass du wieder da bist. Wie wäre es mit einer Empfehlung?"));

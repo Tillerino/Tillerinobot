@@ -2,7 +2,6 @@ package tillerino.tillerinobot.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -57,7 +56,7 @@ class WithHandlerTest extends AbstractDatabaseTest {
     void testBasicWithCommand() throws Exception {
         assertThat(handler.handle("with HD", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Message.class);
-        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden)));
     }
 
     @Test
@@ -65,14 +64,14 @@ class WithHandlerTest extends AbstractDatabaseTest {
         userData.setV2(true);
         assertThat(handler.handle("with HD", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Message.class);
-        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.Lazer)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.Lazer)));
     }
 
     @Test
     void testWithMultipleMods() throws Exception {
         assertThat(handler.handle("with HDHR", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Message.class);
-        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.HardRock)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(456), eq(Mods.getMask(Mods.Hidden, Mods.HardRock)));
     }
 
     @Test

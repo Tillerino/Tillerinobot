@@ -203,7 +203,7 @@ public class IRCBot implements GameChatEventConsumer {
 
     public static String logException(Throwable e, Logger logger) {
         String string = LoggingUtils.getRandomString(6);
-        logger.error(string + ": fucked up", e);
+        logger.error("{}: fucked up", string, e);
         return string;
     }
 
@@ -275,7 +275,7 @@ public class IRCBot implements GameChatEventConsumer {
         }
     }
 
-    private GameChatResponse checkVersionInfo(final GameChatEvent user) throws SQLException, UserException {
+    private GameChatResponse checkVersionInfo(final GameChatEvent user) throws SQLException {
         int userVersion = backend.getLastVisitedVersion(user.getNick());
         if (userVersion < CURRENT_VERSION) {
             backend.setLastVisitedVersion(user.getNick(), CURRENT_VERSION);
@@ -294,23 +294,13 @@ public class IRCBot implements GameChatEventConsumer {
             // clear blocked time in case it wasn't cleared by the last thread
             rateLimiter.blockedTime();
 
-            try {
-                GameChatResponse visit;
-                try (var _ = PhaseTimer.timeTask("visit")) {
-                    visit = visit(event);
-                } finally {
-                    event.completePhase(PhaseTimer.HANDLE);
-                }
-                sendResponse(visit, event);
-            } catch (SQLException | IOException | UserException e) {
-                GameChatResponse exceptionResponse = handleException(e, new Default());
-                if (event.isInteractive()) {
-                    sendResponse(exceptionResponse, event);
-                } else {
-                    // we do this just to clear the semaphore
-                    sendResponse(GameChatResponse.none(), event);
-                }
+            GameChatResponse response;
+            try (var _ = PhaseTimer.timeTask("visit")) {
+                response = visit(event);
+            } finally {
+                event.completePhase(PhaseTimer.HANDLE);
             }
+            sendResponse(response, event);
 
             /*
              * We delay registering the activity until after the event has been handled to
@@ -330,8 +320,7 @@ public class IRCBot implements GameChatEventConsumer {
     }
 
     @SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
-    private GameChatResponse visit(GameChatEvent event)
-            throws SQLException, InterruptedException, IOException, UserException {
+    private GameChatResponse visit(GameChatEvent event) throws InterruptedException {
         if (event instanceof Joined) {
             try {
                 return welcomeIfDonator(event);
@@ -460,7 +449,7 @@ public class IRCBot implements GameChatEventConsumer {
         }
 
         String string = LoggingUtils.getRandomString(8);
-        log.warn("bot user not resolvable " + string + " name: " + nick);
+        log.warn("bot user not resolvable {} name: {}", string, nick);
 
         // message not in language-files, since we cant possible know language atm
         throw new UserException(

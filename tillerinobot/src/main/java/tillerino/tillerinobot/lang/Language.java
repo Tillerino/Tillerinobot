@@ -21,8 +21,6 @@ public interface Language {
     /**
      * The requested beatmap is not known. The reason for this is usually that it's too new or too easy (however weird
      * that may sound).
-     *
-     * @return
      */
     String unknownBeatmap();
 
@@ -31,7 +29,6 @@ public interface Language {
      * Tillerino contacted via Twitter {@literal @Tillerinobot} or reddit /u/Tillerino
      *
      * @param marker the marker to reference the log entry. short string - six or eight characters
-     * @return
      */
     String internalException(String marker);
 
@@ -41,21 +38,14 @@ public interface Language {
      * {@literal @Tillerinobot} or reddit /u/Tillerino if the message pops up repeatedly.
      *
      * @param marker the marker to reference the log entry. short string - six or eight characters
-     * @return
      */
     String externalException(String marker);
 
-    /**
-     * No information was available for the given mods. This message will be appended to the song info in brackets.
-     *
-     * @return
-     */
+    /** No information was available for the given mods. This message will be appended to the song info in brackets. */
     String noInformationForModsShort();
 
     /**
      * No information was available for the given mods. This message will be displayed by itself, so it can be longer.
-     *
-     * @return
      */
     String noInformationForMods();
 
@@ -71,7 +61,6 @@ public interface Language {
      * The entire command that the user typed is not known.
      *
      * @param command does not include the leading exclamation mark.
-     * @return
      */
     String unknownCommand(String command);
 
@@ -79,23 +68,18 @@ public interface Language {
      * given mods in !with command could not be interpreted
      *
      * @param mods the given mods
-     * @return
      */
     String malformattedMods(String mods);
 
     /**
      * !with was used, but the bot can't remember the last song info that was given. This may be because it was
      * restarted or because the cache timed out.
-     *
-     * @return
      */
     String noLastSongInfo();
 
     /**
      * Short string to suggest to try this recommendation with mods if the song info doesn't include that information
      * already. Appended to song info.
-     *
-     * @return
      */
     String tryWithMods();
 
@@ -104,23 +88,16 @@ public interface Language {
      * information already. Appended to song info.
      *
      * @param mods the suggested mods
-     * @return
      */
     String tryWithMods(List<Mods> mods);
 
     /**
      * A rare internal error has occurred, which is no cause for concern. Rather than admiting that an error occurred,
      * this message should make an excuse why the request could not be fulfilled.
-     *
-     * @return
      */
     String excuseForError();
 
-    /**
-     * Response to the !complain command.
-     *
-     * @return
-     */
+    /** Response to the !complain command. */
     String complaint();
 
     /**
@@ -131,18 +108,10 @@ public interface Language {
     @Nonnull
     GameChatResponse hug(OsuApiUser apiUser);
 
-    /**
-     * Response to !help command.
-     *
-     * @return
-     */
+    /** Response to !help command. */
     String help();
 
-    /**
-     * Response to !faq command.
-     *
-     * @return
-     */
+    /** Response to !faq command. */
     String faq();
 
     /**
@@ -151,69 +120,38 @@ public interface Language {
      * @param feature The feature's name.
      * @param minRank The minimum rank to be able to use this feature.
      * @param user ther user who is requesting the feature
-     * @return
      */
     String featureRankRestricted(String feature, int minRank, OsuApiUser user);
 
-    /**
-     * The user requested a recommendation and both gave a mod and the nomod option.
-     *
-     * @return
-     */
+    /** The user requested a recommendation and both gave a mod and the nomod option. */
     String mixedNomodAndMods();
 
     /**
      * The current recommendations sampler is empty. User can use other recommendation options or command !reset to
      * forget all given recommendations.
-     *
-     * @return
      */
     String outOfRecommendations();
 
-    /**
-     * The requested beatmap is not ranked.
-     *
-     * @return
-     */
+    /** The requested beatmap is not ranked. */
     String notRanked();
 
-    /**
-     * Comment after beatmap info was sent in response to /np
-     *
-     * @param apiUser
-     * @param meta
-     */
+    /** Comment after beatmap info was sent in response to /np */
     default GameChatResponse optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
         return GameChatResponse.none();
     }
 
-    /**
-     * Comment after beatmap info was sent in response to !with
-     *
-     * @param apiUser
-     * @param meta
-     */
+    /** Comment after beatmap info was sent in response to !with */
     default GameChatResponse optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
         return GameChatResponse.none();
     }
 
-    /**
-     * Comment after beatmap info was sent in response to !recommend
-     *
-     * @param apiUser
-     * @param recommendation
-     */
+    /** Comment after beatmap info was sent in response to !recommend */
     default GameChatResponse optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
         return GameChatResponse.none();
     }
 
-    /**
-     * The given accuracy is invalid.
-     *
-     * @param acc
-     * @return
-     */
-    public String invalidAccuracy(String acc);
+    /** The given accuracy is invalid. */
+    String invalidAccuracy(String acc);
 
     /**
      * The user has chosen this language. Say something to acknowledge that!
@@ -229,9 +167,8 @@ public interface Language {
      *
      * @param invalid The choice that the user was trying to make
      * @param choices The available choices.
-     * @return
      */
-    public String invalidChoice(String invalid, String choices);
+    String invalidChoice(String invalid, String choices);
 
     /**
      * User formatted setting options wrong.
@@ -247,17 +184,9 @@ public interface Language {
      */
     String apiTimeoutException();
 
-    /**
-     * There are no recent plays to display.
-     *
-     * @return
-     */
+    /** There are no recent plays to display. */
     String noRecentPlays();
 
-    /**
-     * User sent a link to a beatmap set when they should have sent a link to a single beatmap.
-     *
-     * @return
-     */
+    /** User sent a link to a beatmap set when they should have sent a link to a single beatmap. */
     String isSetId();
 }

@@ -24,7 +24,7 @@ public class RecommendationRequestParser {
 
     private final BotBackend backend;
 
-    PredicateParser parser = new PredicateParser();
+    final PredicateParser parser = new PredicateParser();
 
     /**
      * Parses a recommendation request string.
@@ -40,14 +40,13 @@ public class RecommendationRequestParser {
 
         settingsBuilder.model(Model.GAMMA10);
 
-        for (int i = 0; i < remaining.length; i++) {
-            String param = remaining[i];
-            if (param.length() == 0) continue;
-            if (!parseEngines(param, settingsBuilder, apiUser)
-                    && !parseMods(param, settingsBuilder)
-                    && !parsePredicates(param, settingsBuilder, apiUser, lang)
-                    && !parseOther(param, settingsBuilder, apiUser)) {
-                throw new UserException(lang.invalidChoice(param, STANDARD_SYNTAX));
+        for (String setting : remaining) {
+            if (setting.isEmpty()) continue;
+            if (!parseEngines(setting, settingsBuilder, apiUser)
+                    && !parseMods(setting, settingsBuilder)
+                    && !parsePredicates(setting, settingsBuilder, apiUser, lang)
+                    && !parseOther(setting, settingsBuilder, apiUser)) {
+                throw new UserException(lang.invalidChoice(setting, STANDARD_SYNTAX));
             }
         }
 
@@ -70,8 +69,7 @@ public class RecommendationRequestParser {
         return request;
     }
 
-    private boolean parseEngines(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser user)
-            throws SQLException, IOException {
+    private boolean parseEngines(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser user) {
         String lowerCase = param.toLowerCase();
         if (getLevenshteinDistance(lowerCase, "relax") <= 2) {
             settingsBuilder.model(Model.ALPHA);
@@ -140,16 +138,16 @@ public class RecommendationRequestParser {
 
     private boolean parsePredicates(
             String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser apiUser, Language lang)
-            throws SQLException, IOException, UserException {
+            throws UserException {
         if (backend.getDonator(apiUser.getUserId()) > 0) {
             RecommendationPredicate predicate = parser.tryParse(param, lang);
             if (predicate != null) {
                 for (RecommendationPredicate existingPredicate : settingsBuilder.getPredicates()) {
                     if (existingPredicate.contradicts(predicate)) {
                         throw new UserException(lang.invalidChoice(
-                                existingPredicate.getOriginalArgument() + " with " + predicate.getOriginalArgument(),
-                                "either " + existingPredicate.getOriginalArgument() + " or "
-                                        + predicate.getOriginalArgument()));
+                                existingPredicate.originalArgument() + " with " + predicate.originalArgument(),
+                                "either " + existingPredicate.originalArgument() + " or "
+                                        + predicate.originalArgument()));
                     }
                 }
                 settingsBuilder.predicate(predicate);
@@ -159,8 +157,7 @@ public class RecommendationRequestParser {
         return false;
     }
 
-    private boolean parseOther(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser apiUser)
-            throws SQLException, IOException {
+    private boolean parseOther(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser apiUser) {
         String lowerCase = param.toLowerCase();
         if (backend.getDonator(apiUser.getUserId()) > 0) {
             switch (lowerCase) {

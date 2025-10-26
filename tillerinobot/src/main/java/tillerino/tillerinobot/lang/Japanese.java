@@ -42,7 +42,7 @@ public class Japanese implements Language {
             return new Message("ﾋﾟﾋﾟｯ");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("また会いましたね、" + apiUser.getUserName() + "さん。");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "さん・・・")
                     .then(new Message(apiUser.getUserName() + "さんですか？お久しぶりです。"))
                     .then(new Message("少し、おすすめの譜面でも見て行ってくれますか？"));

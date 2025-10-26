@@ -21,13 +21,13 @@ public class MdcUtilsTest {
     public final LogRule logRule = TestAppender.rule(MdcUtilsTest.class);
 
     @AfterEach
-    public final void tearDown() throws Exception {
+    public final void tearDown() {
         MDC.clear();
     }
 
     @Test
     public void keyIsAddedAndRemoved() throws Exception {
-        try (AutoCloseable with = MdcUtils.with("foo", "baz")) {
+        try (var _ = MdcUtils.with("foo", "baz")) {
             assertThat(MDC.get("foo")).isEqualTo("baz");
         }
         assertThat(MDC.get("foo")).isNull();
@@ -37,14 +37,14 @@ public class MdcUtilsTest {
     public void keyIsAddedAndRestored() throws Exception {
         MDC.put("foo", "bar");
         assertThat(MDC.get("foo")).isEqualTo("bar");
-        try (AutoCloseable with = MdcUtils.with("foo", "baz")) {
+        try (var _ = MdcUtils.with("foo", "baz")) {
             assertThat(MDC.get("foo")).isEqualTo("baz");
         }
         assertThat(MDC.get("foo")).isEqualTo("bar");
     }
 
     @Test
-    public void chained() throws Exception {
+    public void chained() {
         MDC.put("foo", "bar");
         MDC.put("foos", "bars");
         try (MdcAttributes with = MdcUtils.with("foo", "baz")) {
@@ -63,7 +63,7 @@ public class MdcUtilsTest {
         MdcSnapshot snapshot = serde(MdcUtils.getSnapshot());
         MDC.put("foo", "baz");
         MDC.remove("foos");
-        try (MdcAttributes with = snapshot.apply()) {
+        try (var _ = snapshot.apply()) {
             assertThat(MDC.get("foo")).isEqualTo("bar");
             assertThat(MDC.get("foos")).isEqualTo("bars");
         }
@@ -72,14 +72,14 @@ public class MdcUtilsTest {
     }
 
     @Test
-    public void testWithActualLog() throws Exception {
+    public void testWithActualLog() {
         MDC.put("foo", "bar");
         log.debug("boink");
         logRule.assertThat().hasSize(1).first().satisfies(mdc("foo", "bar"));
     }
 
     @Test
-    public void eventIdCanBeRetrieved() throws Exception {
+    public void eventIdCanBeRetrieved() {
         MDC.clear();
         assertThat(MdcUtils.getLong(MdcUtils.MDC_EVENT)).isEmpty();
         MDC.put("event", "123");

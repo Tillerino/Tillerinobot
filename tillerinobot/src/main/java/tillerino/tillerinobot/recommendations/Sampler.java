@@ -49,7 +49,7 @@ public class Sampler<T, S> {
         double x = ThreadLocalRandom.current().nextDouble() * sum;
 
         SortedMap<Double, T> rest = distribution.tailMap(x);
-        if (rest.size() == 0) {
+        if (rest.isEmpty()) {
             // this means that there was some extreme numerical instability.
             // this is practically not possible. at least not *maximum stack
             // size* times in a row.

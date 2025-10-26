@@ -44,10 +44,10 @@ public class BeatmapInfoServiceIT extends AbstractDatabaseTest {
     public BotApiRule botApi;
 
     @RegisterExtension
-    public MockServerRule mockServer = new MockServerRule();
+    public final MockServerRule mockServer = new MockServerRule();
 
     @Test
-    public void testRegular() throws Exception {
+    public void testRegular() {
         mockServer.mockJsonGet("/auth/authorization", "{ }", "api-key", "valid-key");
 
         given().header("api-key", "valid-key")
@@ -57,7 +57,7 @@ public class BeatmapInfoServiceIT extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testCors() throws Exception {
+    public void testCors() {
         given().header("Origin", "https://tillerino.github.io")
                 .options("/botinfo")
                 .then()

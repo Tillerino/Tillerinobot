@@ -113,7 +113,7 @@ class WireMockUpdater {
         }
     }
 
-    WireMockServer wireMockServer;
+    final WireMockServer wireMockServer;
 
     {
         SingleRootFileSource fileSource = new SingleRootFileSource("src/test/wiremock");

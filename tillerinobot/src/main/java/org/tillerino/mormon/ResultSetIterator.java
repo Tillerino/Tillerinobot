@@ -37,7 +37,7 @@ class ResultSetIterator<T> implements Iterator<T> {
             mapping.get(instance, set);
 
             return instance;
-        } catch (ReflectiveOperationException | SQLException e) {
+        } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
     }

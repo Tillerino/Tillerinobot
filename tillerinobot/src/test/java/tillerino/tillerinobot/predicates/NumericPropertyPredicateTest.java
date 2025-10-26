@@ -10,7 +10,7 @@ import tillerino.tillerinobot.recommendations.BareRecommendation;
 
 public class NumericPropertyPredicateTest {
     @Test
-    public void testOkay() throws Exception {
+    public void testOkay() {
         RecommendationPredicate predicate = new NumericPropertyPredicate<>("w/e", new TitleLength(), 3, true, 3, true);
 
         OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
@@ -43,7 +43,7 @@ public class NumericPropertyPredicateTest {
     }
 
     @Test
-    public void testMods() throws Exception {
+    public void testMods() {
         RecommendationPredicate predicate = new NumericPropertyPredicate<>("w/e", new TitleLength(), 2, true, 5, true);
 
         OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
@@ -58,7 +58,7 @@ public class NumericPropertyPredicateTest {
     }
 
     @Test
-    public void testContradiction() throws Exception {
+    public void testContradiction() {
         RecommendationPredicate predicate1 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 2, true, 5, true);
 
         RecommendationPredicate predicate2 = new NumericPropertyPredicate<>("w/e", new TitleLength(), 6, true, 7, true);

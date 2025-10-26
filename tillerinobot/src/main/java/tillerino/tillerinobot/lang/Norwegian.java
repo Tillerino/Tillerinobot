@@ -48,7 +48,7 @@ public class Norwegian extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Velkommen tilbake, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...Er det deg? Hvor har du vært? Det er lenge siden!"))
                     .then(new Message(

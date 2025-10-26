@@ -18,7 +18,7 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 @Slf4j
 public class BeatmapsServiceImpl implements BeatmapsService {
-    private class BeatmapResourceImpl extends AbstractBeatmapResource {
+    private static class BeatmapResourceImpl extends AbstractBeatmapResource {
         public BeatmapResourceImpl(DatabaseManager dbm, BeatmapDownloader downloader, OsuApiBeatmap beatmap) {
             super(dbm, downloader, beatmap);
         }

@@ -14,7 +14,7 @@ public class ApiUserTest extends AbstractDatabaseTest {
         DaggerAbstractDatabaseTest_Injector.create().inject(this);
     }
 
-    OsuApi downloader = OsuApiV1Test.Module.osuApiV1();
+    final OsuApi downloader = OsuApiV1Test.Module.osuApiV1();
 
     @Test
     public void testDatabaseSchema() throws Exception {

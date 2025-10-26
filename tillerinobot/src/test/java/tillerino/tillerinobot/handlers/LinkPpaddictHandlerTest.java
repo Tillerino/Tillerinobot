@@ -21,9 +21,9 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.BotBackend;
 
 public class LinkPpaddictHandlerTest {
-    BotBackend backend = mock(BotBackend.class);
+    final BotBackend backend = mock(BotBackend.class);
 
-    LinkPpaddictHandler handler = new LinkPpaddictHandler(backend);
+    final LinkPpaddictHandler handler = new LinkPpaddictHandler(backend);
 
     @BeforeEach
     public void setup() {
@@ -31,7 +31,7 @@ public class LinkPpaddictHandlerTest {
     }
 
     @Test
-    public void testHandle() throws Exception {
+    public void testHandle() {
         assertThatThrownBy(() -> handler.handle("12345678901234567890123456789012", user(12345, "usr"), null, null))
                 .hasMessage("nothing happened.");
         verify(backend).tryLinkToPatreon(eq("12345678901234567890123456789012"), argThat(u -> u.getUserId() == 12345));
@@ -52,7 +52,7 @@ public class LinkPpaddictHandlerTest {
     }
 
     @Test
-    public void testPattern() throws Exception {
+    public void testPattern() {
         assertTrue(LinkPpaddictHandler.TOKEN_PATTERN
                 .matcher(LinkPpaddictHandler.newKey())
                 .matches());

@@ -31,7 +31,6 @@ public class PullThrough {
      *     which is younger, the cached information will be returned. Otherwise, fresh data will be downloaded and
      *     cached. If <= 0, any cached information, if available, will be returned.
      * @return null if the user can't be found at the osu API
-     * @throws SQLException
      * @throws IOException API exception
      */
     @CheckForNull
@@ -44,7 +43,7 @@ public class PullThrough {
     @CheckForNull
     public ApiUser downloadUser(String userName) throws IOException, SQLException {
         ApiUser user;
-        try (var __ = PhaseTimer.timeTask("downloadUser")) {
+        try (var _ = PhaseTimer.timeTask("downloadUser")) {
             System.out.println("downloading user " + userName);
             user = downloader.get().getUser(userName, GameModes.OSU);
             System.out.println(".downloaded user " + userName);
@@ -52,7 +51,7 @@ public class PullThrough {
 
         if (user != null) {
             try (Database database = dbm.getDatabase();
-                    Persister<ApiUser> persisterApiUser = database.persister(ApiUser.class, Action.REPLACE); ) {
+                    Persister<ApiUser> persisterApiUser = database.persister(ApiUser.class, Action.REPLACE)) {
                 persisterApiUser.persist(user);
             }
         }
@@ -62,13 +61,11 @@ public class PullThrough {
     /**
      * Retrieves the last plays from this user. These don't have pp and might be failed attempts.
      *
-     * @param userid
      * @return sorted from most recent to oldest
-     * @throws IOException
      */
     @Nonnull
     public List<ApiScore> getRecentPlays(@UserId int userid) throws IOException {
-        try (var __ = PhaseTimer.timeTask("download recent")) {
+        try (var _ = PhaseTimer.timeTask("download recent")) {
             System.out.println("downloading recent plays for " + userid);
             List<ApiScore> recent = downloader.get().getUserRecent(userid, GameModes.OSU);
             System.out.println(".downloaded recent plays for " + userid);

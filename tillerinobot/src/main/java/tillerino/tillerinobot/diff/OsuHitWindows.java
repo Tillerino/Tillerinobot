@@ -14,11 +14,6 @@ public class OsuHitWindows
     public static final DifficultyRange OK_WINDOW_RANGE = new DifficultyRange(140, 100, 60);
     public static final DifficultyRange MEH_WINDOW_RANGE = new DifficultyRange(200, 150, 100);
 
-    /**
-     * osu! ruleset has a fixed miss window regardless of difficulty settings.
-     */
-    public static final double MISS_WINDOW = 400;
-
     public double great;
     public double ok;
     public double meh;

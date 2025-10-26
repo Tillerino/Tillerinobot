@@ -9,7 +9,6 @@ import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.container.PreMatching;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
-import java.io.IOException;
 import javax.annotation.Priority;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class ApiLoggingFeature implements Feature {
     @PreMatching
     public static class SetPath implements ContainerRequestFilter {
         @Override
-        public void filter(ContainerRequestContext requestContext) throws IOException {
+        public void filter(ContainerRequestContext requestContext) {
             MDC.clear();
             MDC.put(MdcUtils.MDC_API_PATH, requestContext.getUriInfo().getPath());
         }

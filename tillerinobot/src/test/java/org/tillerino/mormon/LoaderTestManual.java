@@ -27,7 +27,7 @@ public class LoaderTestManual extends AbstractDatabaseTest {
             System.out.println(i);
         }
         System.out.println();
-        for (ByteArrays b : db.streamingLoader(ByteArrays.class, "").query()) {
+        for (ByteArrays _ : db.streamingLoader(ByteArrays.class, "").query()) {
             // put a breakpoint here, check memory consumption after GC
             System.out.println("x");
         }

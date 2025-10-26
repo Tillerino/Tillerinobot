@@ -49,20 +49,21 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
         try {
             for (GameChatResponse r : response.flatten()) {
                 for (int i = 0; i < 10; i++) { // arbitrary retry limit greater than zero
-                    if (handleResponse(r, event) instanceof Err<?, Error> err) {
-                        if (err.e() instanceof Error.Retry retry) {
-                            log.warn("Bot not connected. Retrying.");
-                            Thread.sleep(retry.millis());
-                            continue;
-                        } else if (err.e() instanceof Error.PingDeath p) {
-                            try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_PING, p.millis())) {
-                                log.warn("ping timed out");
+                    if (handleResponse(r, event) instanceof Err<?, Error>(Error e)) {
+                        switch (e) {
+                            case Error.Retry(int millis) -> {
+                                log.warn("Bot not connected. Retrying.");
+                                Thread.sleep(millis);
+                                continue;
                             }
-                            continue;
-                        } else if (err.e() instanceof Error.Timeout) {
-                            log.warn("Timed out while trying to send to IRC");
-                        } else {
-                            log.error("Unknown error while sending response");
+                            case Error.PingDeath(long millis) -> {
+                                try (MdcAttributes _ = MdcUtils.with(MdcUtils.MDC_PING, millis)) {
+                                    log.warn("ping timed out");
+                                }
+                                continue;
+                            }
+                            case Error.Timeout _ -> log.warn("Timed out while trying to send to IRC");
+                            default -> log.error("Unknown error while sending response");
                         }
                     }
                     break;
@@ -77,30 +78,26 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
     }
 
     @SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
-    private Result<Response, Error> handleResponse(GameChatResponse response, GameChatEvent result)
-            throws InterruptedException, IOException {
-        if (response instanceof Message(String msg)) {
-            return message(msg, false, result);
-        } else if (response instanceof Success(String msg)) {
-            return message(msg, true, result);
-        } else if (response instanceof Action(String msg)) {
-            return writer.action(msg, result.getNick()).map(ok -> {
-                try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
-                    if (ok.ping() != null) {
-                        mdc.add(MdcUtils.MDC_PING, ok.ping());
+    private Result<Response, Error> handleResponse(GameChatResponse response, GameChatEvent result) throws IOException {
+        return switch (response) {
+            case Message(String msg) -> message(msg, false, result);
+            case Success(String msg) -> message(msg, true, result);
+            case Action(String msg) ->
+                writer.action(msg, result.getNick()).map(ok -> {
+                    try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
+                        if (ok.ping() != null) {
+                            mdc.add(MdcUtils.MDC_PING, ok.ping());
+                        }
+                        liveActivity.propagateSentMessage(result.getNick(), result.getEventId(), ok.ping());
+                        log.debug("sent action: {}", msg);
                     }
-                    liveActivity.propagateSentMessage(result.getNick(), result.getEventId(), ok.ping());
-                    log.debug("sent action: " + msg);
-                }
-                return ok;
-            });
-        } else {
-            throw new NotImplementedException("Unknown response type: " + response.getClass());
-        }
+                    return ok;
+                });
+            default -> throw new NotImplementedException("Unknown response type: " + response.getClass());
+        };
     }
 
-    private Result<Response, Error> message(String msg, boolean success, GameChatEvent result)
-            throws InterruptedException, IOException {
+    private Result<Response, Error> message(String msg, boolean success, GameChatEvent result) {
         return writer.message(msg, result.getNick()).map(ok -> {
             try (MdcAttributes mdc = MdcUtils.with(MdcUtils.MDC_STATE, "sent")) {
                 if (ok.ping() != null) {
@@ -118,7 +115,7 @@ public class ResponsePostprocessor implements GameChatResponseConsumer {
                         botInfo.setLastRecommendation(clock.currentTimeMillis());
                     }
                 }
-                log.debug("sent: " + msg);
+                log.debug("sent: {}", msg);
                 result.getMeta().getTimer().print();
                 botInfo.setLastSentMessage(clock.currentTimeMillis());
             }

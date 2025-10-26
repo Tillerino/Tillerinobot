@@ -24,7 +24,6 @@ import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationServiceImpl;
 import org.tillerino.ppaddict.util.Clock;
 import tillerino.tillerinobot.*;
-import tillerino.tillerinobot.BeatmapsLoader;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.recommendations.AllRecommenders;

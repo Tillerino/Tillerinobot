@@ -45,7 +45,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             OsuApiUser apiUser,
             UserDataManager.UserData userData,
             Language lang)
-            throws UserException, IOException, SQLException, InterruptedException {
+            throws UserException, IOException, SQLException {
         MDC.put(MdcUtils.MDC_HANDLER, "u");
 
         int userId;

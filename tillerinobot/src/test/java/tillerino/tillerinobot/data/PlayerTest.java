@@ -33,12 +33,12 @@ public class PlayerTest extends AbstractDatabaseTest {
         DaggerPlayerTest_Injector.create().inject(this);
     }
 
-    TestClock clock = new TestClock();
+    final TestClock clock = new TestClock();
 
     @Inject
     OsuApiV1 downloader;
 
-    protected ConfigService config = mock(ConfigService.class);
+    protected final ConfigService config = mock(ConfigService.class);
 
     @Test
     public void testUpdateLastSeen() throws Exception {

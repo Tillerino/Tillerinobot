@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.Mods;
 
 public class PredicateParserTest {
-    PredicateParser parser = new PredicateParser();
+    final PredicateParser parser = new PredicateParser();
 
     @Test
     public void testApproachRate() throws Exception {

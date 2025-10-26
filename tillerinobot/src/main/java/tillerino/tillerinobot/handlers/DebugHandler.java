@@ -1,8 +1,6 @@
 package tillerino.tillerinobot.handlers;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.sql.SQLException;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.tillerino.osuApiModel.OsuApiUser;
@@ -25,7 +23,7 @@ public class DebugHandler implements CommandHandler {
 
     @Override
     public GameChatResponse handle(String debugCommand, OsuApiUser debugApiUser, UserData debugUserData, Language lang)
-            throws UserException, IOException, SQLException, InterruptedException {
+            throws UserException {
         if (!debugCommand.startsWith(DEBUG) || !debugUserData.isAllowedToDebug()) {
             return null;
         }
@@ -37,11 +35,11 @@ public class DebugHandler implements CommandHandler {
                     .or(CommandHandler.alwaysHandling(
                             "getUserByIdCached ",
                             (command, apiUser, userData, l) ->
-                                    new Success(command + " is " + pullThrough.getUser(Integer.parseInt(command), 0l))))
+                                    new Success(command + " is " + pullThrough.getUser(Integer.parseInt(command), 0L))))
                     .or(CommandHandler.alwaysHandling(
                             "getUserByIdFresh ",
                             (command, apiUser, userData, l) -> new Success(
-                                    command + " is " + pullThrough.getUser(Integer.parseInt(command), 1l))));
+                                    command + " is " + pullThrough.getUser(Integer.parseInt(command), 1L))));
             GameChatResponse response =
                     commands.handle(debugCommand.substring(DEBUG.length()), debugApiUser, debugUserData, lang);
             if (response != null) {

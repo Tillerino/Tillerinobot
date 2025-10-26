@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class SightedTest {
     @Test
-    public void notInteractive() throws Exception {
+    public void notInteractive() {
         assertThat(new Sighted(123, "", 456)).hasFieldOrPropertyWithValue("interactive", false);
     }
 }

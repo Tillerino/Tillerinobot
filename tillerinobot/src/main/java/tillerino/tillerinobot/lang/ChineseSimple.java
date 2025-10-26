@@ -41,7 +41,7 @@ public class ChineseSimple extends AbstractMutableLanguage {
             return new Message("嘟嘟噜~");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("欢迎回来，" + apiUser.getUserName() + "。");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("是你么? 好久不见呢！"))
                     .then(new Message("很高兴再次见到你。需要我为你推荐歌曲么?"));

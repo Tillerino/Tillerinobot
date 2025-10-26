@@ -48,7 +48,7 @@ public class Default extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Welcome back, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...is that you? It's been so long!"))
                     .then(new Message("It's good to have you back. Can I interest you in a recommendation?"));

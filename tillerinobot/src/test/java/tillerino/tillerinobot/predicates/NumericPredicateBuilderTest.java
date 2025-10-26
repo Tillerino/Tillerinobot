@@ -9,7 +9,7 @@ import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Default;
 
 public class NumericPredicateBuilderTest {
-    NumericPredicateBuilder<TitleLength> builder = new NumericPredicateBuilder<>(new TitleLength());
+    final NumericPredicateBuilder<TitleLength> builder = new NumericPredicateBuilder<>(new TitleLength());
 
     @Test
     public void testEquals() throws Exception {
@@ -60,12 +60,12 @@ public class NumericPredicateBuilderTest {
     }
 
     @Test
-    public void testWrongSign() throws Exception {
+    public void testWrongSign() {
         assertThrows(UserException.class, () -> builder.build("tl~12", new Default()));
     }
 
     @Test
-    public void testWrongNumberFormat() throws Exception {
+    public void testWrongNumberFormat() {
         assertThrows(UserException.class, () -> builder.build("tl=twelve", new Default()));
     }
 }

@@ -17,7 +17,6 @@ import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.WebTarget;
 import java.io.IOError;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -94,7 +93,7 @@ public class ApiTest {
         private Entry<String, String> addParam = null;
 
         @Override
-        public void filter(ClientRequestContext requestContext) throws IOException {
+        public void filter(ClientRequestContext requestContext) {
             if (addToHeader != null) {
                 requestContext.getHeaders().add(addToHeader.getKey(), addToHeader.getValue());
             }
@@ -150,7 +149,7 @@ public class ApiTest {
     private final SetHeaderAndParam clientRequestFilter = new SetHeaderAndParam();
 
     @BeforeEach
-    public void startServer() throws Exception {
+    public void startServer() {
         // build clients
         Client client = ClientBuilder.newBuilder().register(clientRequestFilter).build();
         WebTarget target = client.target("http://localhost:" + server.getPort());
@@ -160,7 +159,7 @@ public class ApiTest {
     }
 
     @Test
-    public void testIsReceiving() throws Exception {
+    public void testIsReceiving() {
         clock.advanceBy(60 * 60 * 1000); // one hour
         remoteMetrics.setLastReceivedMessage(60 * 60 * 1000 - 31000); // thirty-one seconds ago
         assertThatThrownBy(() -> botStatus.isReceiving()).isInstanceOf(NotFoundException.class);

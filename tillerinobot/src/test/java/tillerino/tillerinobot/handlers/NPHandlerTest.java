@@ -3,7 +3,6 @@ package tillerino.tillerinobot.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -82,7 +81,7 @@ class NPHandlerTest extends AbstractDatabaseTest {
         assertThat(handler.handle(
                         "is editing [https://osu.ppy.sh/beatmapsets/312#osu/123 title]", null, userData, new Default()))
                 .isInstanceOf(GameChatResponse.Success.class);
-        verify(diffEstimateProvider).loadBeatmap(eq(123), eq(0L), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(123), eq(0L));
     }
 
     @Test
@@ -94,7 +93,7 @@ class NPHandlerTest extends AbstractDatabaseTest {
                         userData,
                         new Default()))
                 .isInstanceOf(GameChatResponse.Success.class);
-        verify(diffEstimateProvider).loadBeatmap(eq(2419085), eq(0L), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(2419085), eq(0L));
     }
 
     @Test
@@ -122,6 +121,6 @@ class NPHandlerTest extends AbstractDatabaseTest {
                         userData,
                         new Default()))
                 .isInstanceOf(GameChatResponse.Success.class);
-        verify(diffEstimateProvider).loadBeatmap(eq(955737), eq(Mods.getMask(Mods.Lazer)), any());
+        verify(diffEstimateProvider).loadBeatmap(eq(955737), eq(Mods.getMask(Mods.Lazer)));
     }
 }

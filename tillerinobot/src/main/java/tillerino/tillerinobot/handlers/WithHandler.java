@@ -45,7 +45,7 @@ public class WithHandler implements CommandHandler {
             throw new UserException(lang.malformattedMods(message));
         }
         mods = userData.addLazer(mods);
-        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(lastSongInfo.beatmap(), mods, lang);
+        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(lastSongInfo.beatmap(), mods);
         if (beatmap == null) {
             throw new RareUserException(lang.excuseForError());
         }

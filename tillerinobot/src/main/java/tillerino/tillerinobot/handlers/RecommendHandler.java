@@ -60,24 +60,27 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 
         Recommendation recommendation = manager.getRecommendation(apiUser, remaining, lang);
 
-        BeatmapMeta beatmap = recommendation.beatmap;
+        BeatmapMeta beatmap = recommendation.beatmap();
 
         if (beatmap == null) {
             log.error("unknow recommendation occurred");
             throw new RareUserException(lang.excuseForError());
         }
         String addition = null;
-        if (recommendation.bareRecommendation.mods() < 0) {
+        if (recommendation.bareRecommendation().mods() < 0) {
             addition = lang.tryWithMods();
         }
-        if (recommendation.bareRecommendation.mods() > 0
-                && beatmap.getMods() != recommendation.bareRecommendation.mods()) {
-            addition = lang.tryWithMods(Mods.getMods(recommendation.bareRecommendation.mods()));
+        if (recommendation.bareRecommendation().mods() > 0
+                && beatmap.getMods() != recommendation.bareRecommendation().mods()) {
+            addition = lang.tryWithMods(
+                    Mods.getMods(recommendation.bareRecommendation().mods()));
         }
 
         userData.setLastSongInfo(new BeatmapWithMods(beatmap.getBeatmap().getBeatmapId(), beatmap.getMods()));
         manager.saveGivenRecommendation(
-                apiUser.getUserId(), beatmap.getBeatmap().getBeatmapId(), recommendation.bareRecommendation.mods());
+                apiUser.getUserId(),
+                beatmap.getBeatmap().getBeatmapId(),
+                recommendation.bareRecommendation().mods());
         return new Success(beatmap.formInfoMessage(
                         true,
                         userData.isShowMapMetaDataOnRecommendation(),

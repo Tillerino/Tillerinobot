@@ -109,7 +109,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testContradiction() throws Exception {
+    public void testContradiction() {
         assertThatThrownBy(() -> manager.parseSamplerSettings(user, "ar=1 ar=2", new Default()))
                 .isInstanceOf(UserException.class);
     }
@@ -122,7 +122,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
         assertEquals(1, saved.size());
 
-        GivenRecommendation rec = saved.get(0);
+        GivenRecommendation rec = saved.getFirst();
 
         assertEquals(1015, rec.getUserid());
         assertEquals(16, rec.getBeatmapid());
@@ -148,10 +148,10 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
         // save a recommendation and reload it
         manager.saveGivenRecommendation(1954, 2, 0);
         List<GivenRecommendation> recs = manager.loadVisibleRecommendations(1954);
-        assertEquals(2, recs.get(0).getBeatmapid());
+        assertEquals(2, recs.getFirst().getBeatmapid());
 
         // remember its date
-        long firstRecDate = recs.get(0).getDate();
+        long firstRecDate = recs.getFirst().getDate();
         Thread.sleep(30);
 
         // save another recommendation and hide it
@@ -163,7 +163,7 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
         // load visible recommendations and check if this is the earlier one
         recs = manager.loadVisibleRecommendations(1954);
-        assertEquals(firstRecDate, recs.get(0).getDate());
+        assertEquals(firstRecDate, recs.getFirst().getDate());
 
         // hide again and check if list is empty now
         manager.hideRecommendation(1954, 2, 0);

@@ -242,7 +242,7 @@ public class LocalConsoleTillerinobot {
                 System.out.println("you're new. I'll have to ask you a couple of questions.");
 
                 System.out.println("are you a donator? (anything for yes)");
-                final boolean donator = scanner.nextLine().length() > 0;
+                final boolean donator = !scanner.nextLine().isEmpty();
 
                 System.out.println("what's your rank?");
                 final int rank = Integer.parseInt(scanner.nextLine());
@@ -269,7 +269,7 @@ public class LocalConsoleTillerinobot {
         }
 
         /** @return true for a user change; false to shut down */
-        private boolean inputLoop(Scanner scanner) throws Exception {
+        private boolean inputLoop(Scanner scanner) {
             while (running.get()) {
                 String line = scanner.nextLine();
 
@@ -297,7 +297,7 @@ public class LocalConsoleTillerinobot {
             return false;
         }
 
-        ExecutorService exec = singleThreadExecutor("bot event loop");
+        final ExecutorService exec = singleThreadExecutor("bot event loop");
 
         void dispatch(GameChatEvent event) {
             exec.submit(() -> {

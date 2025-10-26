@@ -1,5 +1,6 @@
 package tillerino.tillerinobot;
 
+import java.io.Serial;
 import lombok.NonNull;
 
 /**
@@ -8,6 +9,7 @@ import lombok.NonNull;
  * @author Tillerino
  */
 public class UserException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String ERROR_MESSAGE = "%s must be between %s and %s but was %s";
@@ -36,6 +38,7 @@ public class UserException extends Exception {
      * @author Tillerino
      */
     public static class RareUserException extends UserException {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public RareUserException(String message) {

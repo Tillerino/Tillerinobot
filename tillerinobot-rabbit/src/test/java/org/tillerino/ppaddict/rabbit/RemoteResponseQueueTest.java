@@ -3,7 +3,6 @@ package org.tillerino.ppaddict.rabbit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.tillerino.ppaddict.chat.GameChatResponse;
@@ -20,7 +19,7 @@ public class RemoteResponseQueueTest {
         roundTrip(GameChatResponse.none());
     }
 
-    private void roundTrip(GameChatResponse message) throws JsonProcessingException, JsonMappingException {
+    private void roundTrip(GameChatResponse message) throws JsonProcessingException {
         String serialized = OBJECT_MAPPER.writerFor(GameChatResponse.class).writeValueAsString(message);
         GameChatResponse deserialized = OBJECT_MAPPER.readValue(serialized, GameChatResponse.class);
         assertThat(deserialized).isEqualTo(message);

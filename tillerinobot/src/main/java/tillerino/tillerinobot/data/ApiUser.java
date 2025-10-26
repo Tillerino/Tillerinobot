@@ -24,14 +24,7 @@ import tillerino.tillerinobot.OsuApi;
 public class ApiUser extends OsuApiUser {
     long downloaded = System.currentTimeMillis();
 
-    /**
-     * @param database
-     * @param userid
-     * @param maxAge if > 0, maximum age in milliseconds
-     * @return
-     * @throws SQLException
-     * @throws IOException
-     */
+    /** @param maxAge if > 0, maximum age in milliseconds */
     public static ApiUser loadOrDownload(Database database, @UserId int userid, long maxAge, OsuApi downloader)
             throws SQLException, IOException {
         ApiUser user;

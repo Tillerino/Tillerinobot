@@ -6,7 +6,6 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response.Status;
-import java.io.IOException;
 import java.util.Optional;
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -23,7 +22,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private final AuthenticationService authentication;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         String apiKey = Optional.ofNullable(
                         requestContext.getUriInfo().getQueryParameters().get("k"))
                 .flatMap(l -> l.stream().findFirst())

@@ -26,7 +26,7 @@ public class SynchronousExecutorServiceRule implements ExecutorService, BeforeEa
 
     private static class Impl extends AbstractExecutorService {
         private final ExecutorService async =
-                new ThreadPoolExecutor(0, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+                new ThreadPoolExecutor(0, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
         @Getter
         private boolean shutdown = false;
@@ -55,9 +55,7 @@ public class SynchronousExecutorServiceRule implements ExecutorService, BeforeEa
 
         @Override
         public void execute(Runnable command) {
-            Future<?> future = async.submit(() -> {
-                command.run();
-            });
+            Future<?> future = async.submit(command);
             try {
                 future.get();
             } catch (ExecutionException e) {

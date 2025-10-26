@@ -23,12 +23,12 @@ public class ExecutorServiceRule implements ExecutorService, BeforeEachCallback,
     private boolean interruptOnShutdown = false;
 
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeEach(ExtensionContext context) {
         exec = supplier.get();
     }
 
     @Override
-    public void afterEach(ExtensionContext context) throws Exception {
+    public void afterEach(ExtensionContext context) {
         if (interruptOnShutdown) {
             exec.shutdownNow();
         } else {

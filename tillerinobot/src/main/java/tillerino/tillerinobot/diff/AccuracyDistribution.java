@@ -6,18 +6,11 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static tillerino.tillerinobot.UserException.validateInclusiveBetween;
 
-import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 import org.tillerino.osuApiModel.OsuApiScore;
 import tillerino.tillerinobot.UserException;
 
-@Value
-public class AccuracyDistribution {
-    int x300;
-    int x100;
-    int x50;
-    int miss;
-
+public record AccuracyDistribution(int x300, int x100, int x50, int miss) {
     /**
      * This will calculate the most precise approximation to hit the accuracy target. I.e. if you calculate accuracy
      * exactly based on 300s, 100s, 50s, and misses, this method will reproduce the original values.

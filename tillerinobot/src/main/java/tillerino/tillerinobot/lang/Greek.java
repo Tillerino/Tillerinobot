@@ -42,7 +42,7 @@ public class Greek implements Language {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Καλώς ήρθες πίσω," + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...είσαι εσύ αυτός; Πάει πολύς καιρός!"))
                     .then(new Message("Είναι ωραίο να σε έχουμε πίσω. Μπορώ να σε ενδιαφέρω με μια πρόταση;"));

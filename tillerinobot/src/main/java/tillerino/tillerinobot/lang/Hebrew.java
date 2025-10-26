@@ -39,7 +39,7 @@ public class Hebrew implements Language {
             return new Message("ביפ בופ");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("." + apiUser.getUserName() + " ברוך הבא");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...זה אתה? עבר כל כך הרבה זמן"))
                     .then(new Message("?נפלא לראות אותך. תתעניין בהצעה"));

@@ -10,7 +10,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -37,14 +36,14 @@ public class NamePendingApprovalRecommender implements Recommender {
     private final String token;
 
     @Override
-    public List<TopPlay> loadTopPlays(int userId) throws SQLException, MaintenanceException, IOException {
+    public List<TopPlay> loadTopPlays(int userId) throws MaintenanceException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<BareRecommendation> loadRecommendations(
             List<TopPlay> topPlays, Collection<Integer> exclude, Model model, boolean nomod, long requestMods)
-            throws SQLException, IOException, UserException {
+            throws IOException, UserException {
         Validate.isTrue(model == Model.NAP);
 
         List<Play> mappedPlays = topPlays.stream()
@@ -57,16 +56,15 @@ public class NamePendingApprovalRecommender implements Recommender {
         String requestBody = JACKSON.writeValueAsString(new Request(mappedPlays, allExcludes, nomod, requestMods));
 
         HttpResponse<String> response;
-        try {
-            response = HttpClient.newHttpClient()
-                    .send(
-                            HttpRequest.newBuilder(recommendationsRequestUri)
-                                    .method("POST", BodyPublishers.ofString(requestBody))
-                                    .header("Content-Type", "application/json")
-                                    .header("Authorization", "Bearer " + token)
-                                    .header("User-Agent", "https://github.com/Tillerino/Tillerinobot")
-                                    .build(),
-                            BodyHandlers.ofString());
+        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+            response = httpClient.send(
+                    HttpRequest.newBuilder(recommendationsRequestUri)
+                            .method("POST", BodyPublishers.ofString(requestBody))
+                            .header("Content-Type", "application/json")
+                            .header("Authorization", "Bearer " + token)
+                            .header("User-Agent", "https://github.com/Tillerino/Tillerinobot")
+                            .build(),
+                    BodyHandlers.ofString());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ServiceUnavailableException();

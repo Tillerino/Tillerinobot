@@ -68,10 +68,10 @@ public class IrcNameResolver {
                 .execute("where userName = ", userName)
                 .orElse(null);
 
-        long maxAge = 90l * 24 * 60 * 60 * 1000;
-        if (System.currentTimeMillis() < 1483747380000l /* sometime January 7th, 2017*/) {
+        long maxAge = 90L * 24 * 60 * 60 * 1000;
+        if (System.currentTimeMillis() < 1483747380000L /* sometime January 7th, 2017*/) {
             // decrease by 3 months over 1 week
-            maxAge += Math.min(maxAge, 12 * (1483747380000l - System.currentTimeMillis()));
+            maxAge += Math.min(maxAge, 12 * (1483747380000L - System.currentTimeMillis()));
         }
         if (mapping == null
                 || (mapping.getUserid() > 0 && mapping.getResolved() < System.currentTimeMillis() - maxAge)
@@ -90,7 +90,7 @@ public class IrcNameResolver {
                 user = pullThrough.downloadUser(userName);
             } catch (IOException e) {
                 if (IRCBot.isTimeout(e) && mapping.getUserid() > 0) {
-                    log.debug("timeout downloading user " + userName + "; return stale id.");
+                    log.debug("timeout downloading user {}; return stale id.", userName);
                     return mapping.getUserid();
                 }
                 throw e;
@@ -122,7 +122,7 @@ public class IrcNameResolver {
      */
     @CheckForNull
     public OsuApiUser resolveManually(@UserId int userId) throws SQLException, IOException {
-        OsuApiUser user = pullThrough.getUser(userId, 1l);
+        OsuApiUser user = pullThrough.getUser(userId, 1L);
         if (user == null) {
             return null;
         }

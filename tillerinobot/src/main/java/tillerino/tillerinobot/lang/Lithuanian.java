@@ -41,7 +41,7 @@ public class Lithuanian extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Labas, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...Ar čia tikrai tu?"))
                     .then(new Message("Labas. Gal kažką parekomenduoti?"));

@@ -12,6 +12,6 @@ public class TitleLength implements NumericBeatmapProperty {
 
     @Override
     public double getValue(OsuApiBeatmap beatmap, long mods) {
-        return beatmap.getTitle().length() * (mods != 0l ? 2 : 1);
+        return beatmap.getTitle().length() * (mods != 0L ? 2 : 1);
     }
 }

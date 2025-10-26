@@ -42,7 +42,7 @@ public class PortuguesePortugal implements Language {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Olá, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...és mesmo tu? Há quanto tempo!"))
                     .then(new Message("Que bom ter-te de volta! Interessado em alguma recomendação?"));

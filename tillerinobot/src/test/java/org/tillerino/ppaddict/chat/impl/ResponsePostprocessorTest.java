@@ -26,12 +26,11 @@ import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
-import org.tillerino.ppaddict.util.MdcUtils.MdcAttributes;
 import org.tillerino.ppaddict.util.PhaseTimer;
 
 public class ResponsePostprocessorTest {
     @Spy
-    private LocalGameChatMetrics botInfo = new LocalGameChatMetrics();
+    private final LocalGameChatMetrics botInfo = new LocalGameChatMetrics();
 
     @Mock
     private Bouncer bouncer;
@@ -48,13 +47,13 @@ public class ResponsePostprocessorTest {
     @InjectMocks
     private ResponsePostprocessor responsePostprocessor;
 
-    PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
+    final PrivateMessage event = new PrivateMessage(1, "nick", 2, "yo");
 
     @AutoClose
     AutoCloseable mocks = MockitoAnnotations.openMocks(this);
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         when(writer.action(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
         when(writer.message(any(), any())).thenReturn(ok(new GameChatWriter.Response(null)));
         event.getMeta().setTimer(new PhaseTimer());
@@ -104,7 +103,7 @@ public class ResponsePostprocessorTest {
     @Test
     public void testRecommendation() throws Exception {
         when(clock.currentTimeMillis()).thenReturn(159L);
-        try (MdcAttributes mdc = MdcUtils.with("handler", "r")) {
+        try (var _ = MdcUtils.with("handler", "r")) {
             responsePostprocessor.onResponse(new Success("xyz"), event);
             verify(botInfo).setLastRecommendation(159);
         }

@@ -3,7 +3,6 @@ package tillerino.tillerinobot.handlers;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import lombok.Value;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
@@ -17,11 +16,8 @@ import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 
-@Value
-public class RecentHandler implements CommandHandler {
-    PullThrough pullThrough;
-    DiffEstimateProvider diffEstimateProvider;
-
+public record RecentHandler(PullThrough pullThrough, DiffEstimateProvider diffEstimateProvider)
+        implements CommandHandler {
     @Override
     public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language language)
             throws UserException, IOException, SQLException, InterruptedException {
@@ -40,7 +36,7 @@ public class RecentHandler implements CommandHandler {
 
         OsuApiScore score = recentPlays.getFirst();
 
-        final BeatmapMeta estimates = diffEstimateProvider.loadBeatmap(score.getBeatmapId(), score.getMods(), language);
+        final BeatmapMeta estimates = diffEstimateProvider.loadBeatmap(score.getBeatmapId(), score.getMods());
 
         if (estimates == null) {
             throw new UserException(language.unknownBeatmap());

@@ -10,13 +10,13 @@ import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.data.PullThrough;
 
 public class DebugHandlerTest {
-    PullThrough pullThrough = Mockito.mock(PullThrough.class);
+    final PullThrough pullThrough = Mockito.mock(PullThrough.class);
 
-    IrcNameResolver resolver = Mockito.mock(IrcNameResolver.class);
+    final IrcNameResolver resolver = Mockito.mock(IrcNameResolver.class);
 
-    DebugHandler handler = new DebugHandler(pullThrough, resolver);
+    final DebugHandler handler = new DebugHandler(pullThrough, resolver);
 
-    UserData userData = new UserData();
+    final UserData userData = new UserData();
 
     @BeforeEach
     public void initMocks() {

@@ -33,7 +33,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
         // Greetings for <4 minutes, normal, and >4 days
         if (inactiveTime < 4 * 60 * 1000) {
             greeting = getInactiveShortGreeting(username, inactiveTime);
-        } else if (inactiveTime < 4l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime < 4L * 24 * 60 * 60 * 1000) {
             greeting = getInactiveGreeting(username, inactiveTime);
         } else {
             greeting = getInactiveLongGreeting(username, inactiveTime);

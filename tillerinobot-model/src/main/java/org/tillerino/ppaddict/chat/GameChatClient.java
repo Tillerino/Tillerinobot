@@ -12,8 +12,8 @@ public interface GameChatClient {
 
     @JsonTypeInfo(use = Id.MINIMAL_CLASS)
     sealed interface Error {
-        public record Timeout() implements Error {}
+        record Timeout() implements Error {}
 
-        public record Unknown() implements Error {}
+        record Unknown() implements Error {}
     }
 }

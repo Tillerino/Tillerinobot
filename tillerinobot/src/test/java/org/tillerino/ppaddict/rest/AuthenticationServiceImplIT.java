@@ -26,7 +26,7 @@ public class AuthenticationServiceImplIT {
     }
 
     @RegisterExtension
-    public MockServerRule mockServer = new MockServerRule();
+    public final MockServerRule mockServer = new MockServerRule();
 
     @Inject
     AuthenticationService auth;
@@ -39,17 +39,17 @@ public class AuthenticationServiceImplIT {
     }
 
     @Test
-    public void testPositive() throws Exception {
+    public void testPositive() {
         assertThat(auth.getAuthorization("regular")).hasFieldOrPropertyWithValue("admin", false);
     }
 
     @Test
-    public void testNegative() throws Exception {
+    public void testNegative() {
         assertThatThrownBy(() -> auth.getAuthorization("garbage")).isInstanceOf(NotAuthorizedException.class);
     }
 
     @Test
-    public void testAdmin() throws Exception {
+    public void testAdmin() {
         assertThat(auth.getAuthorization("adminKey")).hasFieldOrPropertyWithValue("admin", true);
     }
 }

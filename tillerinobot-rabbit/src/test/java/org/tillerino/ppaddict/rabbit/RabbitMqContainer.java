@@ -22,7 +22,7 @@ public class RabbitMqContainer {
             .withNetwork(NETWORK)
             .withNetworkAliases("rabbitmq")
             .withReuse(true)
-            .withLogConsumer(new Consumer<OutputFrame>() {
+            .withLogConsumer(new Consumer<>() {
                 // this logger makes sure that we don't output old logs from the reusable container.
 
                 boolean trip = false;

@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict.chat.local;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -45,8 +44,8 @@ public class LocalGameChatEventQueueTest {
 
     private Future<?> queueRunner;
 
-    PrivateMessage event0 = new PrivateMessage(0, "sender", 125, "hello");
-    PrivateMessage event1 = new PrivateMessage(1, "sender", 125, "hello");
+    final PrivateMessage event0 = new PrivateMessage(0, "sender", 125, "hello");
+    final PrivateMessage event1 = new PrivateMessage(1, "sender", 125, "hello");
 
     @BeforeEach
     public void before() {
@@ -70,7 +69,7 @@ public class LocalGameChatEventQueueTest {
 
     @Test
     public void testMdc() throws Exception {
-        try (MdcAttributes mdc = MdcUtils.with("someKey", "someVal")) {
+        try (MdcAttributes _ = MdcUtils.with("someKey", "someVal")) {
             doAnswer(x -> {
                         assertThat(MDC.get("someKey")).isEqualTo("someVal");
                         return null;
@@ -100,9 +99,9 @@ public class LocalGameChatEventQueueTest {
     @Test
     public void queueSizeEventuallyReachesZero() throws Exception {
         List<CountDownLatch> arrived =
-                IntStream.range(0, 2).mapToObj(x -> new CountDownLatch(1)).collect(toList());
+                IntStream.range(0, 2).mapToObj(x -> new CountDownLatch(1)).toList();
         List<CountDownLatch> leavePlease =
-                IntStream.range(0, 2).mapToObj(x -> new CountDownLatch(1)).collect(toList());
+                IntStream.range(0, 2).mapToObj(x -> new CountDownLatch(1)).toList();
 
         doAnswer(x -> {
                     arrived.get((int) ((GameChatEvent) x.getArgument(0)).getEventId())

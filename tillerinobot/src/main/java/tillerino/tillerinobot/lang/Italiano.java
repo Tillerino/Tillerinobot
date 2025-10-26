@@ -44,7 +44,7 @@ public class Italiano extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Bentornato, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...sei davvero tu? È passato così tanto tempo!"))
                     .then(new Message("È bello rivederti. Ti interessa una raccomandazione?"));

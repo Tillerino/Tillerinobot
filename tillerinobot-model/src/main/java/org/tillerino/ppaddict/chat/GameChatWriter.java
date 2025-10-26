@@ -2,7 +2,6 @@ package org.tillerino.ppaddict.chat;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import java.io.IOException;
 import org.tillerino.ppaddict.rabbit.Rpc;
 import org.tillerino.ppaddict.util.Result;
 
@@ -15,8 +14,7 @@ public interface GameChatWriter {
      * @param recipient the recipient of the message
      */
     @Rpc(queue = "irc_writer", timeout = 12000)
-    Result<Response, Error> message(String response, @IRCName String recipient)
-            throws InterruptedException, IOException;
+    Result<Response, Error> message(String response, @IRCName String recipient);
 
     /**
      * Responds with an "action", a special kind of direct message.
@@ -25,18 +23,18 @@ public interface GameChatWriter {
      * @param recipient the recipient of the action
      */
     @Rpc(queue = "irc_writer", timeout = 12000)
-    Result<Response, Error> action(String response, @IRCName String recipient) throws InterruptedException, IOException;
+    Result<Response, Error> action(String response, @IRCName String recipient);
 
     @JsonTypeInfo(use = Id.MINIMAL_CLASS)
     sealed interface Error {
-        public record Timeout() implements Error {}
+        record Timeout() implements Error {}
 
-        public record Unknown() implements Error {}
+        record Unknown() implements Error {}
 
-        public record Retry(int millis) implements Error {}
+        record Retry(int millis) implements Error {}
 
-        public record PingDeath(long millis) implements Error {}
+        record PingDeath(long millis) implements Error {}
     }
 
-    public record Response(Long ping) {}
+    record Response(Long ping) {}
 }

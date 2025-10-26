@@ -38,7 +38,7 @@ public class LocalGameChatResponseQueueTest {
     private LocalGameChatResponseQueue queue;
 
     @AutoClose
-    private AutoCloseable mocks = MockitoAnnotations.openMocks(this);
+    private final AutoCloseable mocks = MockitoAnnotations.openMocks(this);
 
     @RegisterExtension
     public final ExecutorServiceRule exec = ExecutorServiceRule.singleThread("response-queue");
@@ -48,7 +48,7 @@ public class LocalGameChatResponseQueueTest {
     private final PrivateMessage event = new PrivateMessage(1, "nick", 123, "lo");
 
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDown() {
         queueFuture.cancel(true);
     }
 
@@ -103,7 +103,7 @@ public class LocalGameChatResponseQueueTest {
                 .onResponse(any(), any());
 
         queueFuture = exec.submit(queue);
-        try (MdcAttributes mdc = MdcUtils.with("someKey", "someVal")) {
+        try (MdcAttributes _ = MdcUtils.with("someKey", "someVal")) {
             queue.onResponse(GameChatResponse.none(), event);
         }
 

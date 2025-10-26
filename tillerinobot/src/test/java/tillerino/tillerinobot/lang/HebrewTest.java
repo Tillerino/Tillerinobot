@@ -10,11 +10,11 @@ import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
 
 public class HebrewTest {
-    Hebrew lang = new Hebrew();
+    final Hebrew lang = new Hebrew();
 
-    OsuApiUser apiUser = mock(OsuApiUser.class);
+    final OsuApiUser apiUser = mock(OsuApiUser.class);
 
-    boolean print = false;
+    final boolean print = false;
 
     @BeforeEach
     public void setupMocks() {
@@ -22,169 +22,169 @@ public class HebrewTest {
     }
 
     @Test
-    public void testUnknownBeatmap() throws Exception {
+    public void testUnknownBeatmap() {
         println("unknownBeatmap");
         println(lang.unknownBeatmap());
     }
 
     @Test
-    public void testInternalException() throws Exception {
+    public void testInternalException() {
         println("internalException");
         println(lang.internalException("gd67ad678"));
     }
 
     @Test
-    public void testExternalException() throws Exception {
+    public void testExternalException() {
         println("externalException");
         println(lang.externalException("gd56dd"));
     }
 
     @Test
-    public void testNoInformationForModsShort() throws Exception {
+    public void testNoInformationForModsShort() {
         println("noInformationForModsShort");
         println(lang.noInformationForModsShort());
     }
 
     @Test
-    public void testWelcomeUser() throws Exception {
+    public void testWelcomeUser() {
         println("welcomeUser 10 seconds");
         println(lang.welcomeUser(apiUser, 10 * 1000));
         println("welcomeUser 5 hours");
         println(lang.welcomeUser(apiUser, 5 * 3600 * 1000));
         println("welcomeUser 2 days");
-        println(lang.welcomeUser(apiUser, 2l * 24 * 3600 * 1000));
+        println(lang.welcomeUser(apiUser, 2L * 24 * 3600 * 1000));
         println("welcomeUser 10 days");
-        println(lang.welcomeUser(apiUser, 10l * 24 * 3600 * 1000));
+        println(lang.welcomeUser(apiUser, 10L * 24 * 3600 * 1000));
     }
 
     @Test
-    public void testUnknownCommand() throws Exception {
+    public void testUnknownCommand() {
         println("unknownBeatmap");
         println(lang.unknownBeatmap());
     }
 
     @Test
-    public void testNoInformationForMods() throws Exception {
+    public void testNoInformationForMods() {
         println("noInformationForMods");
         println(lang.noInformationForMods());
     }
 
     @Test
-    public void testMalformattedMods() throws Exception {
+    public void testMalformattedMods() {
         println("malformattedMods");
         println(lang.malformattedMods("DZ+ET"));
     }
 
     @Test
-    public void testNoLastSongInfo() throws Exception {
+    public void testNoLastSongInfo() {
         println("noLastSongInfo");
         println(lang.noLastSongInfo());
     }
 
     @Test
-    public void testTryWithMods() throws Exception {
+    public void testTryWithMods() {
         println("tryWithMods unspecific");
         println(lang.tryWithMods());
     }
 
     @Test
-    public void testTryWithModsSpecific() throws Exception {
+    public void testTryWithModsSpecific() {
         println("tryWithMods specific");
         println(lang.tryWithMods(Arrays.asList(Mods.Hidden, Mods.HardRock)));
     }
 
     @Test
-    public void testExcuseForError() throws Exception {
+    public void testExcuseForError() {
         println("excuseForError");
         println(lang.excuseForError());
     }
 
     @Test
-    public void testComplaint() throws Exception {
+    public void testComplaint() {
         println("complaint");
         println(lang.complaint());
     }
 
     @Test
-    public void testHug() throws Exception {
+    public void testHug() {
         println("hug");
         println(lang.hug(apiUser));
     }
 
     @Test
-    public void testHelp() throws Exception {
+    public void testHelp() {
         println("help");
         println(lang.help());
     }
 
     @Test
-    public void testFaq() throws Exception {
+    public void testFaq() {
         println("faq");
         println(lang.faq());
     }
 
     @Test
-    public void testFeatureRankRestricted() throws Exception {
+    public void testFeatureRankRestricted() {
         println("featureRankRestricted");
         println(lang.featureRankRestricted("gamma", 100000, apiUser));
     }
 
     @Test
-    public void testMixedNomodAndMods() throws Exception {
+    public void testMixedNomodAndMods() {
         println("mixedNomodAndMods");
         println(lang.mixedNomodAndMods());
     }
 
     @Test
-    public void testOutOfRecommendations() throws Exception {
+    public void testOutOfRecommendations() {
         println("outOfRecommendations");
         println(lang.outOfRecommendations());
     }
 
     @Test
-    public void testNotRanked() throws Exception {
+    public void testNotRanked() {
         println("notRanked");
         println(lang.notRanked());
     }
 
     @Test
-    public void testOptionalCommentOnNP() throws Exception {
+    public void testOptionalCommentOnNP() {
         println("optionalCommentOnNP");
         println(lang.optionalCommentOnNP(apiUser, null));
     }
 
     @Test
-    public void testOptionalCommentOnWith() throws Exception {
+    public void testOptionalCommentOnWith() {
         println("optionalCommentOnWith");
         println(lang.optionalCommentOnWith(apiUser, null));
     }
 
     @Test
-    public void testOptionalCommentOnRecommendation() throws Exception {
+    public void testOptionalCommentOnRecommendation() {
         println("optionalCommentOnRecommendation");
         println(lang.optionalCommentOnRecommendation(apiUser, null));
     }
 
     @Test
-    public void testInvalidAccuracy() throws Exception {
+    public void testInvalidAccuracy() {
         println("invalidAccuracy");
         println(lang.invalidAccuracy("lOl.3%"));
     }
 
     @Test
-    public void testOptionalCommentOnLanguage() throws Exception {
+    public void testOptionalCommentOnLanguage() {
         println("optionalCommentOnLanguage");
         println(lang.optionalCommentOnLanguage(apiUser));
     }
 
     @Test
-    public void testInvalidChoice() throws Exception {
+    public void testInvalidChoice() {
         println("invalidChoice");
         println(lang.invalidChoice("ice cream", "cookies, chocolate"));
     }
 
     @Test
-    public void testSetFormat() throws Exception {
+    public void testSetFormat() {
         println("setFormat");
         println(lang.setFormat());
     }

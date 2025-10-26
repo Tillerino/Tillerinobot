@@ -27,15 +27,14 @@ public class Loader<T> implements AutoCloseable {
             throws SQLException {
         Mapping<? extends T> mapping = Mapping.getOrCreateMapping(cls);
         String fullQuery = "select " + mapping.fields() + " from `" + mapping.table() + "` " + query;
-        return getLoaderFullQuery(conn, cls, stream, mapping, fullQuery);
+        return getLoaderFullQuery(conn, stream, mapping, fullQuery);
     }
 
     @SuppressFBWarnings(
             value = "OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE",
             justification = "We instead make sure that the statment is closed.")
     private static <T> Loader<T> getLoaderFullQuery(
-            Database conn, Class<? extends T> cls, boolean stream, Mapping<? extends T> mapping, String fullQuery)
-            throws SQLException {
+            Database conn, boolean stream, Mapping<? extends T> mapping, String fullQuery) throws SQLException {
         PreparedStatement statement;
         if (stream) {
             statement = conn.connection()
@@ -63,7 +62,7 @@ public class Loader<T> implements AutoCloseable {
         // execute right away, not in lambda for earlier error messages
         final ResultSet set = statement.executeQuery();
 
-        return () -> new ResultSetIterator(set, mapping);
+        return () -> new ResultSetIterator<>(set, mapping);
     }
 
     public List<T> queryList(Object... parameters) throws SQLException {
@@ -73,8 +72,7 @@ public class Loader<T> implements AutoCloseable {
     /**
      * returns one result from the query
      *
-     * @param params
-     * @return null if there are no results
+     * @return empty if there are no results
      * @throws SQLException on general SQLException or if result was not unique
      */
     @NonNull
@@ -121,7 +119,10 @@ public class Loader<T> implements AutoCloseable {
         StringBuilder query = new StringBuilder();
 
         for (int i = 0; i < keyColumns.length; i++) {
-            query.append((i > 0 ? " and " : "where ") + "`" + keyColumns[i] + "` = ?");
+            query.append(i > 0 ? " and " : "where ")
+                    .append("`")
+                    .append(keyColumns[i])
+                    .append("` = ?");
         }
         return query.toString();
     }

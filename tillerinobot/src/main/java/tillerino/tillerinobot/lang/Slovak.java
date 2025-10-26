@@ -48,7 +48,7 @@ public class Slovak extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Vitaj späť, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...si to ty? Tak dlho som ťa nevidel!"))
                     .then(new Message("To je super, že si späť. Nechcel by si nejaké odporúčanie?"));

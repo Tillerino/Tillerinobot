@@ -57,7 +57,7 @@ public class PersisterTest extends AbstractDatabaseTest {
         SimpleKey player3 = new SimpleKey(3, "ghi");
 
         try (Loader<SimpleKey> loader = db.loader(SimpleKey.class, " order by `myKey`")) {
-            try (Persister<SimpleKey> persister = db.persister(SimpleKey.class, Action.INSERT); ) {
+            try (Persister<SimpleKey> persister = db.persister(SimpleKey.class, Action.INSERT)) {
                 persister.persist(player1, 2);
 
                 assertEquals(Collections.emptyList(), toList(loader.query()));
@@ -73,22 +73,6 @@ public class PersisterTest extends AbstractDatabaseTest {
 
             assertEquals(Arrays.asList(player1, player2, player3), toList(loader.query()));
         }
-    }
-
-    @Data
-    @Table("composite_key")
-    @KeyColumn({"myKey", "additionalKey"})
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CompositeKey {
-        int myKey;
-
-        long additionalKey;
-
-        String additionalProperty;
-
-        static final String TABLE_DEF =
-                "CREATE TABLE IF NOT EXISTS `composite_key` (`myKey` int, `additionalKey` int, `additionalProperty` text)";
     }
 
     <T> List<T> toList(Iterable<T> iterable) {

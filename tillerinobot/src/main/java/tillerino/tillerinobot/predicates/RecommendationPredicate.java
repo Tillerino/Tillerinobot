@@ -18,5 +18,5 @@ public interface RecommendationPredicate {
      */
     Optional<String> findNonPredicateContradiction(RecommendationRequest request);
 
-    String getOriginalArgument();
+    String originalArgument();
 }

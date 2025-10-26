@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Closeable;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
@@ -159,7 +158,7 @@ public class UserDataManager {
         @Getter
         private transient @UserId int userid;
 
-        public int getHearts() throws SQLException, IOException {
+        public int getHearts() {
             return manager.backend.getDonator(userid);
         }
 

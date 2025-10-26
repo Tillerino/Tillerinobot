@@ -68,7 +68,7 @@ public record Mapping<T>(
 
     private static final Map<Class<?>, Mapping<?>> mappings = new ConcurrentHashMap<>();
 
-    void set(Object obj, PreparedStatement statement) throws SQLException {
+    void set(Object obj, PreparedStatement statement) {
         for (FieldManager<?> fieldManager : fieldManagers) {
             try {
                 fieldManager.toStatement(obj, statement);
@@ -78,7 +78,7 @@ public record Mapping<T>(
         }
     }
 
-    void get(Object obj, ResultSet resultSet) throws SQLException {
+    void get(Object obj, ResultSet resultSet) {
         for (FieldManager<?> fieldManager : fieldManagers) {
             try {
                 fieldManager.fromResultSet(obj, resultSet);
@@ -103,7 +103,7 @@ public record Mapping<T>(
                 .collect(joining(", "));
         String questionMarks = fieldManagers.stream().map(sg -> "?").collect(joining(", "));
 
-        Constructor<T> constructor = null;
+        Constructor<T> constructor;
         try {
             constructor = cls.getConstructor();
         } catch (ReflectiveOperationException e) {
@@ -153,7 +153,7 @@ public record Mapping<T>(
         if (pc == null) {
             throw new RuntimeException("Table annotation not present on " + cls);
         }
-        if (pc.value().length() == 0) {
+        if (pc.value().isEmpty()) {
             throw new RuntimeException("must provide table name in Table annotation");
         }
         return pc.value();
@@ -161,7 +161,7 @@ public record Mapping<T>(
 
     private static String getColumnName(Field f) {
         Column p = f.getAnnotation(Column.class);
-        if (p != null && p.value().length() > 0) {
+        if (p != null && !p.value().isEmpty()) {
             return p.value();
         }
         return f.getName();
@@ -188,7 +188,7 @@ public record Mapping<T>(
             @SuppressWarnings("unchecked")
             TypeHandler<T> typeHandler = (TypeHandler<T>) typeHandlers.get(f.getType());
             if (typeHandler == null) {
-                throw new RuntimeException(f.getName() + "" + f.getType() + "");
+                throw new RuntimeException(f.getName() + f.getType());
             }
 
             if (Modifier.isPublic(f.getModifiers())) {

@@ -10,7 +10,7 @@ import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
 
 public class CommandHandlerTest {
-    UserData userData = new UserData();
+    final UserData userData = new UserData();
 
     boolean called_b, called_c;
 
@@ -19,7 +19,7 @@ public class CommandHandlerTest {
         userData.setLanguage(LanguageIdentifier.Default);
     }
 
-    CommandHandler handler = CommandHandler.handling(
+    final CommandHandler handler = CommandHandler.handling(
             "A ",
             CommandHandler.alwaysHandling("B", (a, c, d, lang) -> {
                         called_b = true;
@@ -31,7 +31,7 @@ public class CommandHandlerTest {
                     })));
 
     @Test
-    public void testNestedChoices() throws Exception {
+    public void testNestedChoices() {
         assertEquals("A (B|C)", handler.getChoices());
     }
 
@@ -41,7 +41,7 @@ public class CommandHandlerTest {
     }
 
     @Test
-    public void testNoNestedChoice() throws Exception {
+    public void testNoNestedChoice() {
         assertThrows(UserException.class, () -> handler.handle("A X", null, userData, new Default()));
     }
 

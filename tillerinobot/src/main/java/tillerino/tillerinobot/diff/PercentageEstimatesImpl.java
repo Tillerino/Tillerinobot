@@ -30,7 +30,7 @@ public class PercentageEstimatesImpl implements PercentageEstimates {
     public double getPP(double acc, int combo, int misses) throws UserException {
         AccuracyDistribution dist = AccuracyDistribution.model(beatmap.getObjectCount(), misses, acc);
 
-        return getPP(dist.getX100(), dist.getX50(), combo, dist.getMiss());
+        return getPP(dist.x100(), dist.x50(), combo, dist.miss());
     }
 
     @Override

@@ -41,7 +41,7 @@ public class ChineseTraditional extends AbstractMutableLanguage {
             return new Message("哈囉!");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("歡迎回來!， " + apiUser.getUserName() + "。");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("好久不見了呢!"))
                     .then(new Message("很高興看到你回來，需要我推薦你幾首歌重溫感覺嗎?"));

@@ -43,7 +43,7 @@ public class Francais implements Language {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Re ! :)");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...c'est vraiment toi ? Cela fait si longtemps ! :o"))
                     .then(new Message("Heureux de te revoir " + apiUser.getUserName()

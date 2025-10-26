@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class JoinedTest {
     @Test
-    public void notInteractive() throws Exception {
+    public void notInteractive() {
         assertThat(new Joined(123, "", 456)).hasFieldOrPropertyWithValue("interactive", false);
     }
 }

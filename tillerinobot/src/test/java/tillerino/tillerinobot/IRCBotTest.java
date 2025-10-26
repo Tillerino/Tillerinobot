@@ -1,16 +1,10 @@
 package tillerino.tillerinobot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import dagger.Component;
 import jakarta.ws.rs.InternalServerErrorException;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -97,9 +91,9 @@ public class IRCBotTest extends AbstractDatabaseTest {
     @RegisterExtension
     public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
 
-    RateLimiter rateLimiter = new RateLimiter();
+    final RateLimiter rateLimiter = new RateLimiter();
 
-    TestOsutrackDownloader osuTrackDownloader = spy(new TestOsutrackDownloader());
+    final TestOsutrackDownloader osuTrackDownloader = spy(new TestOsutrackDownloader());
 
     @Inject
     TestBackend backend;
@@ -140,7 +134,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
     @Inject
     PlayerService playerService;
 
-    boolean printResponses = false;
+    final boolean printResponses = false;
 
     private IRCBot bot;
 
@@ -234,12 +228,12 @@ public class IRCBotTest extends AbstractDatabaseTest {
                 .getLastActivity(any(OsuApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), new Message("Welcome back, TheDonator."));
 
-        doReturn(System.currentTimeMillis() - 2l * 24 * 60 * 60 * 1000)
+        doReturn(System.currentTimeMillis() - 2L * 24 * 60 * 60 * 1000)
                 .when(playerService)
                 .getLastActivity(any(OsuApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator, "));
 
-        doReturn(System.currentTimeMillis() - 8l * 24 * 60 * 60 * 1000)
+        doReturn(System.currentTimeMillis() - 8L * 24 * 60 * 60 * 1000)
                 .when(playerService)
                 .getLastActivity(any(OsuApiUser.class));
         verifyResponse(
@@ -392,7 +386,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
                         "osu!track doesn't seem to be working right now. Maybe try your luck on the website: https://ameobea.me/osutrack/"));
     }
 
-    void turnOffVersionMessage() throws SQLException, UserException {
+    void turnOffVersionMessage() {
         doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
     }
 
@@ -400,15 +394,15 @@ public class IRCBotTest extends AbstractDatabaseTest {
     public void testAutomaticNameChangeRemapping() throws Exception {
         doReturn(user(1, "user1 old")).when(pullThrough).downloadUser("user1_old");
         doReturn(user(1, "user1 old")).when(pullThrough).getUser(eq(1), anyLong());
-        assertEquals(1, (int) bot.getUserOrThrow("user1_old").getUserId());
+        assertEquals(1, bot.getUserOrThrow("user1_old").getUserId());
 
         // meanwhile, user 1 changed her name
         doReturn(user(1, "user1 new")).when(pullThrough).getUser(eq(1), anyLong());
         // and user 2 hijacked her old name
         doReturn(user(2, "user1 old")).when(pullThrough).downloadUser("user1_old");
 
-        assertEquals(2, (int) bot.getUserOrThrow("user1_old").getUserId());
-        assertEquals(1, (int) bot.getUserOrThrow("user1_new").getUserId());
+        assertEquals(2, bot.getUserOrThrow("user1_old").getUserId());
+        assertEquals(1, bot.getUserOrThrow("user1_new").getUserId());
     }
 
     @Test
@@ -495,7 +489,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
         return new GameChatResponse() {
             @Override
             public boolean equals(Object arg0) {
-                return arg0 instanceof Message msg && msg.content().contains(s);
+                return arg0 instanceof Message(String content) && content.contains(s);
             }
 
             @Override
@@ -514,7 +508,7 @@ public class IRCBotTest extends AbstractDatabaseTest {
         return new GameChatResponse() {
             @Override
             public boolean equals(Object arg0) {
-                return arg0 instanceof Success suc && suc.content().contains(s);
+                return arg0 instanceof Success(String content) && content.contains(s);
             }
 
             @Override

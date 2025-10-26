@@ -41,7 +41,7 @@ public class Hungarian extends AbstractMutableLanguage {
             return new Message("bíp búp");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Üdv. újra, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...te vagy az? Olyan rég láttalak!"))
                     .then(new Message("Jó hogy visszajöttél. Küldhetek egy ajánlást?"));

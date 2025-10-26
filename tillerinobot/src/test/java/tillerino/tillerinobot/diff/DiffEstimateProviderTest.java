@@ -11,7 +11,6 @@ import com.github.omkelderman.sandoku.DiffResult;
 import com.github.omkelderman.sandoku.ProcessorApi;
 import dagger.Component;
 import dagger.Module;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -163,7 +162,7 @@ public class DiffEstimateProviderTest extends AbstractDatabaseTest {
     }
 
     private void setUpOutdatedVersionDiffEstimate(Database database, String beatmapContent, int beatmapId)
-            throws SQLException, IOException {
+            throws SQLException {
         ActualBeatmap actualBeatmap = new ActualBeatmap();
         actualBeatmap.setBeatmapid(beatmapId);
         actualBeatmap.setContent(beatmapContent.getBytes());

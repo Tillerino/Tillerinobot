@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 /** @author Tillerino */
 public class BotApiDefinition extends Application {
-    Set<Object> resourceInstances = new HashSet<>();
+    final Set<Object> resourceInstances = new HashSet<>();
 
     @Inject
     public BotApiDefinition(

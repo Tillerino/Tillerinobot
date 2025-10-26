@@ -10,37 +10,37 @@ public class GameChatResponseTest {
     static class Aresponse implements GameChatResponse {
         @Override
         public Iterable<GameChatResponse> flatten() {
-            return Collections.singletonList((GameChatResponse) this);
+            return Collections.singletonList(this);
         }
     }
 
     @Test
-    public void noneAndThenSomething() throws Exception {
+    public void noneAndThenSomething() {
         Aresponse something = new Aresponse();
         assertThat(none().then(something).flatten()).contains(something);
     }
 
     @Test
-    public void somethingAndThenNone() throws Exception {
+    public void somethingAndThenNone() {
         Aresponse something = new Aresponse();
         assertThat(something.then(none()).flatten()).contains(something);
     }
 
     @Test
-    public void somethingAndThenNull() throws Exception {
+    public void somethingAndThenNull() {
         Aresponse something = new Aresponse();
         assertThat(something.then(null).flatten()).contains(something);
     }
 
     @Test
-    public void somethingAndThenSomethingElse() throws Exception {
+    public void somethingAndThenSomethingElse() {
         Aresponse something = new Aresponse();
         Aresponse somethingElse = new Aresponse();
         assertThat(something.then(somethingElse).flatten()).containsExactly(something, somethingElse);
     }
 
     @Test
-    public void somethingAndThenList() throws Exception {
+    public void somethingAndThenList() {
         Aresponse something = new Aresponse();
         Aresponse somethingElse = new Aresponse();
         Aresponse evenMore = new Aresponse();
@@ -49,7 +49,7 @@ public class GameChatResponseTest {
     }
 
     @Test
-    public void listAndThenSomething() throws Exception {
+    public void listAndThenSomething() {
         Aresponse something = new Aresponse();
         Aresponse somethingElse = new Aresponse();
         Aresponse evenMore = new Aresponse();
@@ -58,18 +58,18 @@ public class GameChatResponseTest {
     }
 
     @Test
-    public void noneIsNoneAndNotNoneIsNotNone() throws Exception {
+    public void noneIsNoneAndNotNoneIsNotNone() {
         assertThat(none().isNone()).isTrue();
         assertThat(new Aresponse().isNone()).isFalse();
     }
 
     @Test
-    public void noneHasEmptyIterator() throws Exception {
+    public void noneHasEmptyIterator() {
         assertThat(none().flatten()).isEmpty();
     }
 
     @Test
-    public void noneToString() throws Exception {
+    public void noneToString() {
         assertThat(none().toString()).isEqualTo("[No Response]");
     }
 }

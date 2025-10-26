@@ -10,32 +10,32 @@ import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestClock;
 
 public class BouncerTest {
-    Clock clock = new TestClock();
+    final Clock clock = new TestClock();
 
-    Bouncer bouncer = new Bouncer(clock);
+    final Bouncer bouncer = new Bouncer(clock);
 
     @Test
-    public void testEnter() throws Exception {
+    public void testEnter() {
         assertTrue(bouncer.tryEnter("nick", 1));
         assertThat(bouncer.get("nick")).contains(new SemaphorePayload(1, 0, 0, false));
     }
 
     @Test
-    public void testRepeatedDenied() throws Exception {
+    public void testRepeatedDenied() {
         assertTrue(bouncer.tryEnter("it's a me", 1));
         assertFalse(bouncer.tryEnter("it's a me", 2));
         assertThat(bouncer.get("it's a me").get()).hasFieldOrPropertyWithValue("attemptsSinceEntered", 1);
     }
 
     @Test
-    public void testOkAfterLeaving() throws Exception {
+    public void testOkAfterLeaving() {
         assertTrue(bouncer.tryEnter("it's a me", 1));
         assertTrue(bouncer.exit("it's a me", 1));
         assertTrue(bouncer.tryEnter("it's a me", 2));
     }
 
     @Test
-    public void testFalseExit() throws Exception {
+    public void testFalseExit() {
         assertFalse(bouncer.exit("it's a me", 1));
         assertTrue(bouncer.tryEnter("it's a me", 1));
         assertFalse(bouncer.exit("it's a me", 2));

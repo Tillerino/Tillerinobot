@@ -23,7 +23,7 @@ public class LocalGameChatMetrics extends GameChatClientMetrics {
 
     @org.mapstruct.Mapper
     public interface Mapper {
-        static final Mapper INSTANCE = Mappers.getMapper(Mapper.class);
+        Mapper INSTANCE = Mappers.getMapper(Mapper.class);
 
         void loadFromBot(GameChatClientMetrics source, @MappingTarget GameChatClientMetrics target);
 

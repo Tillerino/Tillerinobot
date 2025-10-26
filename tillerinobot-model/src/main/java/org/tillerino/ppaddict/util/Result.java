@@ -39,21 +39,21 @@ public sealed interface Result<T, E> {
     default Optional<T> ok() {
         return switch (this) {
             case Ok<T, E> ok -> Optional.of(ok.t);
-            case Err<T, E> err -> Optional.empty();
+            case Err<T, E> _ -> Optional.empty();
         };
     }
 
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     default Optional<E> err() {
         return switch (this) {
-            case Ok<T, E> ok -> Optional.empty();
+            case Ok<T, E> _ -> Optional.empty();
             case Err<T, E> err -> Optional.of(err.e);
         };
     }
 
     default Result<T, E> inspect(Consumer<T> f) {
-        if (this instanceof Ok<T, E> ok) {
-            f.accept(ok.t);
+        if (this instanceof Ok<T, E>(T t)) {
+            f.accept(t);
         }
         return this;
     }
@@ -66,8 +66,8 @@ public sealed interface Result<T, E> {
     }
 
     default T unwrapOr(T def) {
-        if (this instanceof Ok<T, E> ok) {
-            return ok.t;
+        if (this instanceof Ok<T, E>(T t)) {
+            return t;
         } else return def;
     }
 

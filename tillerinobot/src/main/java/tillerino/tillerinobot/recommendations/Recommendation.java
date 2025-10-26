@@ -1,6 +1,5 @@
 package tillerino.tillerinobot.recommendations;
 
-import lombok.RequiredArgsConstructor;
 import tillerino.tillerinobot.BeatmapMeta;
 
 /**
@@ -8,9 +7,4 @@ import tillerino.tillerinobot.BeatmapMeta;
  *
  * @author Tillerino
  */
-@RequiredArgsConstructor
-public class Recommendation {
-    public final BeatmapMeta beatmap;
-
-    public final BareRecommendation bareRecommendation;
-}
+public record Recommendation(BeatmapMeta beatmap, BareRecommendation bareRecommendation) {}

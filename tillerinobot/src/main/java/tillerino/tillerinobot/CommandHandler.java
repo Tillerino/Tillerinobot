@@ -17,18 +17,17 @@ public interface CommandHandler {
      * A special command handler, which will handle any input. It will at most throw a {@link UserException} if the
      * input is somehow invalid.
      */
-    public interface AnyCommandHandler {
+    interface AnyCommandHandler {
         /**
          * @param command the command <i>excluding</i> the leading exclamation mark if there was one.
          * @param apiUser the requesting user's api object.
          * @param userData the requesting user's data.
          * @param lang the requesting user's language.
-         * @return null if the command was not handled
-         * @throws UserException if the input is invalid
+         * @return never null
          */
         @Nonnull
-        public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
-                throws UserException, IOException, SQLException, InterruptedException;
+        GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+                throws IOException, SQLException, InterruptedException;
     }
 
     /**
@@ -40,10 +39,10 @@ public interface CommandHandler {
      * @throws UserException if the input is invalid
      */
     @CheckForNull
-    public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+    GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
             throws UserException, IOException, SQLException, InterruptedException;
 
-    public default CommandHandler or(CommandHandler next) {
+    default CommandHandler or(CommandHandler next) {
         CommandHandler me = this;
         return new CommandHandler() {
             @Override
@@ -64,7 +63,7 @@ public interface CommandHandler {
     }
 
     @Nonnull
-    public default String getChoices() {
+    default String getChoices() {
         return "(unknown)";
     }
 
@@ -77,7 +76,7 @@ public interface CommandHandler {
      *     be passed to this handler.
      * @return the modified handler.
      */
-    public static CommandHandler handling(String start, CommandHandler underlying) {
+    static CommandHandler handling(String start, CommandHandler underlying) {
         return new CommandHandler() {
             @Override
             public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
@@ -110,11 +109,11 @@ public interface CommandHandler {
      *     be passed to this handler.
      * @return the modified handler.
      */
-    public static CommandHandler alwaysHandling(String start, AnyCommandHandler underlying) {
+    static CommandHandler alwaysHandling(String start, AnyCommandHandler underlying) {
         return new CommandHandler() {
             @Override
             public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
-                    throws UserException, IOException, SQLException, InterruptedException {
+                    throws IOException, SQLException, InterruptedException {
                 if (!Strings.CI.startsWith(command, start)) {
                     return null;
                 }
@@ -128,7 +127,7 @@ public interface CommandHandler {
         };
     }
 
-    public abstract static class WithShorthand implements CommandHandler {
+    abstract class WithShorthand implements CommandHandler {
         private final String command;
         private final String alias;
         private final String aliasWithSpace;

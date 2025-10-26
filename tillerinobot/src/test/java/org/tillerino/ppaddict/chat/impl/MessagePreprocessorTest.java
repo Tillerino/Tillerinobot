@@ -21,17 +21,17 @@ import org.tillerino.ppaddict.chat.impl.Bouncer.SemaphorePayload;
 import org.tillerino.ppaddict.util.Clock;
 
 public class MessagePreprocessorTest {
-    Bouncer bouncer = mock(Bouncer.class);
+    final Bouncer bouncer = mock(Bouncer.class);
 
-    GameChatEventQueue queue = mock(GameChatEventQueue.class);
+    final GameChatEventQueue queue = mock(GameChatEventQueue.class);
 
-    GameChatResponseQueue responses = mock(GameChatResponseQueue.class);
+    final GameChatResponseQueue responses = mock(GameChatResponseQueue.class);
 
-    LiveActivity liveActivity = mock(LiveActivity.class);
+    final LiveActivity liveActivity = mock(LiveActivity.class);
 
-    Clock clock = mock(Clock.class);
+    final Clock clock = mock(Clock.class);
 
-    MessagePreprocessor preprocessor = new MessagePreprocessor(queue, liveActivity, bouncer, responses, clock);
+    final MessagePreprocessor preprocessor = new MessagePreprocessor(queue, liveActivity, bouncer, responses, clock);
 
     @Test
     public void testRegularMessage() throws Exception {

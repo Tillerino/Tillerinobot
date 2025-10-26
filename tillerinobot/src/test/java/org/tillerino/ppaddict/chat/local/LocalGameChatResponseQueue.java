@@ -38,7 +38,7 @@ public class LocalGameChatResponseQueue extends LoopingRunnable implements GameC
     protected void loop() throws InterruptedException {
         Pair<GameChatResponse, GameChatEvent> response = queue.take();
         botInfo.setResponseQueueSize(queue.size());
-        try (MdcAttributes mdc = response.getRight().getMeta().getMdc().apply()) {
+        try (MdcAttributes _ = response.getRight().getMeta().getMdc().apply()) {
             downstream.onResponse(response.getLeft(), response.getRight());
         } catch (InterruptedException e) {
             throw e;

@@ -42,7 +42,7 @@ public class Korean implements Language {
             return new Message("띵동");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("다시 오신 것을 환영합니다, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...당신인가요? 오랜만이네요!"))
                     .then(new Message("당신을 다시 만나게 되어 기뻐요. 몇 가지 곡을 추천해드릴까요?"));

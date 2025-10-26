@@ -44,7 +44,7 @@ public class Nederlands extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Welkom terug, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...ben jij dat? Dat is lang geleden!"))
                     .then(new Message("Het is goed om je weer te zien. Kan ik je wellicht een recommandatie geven?"));

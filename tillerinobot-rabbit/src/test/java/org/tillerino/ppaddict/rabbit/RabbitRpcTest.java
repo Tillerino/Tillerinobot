@@ -27,11 +27,11 @@ import org.tillerino.ppaddict.util.Result;
 class RabbitRpcTest {
     @RegisterExtension
     @Order(1)
-    public ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newCachedThreadPool);
+    public final ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newCachedThreadPool);
 
     @RegisterExtension
     @Order(2)
-    public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
+    public final RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(null);
 
     interface MyRpcInterface {
         @Rpc(queue = "simple_call", timeout = 1000)
@@ -151,7 +151,7 @@ class RabbitRpcTest {
     }
 
     @Test
-    public void allTheValidations() throws Exception {
+    public void allTheValidations() {
         interface Empty {}
         assertThatThrownBy(() -> RabbitRpc.remoteCallProxy(rabbit.getConnection(), Empty.class, "Timeout"))
                 .hasMessageEndingWith("Empty has no methods annotated with @Rpc.");

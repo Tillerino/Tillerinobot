@@ -1,19 +1,14 @@
 package tillerino.tillerinobot.predicates;
 
 import java.util.Optional;
-import lombok.Value;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser.PredicateBuilder;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.RecommendationRequest;
 
-@Value
-public class ExcludeMod implements RecommendationPredicate {
-    Mods mod;
-
+public record ExcludeMod(Mods mod) implements RecommendationPredicate {
     @Override
     public boolean test(BareRecommendation r, OsuApiBeatmap beatmap) {
         return !mod.is(r.mods());
@@ -25,13 +20,13 @@ public class ExcludeMod implements RecommendationPredicate {
     }
 
     @Override
-    public String getOriginalArgument() {
+    public String originalArgument() {
         return "-" + mod.getShortName();
     }
 
     public static class Builder implements PredicateBuilder<ExcludeMod> {
         @Override
-        public ExcludeMod build(String argument, Language lang) throws UserException {
+        public ExcludeMod build(String argument, Language lang) {
             if (!argument.startsWith("-")) {
                 return null;
             }

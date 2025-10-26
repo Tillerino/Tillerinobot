@@ -14,7 +14,7 @@ public class StringShufflerTest {
 
         StringShuffler shuffler = new StringShuffler(rnd);
 
-        Map<String, Integer> map = new HashMap<String, Integer>();
+        Map<String, Integer> map = new HashMap<>();
 
         for (int i = 1; i <= 100; i++) {
             String[] strings = {"a", "b", "c", "d", "e"};
@@ -42,7 +42,7 @@ public class StringShufflerTest {
     public void testInTsundere() {
         TsundereEnglish tsundere = new TsundereEnglish();
 
-        Map<String, Integer> map = new HashMap<String, Integer>();
+        Map<String, Integer> map = new HashMap<>();
 
         for (int i = 1; i <= 100; i++) {
             for (int j = 0; j < 3; j++) {

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class PrivateMessageTest {
     @Test
-    public void interactive() throws Exception {
+    public void interactive() {
         assertThat(new PrivateMessage(123, "", 456, "")).hasFieldOrPropertyWithValue("interactive", true);
     }
 }

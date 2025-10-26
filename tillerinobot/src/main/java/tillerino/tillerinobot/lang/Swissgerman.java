@@ -41,7 +41,7 @@ public class Swissgerman implements Language {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Willkomme zrugg, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...bisch du das? Ich erkenn dich fasch nüme!"))
                     .then(new Message("Schön, dass du wieder da bisch. Wie wärs mitere Empfehlig?"));

@@ -19,7 +19,7 @@ public class PredicateParser {
         T build(String argument, Language lang) throws UserException;
     }
 
-    List<PredicateBuilder<?>> builders = new ArrayList<>();
+    final List<PredicateBuilder<?>> builders = new ArrayList<>();
 
     public PredicateParser() {
         List<NumericBeatmapProperty> properties = Arrays.asList(

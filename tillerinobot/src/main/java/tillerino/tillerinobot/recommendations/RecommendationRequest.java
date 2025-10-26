@@ -52,14 +52,14 @@ public record RecommendationRequest(
     }
 
     /** Modifies the difficulty of recommendations. */
-    static enum Shift {
+    enum Shift {
         /** Regular strength. */
         NONE,
         /** The player is weak compared to their top scores. Recommendations are easier. */
         SUCC,
         /** Even weaker than {@link #SUCC} */
         SUCCER,
-        /** Even weaker than {@link #SUCCERBERG} */
+        /** Even weaker than {@link #SUCCER} */
         SUCCERBERG
     }
 }

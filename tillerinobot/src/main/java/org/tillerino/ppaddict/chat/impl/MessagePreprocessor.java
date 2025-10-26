@@ -51,13 +51,13 @@ public class MessagePreprocessor implements GameChatEventConsumer {
                 liveActivity.propagateReceivedMessage(event.getNick(), event.getEventId());
             }
             if (event instanceof PrivateAction action) {
-                try (MdcAttributes mdc2 = MdcUtils.with(MdcUtils.MDC_STATE, "action")) {
-                    log.debug("action: " + action.getAction());
+                try (var _ = MdcUtils.with(MdcUtils.MDC_STATE, "action")) {
+                    log.debug("action: {}", action.getAction());
                 }
             }
             if (event instanceof PrivateMessage message) {
-                try (MdcAttributes mdc2 = MdcUtils.with(MdcUtils.MDC_STATE, "msg")) {
-                    log.debug("received: " + message.getMessage());
+                try (var _ = MdcUtils.with(MdcUtils.MDC_STATE, "msg")) {
+                    log.debug("received: {}", message.getMessage());
                 }
             }
             if (event.isInteractive() && !bouncer.tryEnter(event.getNick(), event.getEventId())) {

@@ -42,7 +42,7 @@ public class Russian implements Language {
             return new Message("бип боп");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Рад снова вас видеть, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...это действительно вы? Столько времени прошло!"))
                     .then(new Message("Здорово, что вы вернулись. Могу ли я заинтересовать вас рекомендацией?"));

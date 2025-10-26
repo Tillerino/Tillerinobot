@@ -48,7 +48,7 @@ public class Catalan extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Benvingut de nou, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...ets tu? Quant de temps!"))
                     .then(new Message("És genial tenir-te de tornada. Puc donar-te una recomanació?"));

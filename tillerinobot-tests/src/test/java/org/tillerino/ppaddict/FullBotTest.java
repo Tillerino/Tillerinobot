@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -59,7 +58,6 @@ import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import tillerino.tillerinobot.*;
-import tillerino.tillerinobot.BeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
 import tillerino.tillerinobot.TestBackend.TestRecommender;
 import tillerino.tillerinobot.data.PullThrough;
@@ -235,7 +233,7 @@ public class FullBotTest extends AbstractDatabaseTest {
 
     @RegisterExtension
     @Order(2)
-    public RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(exec);
+    public final RabbitMqContainerConnection rabbit = new RabbitMqContainerConnection(exec);
 
     @Inject
     @Named("core")
@@ -247,8 +245,8 @@ public class FullBotTest extends AbstractDatabaseTest {
     private final AtomicInteger recommendationCount = new AtomicInteger();
     protected final List<Future<?>> started = new ArrayList<>();
 
-    protected int users = 2;
-    protected int recommendationsPerUser = 10;
+    protected final int users = 2;
+    protected final int recommendationsPerUser = 10;
 
     @Inject
     BotStatus botInfoApi;
@@ -297,7 +295,7 @@ public class FullBotTest extends AbstractDatabaseTest {
 
     @Test
     public void testMultipleUsers() {
-        List<Client> clients = IntStream.range(0, users).mapToObj(Client::new).collect(toList());
+        List<Client> clients = IntStream.range(0, users).mapToObj(Client::new).toList();
         clients.forEach(client -> {
             try {
                 // we have to spread out our connection attempts a bit or they might fail

@@ -41,7 +41,7 @@ public class Farsi implements Language {
             return new Message("bip boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Khosh aamadi, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...in toi? Kheiliwakhte hamdigaro nadidim!"))
                     .then(new Message("Didamet hal kardam. Mikhai recommendation-i behet bedam?"));

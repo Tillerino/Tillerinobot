@@ -68,7 +68,7 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
                 answers.add(language.apiTimeoutException());
                 for (; ; ) {
                     String answer = language.apiTimeoutException();
-                    if (answer.equals(answers.get(0))) {
+                    if (answer.equals(answers.getFirst())) {
                         assertThat(answers)
                                 .size()
                                 .as("number of responses to API timeout")

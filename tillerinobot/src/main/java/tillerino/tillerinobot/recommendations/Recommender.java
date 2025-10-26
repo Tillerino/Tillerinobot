@@ -20,7 +20,7 @@ public interface Recommender {
      * @param nomod don't recommend mods
      * @param requestMods request specific mods (these will be included, but this won't exclude other mods)
      */
-    public Collection<BareRecommendation> loadRecommendations(
+    Collection<BareRecommendation> loadRecommendations(
             List<TopPlay> topPlays,
             @Nonnull Collection<Integer> exclude,
             @Nonnull Model model,

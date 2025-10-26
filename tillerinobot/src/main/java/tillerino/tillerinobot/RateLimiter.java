@@ -37,7 +37,7 @@ public class RateLimiter {
 
     private final ThreadLocal<Integer> threadPriority = ThreadLocal.withInitial(() -> MAINTENANCE);
 
-    private final ThreadLocal<Long> blockedTime = ThreadLocal.withInitial(() -> 0l);
+    private final ThreadLocal<Long> blockedTime = ThreadLocal.withInitial(() -> 0L);
 
     private final List<BlockingQueue<Object>> permits = new ArrayList<>();
 

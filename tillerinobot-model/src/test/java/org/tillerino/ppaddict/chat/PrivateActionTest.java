@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class PrivateActionTest {
     @Test
-    public void interactive() throws Exception {
+    public void interactive() {
         assertThat(new PrivateAction(123, "", 456, "")).hasFieldOrPropertyWithValue("interactive", true);
     }
 }

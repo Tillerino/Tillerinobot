@@ -32,7 +32,7 @@ public class JdkServerResource implements BeforeEachCallback, AfterEachCallback 
     }
 
     @Override
-    public void afterEach(ExtensionContext context) throws Exception {
+    public void afterEach(ExtensionContext context) {
         try {
             server.stop(1);
         } catch (Exception e) {

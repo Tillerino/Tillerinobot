@@ -43,15 +43,15 @@ public class OptionsHandlerTest {
                 .usingLanguage(any(FailableFunction.class));
     }
 
-    UserData userData = mock(UserData.class);
+    final UserData userData = mock(UserData.class);
 
-    OptionsHandler handler = new OptionsHandler(
+    final OptionsHandler handler = new OptionsHandler(
             new RecommendationRequestParser(mock(BotBackend.class)),
             mock(UserDataManager.class),
             mock(RecommendationsManager.class));
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
         // Make the mock return the last set value
         doAnswer(invocation -> {
                     boolean value = invocation.getArgument(0);
@@ -63,7 +63,7 @@ public class OptionsHandlerTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void test() {
         assertEquals(E.AA, OptionsHandler.find(E.values(), E::name, "a"));
         assertEquals(E.AA, OptionsHandler.find(E.values(), E::name, "ac"));
         assertEquals(E.BB, OptionsHandler.find(E.values(), E::name, "b"));
@@ -71,13 +71,13 @@ public class OptionsHandlerTest {
     }
 
     @Test
-    public void testEmpty() throws Exception {
+    public void testEmpty() {
         // this will match nothing
         assertThrows(IllegalArgumentException.class, () -> OptionsHandler.find(E.values(), E::name, ""));
     }
 
     @Test
-    public void testCenter() throws Exception {
+    public void testCenter() {
         // this will match both AA and BB
         assertThrows(IllegalArgumentException.class, () -> OptionsHandler.find(E.values(), E::name, "ab"));
     }
@@ -118,7 +118,7 @@ public class OptionsHandlerTest {
     }
 
     @Test
-    public void testSetUnknownLanguage() throws Exception {
+    public void testSetUnknownLanguage() {
         assertThatThrownBy(() -> handler.handle("set language defflt", null, userData, new Default()))
                 .isInstanceOf(UserException.class)
                 .hasMessageContaining("Tiếng Việt");
@@ -140,14 +140,14 @@ public class OptionsHandlerTest {
     }
 
     @Test
-    public void testInvalidDefaultSettings() throws Exception {
+    public void testInvalidDefaultSettings() {
         OsuApiUser user = new OsuApiUser();
         user.setUserId(1);
         assertThrows(UserException.class, () -> handler.handle("set default invalid", user, userData, new Default()));
     }
 
     @Test
-    public void allLanguageNamesNeedToBeParsable() throws Exception {
+    public void allLanguageNamesNeedToBeParsable() {
         for (LanguageIdentifier language : LanguageIdentifier.values()) {
             assertThat(OptionsHandler.find(LanguageIdentifier.values(), i -> i.token, language.token))
                     .isNotNull();
@@ -185,7 +185,7 @@ public class OptionsHandlerTest {
     }
 
     @Test
-    public void testSetV2InvalidValue() throws Exception {
+    public void testSetV2InvalidValue() {
         assertThatThrownBy(() -> handler.handle("set v2 maybe", null, userData, new Default()))
                 .isInstanceOf(UserException.class)
                 .hasMessageContaining("on|true|yes|1|off|false|no|0");

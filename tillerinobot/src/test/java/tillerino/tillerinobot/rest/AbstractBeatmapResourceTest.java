@@ -38,7 +38,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
     @Inject
     BeatmapDownloader downloader;
 
-    OsuApiBeatmap beatmap = new OsuApiBeatmap();
+    final OsuApiBeatmap beatmap = new OsuApiBeatmap();
 
     AbstractBeatmapResource resource;
 
@@ -78,7 +78,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testThrowAndReuploadOnWrongHash() throws Exception {
+    public void testThrowAndReuploadOnWrongHash() {
         String correctContent = "correct";
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(correctContent));

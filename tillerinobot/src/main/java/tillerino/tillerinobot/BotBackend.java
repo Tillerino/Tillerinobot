@@ -1,6 +1,5 @@
 package tillerino.tillerinobot;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -9,13 +8,8 @@ import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
 
 public interface BotBackend {
-    /**
-     * @param nick
-     * @return the last version of the bot that was visited by this user. -1 if no information available.
-     * @throws SQLException
-     * @throws UserException
-     */
-    int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException, UserException;
+    /** @return the last version of the bot that was visited by this user. -1 if no information available. */
+    int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException;
 
     void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
 
@@ -24,7 +18,7 @@ public interface BotBackend {
      *
      * @return a positive value if the user is a donator/patron.
      */
-    int getDonator(@UserId int user) throws SQLException, IOException;
+    int getDonator(@UserId int user);
 
     /**
      * links the given user to a Patreon account using a token string.

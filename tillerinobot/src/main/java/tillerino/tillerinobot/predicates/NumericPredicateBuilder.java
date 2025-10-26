@@ -1,6 +1,5 @@
 package tillerino.tillerinobot.predicates;
 
-import lombok.Value;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser.PredicateBuilder;
@@ -8,14 +7,11 @@ import tillerino.tillerinobot.predicates.PredicateParser.PredicateBuilder;
 /**
  * The correct name of this class would have been <code>NumericBeatmapPropertyRecommendationPredicateBuilder</code>.
  *
- * @author Tillerino
  * @param <T>
+ * @author Tillerino
  */
-@Value
-public class NumericPredicateBuilder<T extends NumericBeatmapProperty>
+public record NumericPredicateBuilder<T extends NumericBeatmapProperty>(T property)
         implements PredicateBuilder<NumericPropertyPredicate<T>> {
-    T property;
-
     enum Relation {
         EQ,
         GEQ,

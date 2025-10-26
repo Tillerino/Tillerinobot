@@ -44,7 +44,7 @@ public class Polish extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Witaj ponownie, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...czy to Ty? Minęło sporo czasu!"))
                     .then(new Message("Dobrze znowu Cię widzieć. Chcesz usłyszeć kilka rekomendacji?"));

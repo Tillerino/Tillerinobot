@@ -25,7 +25,7 @@ public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
     ConfigService config;
 
     @Test
-    public void noConfigIsDefault() throws Exception {
+    public void noConfigIsDefault() {
         assertThat(config.scoresMaintenance()).isFalse();
     }
 

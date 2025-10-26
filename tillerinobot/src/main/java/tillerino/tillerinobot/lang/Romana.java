@@ -48,7 +48,7 @@ public class Romana extends AbstractMutableLanguage {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
             return new Message("Bun venit înapoi, " + apiUser.getUserName() + ".");
-        } else if (inactiveTime > 7l * 24 * 60 * 60 * 1000) {
+        } else if (inactiveTime > 7L * 24 * 60 * 60 * 1000) {
             return new Message(apiUser.getUserName() + "...")
                     .then(new Message("...ești chiar tu? A trecut atât de mult timp!"))
                     .then(new Message("Imi pare bine ca ai revenit. Pot să îți dau o recomandare?"));

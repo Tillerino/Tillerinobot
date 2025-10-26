@@ -43,7 +43,6 @@ import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.*;
-import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
 import tillerino.tillerinobot.recommendations.Recommender;
@@ -75,21 +74,19 @@ public class TestBackend implements BotBackend {
 
     @JsonAutoDetect(fieldVisibility = Visibility.NON_PRIVATE)
     static class Database {
-        Map<Integer, User> users = new HashMap<>();
+        final Map<Integer, User> users = new HashMap<>();
 
-        Map<String, Integer> userNames = new HashMap<>();
+        final Map<String, Integer> userNames = new HashMap<>();
     }
 
     private static final ObjectMapper JACKSON = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     boolean serialize;
 
-    BeatmapsLoader loader;
-
     DiffEstimateProvider diffEstimateProvider;
 
     @Getter
-    static Map<Integer, Integer> setIds = new HashMap<>();
+    static final Map<Integer, Integer> setIds = new HashMap<>();
 
     static {
         try (BufferedReader reader =
@@ -106,10 +103,8 @@ public class TestBackend implements BotBackend {
     @Inject
     public TestBackend(
             @Named("tillerinobot.test.persistentBackend") boolean serialize,
-            BeatmapsLoader loader,
             DiffEstimateProvider diffEstimateProvider) {
         this.serialize = serialize;
-        this.loader = loader;
         this.diffEstimateProvider = diffEstimateProvider;
         if (serialize) {
             try (Reader reader =
@@ -165,26 +160,26 @@ public class TestBackend implements BotBackend {
     }
 
     @Override
-    public int getLastVisitedVersion(String nick) throws SQLException, UserException {
+    public int getLastVisitedVersion(String nick) {
         return database.users.get(database.userNames.get(nick)).lastVisistedVersion;
     }
 
     @Override
-    public void setLastVisitedVersion(String nick, int version) throws SQLException {
+    public void setLastVisitedVersion(String nick, int version) {
         database.users.get(database.userNames.get(nick)).lastVisistedVersion = version;
         writeDatabase();
     }
 
     @Override
-    public int getDonator(int user) throws SQLException, IOException {
+    public int getDonator(int user) {
         return database.users.get(user).isDonator ? 1 : 0;
     }
 
     private List<BeatmapMeta> findBeatmaps(final double equivalentPp, long requestMods, boolean nomod)
-            throws SQLException, IOException, InterruptedException, UserException {
+            throws SQLException, IOException, InterruptedException {
         ArrayList<Long> mods = new ArrayList<>();
         if (requestMods == 0) {
-            mods.add(0l);
+            mods.add(0L);
             if (!nomod) {
                 mods.add(Mods.getMask(Mods.DoubleTime));
                 mods.add(Mods.getMask(Mods.DoubleTime, Mods.Hidden));
@@ -198,7 +193,7 @@ public class TestBackend implements BotBackend {
         List<BeatmapMeta> maps = new ArrayList<>();
         for (int i : setIds.keySet()) {
             for (long m : mods) {
-                BeatmapMeta meta = diffEstimateProvider.loadBeatmap(i, m, null);
+                BeatmapMeta meta = diffEstimateProvider.loadBeatmap(i, m);
                 if (Math.abs(1 - meta.getEstimates().getPP(.98) / equivalentPp) < .15) {
                     maps.add(meta);
                 }
@@ -253,7 +248,7 @@ public class TestBackend implements BotBackend {
         private final PullThrough pullThrough;
 
         @Override
-        @SneakyThrows({UserException.class, InterruptedException.class})
+        @SneakyThrows({InterruptedException.class})
         public List<TopPlay> loadTopPlays(int userId) throws SQLException, MaintenanceException, IOException {
             OsuApiUser user = pullThrough.getUser(userId, 0);
             final double equivalent = user.getPp() / 20;
@@ -289,7 +284,7 @@ public class TestBackend implements BotBackend {
 
         double equivalentPp(List<TopPlay> plays) {
             plays = new ArrayList<>(plays);
-            Collections.sort(plays, Comparator.comparingDouble(TopPlay::getPp).reversed());
+            plays.sort(Comparator.comparingDouble(TopPlay::getPp).reversed());
             double ppSum = 0;
             double partialSum = 0;
 
@@ -306,8 +301,8 @@ public class TestBackend implements BotBackend {
     public interface Module {
         @dagger.Provides
         @Singleton
-        static TestBackend testBackend(BeatmapsLoader loader, DiffEstimateProvider diffEstimateProvider) {
-            return spy(new TestBackend(false, loader, diffEstimateProvider));
+        static TestBackend testBackend(DiffEstimateProvider diffEstimateProvider) {
+            return spy(new TestBackend(false, diffEstimateProvider));
         }
 
         @dagger.Provides
@@ -327,8 +322,7 @@ public class TestBackend implements BotBackend {
         static DiffEstimateProvider diffEstimateProvider(BeatmapsLoader loader) {
             return spy(new DiffEstimateProvider(null, null, null, null) {
                 @Override
-                public BeatmapMeta loadBeatmap(int beatmapid, final long mods, Language lang)
-                        throws SQLException, IOException {
+                public BeatmapMeta loadBeatmap(int beatmapid, final long mods) throws SQLException, IOException {
                     OsuApiBeatmap beatmap = loader.getBeatmap(beatmapid, 0L);
 
                     BeatmapImpl cBeatmap = BeatmapImpl.builder()
@@ -381,13 +375,13 @@ public class TestBackend implements BotBackend {
         static PlayerService playerService(TestBackend backend) {
             return spy(new PlayerService(null) {
                 @Override
-                public void registerActivity(int userid, long timestamp) throws SQLException {
+                public void registerActivity(int userid, long timestamp) {
                     backend.database.users.get(userid).lastActivity = timestamp;
                     backend.writeDatabase();
                 }
 
                 @Override
-                public long getLastActivity(OsuApiUser user) throws SQLException {
+                public long getLastActivity(OsuApiUser user) {
                     return backend.database.users.get(user.getUserId()).lastActivity;
                 }
             });

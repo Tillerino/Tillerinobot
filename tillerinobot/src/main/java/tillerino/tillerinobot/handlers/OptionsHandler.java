@@ -91,17 +91,17 @@ public class OptionsHandler implements CommandHandler {
         List<E> found = new ArrayList<>();
         int bestDistance = Integer.MAX_VALUE;
 
-        for (int i = 0; i < haystack.length; i++) {
-            int distance = getLevenshteinDistance(token.apply(haystack[i]).toLowerCase(), needle);
+        for (E candidate : haystack) {
+            int distance = getLevenshteinDistance(token.apply(candidate).toLowerCase(), needle);
             if (distance > 1) {
                 continue;
             }
             if (distance < bestDistance) {
                 bestDistance = distance;
                 found.clear();
-                found.add(haystack[i]);
+                found.add(candidate);
             } else if (distance == bestDistance) {
-                found.add(haystack[i]);
+                found.add(candidate);
             }
         }
 
@@ -113,6 +113,6 @@ public class OptionsHandler implements CommandHandler {
             throw new IllegalArgumentException(String.format("%s all match %s", found, needle));
         }
 
-        return found.get(0);
+        return found.getFirst();
     }
 }

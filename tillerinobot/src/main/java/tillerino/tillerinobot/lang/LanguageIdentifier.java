@@ -44,12 +44,12 @@ public enum LanguageIdentifier {
 
     public final String token;
 
-    private LanguageIdentifier(Class<? extends Language> cls) {
+    LanguageIdentifier(Class<? extends Language> cls) {
         this.cls = cls;
         this.token = name();
     }
 
-    private LanguageIdentifier(Class<? extends Language> cls, String token) {
+    LanguageIdentifier(Class<? extends Language> cls, String token) {
         this.cls = cls;
         this.token = token;
     }

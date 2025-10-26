@@ -123,7 +123,7 @@ public record Database(Connection connection) implements AutoCloseable {
     }
 
     public <T> Persister<T> persister(Class<T> cls, Action action) throws SQLException {
-        return new Persister<T>(this, cls, action);
+        return new Persister<>(this, cls, action);
     }
 
     /** Convenience method to persist a single object. */

@@ -24,7 +24,7 @@ public class StarDiff implements NumericBeatmapProperty {
         if (request.requestedMods() != 0L) {
             return Optional.of(String.format(
                     "%s %s",
-                    Mods.toShortNamesContinuous(Mods.getMods(request.requestedMods())), value.getOriginalArgument()));
+                    Mods.toShortNamesContinuous(Mods.getMods(request.requestedMods())), value.originalArgument()));
         }
         return Optional.empty();
     }

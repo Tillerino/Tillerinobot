@@ -77,12 +77,12 @@ public class BotIT {
                 .onMessage(Mockito.any(ClientEvent.class));
     }
 
-    protected void startBot() throws Exception {
+    protected void startBot() {
         TILLERINOBOT_IRC.start();
         RestAssured.baseURI = "http://" + TILLERINOBOT_IRC.getHost() + ":" + TILLERINOBOT_IRC.getMappedPort(8080) + "/";
     }
 
-    protected void stopBot() throws Exception {
+    protected void stopBot() {
         TILLERINOBOT_IRC.stop();
     }
 
@@ -115,7 +115,7 @@ public class BotIT {
     @Test
     // This test kills the shared rabbit MQ container, which messes with parallel tests.
     @Disabled
-    public void livenessReactsToRabbit() throws Exception {
+    public void livenessReactsToRabbit() {
         RabbitMqContainer.stop();
         await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
         RabbitMqContainer.start();
@@ -124,7 +124,7 @@ public class BotIT {
     }
 
     @Test
-    public void livenessReactsToNgircd() throws Exception {
+    public void livenessReactsToNgircd() {
         NGIRCD.stop();
         await().untilAsserted(() -> RestAssured.when().get("/live").then().statusCode(503));
         Result<GameChatClientMetrics, GameChatClient.Error> metrics1 = gameChatClient.getMetrics();
@@ -137,7 +137,7 @@ public class BotIT {
     }
 
     @Test
-    public void incomingPrivateMessage() throws Exception {
+    public void incomingPrivateMessage() {
         connectKitteh();
         kitteh.sendMessage("tbot", "hello");
 
@@ -150,7 +150,7 @@ public class BotIT {
     }
 
     @Test
-    public void incomingPrivateAction() throws Exception {
+    public void incomingPrivateAction() {
         connectKitteh();
         kitteh.sendMessage("tbot", "\u0001ACTION hello\u0001");
 
@@ -163,13 +163,13 @@ public class BotIT {
     }
 
     @Test
-    public void joiningChannelResultsInJoinedEvent() throws Exception {
+    public void joiningChannelResultsInJoinedEvent() {
         connectKitteh();
         kitteh.addChannel("#osu");
-        await().untilAsserted(
-                        () -> assertThat(incoming).singleElement().isInstanceOfSatisfying(Joined.class, message -> {
-                            assertThat(message.getNick()).isEqualTo("test");
-                        }));
+        await().untilAsserted(() -> assertThat(incoming)
+                .singleElement()
+                .isInstanceOfSatisfying(
+                        Joined.class, message -> assertThat(message.getNick()).isEqualTo("test")));
     }
 
     @Test
@@ -178,9 +178,8 @@ public class BotIT {
         NGIRCD.logs.clear();
         connectKitteh();
         kitteh.addChannel("#osu");
-        await().untilAsserted(() -> assertThat(NGIRCD.logs).anySatisfy(message -> {
-            assertThat(message).contains("Kitteh");
-        }));
+        await().untilAsserted(() -> assertThat(NGIRCD.logs)
+                .anySatisfy(message -> assertThat(message).contains("Kitteh")));
         Thread.sleep(1000); // ngIRCd takes a bit to process the join
         startBot();
         await().untilAsserted(
@@ -192,7 +191,7 @@ public class BotIT {
     }
 
     @Test
-    public void outgoingPrivateMessage() throws Exception {
+    public void outgoingPrivateMessage() {
         connectKitteh();
         assertThat(writer.message("hello", "test").ok()).isPresent();
         await().untilAsserted(() -> withEvents(events -> assertThat(events)
@@ -204,7 +203,7 @@ public class BotIT {
     }
 
     @Test
-    public void outgoingPrivateAction() throws Exception {
+    public void outgoingPrivateAction() {
         connectKitteh();
         assertThat(writer.action("hello", "test").ok()).isPresent();
         await().untilAsserted(() -> withEvents(events -> assertThat(events)

@@ -9,6 +9,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response.Status;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
@@ -38,11 +39,9 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.IRCBot;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
-import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.DiffEstimate;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
-import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 
@@ -232,7 +231,7 @@ public class DiffEstimateProvider {
             for (; ; ) {
                 MDC.clear();
                 Optional<DiffEstimate> outdated = loader.queryUnique(SanDoku.VERSION);
-                if (!outdated.isPresent()) {
+                if (outdated.isEmpty()) {
                     return true;
                 }
 
@@ -266,7 +265,7 @@ public class DiffEstimateProvider {
             throw new NoEstimatesException();
         }
 
-        try (var __ = PhaseTimer.timeTask("loadOrCalculateEstimates");
+        try (var _ = PhaseTimer.timeTask("loadOrCalculateEstimates");
                 Database database = dbm.getDatabase()) {
             // try to load with these exact mods
             BeatmapImpl diffEstimate = loadOrCalculate(database, beatmapId, mods);
@@ -279,12 +278,12 @@ public class DiffEstimateProvider {
         }
     }
 
-    public BeatmapMeta loadBeatmap(final @BeatmapId int beatmapid, @BitwiseMods long mods, Language lang)
-            throws SQLException, IOException, UserException, InterruptedException {
+    public BeatmapMeta loadBeatmap(final @BeatmapId int beatmapid, @BitwiseMods long mods)
+            throws SQLException, IOException, InterruptedException {
         ApiBeatmap beatmap;
         long diffMods = DiffEstimateProvider.getDiffMods(mods);
-        try (Database database = dbm.getDatabase(); ) {
-            beatmap = ApiBeatmap.loadOrDownload(database, beatmapid, diffMods, 7l * 24 * 60 * 60 * 1000, downloader);
+        try (Database database = dbm.getDatabase()) {
+            beatmap = ApiBeatmap.loadOrDownload(database, beatmapid, diffMods, 7L * 24 * 60 * 60 * 1000, downloader);
         } catch (SQLException e) {
             throw new SQLException("exception loading beatmap " + beatmapid + " mods " + diffMods, e);
         }
@@ -298,12 +297,7 @@ public class DiffEstimateProvider {
         }
     }
 
-    /**
-     * returns only TD, HT, DT, EZ, HR, and FL, converting NC to DT. Also includes HD, but only if FL is present
-     *
-     * @param mods
-     * @return
-     */
+    /** returns only TD, HT, DT, EZ, HR, and FL, converting NC to DT. Also includes HD, but only if FL is present */
     @SuppressFBWarnings(value = "TQ", justification = "Producer")
     public static @BitwiseMods long getDiffMods(@BitwiseMods long mods) {
         if (Nightcore.is(mods)) {
@@ -324,6 +318,7 @@ public class DiffEstimateProvider {
     }
 
     public static class NoEstimatesException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
     }
 }

@@ -120,7 +120,7 @@ public class AllLanguagesTest {
     public void testWelcome(LanguageIdentifier ident) throws Exception {
         Language lang = ident.cls.getConstructor().newInstance();
         for (long inactiveTime : new long[] {
-            60 * 1000 - 1, 24 * 60 * 60 * 1000 - 1, 7l * 24 * 60 * 60 * 1000, 7l * 24 * 60 * 60 * 1000 + 1
+            60 * 1000 - 1, 24 * 60 * 60 * 1000 - 1, 7L * 24 * 60 * 60 * 1000, 7L * 24 * 60 * 60 * 1000 + 1
         }) lang.welcomeUser(new OsuApiUser(), inactiveTime);
     }
 }

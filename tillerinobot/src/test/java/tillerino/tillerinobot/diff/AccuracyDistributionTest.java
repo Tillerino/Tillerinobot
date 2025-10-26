@@ -9,7 +9,7 @@ import tillerino.tillerinobot.UserException;
 
 public class AccuracyDistributionTest {
     @Test
-    public void testOptimization() throws Exception {
+    public void testOptimization() {
         // takes one second.
         // the randoms and the first getaccuracy takes about .66 seconds.
         // => get accuracy distribution takes about 16 ns
@@ -25,10 +25,10 @@ public class AccuracyDistributionTest {
                     AccuracyDistribution.closest(_300s + _100s + _50s + misses, misses, acc);
 
             double rec = OsuApiScore.getAccuracy(
-                    accuracyDistribution.getX300(),
-                    accuracyDistribution.getX100(),
-                    accuracyDistribution.getX50(),
-                    accuracyDistribution.getMiss());
+                    accuracyDistribution.x300(),
+                    accuracyDistribution.x100(),
+                    accuracyDistribution.x50(),
+                    accuracyDistribution.miss());
 
             assertEquals(acc, rec, 0d);
         }
@@ -38,7 +38,7 @@ public class AccuracyDistributionTest {
     public void testModelLineNoMisses() throws Exception {
         for (double acc = 1; acc > 0.16; acc -= 0.01) {
             AccuracyDistribution model = AccuracyDistribution.model(10000, 0, acc);
-            double rec = OsuApiScore.getAccuracy(model.getX300(), model.getX100(), model.getX50(), model.getMiss());
+            double rec = OsuApiScore.getAccuracy(model.x300(), model.x100(), model.x50(), model.miss());
             assertEquals(acc, rec, 0.0001);
         }
     }
@@ -47,7 +47,7 @@ public class AccuracyDistributionTest {
     public void testModelLineHalfMisses() throws Exception {
         for (double acc = .5; acc > 0.16; acc -= 0.01) {
             AccuracyDistribution model = AccuracyDistribution.model(10000, 5000, acc);
-            double rec = OsuApiScore.getAccuracy(model.getX300(), model.getX100(), model.getX50(), model.getMiss());
+            double rec = OsuApiScore.getAccuracy(model.x300(), model.x100(), model.x50(), model.miss());
             assertEquals(acc, rec, 0.0001);
         }
     }
@@ -70,7 +70,7 @@ public class AccuracyDistributionTest {
 
             AccuracyDistribution model = AccuracyDistribution.model(_300s + _100s + _50s + misses, misses, acc);
 
-            double rec = OsuApiScore.getAccuracy(model.getX300(), model.getX100(), model.getX50(), model.getMiss());
+            double rec = OsuApiScore.getAccuracy(model.x300(), model.x100(), model.x50(), model.miss());
 
             // The accuracy is down to swapping a single 300 for a 100 and vice versa.
             // With 500 objects, our accuracy is +- 1/500 * 1/3 ~ 0.00066666...
@@ -84,10 +84,10 @@ public class AccuracyDistributionTest {
                         _100s,
                         _50s,
                         misses,
-                        model.getX300(),
-                        model.getX100(),
-                        model.getX50(),
-                        model.getMiss(),
+                        model.x300(),
+                        model.x100(),
+                        model.x50(),
+                        model.miss(),
                         acc,
                         rec);
             }
@@ -96,7 +96,7 @@ public class AccuracyDistributionTest {
     }
 
     @Test
-    public void testIllegalAccuracy() throws Exception {
+    public void testIllegalAccuracy() {
         assertThatThrownBy(() -> AccuracyDistribution.model(100, 50, .6))
                 .isInstanceOf(UserException.class)
                 .hasMessageContaining("accuracy must be between 8.3");

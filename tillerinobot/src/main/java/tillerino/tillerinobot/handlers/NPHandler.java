@@ -55,7 +55,7 @@ public class NPHandler implements CommandHandler {
         MdcUtils.getLong(MdcUtils.MDC_EVENT).ifPresent(eventId -> live.propagateMessageDetails(eventId, "/np"));
 
         pair = pair.withMods(userData.addLazer(pair.mods()));
-        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(pair.beatmap(), pair.mods(), lang);
+        BeatmapMeta beatmap = diffEstimateProvider.loadBeatmap(pair.beatmap(), pair.mods());
 
         if (beatmap == null) {
             throw new UserException(lang.unknownBeatmap());

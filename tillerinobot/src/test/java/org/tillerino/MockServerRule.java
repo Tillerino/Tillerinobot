@@ -30,26 +30,22 @@ public class MockServerRule implements BeforeEachCallback, AfterEachCallback {
     private static final WireMockContainer MOCK_SERVER = new WireMockContainer(WireMockContainer.WIREMOCK_2_LATEST)
             .withNetwork(DockerNetwork.NETWORK)
             .withNetworkAliases("mockserver")
-            .withCreateContainerCmdModifier(cmd -> {
-                cmd.withHostConfig(cmd.getHostConfig()
-                        .withMounts(List.of(
-                                new Mount()
-                                        .withSource(
-                                                Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/mappings")
-                                                        .normalize()
-                                                        .toAbsolutePath()
-                                                        .toString())
-                                        .withTarget("/home/wiremock/mappings")
-                                        .withType(MountType.BIND),
-                                new Mount()
-                                        .withSource(
-                                                Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/__files")
-                                                        .normalize()
-                                                        .toAbsolutePath()
-                                                        .toString())
-                                        .withTarget("/home/wiremock/__files")
-                                        .withType(MountType.BIND))));
-            });
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(cmd.getHostConfig()
+                    .withMounts(List.of(
+                            new Mount()
+                                    .withSource(Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/mappings")
+                                            .normalize()
+                                            .toAbsolutePath()
+                                            .toString())
+                                    .withTarget("/home/wiremock/mappings")
+                                    .withType(MountType.BIND),
+                            new Mount()
+                                    .withSource(Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/__files")
+                                            .normalize()
+                                            .toAbsolutePath()
+                                            .toString())
+                                    .withTarget("/home/wiremock/__files")
+                                    .withType(MountType.BIND)))));
     private static final WireMock CLIENT;
 
     static {
@@ -96,13 +92,13 @@ public class MockServerRule implements BeforeEachCallback, AfterEachCallback {
     }
 
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeEach(ExtensionContext context) {
         CLIENT.resetRequests();
         CLIENT.resetToDefaultMappings();
     }
 
     @Override
-    public void afterEach(ExtensionContext context) throws Exception {
+    public void afterEach(ExtensionContext context) {
         if (context.getExecutionException().isPresent()) {
             List<NearMiss> nearMisses = CLIENT.findNearMissesForAllUnmatchedRequests();
             if (!nearMisses.isEmpty()) {
