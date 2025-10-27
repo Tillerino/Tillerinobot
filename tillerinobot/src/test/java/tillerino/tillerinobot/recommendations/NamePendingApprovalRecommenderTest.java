@@ -10,11 +10,11 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.tillerino.MockServerRule;
+import org.tillerino.WireMockDocker;
 
 public class NamePendingApprovalRecommenderTest {
     @RegisterExtension
-    public final MockServerRule mockServer = new MockServerRule();
+    public final WireMockDocker mockServer = new WireMockDocker();
 
     @Test
     public void getRecommendations() throws Exception {
@@ -43,10 +43,10 @@ public class NamePendingApprovalRecommenderTest {
 						"nomod" : true,
 						"requestMods" : 64
 						}"""));
-        MockServerRule.mockServer().register(request.willReturn(response));
+        WireMockDocker.mockServer().register(request.willReturn(response));
 
         NamePendingApprovalRecommender recommender = new NamePendingApprovalRecommender(
-                URI.create(MockServerRule.getExternalMockServerAddress() + "/recommend"), "my-token");
+                URI.create(WireMockDocker.getExternalAddress() + "/recommend"), "my-token");
         List<TopPlay> topPlays = List.of(new TopPlay(0, 0, 116128, 0, 240.588));
         Collection<Integer> exclusions = List.of(456);
         Collection<BareRecommendation> loadRecommendations =

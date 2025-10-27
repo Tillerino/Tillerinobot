@@ -3,7 +3,6 @@ package tillerino.tillerinobot.osutrack;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dagger.Binds;
 import jakarta.ws.rs.NotFoundException;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -38,11 +37,5 @@ public class TestOsutrackDownloader extends OsutrackDownloader {
         String json =
                 new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
         return parseJson(json);
-    }
-
-    @dagger.Module
-    public interface Module {
-        @Binds
-        OsutrackDownloader osutrackDownloader(TestOsutrackDownloader testOsutrackDownloader);
     }
 }

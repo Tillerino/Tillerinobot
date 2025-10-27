@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict.rest;
 
-import dagger.Module;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
@@ -37,11 +36,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public String createKey(String adminKey, int osuUserId) throws NotFoundException, ForbiddenException {
         return remoteService.createKey(adminKey, osuUserId);
-    }
-
-    @Module
-    public interface RemoteAuthenticationModule {
-        @dagger.Binds
-        AuthenticationService s(AuthenticationServiceImpl s);
     }
 }

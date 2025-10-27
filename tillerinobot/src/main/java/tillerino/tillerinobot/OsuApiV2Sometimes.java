@@ -1,5 +1,6 @@
 package tillerino.tillerinobot;
 
+import dagger.Lazy;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -16,11 +17,11 @@ import tillerino.tillerinobot.data.ApiUser;
 public class OsuApiV2Sometimes implements OsuApi {
     private final OsuApiV1 v1;
     private final OsuApiV2 v2;
-    private final UserDataManager userDataManager;
+    private final Lazy<UserDataManager> userDataManager;
 
     @Override
     public List<ApiScore> getUserTop(int userId, int mode, int limit) throws IOException {
-        try (UserData userData = userDataManager.loadUserData(userId)) {
+        try (UserData userData = userDataManager.get().loadUserData(userId)) {
             if (userData.isV2()) {
                 return v2.getUserTop(userId, mode, limit);
             }
@@ -32,7 +33,7 @@ public class OsuApiV2Sometimes implements OsuApi {
 
     @Override
     public List<ApiScore> getUserRecent(int userid, int mode) throws IOException {
-        try (UserData userData = userDataManager.loadUserData(userid)) {
+        try (UserData userData = userDataManager.get().loadUserData(userid)) {
             if (userData.isV2()) {
                 return v2.getUserRecent(userid, mode);
             }
@@ -56,11 +57,5 @@ public class OsuApiV2Sometimes implements OsuApi {
     @Override
     public ApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
         return v1.getBeatmap(beatmapid, mods);
-    }
-
-    @dagger.Module
-    public interface Module {
-        @dagger.Binds
-        OsuApi osuApi(OsuApiV2Sometimes osuApiV2Sometimes);
     }
 }

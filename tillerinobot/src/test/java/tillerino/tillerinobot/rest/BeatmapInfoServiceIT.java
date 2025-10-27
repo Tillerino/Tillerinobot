@@ -3,52 +3,23 @@ package tillerino.tillerinobot.rest;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.tillerino.MockServerRule;
-import org.tillerino.MockServerRule.MockServerModule;
-import org.tillerino.ppaddict.mockmodules.BeatmapsServiceMockModule;
-import org.tillerino.ppaddict.mockmodules.GameChatClientMockModule;
-import org.tillerino.ppaddict.rest.AuthenticationServiceImpl.RemoteAuthenticationModule;
-import org.tillerino.ppaddict.util.TestClock;
 import tillerino.tillerinobot.*;
 
-public class BeatmapInfoServiceIT extends AbstractDatabaseTest {
-    @Singleton
-    @Component(
-            modules = {
-                DockeredMysqlModule.class,
-                RemoteAuthenticationModule.class,
-                MockServerModule.class,
-                TestClock.Module.class,
-                TestBackend.Module.class,
-                GameChatClientMockModule.class,
-                BeatmapsServiceMockModule.class,
-                OsuApiV2Sometimes.Module.class,
-                OsuApiV1Test.Module.class,
-                OsuApiV2Test.Module.class
-            })
-    interface Injector {
-        void inject(BeatmapInfoServiceIT t);
-    }
-
-    {
-        DaggerBeatmapInfoServiceIT_Injector.create().inject(this);
-    }
-
-    @Inject
+public class BeatmapInfoServiceIT extends TestBase {
     @RegisterExtension
-    public BotApiRule botApi;
+    public BotApiRule botApi = botApiNoInit;
 
-    @RegisterExtension
-    public final MockServerRule mockServer = new MockServerRule();
+    @BeforeEach
+    public void setUp() throws Exception {
+        TestBase.mockBeatmapMetas(diffEstimateProvider);
+    }
 
     @Test
     public void testRegular() {
-        mockServer.mockJsonGet("/auth/authorization", "{ }", "api-key", "valid-key");
+        wireMock.mockJsonGet("/auth/authorization", "{ }", "api-key", "valid-key");
 
         given().header("api-key", "valid-key")
                 .get("/beatmapinfo?wait=2000&beatmapid=129891&mods=0")

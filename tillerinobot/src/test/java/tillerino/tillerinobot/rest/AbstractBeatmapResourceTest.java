@@ -7,36 +7,19 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import dagger.Component;
 import jakarta.ws.rs.WebApplicationException;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.ppaddict.mockmodules.BeatmapDownloaderMockModule;
-import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.TestBase;
 import tillerino.tillerinobot.data.ActualBeatmap;
-import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
 /**
  * In this test, we want to make sure that the {@link AbstractBeatmapResource} handles downloading and saving beatmaps
  * files correctly with respect to the expected hash value.
  */
-public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
-    @Component(modules = {DockeredMysqlModule.class, BeatmapDownloaderMockModule.class})
-    @Singleton
-    interface Injector {
-        void inject(AbstractBeatmapResourceTest t);
-    }
-
-    {
-        DaggerAbstractBeatmapResourceTest_Injector.create().inject(this);
-    }
-
-    @Inject
-    BeatmapDownloader downloader;
+public class AbstractBeatmapResourceTest extends TestBase {
 
     final OsuApiBeatmap beatmap = new OsuApiBeatmap();
 
@@ -44,7 +27,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
 
     @BeforeEach
     public void init() {
-        resource = new AbstractBeatmapResource(dbm, downloader, beatmap) {
+        resource = new AbstractBeatmapResource(dbm, beatmapDownloader, beatmap) {
             @Override
             public OsuApiBeatmap get() {
                 throw new UnsupportedOperationException();
@@ -60,7 +43,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(content));
         assertEquals(content, resource.getFile());
-        verifyNoInteractions(downloader);
+        verifyNoInteractions(beatmapDownloader);
         // data was compressed after the fact
         assertThat(dbm.selectUnique(ActualBeatmap.class).execute("where beatmapid = ", 12))
                 .hasValueSatisfying(ab -> assertThat(ab).hasFieldOrPropertyWithValue("content", null));
@@ -73,7 +56,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
         dbm.persist(new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)), Action.INSERT);
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(newContent));
-        doReturn(newContent).when(downloader).getActualBeatmap(12);
+        doReturn(newContent).when(beatmapDownloader).getActualBeatmap(12);
         assertEquals("world", resource.getFile());
     }
 
@@ -82,7 +65,7 @@ public class AbstractBeatmapResourceTest extends AbstractDatabaseTest {
         String correctContent = "correct";
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(correctContent));
-        doReturn("wrong content").when(downloader).getActualBeatmap(12);
+        doReturn("wrong content").when(beatmapDownloader).getActualBeatmap(12);
         try {
             resource.getFile();
             fail("should have thrown");

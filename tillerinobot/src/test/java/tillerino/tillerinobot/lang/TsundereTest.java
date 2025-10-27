@@ -10,9 +10,7 @@ import static org.mockito.Mockito.verify;
 import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.LiveActivity;
-import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.TestBackend;
-import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
@@ -27,11 +25,13 @@ public class TsundereTest {
 
         // mock backend and create RecommendationsManager and RecommendHandler based on mocked backend
         BotBackend backend = mock(BotBackend.class);
+        BeatmapsLoader beatmapsLoader = mock(BeatmapsLoader.class);
+        TestBase.mockApiBeatmaps(beatmapsLoader);
         RecommendHandler handler = new RecommendHandler(
                 new RecommendationsManager(
                         null,
                         new RecommendationRequestParser(backend),
-                        new TestBackend.TestBeatmapsLoader(),
+                        beatmapsLoader,
                         mock(Recommender.class),
                         null,
                         null,

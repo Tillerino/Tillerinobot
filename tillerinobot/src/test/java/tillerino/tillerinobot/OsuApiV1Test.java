@@ -1,50 +1,12 @@
 package tillerino.tillerinobot;
 
-import dagger.Component;
-import dagger.Provides;
-import java.net.URI;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
-import org.tillerino.MockServerRule;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiUser;
 
-public class OsuApiV1Test {
+public class OsuApiV1Test extends TestBase {
     public static final String OSUAPI_V1_MOCK_KEY = "1234567890123456789012345678901234567890";
-
-    @Component(modules = Module.class)
-    @Singleton
-    interface Injector {
-        void inject(OsuApiV1Test t);
-    }
-
-    @dagger.Module
-    public interface Module {
-        @Provides
-        @SneakyThrows
-        static OsuApiV1 osuApiV1() {
-            return Mockito.spy(new OsuApiV1(
-                    URI.create(MockServerRule.getExternalMockServerAddress() + "/api/")
-                            .toURL(),
-                    OSUAPI_V1_MOCK_KEY,
-                    RateLimiter.unlimited()));
-        }
-    }
-
-    {
-        DaggerOsuApiV1Test_Injector.create().inject(this);
-    }
-
-    @Inject
-    OsuApiV1 osuApiV1;
-
-    @RegisterExtension
-    public final MockServerRule mockServer = new MockServerRule();
 
     @Test
     void testGetUserFromName() throws Exception {

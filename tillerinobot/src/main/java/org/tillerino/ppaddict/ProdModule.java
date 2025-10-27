@@ -29,6 +29,7 @@ import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.recommendations.AllRecommenders;
 import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
+import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
 
 /**
@@ -41,9 +42,8 @@ import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
             RabbitQueuesModule.class,
             ProcessorsModule.class,
             CachedDatabaseConfigServiceModule.class,
-            BeatmapsServiceImpl.Module.class,
-            OsuApiV1.DownloaderModule.class,
-            OsuApiV2.CredentialsFromEnvModule.class,
+            OsuApiV1.FromEnvModule.class,
+            OsuApiV2.FromEnvModule.class,
             MessageHandlerSchedulerModule.class,
             Clock.Module.class
         })
@@ -59,6 +59,9 @@ public interface ProdModule {
 
     @Binds
     Recommender recommender(AllRecommenders allRecommenders);
+
+    @Binds
+    BeatmapsService beatmapsService(BeatmapsServiceImpl impl);
 
     @Provides
     @Singleton

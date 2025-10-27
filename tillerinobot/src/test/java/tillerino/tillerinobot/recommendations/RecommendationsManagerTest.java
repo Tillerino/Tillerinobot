@@ -11,63 +11,28 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-import dagger.Component;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiUser;
-import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
-import org.tillerino.ppaddict.util.Clock;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.GivenRecommendation;
-import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Default;
 
-public class RecommendationsManagerTest extends AbstractDatabaseTest {
-    @Singleton
-    @Component(
-            modules = {
-                TestBackend.Module.class,
-                DockeredMysqlModule.class,
-                OsuApiV1.Module.class,
-                OsuApiV1Test.Module.class,
-                CachedDatabaseConfigServiceModule.class,
-                Clock.Module.class
-            })
-    interface Injector {
-        void inject(RecommendationsManagerTest test);
-    }
-
-    {
-        DaggerRecommendationsManagerTest_Injector.create().inject(this);
-    }
-
-    @Inject
-    TestBackend backend;
-
-    @Inject
-    RecommendationsManager manager;
-
-    @Inject
-    Recommender recommender;
-
-    @Inject
-    PullThrough pullThrough;
+public class RecommendationsManagerTest extends TestBase {
 
     OsuApiUser user;
 
     @BeforeEach
-    public void createUser() throws SQLException, IOException {
-        backend.hintUser("donator", true, 1, 1000);
+    public void createUser() throws Exception {
+        TestBase.mockBeatmapMetas(diffEstimateProvider);
+        MockData.mockUser("donator", true, 1, 1000, 123, backend, osuApi, standardRecommender);
 
         user = pullThrough.downloadUser("donator");
     }
@@ -86,39 +51,41 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
     @Test
     public void testPredicateParser() throws Exception {
-        RecommendationRequest samplerSettings = manager.parseSamplerSettings(user, "gamma AR=9", new Default());
+        RecommendationRequest samplerSettings =
+                recommendationsManager.parseSamplerSettings(user, "gamma AR=9", new Default());
 
         assertEquals(1, samplerSettings.predicates().size());
 
         // Test "nc" alias for nightcore
         // Gives double-time recommendations
-        samplerSettings = manager.parseSamplerSettings(user, "nc", new Default());
+        samplerSettings = recommendationsManager.parseSamplerSettings(user, "nc", new Default());
 
         assertTrue(Mods.DoubleTime.is(samplerSettings.requestedMods()));
     }
 
     @Test
     public void testContinuousMods() throws Exception {
-        RecommendationRequest samplerSettings = manager.parseSamplerSettings(user, "hdhr", new Default());
+        RecommendationRequest samplerSettings =
+                recommendationsManager.parseSamplerSettings(user, "hdhr", new Default());
 
         assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock), samplerSettings.requestedMods());
 
-        samplerSettings = manager.parseSamplerSettings(user, "hdhr dt", new Default());
+        samplerSettings = recommendationsManager.parseSamplerSettings(user, "hdhr dt", new Default());
 
         assertEquals(Mods.getMask(Mods.Hidden, Mods.HardRock, Mods.DoubleTime), samplerSettings.requestedMods());
     }
 
     @Test
     public void testContradiction() {
-        assertThatThrownBy(() -> manager.parseSamplerSettings(user, "ar=1 ar=2", new Default()))
+        assertThatThrownBy(() -> recommendationsManager.parseSamplerSettings(user, "ar=1 ar=2", new Default()))
                 .isInstanceOf(UserException.class);
     }
 
     @Test
     public void testSaveRecommendations() throws Exception {
-        manager.saveGivenRecommendation(1015, 16, 64);
+        recommendationsManager.saveGivenRecommendation(1015, 16, 64);
 
-        List<GivenRecommendation> saved = manager.loadGivenRecommendations(1015);
+        List<GivenRecommendation> saved = recommendationsManager.loadGivenRecommendations(1015);
 
         assertEquals(1, saved.size());
 
@@ -131,23 +98,23 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
 
     @Test
     public void forgettingRecommendations() throws Exception {
-        manager.saveGivenRecommendation(465, 16, 64);
-        manager.saveGivenRecommendation(863, 42, 5634);
+        recommendationsManager.saveGivenRecommendation(465, 16, 64);
+        recommendationsManager.saveGivenRecommendation(863, 42, 5634);
 
-        assertEquals(1, manager.loadGivenRecommendations(465).size());
-        assertEquals(1, manager.loadGivenRecommendations(863).size());
+        assertEquals(1, recommendationsManager.loadGivenRecommendations(465).size());
+        assertEquals(1, recommendationsManager.loadGivenRecommendations(863).size());
 
-        manager.forgetRecommendations(465);
+        recommendationsManager.forgetRecommendations(465);
 
-        assertEquals(0, manager.loadGivenRecommendations(465).size());
-        assertEquals(1, manager.loadGivenRecommendations(863).size());
+        assertEquals(0, recommendationsManager.loadGivenRecommendations(465).size());
+        assertEquals(1, recommendationsManager.loadGivenRecommendations(863).size());
     }
 
     @Test
     public void testHiding() throws Exception {
         // save a recommendation and reload it
-        manager.saveGivenRecommendation(1954, 2, 0);
-        List<GivenRecommendation> recs = manager.loadVisibleRecommendations(1954);
+        recommendationsManager.saveGivenRecommendation(1954, 2, 0);
+        List<GivenRecommendation> recs = recommendationsManager.loadVisibleRecommendations(1954);
         assertEquals(2, recs.getFirst().getBeatmapid());
 
         // remember its date
@@ -155,39 +122,45 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
         Thread.sleep(30);
 
         // save another recommendation and hide it
-        manager.saveGivenRecommendation(1954, 3, 0);
-        recs = manager.loadVisibleRecommendations(1954);
+        recommendationsManager.saveGivenRecommendation(1954, 3, 0);
+        recs = recommendationsManager.loadVisibleRecommendations(1954);
         assertEquals(2, recs.size());
         assertTrue(recs.get(0).getDate() > recs.get(1).getDate());
-        manager.hideRecommendation(1954, 3, 0);
+        recommendationsManager.hideRecommendation(1954, 3, 0);
 
         // load visible recommendations and check if this is the earlier one
-        recs = manager.loadVisibleRecommendations(1954);
+        recs = recommendationsManager.loadVisibleRecommendations(1954);
         assertEquals(firstRecDate, recs.getFirst().getDate());
 
         // hide again and check if list is empty now
-        manager.hideRecommendation(1954, 2, 0);
-        recs = manager.loadVisibleRecommendations(1954);
+        recommendationsManager.hideRecommendation(1954, 2, 0);
+        recs = recommendationsManager.loadVisibleRecommendations(1954);
         assertEquals(0, recs.size());
     }
 
     @Test
     public void defaultSettings() throws Exception {
-        assertThat(manager.getRecommendation(user, "", new Default())).isNotNull();
+        TestBase.mockRecommendations(recommender);
+        assertThat(recommendationsManager.getRecommendation(user, "", new Default()))
+                .isNotNull();
         verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA10), eq(false), eq(0L));
     }
 
     @Test
     public void testGamma10() throws Exception {
-        assertThat(manager.getRecommendation(user, "gamma10", new Default())).isNotNull();
+        TestBase.mockRecommendations(recommender);
+        assertThat(recommendationsManager.getRecommendation(user, "gamma10", new Default()))
+                .isNotNull();
         verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA10), anyBoolean(), anyLong());
     }
 
     @Test
     public void gamma7NotRestricted() throws Exception {
-        backend.hintUser("guy", false, 123, 123);
+        MockData.mockUser("guy", false, 123, 123, 123, backend, osuApi, standardRecommender);
+        TestBase.mockRecommendations(recommender);
         user = pullThrough.downloadUser("guy");
-        assertThat(manager.getRecommendation(user, "gamma7", new Default())).isNotNull();
+        assertThat(recommendationsManager.getRecommendation(user, "gamma7", new Default()))
+                .isNotNull();
     }
 
     @Test
@@ -205,16 +178,18 @@ public class RecommendationsManagerTest extends AbstractDatabaseTest {
         runShift("succerberg", 5);
     }
 
-    private void runShift(String mode, int limit)
-            throws IOException, SQLException, UserException, InterruptedException {
-        backend.hintUser("guy", true, 123, 1000);
+    private void runShift(String mode, int limit) throws Exception {
+        MockData.mockUser("guy", true, 123, 1000, 123, backend, osuApi, standardRecommender);
+        TestBase.mockRecommendations(standardRecommender);
+
         user = pullThrough.downloadUser("guy");
 
         List<TopPlay> topPlays = new ArrayList<>(recommender.loadTopPlays(user.getUserId()));
         assertThat(topPlays).hasSize(50);
         topPlays.sort(Comparator.comparingDouble(TopPlay::getPp));
 
-        assertThat(manager.getRecommendation(user, mode, new Default())).isNotNull();
+        assertThat(recommendationsManager.getRecommendation(user, mode, new Default()))
+                .isNotNull();
         verify(recommender)
                 .loadRecommendations(
                         argThat(l -> l.equals(topPlays.subList(0, limit))),

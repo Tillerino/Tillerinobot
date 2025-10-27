@@ -26,7 +26,7 @@ public class MdcUtilsTest {
     }
 
     @Test
-    public void keyIsAddedAndRemoved() throws Exception {
+    public void keyIsAddedAndRemoved() {
         try (var _ = MdcUtils.with("foo", "baz")) {
             assertThat(MDC.get("foo")).isEqualTo("baz");
         }
@@ -34,7 +34,7 @@ public class MdcUtilsTest {
     }
 
     @Test
-    public void keyIsAddedAndRestored() throws Exception {
+    public void keyIsAddedAndRestored() {
         MDC.put("foo", "bar");
         assertThat(MDC.get("foo")).isEqualTo("bar");
         try (var _ = MdcUtils.with("foo", "baz")) {

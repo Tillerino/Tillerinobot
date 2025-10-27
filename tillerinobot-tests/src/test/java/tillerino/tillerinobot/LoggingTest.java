@@ -58,7 +58,7 @@ public class LoggingTest {
     public final MysqlDatabaseLifecycle lifecycle = new MysqlDatabaseLifecycle();
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         MDC.clear(); // it might be that there's some garbage from other tests in the MDC
         Injector injector = DaggerLocalConsoleTillerinobot_Injector.builder()
                 .clockModule(new ClockModule(clock))
@@ -67,12 +67,14 @@ public class LoggingTest {
         in = injector.messagePreprocessor();
         out = injector.gameChatWriter();
         assertTrue(MockUtil.isMock(out));
-        TestBackend backend = (TestBackend) injector.botBackend();
+        BotBackend backend = injector.botBackend();
         exec.submit(injector.localGameChatEventQueue());
         exec.submit(injector.localGameChatResponseQueue());
 
-        backend.hintUser("irc-guy", false, 1000, 1000);
-        backend.hintUser("other-guy", true, 1000, 1000);
+        MockData.mockUser("irc-guy", false, 1000, 1000, 1, backend, injector.osuApi(), injector.recommender());
+        MockData.mockUser("other-guy", true, 1000, 1000, 2, backend, injector.osuApi(), injector.recommender());
+        TestBase.mockRecommendations(injector.recommender());
+        TestBase.mockBeatmapMetas(injector.diffEstimateProvider());
         backend.setLastVisitedVersion("irc-guy", IRCBot.CURRENT_VERSION);
 
         doAnswer(_ -> ok(new GameChatWriter.Response(14L))).when(out).message(anyString(), any());

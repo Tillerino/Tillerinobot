@@ -25,7 +25,7 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
-import tillerino.tillerinobot.OsuApiV1.DownloaderModule;
+import tillerino.tillerinobot.OsuApiV1.FromEnvModule;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
 /** See {@link #main(String[])} */
@@ -89,12 +89,12 @@ class WireMockUpdater {
         @dagger.Provides
         @Named("osuapi.key")
         static String getOsuApiKey() {
-            return DownloaderModule.getOsuApiKey();
+            return FromEnvModule.getOsuApiKey();
         }
 
         @Provides
         static Credentials clientId() {
-            return OsuApiV2.CredentialsFromEnvModule.credentials();
+            return OsuApiV2.FromEnvModule.credentials();
         }
     }
 

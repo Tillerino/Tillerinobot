@@ -2,13 +2,11 @@ package tillerino.tillerinobot.rest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
-import dagger.Binds;
-import dagger.Component;
-import dagger.Provides;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.Client;
@@ -21,9 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map.Entry;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import nl.altindag.log.model.LogEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.ListAssert;
@@ -31,61 +26,18 @@ import org.glassfish.jersey.client.proxy.WebResourceFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatClientMetrics;
-import org.tillerino.ppaddict.chat.local.LocalGameChatMetrics;
-import org.tillerino.ppaddict.mockmodules.BeatmapsServiceMockModule;
-import org.tillerino.ppaddict.mockmodules.GameChatClientMockModule;
-import org.tillerino.ppaddict.rest.AuthenticationService;
+import org.tillerino.ppaddict.rest.AuthenticationService.Authorization;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
-import org.tillerino.ppaddict.util.TestClock;
 import tillerino.tillerinobot.*;
-import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 
 /** Tests the Tillerinobot API on a live HTTP server including authentication. */
-public class ApiTest {
-    @Component(
-            modules = {
-                DockeredMysqlModule.class,
-                Module.class,
-                TestBackend.Module.class,
-                TestClock.Module.class,
-                BeatmapsServiceMockModule.class,
-                GameChatClientMockModule.class,
-                OsuApiV1Test.Module.class
-            })
-    @Singleton
-    interface Injector {
-        void inject(ApiTest t);
-    }
-
-    @dagger.Module
-    interface Module {
-        @Singleton
-        @Provides
-        static JdkServerResource jdkServerResource(BotApiDefinition def) {
-            return new JdkServerResource(def, "localhost", 0);
-        }
-
-        @Provides
-        static @Named("tillerinobot.test.persistentBackend") boolean persistentBackend() {
-            return false;
-        }
-
-        @Binds
-        AuthenticationService authenticationService(FakeAuthenticationService fakeAuthenticationService);
-
-        @Binds
-        OsuApi osuApi(OsuApiV1 osuApiV1);
-    }
-
-    {
-        DaggerApiTest_Injector.create().inject(this);
-    }
+public class ApiTest extends TestBase {
 
     /** Filter for the client to add a header or query parameter to the request. */
     static class SetHeaderAndParam implements ClientRequestFilter {
+
         /** Set this field to add a header to the request */
         private Entry<String, String> addToHeader = null;
 
@@ -120,25 +72,14 @@ public class ApiTest {
         }
     }
 
-    @Inject
-    TestClock clock;
-
     /** Jetty server */
     @RegisterExtension
-    @Inject
-    public JdkServerResource server;
+    public JdkServerResource server = botApiNoInit;
 
     @RegisterExtension
     public final LogRule log = TestAppender.rule(ApiLoggingFeature.class);
 
-    /** API-internal object */
-    @Inject
-    LocalGameChatMetrics botInfo;
-
     private final GameChatClientMetrics remoteMetrics = new GameChatClientMetrics();
-
-    @Inject
-    GameChatClient gameChatClient;
 
     /** Endpoint which goes through the started HTTP API */
     private BotStatus botStatus;
@@ -181,6 +122,9 @@ public class ApiTest {
 
     @Test
     public void testAuthenticationByParam() throws Throwable {
+        doReturn(new Authorization(false)).when(authenticationService).getAuthorization("valid-key");
+        TestBase.mockBeatmapMetas(diffEstimateProvider);
+
         assertThatThrownBy(() -> beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1))
                 .isInstanceOf(NotAuthorizedException.class);
         clientRequestFilter.addParam = Pair.of("k", "valid-key");
@@ -190,6 +134,9 @@ public class ApiTest {
 
     @Test
     public void testAuthenticationByHeader() throws Throwable {
+        doReturn(new Authorization(false)).when(authenticationService).getAuthorization("valid-key");
+        TestBase.mockBeatmapMetas(diffEstimateProvider);
+
         assertThatThrownBy(() -> beatmapDifficulties.getBeatmapInfo(1, 0L, Collections.emptyList(), -1))
                 .isInstanceOf(NotAuthorizedException.class);
         clientRequestFilter.addToHeader = Pair.of("api-key", "valid-key");

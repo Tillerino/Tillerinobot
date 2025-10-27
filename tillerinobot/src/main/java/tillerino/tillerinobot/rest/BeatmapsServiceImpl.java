@@ -29,12 +29,6 @@ public class BeatmapsServiceImpl implements BeatmapsService {
         }
     }
 
-    @dagger.Module
-    public interface Module {
-        @dagger.Binds
-        BeatmapsService beatmapsService(BeatmapsServiceImpl impl);
-    }
-
     private final DatabaseManager databaseManager;
 
     private final BeatmapDownloader downloader;

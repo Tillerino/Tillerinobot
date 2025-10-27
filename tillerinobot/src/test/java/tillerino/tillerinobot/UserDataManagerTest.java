@@ -4,32 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import dagger.Component;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.junit.jupiter.api.Test;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 
-public class UserDataManagerTest extends AbstractDatabaseTest {
-    @Component(modules = {DockeredMysqlModule.class, TestBackend.Module.class})
-    @Singleton
-    interface Injector {
-        void inject(UserDataManagerTest t);
-    }
-
-    {
-        DaggerUserDataManagerTest_Injector.create().inject(this);
-    }
-
-    @Inject
-    UserDataManager manager;
-
+public class UserDataManagerTest extends TestBase {
     @Test
     public void testSaveLoad() throws Exception {
-        UserData data = manager.loadUserData(534678);
+        UserData data = userDataManager.loadUserData(534678);
         assertFalse(data.isAllowedToDebug());
         data.setAllowedToDebug(true);
         data.setLastSongInfo(new BeatmapWithMods(123, 456));
@@ -37,26 +21,26 @@ public class UserDataManagerTest extends AbstractDatabaseTest {
 
         reloadManager();
 
-        data = manager.loadUserData(534678);
+        data = userDataManager.loadUserData(534678);
         assertTrue(data.isAllowedToDebug());
         assertThat(data.getLastSongInfo()).hasFieldOrPropertyWithValue("beatmap", 123);
     }
 
     @Test
     public void testV2SaveLoad() throws Exception {
-        UserData data = manager.loadUserData(534678);
+        UserData data = userDataManager.loadUserData(534678);
         assertFalse(data.isV2());
         data.setV2(true);
         data.close();
 
         reloadManager();
 
-        data = manager.loadUserData(534678);
+        data = userDataManager.loadUserData(534678);
         assertTrue(data.isV2());
     }
 
     private void reloadManager() {
-        manager = new UserDataManager(null, dbm);
+        userDataManager = new UserDataManager(null, dbm);
     }
 
     @Test

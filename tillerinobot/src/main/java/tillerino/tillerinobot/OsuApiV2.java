@@ -86,7 +86,7 @@ public class OsuApiV2 implements OsuApi {
     }
 
     @dagger.Module
-    public interface CredentialsFromEnvModule {
+    public interface FromEnvModule {
         @Provides
         static @Named("osuapiv2.url") URI baseUrl() {
             return URI.create(envOrThrow("OSU_API_V2_URL"));

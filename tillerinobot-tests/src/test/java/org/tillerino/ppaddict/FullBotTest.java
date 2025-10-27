@@ -12,7 +12,6 @@ import static tillerino.tillerinobot.MysqlContainer.mysql;
 
 import com.rabbitmq.client.Connection;
 import dagger.Component;
-import dagger.Module;
 import dagger.Provides;
 import java.net.URI;
 import java.time.Duration;
@@ -40,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
 import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
+import org.tillerino.WireMockDocker.Module;
 import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
 import org.tillerino.ppaddict.chat.impl.MessagePreprocessor;
 import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
@@ -47,7 +47,6 @@ import org.tillerino.ppaddict.chat.impl.RabbitQueuesModule;
 import org.tillerino.ppaddict.chat.impl.ResponsePostprocessor;
 import org.tillerino.ppaddict.chat.irc.IrcContainer;
 import org.tillerino.ppaddict.chat.irc.KittehForNgircd;
-import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.live.AbstractLiveActivityEndpointTest.GenericWebSocketClient;
 import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
@@ -58,11 +57,7 @@ import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import tillerino.tillerinobot.*;
-import tillerino.tillerinobot.TestBackend.TestBeatmapsLoader;
-import tillerino.tillerinobot.TestBackend.TestRecommender;
-import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
-import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
 import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.BotInfoService;
 import tillerino.tillerinobot.rest.BotStatus;
@@ -136,43 +131,17 @@ public class FullBotTest extends AbstractDatabaseTest {
         }
     }
 
-    @Module(
+    @dagger.Module(
             includes = {
                 RabbitQueuesModule.class,
                 DockeredMysqlModule.class,
                 MessageHandlerSchedulerModule.class,
                 ProcessorsModule.class,
-                CachedDatabaseConfigServiceModule.class,
-                TestOsutrackDownloader.Module.class,
-                OsuApiV1.Module.class,
-                OsuApiV1Test.Module.class,
-                CachedDatabaseConfigServiceModule.class,
-                Clock.Module.class
+                TestBaseModule.class,
+                Clock.Module.class,
+                Module.class
             })
     protected class FullBotConfiguration {
-        @Provides
-        @Singleton
-        BotBackend provideBotBackend(TestBackend testBackend) {
-            return testBackend;
-        }
-
-        @Provides
-        @Singleton
-        Recommender provideRecommender(TestRecommender testRecommender) {
-            return testRecommender;
-        }
-
-        @Provides
-        @Named("tillerinobot.test.persistentBackend")
-        Boolean providePersistentBackend() {
-            return false;
-        }
-
-        @Provides
-        BeatmapsLoader provideBeatmapsLoader(TestBeatmapsLoader testBeatmapsLoader) {
-            return testBeatmapsLoader;
-        }
-
         @Provides
         @Named("coreSize")
         int provideCoreSize() {
@@ -192,17 +161,6 @@ public class FullBotTest extends AbstractDatabaseTest {
         @Provides
         BotStatus provideBotStatus(BotInfoService botInfoService) {
             return botInfoService;
-        }
-
-        @Provides
-        @Singleton
-        static DiffEstimateProvider diffEstimateProvider(BeatmapsLoader beatmapsLoader) {
-            return TestBackend.Module.diffEstimateProvider(beatmapsLoader);
-        }
-
-        @Provides
-        static PullThrough pullThrough(TestBackend backend) {
-            return TestBackend.Module.pullThrough(backend);
         }
     }
 
@@ -255,7 +213,16 @@ public class FullBotTest extends AbstractDatabaseTest {
     MessagePreprocessor messagePreprocessor;
 
     @Inject
-    TestBackend testBackend;
+    BotBackend backend;
+
+    @Inject
+    OsuApi osuApi;
+
+    @Inject
+    Recommender recommender;
+
+    @Inject
+    DiffEstimateProvider diffEstimateProvider;
 
     @Override
     public void createEntityManager() {}
@@ -276,8 +243,10 @@ public class FullBotTest extends AbstractDatabaseTest {
         connect.get(10, TimeUnit.SECONDS);
 
         for (int botNumber = 0; botNumber < users; botNumber++) {
-            testBackend.hintUser("user" + botNumber, false, 12, 1000);
+            MockData.mockUser("user" + botNumber, false, 12, 1000, 1, backend, osuApi, recommender);
         }
+        TestBase.mockRecommendations(recommender);
+        TestBase.mockBeatmapMetas(diffEstimateProvider);
         RemoteEventQueue externalEventQueue = RabbitMqConfiguration.externalEventQueue(rabbit.getConnection());
         externalEventQueue.setup();
         externalEventQueue.subscribe(messagePreprocessor::onEvent);

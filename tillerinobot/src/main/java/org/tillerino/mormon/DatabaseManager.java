@@ -119,7 +119,7 @@ public class DatabaseManager implements AutoCloseable {
     }
 
     @dagger.Module
-    public interface Module {
+    public interface FromEnvModule {
         @dagger.Provides
         static @Named("mysql") Properties properties() {
             Properties properties = new Properties();

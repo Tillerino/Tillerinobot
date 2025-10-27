@@ -7,36 +7,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.tillerino.ppaddict.config.ConfigService;
 import org.tillerino.ppaddict.util.MaintenanceException;
-import org.tillerino.ppaddict.util.TestClock;
-import tillerino.tillerinobot.AbstractDatabaseTest;
-import tillerino.tillerinobot.OsuApiV1;
-import tillerino.tillerinobot.OsuApiV1Test;
+import tillerino.tillerinobot.TestBase;
 
-public class PlayerTest extends AbstractDatabaseTest {
-    @Component(modules = {Module.class, DockeredMysqlModule.class, OsuApiV1Test.Module.class})
-    @Singleton
-    interface Injector {
-        void inject(PlayerTest t);
-    }
-
-    @dagger.Module
-    interface Module {}
-
-    {
-        DaggerPlayerTest_Injector.create().inject(this);
-    }
-
-    final TestClock clock = new TestClock();
-
-    @Inject
-    OsuApiV1 downloader;
+public class PlayerTest extends TestBase {
 
     protected final ConfigService config = mock(ConfigService.class);
 
@@ -55,8 +32,8 @@ public class PlayerTest extends AbstractDatabaseTest {
                 .hasFieldOrPropertyWithValue("agetop50", 2L);
 
         Player updating = Player.getPlayer(db, 2070907);
-        updating.updateTop50(db, 1, downloader, clock, config);
-        verify(downloader).getUserTop(2070907, 0, 50);
+        updating.updateTop50(db, 1, osuApi, clock, config);
+        verify(osuApi).getUserTop(2070907, 0, 50);
         assertThat(updating).hasFieldOrPropertyWithValue("agetop50", 0L);
 
         // don't reduce
@@ -73,9 +50,9 @@ public class PlayerTest extends AbstractDatabaseTest {
                 .hasFieldOrPropertyWithValue("agetop50", 1L);
 
         updating = Player.getPlayer(db, 2070907);
-        updating.updateTop50(db, 0, downloader, clock, config);
-        verify(downloader, times(2)).getUserTop(2070907, 0, 50);
-        Mockito.verifyNoMoreInteractions(downloader);
+        updating.updateTop50(db, 0, osuApi, clock, config);
+        verify(osuApi, times(2)).getUserTop(2070907, 0, 50);
+        Mockito.verifyNoMoreInteractions(osuApi);
         assertThat(updating).hasFieldOrPropertyWithValue("agetop50", 0L);
         assertThat(Player.getPlayer(db, 2070907))
                 .hasFieldOrPropertyWithValue("lastseen", 3L)
@@ -87,7 +64,7 @@ public class PlayerTest extends AbstractDatabaseTest {
         when(config.scoresMaintenance()).thenReturn(true);
         clock.advanceBy(1000);
         Player player = Player.getPlayer(db, 1);
-        assertThatThrownBy(() -> player.updateTop50(db, 1, downloader, clock, config))
+        assertThatThrownBy(() -> player.updateTop50(db, 1, osuApi, clock, config))
                 .isInstanceOf(MaintenanceException.class);
     }
 }

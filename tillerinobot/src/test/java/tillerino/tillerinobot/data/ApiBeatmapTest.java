@@ -3,30 +3,14 @@ package tillerino.tillerinobot.data;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Persister.Action;
 import tillerino.tillerinobot.*;
 
-public class ApiBeatmapTest extends AbstractDatabaseTest {
-    @Component(modules = {DockeredMysqlModule.class, OsuApiV1Test.Module.class})
-    @Singleton
-    interface Injector {
-        void inject(ApiBeatmapTest t);
-    }
-
-    {
-        DaggerApiBeatmapTest_Injector.create().inject(this);
-    }
-
-    @Inject
-    protected OsuApiV1 downloader;
-
+public class ApiBeatmapTest extends TestBase {
     @Test
     public void testSchema() throws Exception {
-        assertNotNull(ApiBeatmap.loadOrDownload(db, 131891, 0L, 0, downloader));
+        assertNotNull(ApiBeatmap.loadOrDownload(db, 131891, 0L, 0, osuApiV1));
     }
 
     @Test

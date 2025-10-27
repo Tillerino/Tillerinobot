@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.MDC;
@@ -53,7 +54,14 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             userId = apiUser.getUserId();
         } else {
             // query someone else
-            OsuApiUser otherApiUser = pullThrough.downloadUser(remaining);
+            OsuApiUser otherApiUser = null;
+            try {
+                otherApiUser = pullThrough.downloadUser(remaining);
+            } catch (IOException e) {
+                if (!Objects.requireNonNull(e.getMessage(), "").contains("response code 404")) {
+                    throw e;
+                }
+            }
             if (otherApiUser == null) {
                 return new Success(String.format("User %s does not exist", remaining));
             }

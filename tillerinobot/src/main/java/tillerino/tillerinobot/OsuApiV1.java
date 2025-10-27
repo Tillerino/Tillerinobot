@@ -80,13 +80,7 @@ public class OsuApiV1 implements OsuApi {
     }
 
     @dagger.Module
-    public interface Module {
-        @dagger.Binds
-        OsuApi osuApi(OsuApiV1 osuApiV1);
-    }
-
-    @dagger.Module
-    public interface DownloaderModule {
+    public interface FromEnvModule {
         @dagger.Provides
         @Named("osuapi.key")
         static String getOsuApiKey() {
@@ -94,7 +88,7 @@ public class OsuApiV1 implements OsuApi {
             if (env != null) {
                 return env;
             }
-            InputStream is = DownloaderModule.class.getResourceAsStream("/osuapikey");
+            InputStream is = FromEnvModule.class.getResourceAsStream("/osuapikey");
             if (is == null) {
                 throw new RuntimeException("cannot find osu api key");
             }

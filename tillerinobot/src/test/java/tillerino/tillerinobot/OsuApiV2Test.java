@@ -1,55 +1,17 @@
 package tillerino.tillerinobot;
 
-import dagger.Component;
-import dagger.Provides;
-import java.net.URI;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
-import org.tillerino.MockServerRule;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
-import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiUser;
 
-public class OsuApiV2Test {
+public class OsuApiV2Test extends TestBase {
     public static final String OSUAPI_V2_MOCK_CLIENT_ID = "12345";
     public static final String OSUAPI_V2_MOCK_CLIENT_SECRET = "jusTAL0OfnumB3r5aNdch4r4CT3Er5Br0PlStAHp";
     public static final Credentials OSUAPI_V2_MOCK_CREDENTIALS =
             new Credentials(OSUAPI_V2_MOCK_CLIENT_ID, OSUAPI_V2_MOCK_CLIENT_SECRET);
     public static final String OSUAPI_V2_MOCK_TOKEN = "osu-oauth-mock-token";
-
-    @Component(modules = Module.class)
-    @Singleton
-    interface Injector {
-        void inject(OsuApiV2Test t);
-    }
-
-    @dagger.Module
-    public interface Module {
-        @Provides
-        @Singleton
-        @SneakyThrows
-        static OsuApiV2 osuApiV2() {
-            URI baseUrl = URI.create(MockServerRule.getExternalMockServerAddress());
-            return Mockito.spy(new OsuApiV2(
-                    baseUrl, TokenCache.inMemory(baseUrl, OSUAPI_V2_MOCK_CREDENTIALS), RateLimiter.unlimited()));
-        }
-    }
-
-    {
-        DaggerOsuApiV2Test_Injector.create().inject(this);
-    }
-
-    @Inject
-    OsuApiV2 osuApiV2;
-
-    @RegisterExtension
-    public final MockServerRule mockServer = new MockServerRule();
 
     @Test
     void testGetUserFromName() throws Exception {

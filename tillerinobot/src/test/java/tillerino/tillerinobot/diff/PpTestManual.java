@@ -1,16 +1,10 @@
 package tillerino.tillerinobot.diff;
 
 import com.github.omkelderman.sandoku.DiffResult;
-import com.github.omkelderman.sandoku.ProcessorApi;
 import com.github.omkelderman.sandoku.ScoreInfo;
-import dagger.Component;
-import dagger.Provides;
 import jakarta.ws.rs.BadRequestException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.assertj.core.data.Offset;
@@ -21,57 +15,17 @@ import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiScore;
-import org.tillerino.ppaddict.mockmodules.BeatmapDownloaderMockModule;
-import tillerino.tillerinobot.AbstractDatabaseTest;
-import tillerino.tillerinobot.OsuApi;
-import tillerino.tillerinobot.OsuApiV2;
-import tillerino.tillerinobot.OsuApiV2Test;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
-import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
-import tillerino.tillerinobot.rest.BeatmapsServiceImpl;
 
 @ExtendWith(SoftAssertionsExtension.class)
-public class PpTestManual extends AbstractDatabaseTest {
-    @Component(
-            modules = {
-                OsuApiV2Test.Module.class,
-                BeatmapDownloaderMockModule.class,
-                DockeredMysqlModule.class,
-                Module.class,
-                BeatmapsServiceImpl.Module.class
-            })
-    @Singleton
-    interface Injector {
-        void inject(PpTestManual t);
-    }
-
-    @dagger.Module
-    interface Module {
-        @dagger.Binds
-        OsuApi osuApi(OsuApiV2 v2);
-
-        @Provides
-        static ProcessorApi sanDoku() {
-            return SanDoku.defaultClient(URI.create("http://localhost:8080"));
-        }
-    }
+public class PpTestManual extends TestBase {
 
     {
-        DaggerPpTestManual_Injector.create().inject(this);
+        // switch to V2 API
+        diffEstimateProvider = new DiffEstimateProvider(beatmapsService, osuApiV2, sanDoku, dbm);
     }
-
-    @Inject
-    OsuApiV2 api;
-
-    @Inject
-    ProcessorApi sanDoku;
-
-    @Inject
-    BeatmapDownloader beatmapDownloader;
-
-    @Inject
-    DiffEstimateProvider diffEstimateProvider;
 
     @Test
     void testBigBlack(SoftAssertions softly) throws Exception {
@@ -82,7 +36,7 @@ public class PpTestManual extends AbstractDatabaseTest {
     @Test
     void testSongCompilationIV(SoftAssertions softly) throws Exception {
         // https://osu.ppy.sh/beatmapsets/2347113#osu/5047712
-        testBeatmapTop(softly, 5047712, 10504284, 2.5, 2.5);
+        testBeatmapTop(softly, 5047712, 0, 2.5, 2.5);
     }
 
     @Test
@@ -108,7 +62,7 @@ public class PpTestManual extends AbstractDatabaseTest {
             throws Exception {
         byte[] beatmapBytes = beatmapDownloader.getActualBeatmap(beatmapid).getBytes(StandardCharsets.UTF_8);
 
-        for (ApiScore score : api.getBeatmapTop(beatmapid, 0)) {
+        for (ApiScore score : osuApiV2.getBeatmapTop(beatmapid, 0)) {
             if (userFilter != 0 && score.getUserId() != userFilter) {
                 continue;
             }

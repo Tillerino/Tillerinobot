@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.tillerino.ppaddict.util.Result.ok;
 
 import com.sun.net.httpserver.HttpServer;
@@ -14,7 +13,6 @@ import dagger.Component;
 import dagger.Provides;
 import jakarta.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -29,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.tillerino.WireMockDocker;
 import org.tillerino.ppaddict.chat.GameChatClient;
 import org.tillerino.ppaddict.chat.GameChatClientMetrics;
 import org.tillerino.ppaddict.chat.GameChatEvent;
@@ -42,14 +41,13 @@ import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.chat.local.LocalGameChatEventQueue;
 import org.tillerino.ppaddict.chat.local.LocalGameChatResponseQueue;
-import org.tillerino.ppaddict.config.CachedDatabaseConfigServiceModule;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
-import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.Result;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.data.PullThrough;
-import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
+import tillerino.tillerinobot.diff.DiffEstimateProvider;
+import tillerino.tillerinobot.recommendations.Recommender;
 import tillerino.tillerinobot.rest.BeatmapResource;
 import tillerino.tillerinobot.rest.BeatmapsService;
 import tillerino.tillerinobot.rest.BotApiDefinition;
@@ -79,6 +77,16 @@ public class LocalConsoleTillerinobot {
 
         @Named("messagePreprocessor")
         GameChatEventConsumer messagePreprocessor();
+
+        BeatmapsService beatmapsService();
+
+        BeatmapsLoader beatmapsLoader();
+
+        DiffEstimateProvider diffEstimateProvider();
+
+        Recommender recommender();
+
+        OsuApi osuApi();
     }
 
     @dagger.Module
@@ -100,50 +108,19 @@ public class LocalConsoleTillerinobot {
                 DockeredMysqlModule.class,
                 InMemoryQueuesModule.class,
                 LiveActivityMockModule.class,
-                TestBackend.Module.class,
                 MessageHandlerSchedulerModule.class,
                 ProcessorsModule.class,
-                TestOsutrackDownloader.Module.class,
-                OsuApiV1.Module.class,
-                OsuApiV1Test.Module.class,
-                CachedDatabaseConfigServiceModule.class
+                TestBaseModule.class,
+                WireMockDocker.Module.class
             })
     public interface Module {
-        @dagger.Provides
-        static @Named("tillerinobot.test.persistentBackend") boolean persistentBackend() {
-            return false;
-        }
-
         @dagger.Provides
         static @Named("coreSize") int coreSize() {
             return 1;
         }
 
         @Binds
-        AuthenticationService authenticationService(FakeAuthenticationService fakeAuthenticationService);
-
-        @Binds
         GameChatClient gameChatClient(ConsoleRunner consoleRunner);
-
-        @dagger.Provides
-        @Singleton
-        static BeatmapsService getBeatmapsService(BeatmapsLoader backend) {
-            BeatmapsService beatService = mock(BeatmapsService.class);
-            when(beatService.byId(anyInt())).thenAnswer(req -> {
-                BeatmapResource res = mock(BeatmapResource.class);
-                doAnswer(x -> backend.getBeatmap((Integer) req.getArguments()[0], 0L))
-                        .when(res)
-                        .get();
-                doAnswer(x -> {
-                            System.out.println("Beatmap uploaded: " + x.getArguments()[0]);
-                            return null;
-                        })
-                        .when(res)
-                        .setFile(anyString());
-                return res;
-            });
-            return beatService;
-        }
 
         @dagger.Provides
         @Singleton
@@ -164,6 +141,24 @@ public class LocalConsoleTillerinobot {
                     .message(anyString(), any());
             return writer;
         }
+    }
+
+    private static void mockBeatmaps(BeatmapsLoader backend, BeatmapsService beatService) {
+        doAnswer(req -> {
+                    BeatmapResource res = mock(BeatmapResource.class);
+                    doAnswer(x -> backend.getBeatmap((Integer) req.getArguments()[0], 0L))
+                            .when(res)
+                            .get();
+                    doAnswer(x -> {
+                                System.out.println("Beatmap uploaded: " + x.getArguments()[0]);
+                                return null;
+                            })
+                            .when(res)
+                            .setFile(anyString());
+                    return res;
+                })
+                .when(beatService)
+                .byId(anyInt());
     }
 
     static ThreadFactory threadFactory(String name) {
@@ -191,6 +186,10 @@ public class LocalConsoleTillerinobot {
                 .build();
         MysqlContainer.MysqlDatabaseLifecycle.createSchema();
 
+        TestBase.mockRecommendations(injector.recommender());
+        TestBase.mockBeatmapMetas(injector.diffEstimateProvider());
+        mockBeatmaps(injector.beatmapsLoader(), injector.beatmapsService());
+
         URI baseUri = UriBuilder.fromUri("http://localhost/")
                 .port(Integer.parseInt(Stream.of(args).findAny().orElse("0")))
                 .build();
@@ -212,6 +211,8 @@ public class LocalConsoleTillerinobot {
         final BotBackend backend;
         final IrcNameResolver resolver;
         final PullThrough pullThrough;
+        final OsuApi osuApi;
+        final Recommender recommender;
 
         final AtomicBoolean running = new AtomicBoolean(true);
         String username;
@@ -220,39 +221,35 @@ public class LocalConsoleTillerinobot {
         public void run() {
             log.info("Starting Tillerinobot");
 
-            try (Scanner scanner = new Scanner(System.in)) {
-                while (running.get()) {
-                    try {
-                        if (!userLoop(scanner)) {
-                            break;
-                        }
-                    } catch (Exception e) {
-                        throw new ContextedRuntimeException(e);
+            while (running.get()) {
+                try {
+                    if (!userLoop()) {
+                        break;
                     }
+                } catch (Exception e) {
+                    throw new ContextedRuntimeException(e);
                 }
             }
         }
 
         /** @return true for a user change; false to shut down */
-        private boolean userLoop(Scanner scanner) throws Exception {
+        private boolean userLoop() throws Exception {
             System.out.println("please provide your name:");
-            username = scanner.nextLine();
+            username = IO.readln();
 
-            if (resolver.resolveIRCName(username) == null && backend instanceof TestBackend testBackend) {
-                System.out.println("you're new. I'll have to ask you a couple of questions.");
+            System.out.println("you're new. I'll have to ask you a couple of questions.");
 
-                System.out.println("are you a donator? (anything for yes)");
-                final boolean donator = !scanner.nextLine().isEmpty();
+            System.out.println("are you a donator? (anything for yes)");
+            final boolean donator = !IO.readln().isEmpty();
 
-                System.out.println("what's your rank?");
-                final int rank = Integer.parseInt(scanner.nextLine());
+            System.out.println("what's your rank?");
+            final int rank = Integer.parseInt(IO.readln());
 
-                System.out.println("how much pp do you have?");
-                final double pp = Double.parseDouble(scanner.nextLine());
+            System.out.println("how much pp do you have?");
+            final double pp = Double.parseDouble(IO.readln());
 
-                testBackend.hintUser(username, donator, rank, pp);
-                resolver.resolveManually(pullThrough.downloadUser(username).getUserId());
-            }
+            MockData.mockUser(username, donator, rank, pp, 1, backend, osuApi, recommender);
+            resolver.resolveManually(pullThrough.downloadUser(username).getUserId());
 
             System.out.println("Welcome to the Tillerinobot simulator");
             System.out.println("To quit, send /q");
@@ -265,13 +262,13 @@ public class LocalConsoleTillerinobot {
                 dispatch(new Joined(System.currentTimeMillis(), username, System.currentTimeMillis()));
             }
 
-            return inputLoop(scanner);
+            return inputLoop();
         }
 
         /** @return true for a user change; false to shut down */
-        private boolean inputLoop(Scanner scanner) {
+        private boolean inputLoop() {
             while (running.get()) {
-                String line = scanner.nextLine();
+                String line = IO.readln();
 
                 if (line.startsWith("/np ")) {
                     dispatch(new PrivateAction(
