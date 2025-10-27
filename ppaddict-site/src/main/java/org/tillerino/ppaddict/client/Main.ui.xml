@@ -1,0 +1,26 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:ppaddict="urn:import:org.tillerino.ppaddict.client">
+	<g:DockLayoutPanel width="1100px" ui:field="maindock"
+		styleName="mainpanel">
+		<g:north size="100.0">
+			<g:DockLayoutPanel unit="EM" width="100%" height="100%">
+				<g:west size="20">
+					<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE" spacing="0">
+						<g:Hyperlink ui:field="beatmapsNaviLink" styleName="title">ppaddict</g:Hyperlink>
+						<g:Label text=" + " styleName="title" />
+						<g:Hyperlink ui:field="recommendationsNaviLink" styleName="title">r!</g:Hyperlink>
+					</g:HorizontalPanel>
+				</g:west>
+				<g:center type="g:DockDirectionType">
+					<g:HorizontalPanel horizontalAlignment="ALIGN_RIGHT"
+						verticalAlignment="ALIGN_MIDDLE" spacing="10" width=""
+						styleName="tablealignright" ui:field="controlsPanel">
+						<g:Hyperlink text="Help" ui:field="helpLink" />
+						<ppaddict:UserBox ui:field="userBox"></ppaddict:UserBox>
+					</g:HorizontalPanel>
+				</g:center>
+			</g:DockLayoutPanel>
+		</g:north>
+	</g:DockLayoutPanel>
+</ui:UiBinder> 

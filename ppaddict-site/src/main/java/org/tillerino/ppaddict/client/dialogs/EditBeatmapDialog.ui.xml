@@ -1,0 +1,9 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<g:VerticalPanel spacing="5">
+		<g:Label text="Notes:"></g:Label>
+		<g:TextBox ui:field="comment" width="300px"></g:TextBox>
+		<g:Button ui:field="save" text="Save"></g:Button>
+	</g:VerticalPanel>
+</ui:UiBinder> 

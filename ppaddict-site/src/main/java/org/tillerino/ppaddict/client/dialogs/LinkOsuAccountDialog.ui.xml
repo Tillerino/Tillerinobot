@@ -1,0 +1,15 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	
+	</ui:style>
+	<g:VerticalPanel width="400px">
+		<g:Label>Open your osu client and send the following token to
+			Tillerino:</g:Label>
+		<g:Label ui:field="code">(retrieving token)</g:Label>
+		<g:Label>This token expires within a minute. Don't worry, you can
+			always get a new one by reopening this box.</g:Label>
+		<g:Button ui:field="done">Check</g:Button>
+	</g:VerticalPanel>
+</ui:UiBinder> 

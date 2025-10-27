@@ -4,6 +4,8 @@
 */.classpath
 */.factorypath
 **/tillerinobot-db.json
+ppaddict-db.json
+.gwt
 
 # IntelliJ IDEA
 **/.idea

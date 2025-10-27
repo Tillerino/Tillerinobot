@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	
+	</ui:style>
+	<g:VerticalPanel width="500px">
+		<g:Label styleName="title">Welcome</g:Label>
+		<g:Label>Welcome to ppaddict. Here's the latest:</g:Label>
+		<g:HTMLPanel ui:field="versionMessagePanel"></g:HTMLPanel>
+		<g:Label>Click help to see what everything on the screen does or
+			means. This changes when you navigate around or log in, so do it
+			often!</g:Label>
+		<g:Label>(Click anywhere outside this box to dismiss)</g:Label>
+	</g:VerticalPanel>
+</ui:UiBinder> 

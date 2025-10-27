@@ -1,0 +1,8 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<g:VerticalPanel spacing="5">
+		<g:Anchor ui:field="permalinkBeatmap" text="Show all mods"></g:Anchor>
+		<g:Anchor ui:field="permalinkSet" text="Show entire set"></g:Anchor>
+	</g:VerticalPanel>
+</ui:UiBinder> 
