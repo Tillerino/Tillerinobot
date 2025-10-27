@@ -22,7 +22,7 @@
         <jersey.version>3.0.8</jersey.version>
         <jetty.version>11.0.26</jetty.version>
         <jackson.version>2.20.0</jackson.version>
-        <testcontainers.version>2.0.1</testcontainers.version>
+        <testcontainers.version>1.21.3</testcontainers.version>
         <!-- determined by container -->
         <wiremock.version>3.0.1</wiremock.version>
         <slf4j.version>2.0.13</slf4j.version>
