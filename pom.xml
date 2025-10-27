@@ -20,9 +20,9 @@
     <properties>
         <jacoco.version>0.8.13</jacoco.version>
         <jersey.version>3.0.8</jersey.version>
-        <jetty.version>11.0.5</jetty.version>
-        <jackson.version>2.19.2</jackson.version>
-        <testcontainers.version>1.21.3</testcontainers.version>
+        <jetty.version>11.0.26</jetty.version>
+        <jackson.version>2.20.0</jackson.version>
+        <testcontainers.version>2.0.1</testcontainers.version>
         <!-- determined by container -->
         <wiremock.version>3.0.1</wiremock.version>
         <slf4j.version>2.0.13</slf4j.version>
@@ -31,24 +31,24 @@
         <spotbugs.version>4.9.8</spotbugs.version>
         <spotbugs.plugin.version>4.9.8.1</spotbugs.plugin.version>
         <project.build.outputTimestamp>2020-02-20T20:20:20Z</project.build.outputTimestamp>
-        <mockito.version>5.19.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
         <rabbitmq.version>5.26.0</rabbitmq.version>
         <lombok.version>1.18.42</lombok.version>
-        <mysql-connector-java.version>9.4.0</mysql-connector-java.version>
+        <mysql-connector-java.version>9.5.0</mysql-connector-java.version>
         <jax-rs.version>4.0.0</jax-rs.version>
         <rest-assured.version>5.5.6</rest-assured.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <log4j.version>2.25.1</log4j.version>
-        <assertj-core.version>3.27.4</assertj-core.version>
-        <json-unit-assertj.version>4.1.1</json-unit-assertj.version>
+        <log4j.version>2.25.2</log4j.version>
+        <assertj-core.version>3.27.6</assertj-core.version>
+        <json-unit-assertj.version>5.0.0</json-unit-assertj.version>
         <resilience4j.version>2.3.0</resilience4j.version>
-        <guava.version>33.4.8-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <commons-io.version>2.20.0</commons-io.version>
         <commons-dbcp2.version>2.13.0</commons-dbcp2.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
         <kitteh.version>9.0.0</kitteh.version>
-        <undertow.version>2.2.25.Final</undertow.version>
-        <logcaptor.version>2.12.0</logcaptor.version>
+        <undertow.version>2.2.38.Final</undertow.version>
+        <logcaptor.version>2.12.1</logcaptor.version>
         <dagger.version>2.56.2</dagger.version>
         <junit.version>5.13.4</junit.version>
     </properties>
