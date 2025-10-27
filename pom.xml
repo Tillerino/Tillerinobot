@@ -13,6 +13,7 @@
         <module>tillerinobot-irc</module>
         <module>tillerinobot-rabbit</module>
         <module>tillerinobot-live</module>
+        <module>ppaddict-site</module>
         <module>tillerinobot-tests</module>
     </modules>
 
