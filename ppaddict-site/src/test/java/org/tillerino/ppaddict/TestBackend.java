@@ -25,6 +25,7 @@ import org.tillerino.ppaddict.server.PersistentUserData;
 import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.MockData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 
@@ -86,7 +87,7 @@ public class TestBackend implements PpaddictBackend {
     public Map<BeatmapWithMods, BeatmapData> getBeatmaps() {
         HashMap<BeatmapWithMods, BeatmapData> ret = new HashMap<>();
 
-        for (Integer id : tillerino.tillerinobot.TestBackend.getSetIds().keySet()) {
+        for (Integer id : MockData.getSetIds().keySet()) {
             for (long mods : new long[] {0, getMask(Hidden, HardRock), getMask(DoubleTime)}) {
                 try {
                     final BeatmapMeta meta = diffEstimateProvider.loadBeatmap(id, mods);
