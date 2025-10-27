@@ -6,9 +6,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import lombok.SneakyThrows;
+import org.tillerino.WireMockDocker;
 import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.ppaddict.auth.FakeAuthenticatorService;
 import org.tillerino.ppaddict.auth.FakeAuthenticatorWebsite;
+import org.tillerino.ppaddict.chat.impl.MessageHandlerScheduler.MessageHandlerSchedulerModule;
+import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
+import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
+import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.PpaddictUserDataService;
 import org.tillerino.ppaddict.server.auth.AuthArriveService;
@@ -16,6 +21,7 @@ import org.tillerino.ppaddict.server.auth.implementations.OsuOauth;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestClock;
 import tillerino.tillerinobot.*;
+import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.recommendations.Recommender;
 
@@ -57,7 +63,13 @@ public class LocalPpaddict {
 
     @dagger.Module(
             includes = {
-                LocalConsoleTillerinobot.Module.class,
+                DockeredMysqlModule.class,
+                InMemoryQueuesModule.class,
+                LiveActivityMockModule.class,
+                MessageHandlerSchedulerModule.class,
+                ProcessorsModule.class,
+                TestBaseModule.class,
+                WireMockDocker.Module.class,
                 TestClock.Module.class,
                 FakeAuthenticatorService.Module.class
             })
