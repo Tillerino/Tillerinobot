@@ -18,11 +18,11 @@
     </modules>
 
     <properties>
-        <jacoco.version>0.8.13</jacoco.version>
+        <jacoco.version>0.8.14</jacoco.version>
         <jersey.version>3.0.8</jersey.version>
         <jetty.version>11.0.26</jetty.version>
         <jackson.version>2.20.0</jackson.version>
-        <testcontainers.version>1.21.3</testcontainers.version>
+        <testcontainers.version>2.0.1</testcontainers.version>
         <!-- determined by container -->
         <wiremock.version>3.0.1</wiremock.version>
         <slf4j.version>2.0.13</slf4j.version>
@@ -408,11 +408,11 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.9.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -420,7 +420,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.0</version>
+                    <version>3.14.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -432,7 +432,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>3.5.4</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -621,7 +621,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.2</version>
             </plugin>
 
             <plugin>

@@ -93,7 +93,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>mysql</artifactId>
+            <artifactId>testcontainers-mysql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -122,7 +122,7 @@
             <plugin>
                 <groupId>net.ltgt.gwt.maven</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <moduleName>org.tillerino.ppaddict.Ppaddict</moduleName>

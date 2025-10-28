@@ -1,7 +1,5 @@
 package org.tillerino.ppaddict.util;
 
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.Network;
 
@@ -24,11 +22,6 @@ public class DockerNetwork {
                         .getId());
 
         return new Network() {
-            @Override
-            public Statement apply(Statement base, Description description) {
-                return base;
-            }
-
             @Override
             public String getId() {
                 return id;
