@@ -1,8 +1,8 @@
 package org.tillerino.ppaddict;
 
 import io.undertow.servlet.api.*;
+import jakarta.servlet.Servlet;
 import javax.inject.Inject;
-import javax.servlet.Servlet;
 import lombok.RequiredArgsConstructor;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.PpaddictContextFilter;

@@ -2,7 +2,7 @@ package org.tillerino.ppaddict.server;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;

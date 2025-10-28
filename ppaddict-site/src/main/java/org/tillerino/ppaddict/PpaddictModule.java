@@ -7,8 +7,8 @@ import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
+import jakarta.servlet.ServletException;
 import java.util.function.Consumer;
-import javax.servlet.ServletException;
 
 public class PpaddictModule {
 

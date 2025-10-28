@@ -5,11 +5,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 import org.tillerino.ppaddict.server.auth.AbstractAuthenticatorService;

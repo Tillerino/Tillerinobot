@@ -1,6 +1,6 @@
 package org.tillerino.ppaddict.server;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;

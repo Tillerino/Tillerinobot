@@ -47,7 +47,7 @@
         <commons-dbcp2.version>2.13.0</commons-dbcp2.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <kitteh.version>9.0.0</kitteh.version>
-        <undertow.version>2.2.38.Final</undertow.version>
+        <undertow.version>2.3.20.Final</undertow.version>
         <logcaptor.version>2.12.1</logcaptor.version>
         <dagger.version>2.56.2</dagger.version>
         <junit.version>5.13.4</junit.version>
