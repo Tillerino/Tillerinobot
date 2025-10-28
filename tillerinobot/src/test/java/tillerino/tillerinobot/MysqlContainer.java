@@ -29,6 +29,7 @@ public class MysqlContainer {
             new ContainerDef()
                     .withNetwork(DockerNetwork.NETWORK)
                     .withNetworkAliases("mysql")
+                    .withExposedPorts(3306)
                     .withReuse(true),
             container -> {
                 container.withUsername("root");

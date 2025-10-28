@@ -6,7 +6,6 @@ import jakarta.ws.rs.ServiceUnavailableException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.NoSuchElementException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -89,7 +88,7 @@ public class OsuApiV2 implements OsuApi {
     public interface FromEnvModule {
         @Provides
         static @Named("osuapiv2.url") URI baseUrl() {
-            return URI.create(envOrThrow("OSU_API_V2_URL"));
+            return URI.create(ProdModule.env("OSU_API_V2_URL").orElse("https://osu.ppy.sh"));
         }
 
         @Provides
@@ -100,10 +99,6 @@ public class OsuApiV2 implements OsuApi {
         @Provides
         static Credentials credentials() {
             return Credentials.fromEnvOrProps();
-        }
-
-        static String envOrThrow(String name) {
-            return ProdModule.env(name).orElseThrow(() -> new NoSuchElementException(name + " must be configured!"));
         }
     }
 }
