@@ -38,7 +38,7 @@ public class RecommendationRequestParser {
 
         RecommendationRequestBuilder settingsBuilder = RecommendationRequest.builder();
 
-        settingsBuilder.model(Model.GAMMA10);
+        settingsBuilder.model(Model.GAMMA11);
 
         for (String setting : remaining) {
             if (setting.isEmpty()) continue;

@@ -220,7 +220,7 @@ public class IRCBotTest extends TestBase {
         verifyResponse(bot, message("user", "!R"), anyResponse());
 
         verify(standardRecommender)
-                .loadRecommendations(Mockito.anyList(), any(), eq(Model.GAMMA10), anyBoolean(), anyLong());
+                .loadRecommendations(Mockito.anyList(), any(), eq(Model.GAMMA11), anyBoolean(), anyLong());
     }
 
     private static final GameChatResponse OSUTRACK_RESPONSE_WITH_SPACE = new Success(

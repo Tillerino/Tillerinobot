@@ -143,7 +143,7 @@ public class RecommendationsManagerTest extends TestBase {
         TestBase.mockRecommendations(recommender);
         assertThat(recommendationsManager.getRecommendation(user, "", new Default()))
                 .isNotNull();
-        verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA10), eq(false), eq(0L));
+        verify(recommender).loadRecommendations(any(), any(), eq(Model.GAMMA11), eq(false), eq(0L));
     }
 
     @Test
@@ -194,7 +194,7 @@ public class RecommendationsManagerTest extends TestBase {
                 .loadRecommendations(
                         argThat(l -> l.equals(topPlays.subList(0, limit))),
                         any(),
-                        eq(Model.GAMMA10),
+                        eq(Model.GAMMA11),
                         anyBoolean(),
                         anyLong());
     }
