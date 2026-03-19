@@ -16,6 +16,7 @@ public enum Model {
     GAMMA9(true),
     GAMMA10(true),
     GAMMA11(true),
+    GAMMA12(true),
     /** External model made by NamePendingApproval */
     NAP(true);
 
