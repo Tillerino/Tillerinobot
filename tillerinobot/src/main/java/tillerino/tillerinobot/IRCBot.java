@@ -453,7 +453,7 @@ public class IRCBot implements GameChatEventConsumer {
 
         // message not in language-files, since we cant possible know language atm
         throw new UserException(
-                "Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-%22confusing-name%22-error this page] on how to resolve it!"
+                "Your name is confusing me. Are you banned? If not, pls check out [https://github.com/Tillerino/Tillerinobot/wiki/How-to-fix-confusing-name-error this page] on how to resolve it!"
                         + " if that does not work, pls [https://github.com/Tillerino/Tillerinobot/wiki/Contact contact Tillerino]. (reference "
                         + string + ")");
     }
