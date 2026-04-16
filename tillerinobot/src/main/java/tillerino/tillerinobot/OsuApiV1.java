@@ -15,8 +15,8 @@ import javax.inject.Singleton;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.tillerino.osuApiModel.Downloader;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.util.MdcUtils;
-import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 
@@ -52,9 +52,9 @@ public class OsuApiV1 implements OsuApi {
     }
 
     @Override
-    public ApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
+    public OsuApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
         limitRate();
-        return downloader.getBeatmap(beatmapid, mods, ApiBeatmap.class);
+        return downloader.getBeatmap(beatmapid, mods, OsuApiBeatmap.class);
     }
 
     @Override

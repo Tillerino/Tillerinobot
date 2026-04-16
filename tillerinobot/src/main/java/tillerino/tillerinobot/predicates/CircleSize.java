@@ -1,7 +1,7 @@
 package tillerino.tillerinobot.predicates;
 
 import lombok.EqualsAndHashCode;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 
 @EqualsAndHashCode
 public class CircleSize implements NumericBeatmapProperty {
@@ -12,7 +12,7 @@ public class CircleSize implements NumericBeatmapProperty {
     }
 
     @Override
-    public double getValue(OsuApiBeatmap beatmap, long mods) {
+    public double getValue(ApiBeatmap beatmap, long mods) {
         return beatmap.getCircleSize(mods);
     }
 }

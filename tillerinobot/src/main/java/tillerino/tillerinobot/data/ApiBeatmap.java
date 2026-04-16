@@ -16,6 +16,9 @@ import javax.annotation.CheckForNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.KeyColumn;
 import org.tillerino.mormon.Loader;
@@ -23,25 +26,130 @@ import org.tillerino.mormon.Persister;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.mormon.Table;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.osuApiModel.types.BeatmapId;
-import org.tillerino.osuApiModel.types.BitwiseMods;
-import org.tillerino.osuApiModel.types.MillisSinceEpoch;
+import org.tillerino.osuApiModel.types.*;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 
 /** Stores on {@link OsuApiBeatmap} object in the database. */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @Table("apibeatmaps")
 @KeyColumn({"beatmapId", "mods"})
 @ToString(callSuper = true)
-public class ApiBeatmap extends OsuApiBeatmap {
+public class ApiBeatmap {
     @MillisSinceEpoch
     public long downloaded = System.currentTimeMillis();
 
     @BitwiseMods
     public long mods = 0;
+
+    @BeatmapId
+    private int beatmapId;
+
+    @BeatmapSetId
+    private int setId;
+
+    private String artist;
+    private String title;
+    private String version;
+    private String creator;
+    private String source;
+    private String tags;
+
+    private int creatorId;
+
+    private int genreId;
+
+    private int languageId;
+
+    /**
+     *
+     *
+     * <ul>
+     *   <li>{@value OsuApiBeatmap#GRAVEYARD} = {@link OsuApiBeatmap#GRAVEYARD}
+     *   <li>{@value OsuApiBeatmap#WIP} = {@link OsuApiBeatmap#WIP}
+     *   <li>{@value OsuApiBeatmap#PENDING} = {@link OsuApiBeatmap#PENDING}
+     *   <li>{@value OsuApiBeatmap#RANKED} = {@link OsuApiBeatmap#RANKED}
+     *   <li>{@value OsuApiBeatmap#APPROVED} = {@link OsuApiBeatmap#APPROVED}
+     *   <li>{@value OsuApiBeatmap#QUALIFIED} = {@link OsuApiBeatmap#QUALIFIED}
+     *   <li>{@value OsuApiBeatmap#LOVED} = {@link OsuApiBeatmap#LOVED}
+     * </ul>
+     */
+    private int approved;
+
+    /** may be null if not ranked */
+    @MillisSinceEpoch
+    private Long approvedDate;
+
+    @MillisSinceEpoch
+    private long lastUpdate;
+
+    private double bpm; // can this be non-integral?
+
+    /** Star difficulty */
+    private double starDifficulty;
+
+    private double aimDifficulty;
+
+    private double speedDifficulty;
+
+    /** Overall difficulty (OD) */
+    private double overallDifficulty;
+
+    /** Circle size value (CS) */
+    private double circleSize;
+
+    /** Approach Rate (AR) */
+    private double approachRate;
+
+    /** Healthdrain (HP) */
+    private double healthDrain;
+
+    /** seconds from first note to last note not including breaks */
+    private int hitLength;
+
+    /** seconds from first note to last note including breaks */
+    private int totalLength;
+
+    /** mode (0 = osu!, 1 = Taiko, 2 = CtB, 3 = osu!mania) */
+    @GameMode
+    private int mode;
+
+    /** md5 hash of the beatmap */
+    private String fileMd5;
+
+    /** Number of times the beatmap was favourited. (americans: notice the ou!) */
+    private int favouriteCount;
+
+    /** Number of times the beatmap was played */
+    private int playCount;
+
+    /** Number of times the beatmap was passed, completed (the user didn't fail or retry) */
+    private int passCount;
+
+    /** The maximum combo an user can reach playing this beatmap. */
+    private int maxCombo;
+
+    public double getApproachRate(@BitwiseMods long mods) {
+        return OsuApiBeatmap.calcAR(this.getApproachRate(), mods);
+    }
+
+    public double getOverallDifficulty(@BitwiseMods long mods) {
+        return OsuApiBeatmap.calcOd(this.getOverallDifficulty(), mods);
+    }
+
+    public double getBpm(@BitwiseMods long mods) {
+        return OsuApiBeatmap.calcBpm(this.getBpm(), mods);
+    }
+
+    public int getTotalLength(@BitwiseMods long mods) {
+        return OsuApiBeatmap.calcTotalLength(this.getTotalLength(), mods);
+    }
+
+    public double getCircleSize(@BitwiseMods long mods) {
+        return OsuApiBeatmap.calcCircleSize(this.getCircleSize(), mods);
+    }
 
     public BeatmapWithMods idAndMods() {
         return new BeatmapWithMods(getBeatmapId(), getMods());
@@ -73,7 +181,8 @@ public class ApiBeatmap extends OsuApiBeatmap {
                         mods,
                         beatmap != null ? "outdated" : "new",
                         beatmap != null ? beatmap.getApproved() : "-");
-                beatmap = downloader.getBeatmap(beatmapid, mods);
+                beatmap = Mapper.INSTANCE.fromApi(
+                        downloader.getBeatmap(beatmapid, mods), mods, System.currentTimeMillis());
                 System.out.printf(
                         ".downloaded api beatmap %s/%s (%s; approved %s)%n",
                         beatmapid,
@@ -130,5 +239,16 @@ public class ApiBeatmap extends OsuApiBeatmap {
             }
         }
         return allFresh;
+    }
+
+    @org.mapstruct.Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
+    public interface Mapper {
+        Mapper INSTANCE = Mappers.getMapper(Mapper.class);
+
+        @Mapping(target = "mods", source = "mods")
+        @Mapping(target = "downloaded", source = "downloaded")
+        ApiBeatmap fromApi(OsuApiBeatmap api, @BitwiseMods long mods, long downloaded);
+
+        OsuApiBeatmap toApi(ApiBeatmap api);
     }
 }

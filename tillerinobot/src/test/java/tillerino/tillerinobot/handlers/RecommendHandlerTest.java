@@ -7,11 +7,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -22,7 +22,7 @@ public class RecommendHandlerTest {
     @Test
     public void testDefaultSettings() throws Exception {
         RecommendationsManager manager = mock(RecommendationsManager.class);
-        OsuApiBeatmap beatmap = new OsuApiBeatmap();
+        ApiBeatmap beatmap = new ApiBeatmap();
         beatmap.setMaxCombo(100);
         when(manager.getRecommendation(any(), any(), any()))
                 .thenReturn(new Recommendation(

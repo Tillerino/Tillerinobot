@@ -25,7 +25,6 @@ import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -39,6 +38,7 @@ import tillerino.tillerinobot.BeatmapsLoader;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.data.Player;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
@@ -208,7 +208,7 @@ public class RecommendationsManager {
 
         recommendationsLoop:
         for (BareRecommendation bareRecommendation : recommendations) {
-            OsuApiBeatmap beatmap = null;
+            ApiBeatmap beatmap = null;
             for (RecommendationPredicate predicate : predicates) {
                 if (beatmap == null) {
                     beatmap = beatmapsLoader.getBeatmap(bareRecommendation.beatmapId(), 0L);

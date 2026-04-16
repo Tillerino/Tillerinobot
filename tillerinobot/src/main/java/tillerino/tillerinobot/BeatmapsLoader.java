@@ -3,9 +3,9 @@ package tillerino.tillerinobot;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.annotation.CheckForNull;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
+import tillerino.tillerinobot.data.ApiBeatmap;
 
 public interface BeatmapsLoader {
     /**
@@ -15,5 +15,5 @@ public interface BeatmapsLoader {
      * @return null if not found
      */
     @CheckForNull
-    OsuApiBeatmap getBeatmap(@BeatmapId int beatmapId, @BitwiseMods long mods) throws SQLException, IOException;
+    ApiBeatmap getBeatmap(@BeatmapId int beatmapId, @BitwiseMods long mods) throws SQLException, IOException;
 }

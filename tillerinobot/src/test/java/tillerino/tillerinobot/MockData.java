@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import lombok.Getter;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.*;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -129,9 +129,9 @@ public class MockData {
     }
 
     @Nonnull
-    public static OsuApiBeatmap createMockBeatmap(int beatmapid) {
+    public static ApiBeatmap createMockBeatmap(int beatmapid) {
         Random rand = new Random(beatmapid);
-        OsuApiBeatmap beatmap = new OsuApiBeatmap();
+        ApiBeatmap beatmap = new ApiBeatmap();
         beatmap.setBeatmapId(beatmapid);
         if (setIds.containsKey(beatmapid)) {
             beatmap.setSetId(setIds.get(beatmapid));
@@ -191,7 +191,7 @@ public class MockData {
     }
 
     public static BeatmapMeta createMockBeatmapMeta(int beatmapid, long mods) {
-        OsuApiBeatmap beatmap = createMockBeatmap(beatmapid);
+        ApiBeatmap beatmap = createMockBeatmap(beatmapid);
 
         BeatmapImpl cBeatmap = BeatmapImpl.builder()
                 .modsUsed(DiffEstimateProvider.getDiffMods(mods))

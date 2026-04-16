@@ -9,15 +9,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 @Data
 @AllArgsConstructor
 public class BeatmapMeta {
-    OsuApiBeatmap beatmap;
+    ApiBeatmap beatmap;
 
     Integer personalPP;
 

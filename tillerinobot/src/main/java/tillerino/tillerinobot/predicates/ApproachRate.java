@@ -1,7 +1,7 @@
 package tillerino.tillerinobot.predicates;
 
 import lombok.EqualsAndHashCode;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 
 @EqualsAndHashCode
 public class ApproachRate implements NumericBeatmapProperty {
@@ -11,7 +11,7 @@ public class ApproachRate implements NumericBeatmapProperty {
     }
 
     @Override
-    public double getValue(OsuApiBeatmap beatmap, long mods) {
+    public double getValue(ApiBeatmap beatmap, long mods) {
         return beatmap.getApproachRate(mods);
     }
 }

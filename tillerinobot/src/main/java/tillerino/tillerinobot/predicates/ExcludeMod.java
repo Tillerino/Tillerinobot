@@ -2,7 +2,7 @@ package tillerino.tillerinobot.predicates;
 
 import java.util.Optional;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser.PredicateBuilder;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -10,7 +10,7 @@ import tillerino.tillerinobot.recommendations.RecommendationRequest;
 
 public record ExcludeMod(Mods mod) implements RecommendationPredicate {
     @Override
-    public boolean test(BareRecommendation r, OsuApiBeatmap beatmap) {
+    public boolean test(BareRecommendation r, ApiBeatmap beatmap) {
         return !mod.is(r.mods());
     }
 

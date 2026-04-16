@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.diff.BeatmapImpl;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
@@ -32,7 +32,7 @@ public class BeatmapMetaTest {
     }
 
     public static BeatmapMeta fakeBeatmapMeta(Integer personalPp) {
-        OsuApiBeatmap beatmap = new OsuApiBeatmap();
+        ApiBeatmap beatmap = new ApiBeatmap();
         beatmap.setArtist("Artist");
         beatmap.setTitle("Title");
         beatmap.setVersion("Version");

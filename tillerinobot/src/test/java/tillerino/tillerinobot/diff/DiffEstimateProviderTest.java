@@ -23,6 +23,7 @@ import org.tillerino.ppaddict.util.TestAppender.LogRule;
 import tillerino.tillerinobot.TestBase;
 import tillerino.tillerinobot.data.ActualBeatmap;
 import tillerino.tillerinobot.data.ApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap.Mapper;
 import tillerino.tillerinobot.data.ApiBeatmapTest;
 import tillerino.tillerinobot.data.DiffEstimate;
 
@@ -45,7 +46,7 @@ public class DiffEstimateProviderTest extends TestBase {
 
             mockSanDokuResponse(beatmapContent, 1.919);
 
-            doReturn(beatmap).when(osuApi).getBeatmap(123, 0L);
+            doReturn(Mapper.INSTANCE.toApi(beatmap)).when(osuApi).getBeatmap(123, 0L);
             assertThat(diffEstimateProvider.loadOrCalculate(database, 123, 0))
                     .isNotNull()
                     .satisfies(impl -> assertThat(impl).hasFieldOrPropertyWithValue("AimDifficulty", 1.919));
@@ -82,7 +83,7 @@ public class DiffEstimateProviderTest extends TestBase {
 
             mockSanDokuResponse(beatmapContent, 1.919);
 
-            doReturn(beatmap).when(osuApi).getBeatmap(123, 0L);
+            doReturn(Mapper.INSTANCE.toApi(beatmap)).when(osuApi).getBeatmap(123, 0L);
             assertThat(diffEstimateProvider.loadOrCalculate(database, 123, 0))
                     .isNotNull()
                     .satisfies(impl -> assertThat(impl).hasFieldOrPropertyWithValue("AimDifficulty", 1.919));

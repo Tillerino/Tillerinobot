@@ -1,12 +1,12 @@
 package tillerino.tillerinobot.predicates;
 
 import java.util.Optional;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.RecommendationRequest;
 
 public interface RecommendationPredicate {
-    boolean test(BareRecommendation r, OsuApiBeatmap beatmap);
+    boolean test(BareRecommendation r, ApiBeatmap beatmap);
 
     /** Checks if this predicate contradicts the given predicate. */
     boolean contradicts(RecommendationPredicate otherPredicate);

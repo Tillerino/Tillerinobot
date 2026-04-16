@@ -13,6 +13,7 @@ import org.tillerino.mormon.Loader;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.data.ApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap.Mapper;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -43,7 +44,7 @@ public class BeatmapsServiceImpl implements BeatmapsService {
                 throw new NotFoundException();
             }
 
-            return new BeatmapResourceImpl(databaseManager, downloader, beatmap);
+            return new BeatmapResourceImpl(databaseManager, downloader, Mapper.INSTANCE.toApi(beatmap));
         } catch (SQLException e) {
             log.error("Error while loading beatmap", e);
             throw new InternalServerErrorException();
@@ -57,7 +58,9 @@ public class BeatmapsServiceImpl implements BeatmapsService {
         try (Database database = databaseManager.getDatabase();
                 Loader<ApiBeatmap> loader = database.loader(ApiBeatmap.class, "where `fileMd5` = ?")) {
             return new BeatmapResourceImpl(
-                    databaseManager, downloader, loader.queryUnique(hash).orElseThrow(NotFoundException::new));
+                    databaseManager,
+                    downloader,
+                    Mapper.INSTANCE.toApi(loader.queryUnique(hash).orElseThrow(NotFoundException::new)));
         } catch (SQLException e) {
             log.error("Error while loading beatmap", e);
             throw new InternalServerErrorException();

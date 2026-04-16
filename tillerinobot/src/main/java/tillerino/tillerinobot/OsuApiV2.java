@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.GameMode;
 import org.tillerino.osuApiModel.v2.DownloaderV2;
@@ -16,7 +17,6 @@ import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
 import org.tillerino.ppaddict.ProdModule;
 import org.tillerino.ppaddict.util.MdcUtils;
-import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 
@@ -52,9 +52,9 @@ public class OsuApiV2 implements OsuApi {
     }
 
     @Override
-    public ApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
+    public OsuApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
         limitRate();
-        return downloader.getBeatmap(beatmapid, mods, ApiBeatmap.class);
+        return downloader.getBeatmap(beatmapid, mods, OsuApiBeatmap.class);
     }
 
     @Override

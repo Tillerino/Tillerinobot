@@ -2,8 +2,8 @@ package tillerino.tillerinobot;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
-import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiUser;
 
 public class OsuApiV2Test extends TestBase {
@@ -35,6 +35,6 @@ public class OsuApiV2Test extends TestBase {
 
     @Test
     void testGetBeatmap() throws Exception {
-        Assertions.assertThat(osuApiV2.getBeatmap(131891, 0)).returns("The Quick Brown Fox", ApiBeatmap::getArtist);
+        Assertions.assertThat(osuApiV2.getBeatmap(131891, 0)).returns("The Quick Brown Fox", OsuApiBeatmap::getArtist);
     }
 }

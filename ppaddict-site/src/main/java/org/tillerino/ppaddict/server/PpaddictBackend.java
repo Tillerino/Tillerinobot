@@ -12,6 +12,7 @@ import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 public interface PpaddictBackend {
@@ -45,7 +46,7 @@ public interface PpaddictBackend {
         public interface Mapper {
             Mapper INSTANCE = Mappers.getMapper(Mapper.class);
 
-            OsuApiBeatmapForPpaddict shrink(OsuApiBeatmap large);
+            OsuApiBeatmapForPpaddict shrink(ApiBeatmap large);
         }
     }
 

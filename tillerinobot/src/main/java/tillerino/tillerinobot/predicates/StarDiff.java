@@ -3,7 +3,7 @@ package tillerino.tillerinobot.predicates;
 import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.recommendations.RecommendationRequest;
 
 @EqualsAndHashCode
@@ -14,7 +14,7 @@ public class StarDiff implements NumericBeatmapProperty {
     }
 
     @Override
-    public double getValue(OsuApiBeatmap beatmap, long mods) {
+    public double getValue(ApiBeatmap beatmap, long mods) {
         return beatmap.getStarDifficulty();
     }
 

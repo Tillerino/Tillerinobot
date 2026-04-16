@@ -7,8 +7,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import tillerino.tillerinobot.UserDataManager.UserData;
-import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
 
@@ -55,7 +55,7 @@ public class OsuApiV2Sometimes implements OsuApi {
     }
 
     @Override
-    public ApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
+    public OsuApiBeatmap getBeatmap(int beatmapid, long mods) throws IOException {
         return v1.getBeatmap(beatmapid, mods);
     }
 }

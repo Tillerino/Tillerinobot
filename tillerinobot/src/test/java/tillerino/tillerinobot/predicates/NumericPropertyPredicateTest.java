@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
-import org.tillerino.osuApiModel.OsuApiBeatmap;
+import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 
 public class NumericPropertyPredicateTest {
@@ -13,18 +13,18 @@ public class NumericPropertyPredicateTest {
     public void testOkay() {
         RecommendationPredicate predicate = new NumericPropertyPredicate<>("w/e", new TitleLength(), 3, true, 3, true);
 
-        OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
+        ApiBeatmap okayBeatmap = mock(ApiBeatmap.class);
         when(okayBeatmap.getTitle()).thenReturn("hai");
         BareRecommendation rec = new BareRecommendation(0, 0, null, null, 0);
 
         assertTrue(predicate.test(rec, okayBeatmap));
 
-        OsuApiBeatmap tooLongBeatmap = mock(OsuApiBeatmap.class);
+        ApiBeatmap tooLongBeatmap = mock(ApiBeatmap.class);
         when(tooLongBeatmap.getTitle()).thenReturn("weeeeeeeeee");
 
         assertFalse(predicate.test(rec, tooLongBeatmap));
 
-        OsuApiBeatmap tooShortBeatmap = mock(OsuApiBeatmap.class);
+        ApiBeatmap tooShortBeatmap = mock(ApiBeatmap.class);
         when(tooShortBeatmap.getTitle()).thenReturn("m");
 
         assertFalse(predicate.test(rec, tooShortBeatmap));
@@ -46,7 +46,7 @@ public class NumericPropertyPredicateTest {
     public void testMods() {
         RecommendationPredicate predicate = new NumericPropertyPredicate<>("w/e", new TitleLength(), 2, true, 5, true);
 
-        OsuApiBeatmap okayBeatmap = mock(OsuApiBeatmap.class);
+        ApiBeatmap okayBeatmap = mock(ApiBeatmap.class);
         when(okayBeatmap.getTitle()).thenReturn("hai");
         BareRecommendation okayRec = new BareRecommendation(0, 0, null, null, 0);
 
