@@ -8,4 +8,7 @@
   <Match>
   	<Source name="~.*MapperImpl.java" />
   </Match>
+	<Match>
+		<AnnotatedWith name="org.tillerino.jagger.annotations.Generated"/>
+	</Match>
 </FindBugsFilter>

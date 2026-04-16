@@ -40,14 +40,13 @@ public class UserDataManagerTest extends TestBase {
     }
 
     private void reloadManager() {
-        userDataManager = new UserDataManager(null, dbm);
+        userDataManager = new UserDataManager(null, dbm, botUserDataRepo);
     }
 
     @Test
     public void testLanguageMutability() throws Exception {
-        UserDataManager manager = new UserDataManager(null, dbm);
         List<String> answers = new ArrayList<>();
-        try (UserData data = manager.loadUserData(534678)) {
+        try (UserData data = userDataManager.loadUserData(534678)) {
             data.usingLanguage(language -> {
                 answers.add(language.apiTimeoutException());
                 for (; ; ) {
@@ -68,7 +67,7 @@ public class UserDataManagerTest extends TestBase {
         // at this point we got the first answer again. Time go serialize, deserialize and check if we get the second
         // answer next.
         reloadManager();
-        try (UserData data = manager.loadUserData(534678)) {
+        try (UserData data = userDataManager.loadUserData(534678)) {
             data.usingLanguage(lang -> {
                 assertThat(lang.apiTimeoutException())
                         .as("API timeout message after reload")

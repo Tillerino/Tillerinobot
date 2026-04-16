@@ -17,12 +17,15 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.lang3.function.FailableConsumer;
+import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.tillerino.mormon.Database.UnpreparedStatement;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.PhaseTimer;
+import tillerino.tillerinobot.data.RepoModule;
 
 @Slf4j
 @Singleton
@@ -67,6 +70,7 @@ public class DatabaseManager implements AutoCloseable {
 
         return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database
                 + "?user=" + user + "&password=" + password
+                + "&allowPublicKeyRetrieval=true" // for local markov
                 + "&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&useSSL=false");
     }
 
@@ -118,7 +122,19 @@ public class DatabaseManager implements AutoCloseable {
         }
     }
 
-    @dagger.Module
+    public void onDatabase(FailableConsumer<Connection, SQLException> task) throws SQLException {
+        try (Database db = getDatabase()) {
+            task.accept(db.connection());
+        }
+    }
+
+    public <T> T getFromDatabase(FailableFunction<Connection, T, SQLException> task) throws SQLException {
+        try (Database db = getDatabase()) {
+            return task.apply(db.connection());
+        }
+    }
+
+    @dagger.Module(includes = RepoModule.class)
     public interface FromEnvModule {
         @dagger.Provides
         static @Named("mysql") Properties properties() {

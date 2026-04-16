@@ -23,8 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.data.ActualBeatmap;
@@ -66,21 +66,22 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 
     protected final OsuApiBeatmap beatmap;
 
+    protected final ActualBeatmap.Repo repo;
+
     @Override
     public String getFile() {
-        try {
-            ActualBeatmap found = dbm.selectUnique(ActualBeatmap.class)
-                    .execute("where beatmapid = ", beatmap.getBeatmapId())
-                    .orElse(null);
+        try (Database db = dbm.getDatabase()) {
+            ActualBeatmap found =
+                    repo.findOneById(db.connection(), beatmap.getBeatmapId()).orElse(null);
             if (found != null) {
                 if (found.getHash() == null || found.getHash().isEmpty()) {
                     found.setHash(md5Hex(found.decompressedContent()));
-                    dbm.persist(found, Action.REPLACE);
+                    repo.replace(db.connection(), found);
                 }
                 byte[] content = found.getContent();
                 if (content != null) {
                     found.compressContent(content);
-                    dbm.persist(found, Action.REPLACE);
+                    repo.replace(db.connection(), found);
                 }
             }
             if (found == null
@@ -97,7 +98,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
                 found.compressContent(downloaded.getBytes(UTF_8));
                 found.setDownloaded(System.currentTimeMillis());
                 found.setHash(md5Hex(downloaded));
-                dbm.persist(found, Action.REPLACE);
+                repo.replace(db.connection(), found);
             }
             if (!found.getHash().equals(beatmap.getFileMd5())) {
                 throw new WebApplicationException(Response.status(Status.BAD_GATEWAY)
@@ -115,16 +116,15 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
 
     @Override
     public void setFile(String content) {
-        try {
+        try (Database db = dbm.getDatabase()) {
             String hash = DigestUtils.md5Hex(content);
             if (!hash.equals(beatmap.getFileMd5())) {
                 throw new WebApplicationException(
                         String.format("Hash does not match. Expected: %s Actual: %s", beatmap.getFileMd5(), hash),
                         Status.FORBIDDEN);
             }
-            ActualBeatmap found = dbm.selectUnique(ActualBeatmap.class)
-                    .execute("where beatmapid = ", beatmap.getBeatmapId())
-                    .orElse(null);
+            ActualBeatmap found =
+                    repo.findOneById(db.connection(), beatmap.getBeatmapId()).orElse(null);
             if (found == null) {
                 found = new ActualBeatmap();
                 found.setBeatmapid(beatmap.getBeatmapId());
@@ -132,7 +132,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
             found.compressContent(content.getBytes(UTF_8));
             found.setDownloaded(System.currentTimeMillis());
             found.setHash(hash);
-            dbm.persist(found, Action.REPLACE);
+            repo.replace(db.connection(), found);
         } catch (SQLException e) {
             log.error("database error", e);
             throw new InternalServerErrorException();

@@ -19,10 +19,6 @@ public class TestClock implements Clock {
         time.addAndGet(millis);
     }
 
-    public void set(long millis) {
-        time.set(millis);
-    }
-
     @dagger.Module
     public interface Module {
         @dagger.Binds

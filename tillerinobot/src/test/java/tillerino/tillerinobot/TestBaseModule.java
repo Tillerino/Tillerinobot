@@ -15,7 +15,14 @@ import org.tillerino.ppaddict.config.DatabaseConfigService;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationServiceImpl;
 import org.tillerino.ppaddict.util.Clock;
+import tillerino.tillerinobot.data.ApiBeatmap;
+import tillerino.tillerinobot.data.ApiScore;
+import tillerino.tillerinobot.data.ApiUser;
+import tillerino.tillerinobot.data.DiffEstimate;
+import tillerino.tillerinobot.data.GivenRecommendation;
+import tillerino.tillerinobot.data.Player;
 import tillerino.tillerinobot.data.PullThrough;
+import tillerino.tillerinobot.data.UserTop50Entry;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
@@ -83,8 +90,14 @@ public interface TestBaseModule {
 
     @Provides
     @Singleton
-    static DiffEstimateProvider diffEstimateProvider(BeatmapsService b, OsuApi d, ProcessorApi c, DatabaseManager dbm) {
-        return spy(new DiffEstimateProvider(b, d, c, dbm));
+    static DiffEstimateProvider diffEstimateProvider(
+            BeatmapsService b,
+            OsuApi d,
+            ProcessorApi c,
+            DatabaseManager dbm,
+            DiffEstimate.Repo repo,
+            ApiBeatmap.Repo apiBeatmapRepo) {
+        return spy(new DiffEstimateProvider(b, d, c, dbm, repo, apiBeatmapRepo));
     }
 
     @Provides
@@ -95,14 +108,15 @@ public interface TestBaseModule {
 
     @Provides
     @Singleton
-    static PlayerService playerService(DatabaseManager dbm) {
-        return spy(new PlayerService(dbm));
+    static PlayerService playerService(
+            DatabaseManager dbm, Player.Repo repo, ApiScore.Repo scoreRepo, UserTop50Entry.Repo top50EntryRepo) {
+        return spy(new PlayerService(dbm, repo, scoreRepo, top50EntryRepo));
     }
 
     @Provides
     @Singleton
-    static PullThrough pullThrough(DatabaseManager dbm, Lazy<OsuApi> osuApi) {
-        return spy(new PullThrough(dbm, osuApi));
+    static PullThrough pullThrough(DatabaseManager dbm, ApiUser.Repo apiUserRepo, Lazy<OsuApi> osuApi) {
+        return spy(new PullThrough(dbm, apiUserRepo, osuApi));
     }
 
     @Provides
@@ -115,9 +129,20 @@ public interface TestBaseModule {
             OsuApi osuApi,
             Clock clock,
             ConfigService config,
-            DiffEstimateProvider diffEstimateProvider) {
+            DiffEstimateProvider diffEstimateProvider,
+            PlayerService playerService,
+            GivenRecommendation.Repo givenRecommendationRepo) {
         return spy(new RecommendationsManager(
-                dbm, parser, beatmapsLoader, recommender, osuApi, clock, config, diffEstimateProvider));
+                dbm,
+                parser,
+                beatmapsLoader,
+                recommender,
+                osuApi,
+                clock,
+                config,
+                diffEstimateProvider,
+                playerService,
+                givenRecommendationRepo));
     }
 
     @Provides

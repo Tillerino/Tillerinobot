@@ -17,7 +17,6 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.mormon.Database;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.TestAppender;
 import org.tillerino.ppaddict.util.TestAppender.LogRule;
@@ -81,7 +80,7 @@ public class DiffEstimateProviderTest extends TestBase {
             DiffEstimate oldDiffEstimate = new DiffEstimate(123, 0);
             oldDiffEstimate.setSuccess(true);
             oldDiffEstimate.setMd5("old md5");
-            database.persister(DiffEstimate.class, Action.INSERT).persist(oldDiffEstimate);
+            diffEstimateRepo.insert(database.connection(), oldDiffEstimate);
 
             mockSanDokuResponse(beatmapContent, 1.919);
 
@@ -117,18 +116,18 @@ public class DiffEstimateProviderTest extends TestBase {
         actualBeatmap.setContent(beatmapContent.getBytes());
         actualBeatmap.setDownloaded(System.currentTimeMillis());
         actualBeatmap.setHash(DigestUtils.md5Hex(beatmapContent));
-        dbm.persist(actualBeatmap, Action.INSERT);
+        actualBeatmapRepo.insert(database.connection(), actualBeatmap);
 
         ApiBeatmap beatmap = ApiBeatmapTest.newApiBeatmap();
         beatmap.setBeatmapId(beatmapId);
         beatmap.setFileMd5(DigestUtils.md5Hex(beatmapContent));
-        database.persist(beatmap, Action.INSERT);
+        apiBeatmapRepo.insert(database.connection(), beatmap);
 
         DiffEstimate oldDiffEstimate = new DiffEstimate(beatmapId, 0);
         oldDiffEstimate.setSuccess(true);
         oldDiffEstimate.setMd5(DigestUtils.md5Hex(beatmapContent));
         oldDiffEstimate.setDataVersion(255);
-        database.persister(DiffEstimate.class, Action.INSERT).persist(oldDiffEstimate);
+        diffEstimateRepo.insert(database.connection(), oldDiffEstimate);
 
         mockSanDokuResponse(beatmapContent, 1.919);
     }
@@ -139,10 +138,10 @@ public class DiffEstimateProviderTest extends TestBase {
             DiffEstimate oldDiffEstimate = new DiffEstimate(123, 0);
             oldDiffEstimate.setSuccess(true);
             oldDiffEstimate.setMd5("no md5");
-            database.persister(DiffEstimate.class, Action.INSERT).persist(oldDiffEstimate);
+            diffEstimateRepo.insert(database.connection(), oldDiffEstimate);
 
             assertThat(diffEstimateProvider.loadOrCalculate(database, 123, 0)).isNull();
-            assertThat(database.loader(DiffEstimate.class, "").query()).isEmpty();
+            assertThat(diffEstimateRepo.getAll(database.connection())).isEmpty();
         }
     }
 
@@ -157,10 +156,10 @@ public class DiffEstimateProviderTest extends TestBase {
             actualBeatmap.setContent("bla old".getBytes());
             actualBeatmap.setDownloaded(0); // so it can be updated
             actualBeatmap.setHash(DigestUtils.md5Hex("bla old"));
-            dbm.persist(actualBeatmap, Action.REPLACE);
+            actualBeatmapRepo.replace(db.connection(), actualBeatmap);
             doReturn("bla").when(beatmapDownloader).getActualBeatmap(123);
 
-            assertThat(database.selectUnique(DiffEstimate.class).execute("where beatmapid = ", 123, " and mods = ", 0L))
+            assertThat(diffEstimateRepo.findOne(database.connection(), 123, 0L))
                     .hasValueSatisfying(
                             diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 0.0));
 
@@ -169,7 +168,7 @@ public class DiffEstimateProviderTest extends TestBase {
                             ::updateDiffEstimatesAndWait); // since we downloaded, this won't sleep because it hasn't
             // exhausted all beatmaps.
             verify(beatmapDownloader).getActualBeatmap(123);
-            assertThat(database.selectUnique(DiffEstimate.class).execute("where beatmapid = ", 123, " and mods = ", 0L))
+            assertThat(diffEstimateRepo.findOne(database.connection(), 123, 0L))
                     .hasValueSatisfying(
                             diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 1.919));
         }
@@ -181,19 +180,19 @@ public class DiffEstimateProviderTest extends TestBase {
             setUpOutdatedVersionDiffEstimate(database, "bla123", 123);
             setUpOutdatedVersionDiffEstimate(database, "bla456", 456);
 
-            assertThat(database.selectUnique(DiffEstimate.class).execute("where beatmapid = ", 123, " and mods = ", 0L))
+            assertThat(diffEstimateRepo.findOne(database.connection(), 123, 0L))
                     .hasValueSatisfying(
                             diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 0.0));
-            assertThat(database.selectUnique(DiffEstimate.class).execute("where beatmapid = ", 456, " and mods = ", 0L))
+            assertThat(diffEstimateRepo.findOne(database.connection(), 456, 0L))
                     .hasValueSatisfying(
                             diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 0.0));
 
             runAsyncAndWait(diffEstimateProvider::updateDiffEstimates);
 
-            assertThat(database.selectUnique(DiffEstimate.class).execute("where beatmapid = ", 123, " and mods = ", 0L))
+            assertThat(diffEstimateRepo.findOne(database.connection(), 123, 0L))
                     .hasValueSatisfying(
                             diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 1.919));
-            assertThat(database.selectUnique(DiffEstimate.class).execute("where beatmapid = ", 456, " and mods = ", 0L))
+            assertThat(diffEstimateRepo.findOne(database.connection(), 456, 0L))
                     .hasValueSatisfying(
                             diffEstimate -> assertThat(diffEstimate).hasFieldOrPropertyWithValue("aim", 1.919));
         }

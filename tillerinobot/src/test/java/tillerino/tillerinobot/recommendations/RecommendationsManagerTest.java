@@ -17,8 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tillerino.mormon.Loader;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.ApiUser;
@@ -41,12 +39,12 @@ public class RecommendationsManagerTest extends TestBase {
     public void testAutoIncrement() throws SQLException {
         GivenRecommendation rec = new GivenRecommendation(323456789, 2, 3, 4);
 
-        dbm.persist(rec, Action.INSERT);
+        givenRecommendationRepo.insert(db.connection(), rec);
 
-        try (Loader<GivenRecommendation> loader = db.loader(GivenRecommendation.class, "")) {
-            GivenRecommendation givenRecommendation = loader.queryUnique().get();
-            assertThat(givenRecommendation.getId()).isPositive().isNotEqualTo(323456789);
-        }
+        List<GivenRecommendation> all = givenRecommendationRepo.getAll(db.connection());
+        assertThat(all).hasSize(1);
+        GivenRecommendation givenRecommendation = all.get(0);
+        assertThat(givenRecommendation.getId()).isPositive().isNotEqualTo(323456789);
     }
 
     @Test

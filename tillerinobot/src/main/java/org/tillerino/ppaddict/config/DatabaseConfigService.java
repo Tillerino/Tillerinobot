@@ -11,16 +11,15 @@ import org.tillerino.mormon.DatabaseManager;
 import tillerino.tillerinobot.data.BotConfig;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DatabaseConfigService implements ConfigService {
     private final DatabaseManager dbm;
+    private final BotConfig.Repo repo;
 
     @Override
     public Optional<String> config(String key) {
         try (Database db = dbm.getDatabase()) {
-            return db.selectUnique(BotConfig.class)
-                    .execute("where path = ", key)
-                    .map(BotConfig::getValue);
+            return repo.get(db.connection(), key).map(BotConfig::getValue);
         } catch (SQLException e) {
             throw new ContextedRuntimeException("Unable to load config", e).addContextValue("key", key);
         }

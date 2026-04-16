@@ -51,6 +51,8 @@
         <logcaptor.version>2.12.1</logcaptor.version>
         <dagger.version>2.56.2</dagger.version>
         <junit.version>5.13.4</junit.version>
+        <jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
+        <jagger.version>0.6.5-SNAPSHOT</jagger.version>
     </properties>
 
     <dependencyManagement>
@@ -139,6 +141,11 @@
                 <version>${jax-rs.version}</version>
             </dependency>
             <dependency>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>${jakarta.persistence-api.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>1</version>
@@ -222,6 +229,16 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tillerino.jagger</groupId>
+                <artifactId>jagger-core</artifactId>
+                <version>${jagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tillerino.jagger</groupId>
+                <artifactId>jagger-processor</artifactId>
+                <version>${jagger.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.rabbitmq</groupId>
@@ -526,14 +543,18 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </annotationProcessorPath>
-                        <dependency>
+                        <annotationProcessorPath>
+                            <groupId>org.tillerino.jagger</groupId>
+                            <artifactId>jagger-processor</artifactId>
+                        </annotationProcessorPath>
+                        <annotationProcessorPath>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
-                        </dependency>
-                        <dependency>
+                        </annotationProcessorPath>
+                        <annotationProcessorPath>
                             <groupId>com.google.dagger</groupId>
                             <artifactId>dagger-compiler</artifactId>
-                        </dependency>
+                        </annotationProcessorPath>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>

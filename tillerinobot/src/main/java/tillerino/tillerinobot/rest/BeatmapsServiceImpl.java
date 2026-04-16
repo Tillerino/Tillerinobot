@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Loader;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import tillerino.tillerinobot.OsuApi;
+import tillerino.tillerinobot.data.ActualBeatmap;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiBeatmap.Mapper;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
@@ -20,8 +20,9 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 @Slf4j
 public class BeatmapsServiceImpl implements BeatmapsService {
     private static class BeatmapResourceImpl extends AbstractBeatmapResource {
-        public BeatmapResourceImpl(DatabaseManager dbm, BeatmapDownloader downloader, OsuApiBeatmap beatmap) {
-            super(dbm, downloader, beatmap);
+        public BeatmapResourceImpl(
+                DatabaseManager dbm, BeatmapDownloader downloader, OsuApiBeatmap beatmap, ActualBeatmap.Repo repo) {
+            super(dbm, downloader, beatmap, repo);
         }
 
         @Override
@@ -36,15 +37,21 @@ public class BeatmapsServiceImpl implements BeatmapsService {
 
     private final OsuApi apiDownloader;
 
+    private final ActualBeatmap.Repo actualBeatmapRepo;
+
+    private final ApiBeatmap.Repo apiBeatmapRepo;
+
     @Override
     public BeatmapResource byId(int id) {
         try (Database database = databaseManager.getDatabase()) {
-            ApiBeatmap beatmap = ApiBeatmap.loadOrDownload(database, id, 0L, 0, apiDownloader);
+            ApiBeatmap beatmap =
+                    ApiBeatmap.loadOrDownload(apiBeatmapRepo, database.connection(), id, 0L, 0, apiDownloader);
             if (beatmap == null) {
                 throw new NotFoundException();
             }
 
-            return new BeatmapResourceImpl(databaseManager, downloader, Mapper.INSTANCE.toApi(beatmap));
+            return new BeatmapResourceImpl(
+                    databaseManager, downloader, Mapper.INSTANCE.toApi(beatmap), actualBeatmapRepo);
         } catch (SQLException e) {
             log.error("Error while loading beatmap", e);
             throw new InternalServerErrorException();
@@ -55,12 +62,13 @@ public class BeatmapsServiceImpl implements BeatmapsService {
 
     @Override
     public BeatmapResource byHash(String hash) {
-        try (Database database = databaseManager.getDatabase();
-                Loader<ApiBeatmap> loader = database.loader(ApiBeatmap.class, "where `fileMd5` = ?")) {
+        try (Database db = databaseManager.getDatabase()) {
+            ApiBeatmap beatmap = ApiBeatmap.findByFileMd5(apiBeatmapRepo, db.connection(), hash);
+            if (beatmap == null) {
+                throw new NotFoundException();
+            }
             return new BeatmapResourceImpl(
-                    databaseManager,
-                    downloader,
-                    Mapper.INSTANCE.toApi(loader.queryUnique(hash).orElseThrow(NotFoundException::new)));
+                    databaseManager, downloader, Mapper.INSTANCE.toApi(beatmap), actualBeatmapRepo);
         } catch (SQLException e) {
             log.error("Error while loading beatmap", e);
             throw new InternalServerErrorException();

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.ApiUser;
+import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
@@ -36,7 +37,9 @@ public class TsundereTest {
                         null,
                         null,
                         null,
-                        null),
+                        null,
+                        null,
+                        mock(GivenRecommendation.Repo.class)),
                 mock(LiveActivity.class));
 
         // make a bullshit call to the handler four times

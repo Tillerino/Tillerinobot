@@ -9,9 +9,10 @@ import org.apache.commons.lang3.function.Failable;
 import org.junit.jupiter.api.Test;
 import org.tillerino.ppaddict.util.TestClock;
 import tillerino.tillerinobot.AbstractDatabaseTest;
+import tillerino.tillerinobot.data.RepoModule;
 
 public class PpaddictUserDataServiceTest extends AbstractDatabaseTest {
-    @Component(modules = {TestClock.Module.class, DockeredMysqlModule.class})
+    @Component(modules = {TestClock.Module.class, DockeredMysqlModule.class, RepoModule.class})
     @Singleton
     interface Injector {
         void inject(PpaddictUserDataServiceTest t);

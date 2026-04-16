@@ -23,7 +23,8 @@ public class PpTestManual extends TestBase {
 
     {
         // switch to V2 API
-        diffEstimateProvider = new DiffEstimateProvider(beatmapsService, osuApiV2, sanDoku, dbm);
+        diffEstimateProvider =
+                new DiffEstimateProvider(beatmapsService, osuApiV2, sanDoku, dbm, diffEstimateRepo, apiBeatmapRepo);
     }
 
     @Test

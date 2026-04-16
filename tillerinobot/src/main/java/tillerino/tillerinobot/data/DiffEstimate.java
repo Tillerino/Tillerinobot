@@ -1,11 +1,16 @@
 package tillerino.tillerinobot.data;
 
 import com.github.omkelderman.sandoku.DiffResult;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.mapstruct.Mapper;
@@ -13,14 +18,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
-import org.tillerino.mormon.Column;
-import org.tillerino.mormon.Database;
-import org.tillerino.mormon.KeyColumn;
-import org.tillerino.mormon.Loader;
-import org.tillerino.mormon.Table;
+import org.tillerino.jagger.annotations.*;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
-import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.BeatmapImpl;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
@@ -37,8 +37,8 @@ import tillerino.tillerinobot.diff.sandoku.SanDoku;
  */
 @Data
 @NoArgsConstructor
-@Table("diffestimates")
-@KeyColumn({"beatmapid", "mods"})
+@Table(name = "diffestimates")
+@JdbcConfig(quoteChar = "`")
 public class DiffEstimate {
     @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
     public interface DiffEstimateToBeatmapImplMapper {
@@ -95,9 +95,11 @@ public class DiffEstimate {
 
     // all fields are public because Mapstruct <> lombok is broken
     // meta data
+    @Id
     @BeatmapId
     public int beatmapid;
 
+    @Id
     @BitwiseMods
     public long mods;
 
@@ -124,7 +126,7 @@ public class DiffEstimate {
     public double approachRate;
     public double overallDifficulty;
 
-    @Column("maxMaxCombo")
+    @Column(name = "maxMaxCombo")
     public int maxCombo;
 
     public int circleCount;
@@ -138,24 +140,35 @@ public class DiffEstimate {
         this.mods = mods;
     }
 
-    /**
-     * Load multiple diff estimates at once.
-     *
-     * @param beatmaps performance penalty if not unique, but will not throw up
-     * @return entries for all diff estimates that could be found. Will not throw if some are missing.
-     */
-    public static Map<BeatmapWithMods, DiffEstimate> loadMultiple(
-            Database database, Collection<BeatmapWithMods> beatmaps) throws SQLException {
-        if (beatmaps.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        String combinations = beatmaps.stream()
-                .map(bwm -> "(" + bwm.beatmap() + "," + bwm.mods() + ")")
-                .collect(Collectors.joining(",", "(", ")"));
-        try (Loader<DiffEstimate> loader =
-                database.loader(DiffEstimate.class, "where (beatmapid, mods) in " + combinations)) {
-            return loader.queryList().stream()
-                    .collect(Collectors.toMap(e -> new BeatmapWithMods(e.beatmapid, e.mods), e -> e));
-        }
+    @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
+    public interface Repo {
+        @JdbcSelect
+        List<DiffEstimate> getAll(Connection c) throws SQLException;
+
+        @JdbcSelect(where = "`beatmapid` = :beatmapid and `mods` = :mods")
+        Optional<DiffEstimate> findOne(Connection c, @BeatmapId int beatmapid, @BitwiseMods long mods)
+                throws SQLException;
+
+        @JdbcSelect("select * from diffestimates where dataVersion != :version limit 1")
+        Optional<DiffEstimate> getOutdated(Connection c, int version) throws SQLException;
+
+        @JdbcSelect(where = "`success`")
+        Iterable<DiffEstimate> iterateSuccessful(Connection c) throws SQLException;
+
+        @JdbcInsert
+        void insert(Connection c, DiffEstimate diffEstimate) throws SQLException;
+
+        @JdbcInsert("REPLACE INTO `diffestimates` (`diffEstimate.#columns`) VALUES (:diffEstimate.#values)")
+        void replace(Connection c, DiffEstimate diffEstimate) throws SQLException;
+
+        @JdbcSelect
+        List<DiffEstimate> getMultiple(ResultSet resultSet) throws SQLException;
+
+        @JdbcUpdate("DELETE from diffestimates where (`beatmapid`, `mods`) = (:beatmapid, :mods)")
+        void deleteByBeatmapIdAndMods(Connection c, @BeatmapId int beatmapid, @BitwiseMods long mods)
+                throws SQLException;
+
+        @JdbcUpdate("DELETE from diffestimates where `beatmapid` = :beatmapid")
+        void deleteByBeatmapId(Connection c, @BeatmapId int beatmapid) throws SQLException;
     }
 }

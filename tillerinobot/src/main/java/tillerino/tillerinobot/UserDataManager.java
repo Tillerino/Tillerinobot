@@ -25,8 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
+import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -215,11 +215,14 @@ public class UserDataManager {
 
     private final DatabaseManager dbm;
 
+    private final BotUserData.Repo repo;
+
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
     @Inject
-    public UserDataManager(BotBackend backend, DatabaseManager dbm) {
+    public UserDataManager(BotBackend backend, DatabaseManager dbm, BotUserData.Repo repo) {
         this.backend = backend;
         this.dbm = dbm;
+        this.repo = repo;
     }
 
     /**
@@ -236,10 +239,9 @@ public class UserDataManager {
             .registerModule(new ParameterNamesModule());
 
     public UserData loadUserData(@UserId int userid) throws SQLException {
-        try (var _ = PhaseTimer.timeTask("loadUserData")) {
-            BotUserData data = dbm.selectUnique(BotUserData.class)
-                    .execute("where userId = ", userid)
-                    .orElse(null);
+        try (var _ = PhaseTimer.timeTask("loadUserData");
+                Database db = dbm.getDatabase()) {
+            BotUserData data = repo.get(db.connection(), userid).orElse(null);
 
             UserData options;
             if (data == null || StringUtils.isEmpty(data.getUserdata())) {
@@ -280,7 +282,9 @@ public class UserDataManager {
             BotUserData data = new BotUserData();
             data.setUserId(options.userid);
             data.setUserdata(serialized);
-            dbm.persist(data, Action.REPLACE);
+            try (Database db = dbm.getDatabase()) {
+                repo.set(db.connection(), data);
+            }
             options.setChanged(false);
         }
     }

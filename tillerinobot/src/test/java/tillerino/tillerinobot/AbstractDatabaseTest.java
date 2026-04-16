@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
 import tillerino.tillerinobot.MysqlContainer.MysqlDatabaseLifecycle;
+import tillerino.tillerinobot.data.*;
 
 /** Creates a MySQL instance in running in Docker. */
 public abstract class AbstractDatabaseTest {
@@ -24,7 +25,7 @@ public abstract class AbstractDatabaseTest {
         void inject(AbstractDatabaseTest t);
     }
 
-    @dagger.Module
+    @dagger.Module(includes = RepoModule.class)
     public interface DockeredMysqlModule {
         @dagger.Provides
         @Named("mysql")
@@ -44,6 +45,36 @@ public abstract class AbstractDatabaseTest {
 
     @Inject
     protected DatabaseManager dbm;
+
+    @Inject
+    protected BotUserData.Repo botUserDataRepo;
+
+    @Inject
+    protected DiffEstimate.Repo diffEstimateRepo;
+
+    @Inject
+    protected Player.Repo playerRepo;
+
+    @Inject
+    protected ActualBeatmap.Repo actualBeatmapRepo;
+
+    @Inject
+    protected ApiScore.Repo apiScoreRepo;
+
+    @Inject
+    protected UserTop50Entry.Repo userTop50Repo;
+
+    @Inject
+    protected UserNameMapping.Repo userNameMappingRepo;
+
+    @Inject
+    protected GivenRecommendation.Repo givenRecommendationRepo;
+
+    @Inject
+    protected ApiBeatmap.Repo apiBeatmapRepo;
+
+    @Inject
+    protected ApiUser.Repo apiUserRepo;
 
     protected Database db;
 
