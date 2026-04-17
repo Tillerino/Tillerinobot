@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.GameMode;
@@ -67,18 +68,24 @@ public class OsuApiV2 implements OsuApi {
     @Override
     public List<ApiScore> getUserTop(int userId, int mode, int limit) throws IOException {
         limitRate();
-        return downloader.getUserTop(userId, mode, limit, ApiScore.class);
+        return downloader.getUserTop(userId, mode, limit, OsuApiScore.class).stream()
+                .map(score -> ApiScore.Mapper.INSTANCE.fromApi(score, clock.currentTimeMillis()))
+                .toList();
     }
 
     @Override
     public List<ApiScore> getUserRecent(int userid, int mode) throws IOException {
         limitRate();
-        return downloader.getUserRecent(userid, mode, ApiScore.class);
+        return downloader.getUserRecent(userid, mode, OsuApiScore.class).stream()
+                .map(score -> ApiScore.Mapper.INSTANCE.fromApi(score, clock.currentTimeMillis()))
+                .toList();
     }
 
     public List<ApiScore> getBeatmapTop(@BeatmapId int beatmapId, @GameMode int gameMode) throws IOException {
         limitRate();
-        return downloader.getBeatmapTop(beatmapId, gameMode, ApiScore.class);
+        return downloader.getBeatmapTop(beatmapId, gameMode, OsuApiScore.class).stream()
+                .map(score -> ApiScore.Mapper.INSTANCE.fromApi(score, clock.currentTimeMillis()))
+                .toList();
     }
 
     private void limitRate() {

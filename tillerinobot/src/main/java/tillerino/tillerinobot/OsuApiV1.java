@@ -16,6 +16,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.tillerino.osuApiModel.Downloader;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
@@ -68,13 +69,17 @@ public class OsuApiV1 implements OsuApi {
     @Override
     public List<ApiScore> getUserTop(int userId, int mode, int limit) throws IOException {
         limitRate();
-        return downloader.getUserTop(userId, mode, limit, ApiScore.class);
+        return downloader.getUserTop(userId, mode, limit, OsuApiScore.class).stream()
+                .map(score -> ApiScore.Mapper.INSTANCE.fromApi(score, clock.currentTimeMillis()))
+                .toList();
     }
 
     @Override
     public List<ApiScore> getUserRecent(int userid, int mode) throws IOException {
         limitRate();
-        return downloader.getUserRecent(userid, mode, ApiScore.class);
+        return downloader.getUserRecent(userid, mode, OsuApiScore.class).stream()
+                .map(score -> ApiScore.Mapper.INSTANCE.fromApi(score, clock.currentTimeMillis()))
+                .toList();
     }
 
     private void limitRate() {

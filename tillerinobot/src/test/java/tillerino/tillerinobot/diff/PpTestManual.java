@@ -14,7 +14,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiScore;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.diff.sandoku.SanDoku;
@@ -118,6 +117,6 @@ public class PpTestManual extends TestBase {
         Mapper INSTANCE = Mappers.getMapper(Mapper.class);
 
         @Mapping(target = "totalScore", expression = "java(0L)")
-        ScoreInfo toSanDoku(OsuApiScore score);
+        ScoreInfo toSanDoku(ApiScore score);
     }
 }

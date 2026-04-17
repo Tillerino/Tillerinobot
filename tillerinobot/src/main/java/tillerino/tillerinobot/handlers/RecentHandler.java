@@ -3,7 +3,6 @@ package tillerino.tillerinobot.handlers;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.BeatmapMeta;
@@ -34,7 +33,7 @@ public record RecentHandler(PullThrough pullThrough, DiffEstimateProvider diffEs
             throw new UserException(language.noRecentPlays());
         }
 
-        OsuApiScore score = recentPlays.getFirst();
+        ApiScore score = recentPlays.getFirst();
 
         final BeatmapMeta estimates = diffEstimateProvider.loadBeatmap(score.getBeatmapId(), score.getMods());
 
