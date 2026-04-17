@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import tillerino.tillerinobot.IrcNameResolver;
+import tillerino.tillerinobot.data.ApiUser;
 
 @Singleton
 @Path("/userbyid")
@@ -24,9 +24,9 @@ public class UserByIdService {
     @KeyRequired
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public OsuApiUser getUserById(@QueryParam("id") @UserId int id) throws SQLException {
+    public ApiUser getUserById(@QueryParam("id") @UserId int id) throws SQLException {
         try {
-            OsuApiUser user = resolver.resolveManually(id);
+            ApiUser user = resolver.resolveManually(id);
             if (user == null) {
                 throw new NotFoundException("user with that id does not exist");
             } else {

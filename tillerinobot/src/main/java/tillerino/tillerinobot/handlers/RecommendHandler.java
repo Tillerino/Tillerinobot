@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import org.tillerino.ppaddict.chat.LiveActivity;
@@ -18,6 +17,7 @@ import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.Recommendation;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
@@ -36,7 +36,7 @@ public class RecommendHandler extends CommandHandler.WithShorthand {
 
     @Override
     public GameChatResponse handleArgument(
-            String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData, Language lang)
+            String originalCommand, @Nonnull String remaining, ApiUser apiUser, UserData userData, Language lang)
             throws UserException, IOException, SQLException, InterruptedException {
         MDC.put(MdcUtils.MDC_HANDLER, MdcUtils.MDC_HANDLER_RECOMMEND);
 

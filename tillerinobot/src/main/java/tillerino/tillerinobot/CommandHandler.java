@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.Strings;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 
 public interface CommandHandler {
@@ -26,7 +26,7 @@ public interface CommandHandler {
          * @return never null
          */
         @Nonnull
-        GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+        GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
                 throws IOException, SQLException, InterruptedException;
     }
 
@@ -39,14 +39,14 @@ public interface CommandHandler {
      * @throws UserException if the input is invalid
      */
     @CheckForNull
-    GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+    GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
             throws UserException, IOException, SQLException, InterruptedException;
 
     default CommandHandler or(CommandHandler next) {
         CommandHandler me = this;
         return new CommandHandler() {
             @Override
-            public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+            public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
                     throws UserException, IOException, SQLException, InterruptedException {
                 GameChatResponse response = me.handle(command, apiUser, userData, lang);
                 if (response != null) {
@@ -79,7 +79,7 @@ public interface CommandHandler {
     static CommandHandler handling(String start, CommandHandler underlying) {
         return new CommandHandler() {
             @Override
-            public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+            public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
                     throws UserException, IOException, SQLException, InterruptedException {
                 if (!Strings.CI.startsWith(command, start)) {
                     return null;
@@ -112,7 +112,7 @@ public interface CommandHandler {
     static CommandHandler alwaysHandling(String start, AnyCommandHandler underlying) {
         return new CommandHandler() {
             @Override
-            public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+            public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
                     throws IOException, SQLException, InterruptedException {
                 if (!Strings.CI.startsWith(command, start)) {
                     return null;
@@ -139,8 +139,7 @@ public interface CommandHandler {
         }
 
         @Override
-        public final GameChatResponse handle(
-                String originalCommand, OsuApiUser apiUser, UserData userData, Language lang)
+        public final GameChatResponse handle(String originalCommand, ApiUser apiUser, UserData userData, Language lang)
                 throws UserException, IOException, SQLException, InterruptedException {
             String lowerCase = originalCommand.toLowerCase();
             if (lowerCase.equals(alias)) {
@@ -160,7 +159,7 @@ public interface CommandHandler {
         }
 
         public abstract GameChatResponse handleArgument(
-                String originalCommand, @Nonnull String remaining, OsuApiUser apiUser, UserData userData, Language lang)
+                String originalCommand, @Nonnull String remaining, ApiUser apiUser, UserData userData, Language lang)
                 throws UserException, IOException, SQLException, InterruptedException;
     }
 }

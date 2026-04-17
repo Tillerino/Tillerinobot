@@ -4,10 +4,10 @@ import static java.util.stream.Collectors.joining;
 
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.handlers.OptionsHandler;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
@@ -18,7 +18,7 @@ public class LangOptionHandler extends OptionHandler {
     }
 
     @Override
-    protected void handleSet(String value, UserData userData, OsuApiUser apiUser, Language lang) throws UserException {
+    protected void handleSet(String value, UserData userData, ApiUser apiUser, Language lang) throws UserException {
         LanguageIdentifier ident;
         try {
             ident = OptionsHandler.find(LanguageIdentifier.values(), i -> i.token, value);
@@ -34,7 +34,7 @@ public class LangOptionHandler extends OptionHandler {
     }
 
     @Override
-    protected GameChatResponse responseAfterSet(UserData userData, OsuApiUser apiUser) {
+    protected GameChatResponse responseAfterSet(UserData userData, ApiUser apiUser) {
         return userData.usingLanguage(lang -> lang.optionalCommentOnLanguage(apiUser));
     }
 

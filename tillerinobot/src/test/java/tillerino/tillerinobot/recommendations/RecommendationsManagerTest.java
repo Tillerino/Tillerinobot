@@ -20,14 +20,14 @@ import org.junit.jupiter.api.Test;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.*;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.lang.Default;
 
 public class RecommendationsManagerTest extends TestBase {
 
-    OsuApiUser user;
+    ApiUser user;
 
     @BeforeEach
     public void createUser() throws Exception {

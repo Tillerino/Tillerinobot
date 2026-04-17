@@ -13,13 +13,13 @@ import static org.mockito.Mockito.when;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.lang.LanguageIdentifier;
@@ -141,7 +141,7 @@ public class OptionsHandlerTest {
 
     @Test
     public void testInvalidDefaultSettings() {
-        OsuApiUser user = new OsuApiUser();
+        ApiUser user = new ApiUser();
         user.setUserId(1);
         assertThrows(UserException.class, () -> handler.handle("set default invalid", user, userData, new Default()));
     }

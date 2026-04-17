@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /** @author [HDHR] andre.pedrocv@gmail.com https://osu.ppy.sh/u/3547567 https://github.com/ThatGuy986 */
 public class PortuguesePortugal implements Language {
@@ -37,7 +37,7 @@ public class PortuguesePortugal implements Language {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -103,7 +103,7 @@ public class PortuguesePortugal implements Language {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("anda cá!").then(new Action("abraça " + apiUser.getUserName()));
     }
 
@@ -122,7 +122,7 @@ public class PortuguesePortugal implements Language {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Desculpa, de momento" + feature + " só está disponível para jogadores de rank superior a " + minRank
                 + ".";
     }
@@ -150,7 +150,7 @@ public class PortuguesePortugal implements Language {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message("O [HDHR] ensinou-me a falar Português (de Portugal)!");
     }
 

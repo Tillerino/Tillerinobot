@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.predicates.PredicateParser;
 import tillerino.tillerinobot.predicates.RecommendationPredicate;
@@ -32,7 +32,7 @@ public class RecommendationRequestParser {
      * @param message the string after the trigger word, e.g. "!r " has been removed.
      * @return a validated request
      */
-    public RecommendationRequest parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message, Language lang)
+    public RecommendationRequest parseSamplerSettings(ApiUser apiUser, @Nonnull String message, Language lang)
             throws UserException, SQLException, IOException {
         String[] remaining = message.split(" ");
 
@@ -69,7 +69,7 @@ public class RecommendationRequestParser {
         return request;
     }
 
-    private boolean parseEngines(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser user) {
+    private boolean parseEngines(String param, RecommendationRequestBuilder settingsBuilder, ApiUser user) {
         String lowerCase = param.toLowerCase();
         if (getLevenshteinDistance(lowerCase, "relax") <= 2) {
             settingsBuilder.model(Model.ALPHA);
@@ -141,7 +141,7 @@ public class RecommendationRequestParser {
     }
 
     private boolean parsePredicates(
-            String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser apiUser, Language lang)
+            String param, RecommendationRequestBuilder settingsBuilder, ApiUser apiUser, Language lang)
             throws UserException {
         if (backend.getDonator(apiUser.getUserId()) > 0) {
             RecommendationPredicate predicate = parser.tryParse(param, lang);
@@ -161,7 +161,7 @@ public class RecommendationRequestParser {
         return false;
     }
 
-    private boolean parseOther(String param, RecommendationRequestBuilder settingsBuilder, OsuApiUser apiUser) {
+    private boolean parseOther(String param, RecommendationRequestBuilder settingsBuilder, ApiUser apiUser) {
         String lowerCase = param.toLowerCase();
         if (backend.getDonator(apiUser.getUserId()) > 0) {
             switch (lowerCase) {

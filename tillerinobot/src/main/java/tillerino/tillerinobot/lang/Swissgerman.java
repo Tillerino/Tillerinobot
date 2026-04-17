@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 public class Swissgerman implements Language {
 
@@ -36,7 +36,7 @@ public class Swissgerman implements Language {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -102,7 +102,7 @@ public class Swissgerman implements Language {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("La dich umarme!").then(new Action("umarmt " + apiUser.getUserName()));
     }
 
@@ -121,7 +121,7 @@ public class Swissgerman implements Language {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Es tuet mir sehr leid, aber momentan gits " + feature + " nur für Spieler, wo mindestens Rang "
                 + minRank + " sind.";
     }
@@ -149,7 +149,7 @@ public class Swissgerman implements Language {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message("De Maurice het mir Schwiizerdütsch bihbracht. :D");
     }
 

@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /**
  * TRANSLATION NOTE:
@@ -44,7 +44,7 @@ public class Indonesian extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -112,7 +112,7 @@ public class Indonesian extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Sini, kau!").then(new Action("memeluk " + apiUser.getUserName()));
     }
 
@@ -131,7 +131,7 @@ public class Indonesian extends AbstractMutableLanguage {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Maaf, sampai saat ini " + feature + " hanya dapat dipakai untuk pengguna yang telah melewati peringkat "
                 + minRank + ".";
     }
@@ -159,7 +159,7 @@ public class Indonesian extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         /*
          * TRANSLATION NOTE: This line is sent to the user right after they have
          * chosen this Language implementation. The English version refers to

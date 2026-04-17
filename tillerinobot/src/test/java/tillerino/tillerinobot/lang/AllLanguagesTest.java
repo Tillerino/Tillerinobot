@@ -6,9 +6,9 @@ import java.util.Arrays;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.BeatmapMetaTest;
+import tillerino.tillerinobot.data.ApiUser;
 
 public class AllLanguagesTest {
     @ParameterizedTest
@@ -37,10 +37,10 @@ public class AllLanguagesTest {
     @EnumSource(LanguageIdentifier.class)
     public void testOptionals(LanguageIdentifier ident) throws Exception {
         Language lang = ident.cls.getConstructor().newInstance();
-        lang.optionalCommentOnLanguage(new OsuApiUser());
-        lang.optionalCommentOnNP(new OsuApiUser(), BeatmapMetaTest.fakeBeatmapMeta(101));
+        lang.optionalCommentOnLanguage(new ApiUser());
+        lang.optionalCommentOnNP(new ApiUser(), BeatmapMetaTest.fakeBeatmapMeta(101));
         // lang.optionalCommentOnRecommendation(new OsuApiUser(), recommendation)
-        lang.optionalCommentOnWith(new OsuApiUser(), BeatmapMetaTest.fakeBeatmapMeta(101));
+        lang.optionalCommentOnWith(new ApiUser(), BeatmapMetaTest.fakeBeatmapMeta(101));
     }
 
     @ParameterizedTest
@@ -61,7 +61,7 @@ public class AllLanguagesTest {
     @EnumSource(LanguageIdentifier.class)
     public void testFeatureRankRestricted(LanguageIdentifier ident) throws Exception {
         Language lang = ident.cls.getConstructor().newInstance();
-        assertThat(lang.featureRankRestricted("THE_FEATURE", 1234, new OsuApiUser()))
+        assertThat(lang.featureRankRestricted("THE_FEATURE", 1234, new ApiUser()))
                 .as("Rank-restricted feature")
                 .contains("THE_FEATURE", "1234");
     }
@@ -71,7 +71,7 @@ public class AllLanguagesTest {
     public void testHug(LanguageIdentifier ident) throws Exception {
         Language lang = ident.cls.getConstructor().newInstance();
         for (int attempt = 0; attempt < 1000; attempt++) {
-            assertThat(lang.hug(new OsuApiUser())).isNotEqualTo(GameChatResponse.none());
+            assertThat(lang.hug(new ApiUser())).isNotEqualTo(GameChatResponse.none());
         }
     }
 
@@ -121,6 +121,6 @@ public class AllLanguagesTest {
         Language lang = ident.cls.getConstructor().newInstance();
         for (long inactiveTime : new long[] {
             60 * 1000 - 1, 24 * 60 * 60 * 1000 - 1, 7L * 24 * 60 * 60 * 1000, 7L * 24 * 60 * 60 * 1000 + 1
-        }) lang.welcomeUser(new OsuApiUser(), inactiveTime);
+        }) lang.welcomeUser(new ApiUser(), inactiveTime);
     }
 }

@@ -9,9 +9,9 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.predicates.ExcludeMod;
 import tillerino.tillerinobot.predicates.MapLength;
@@ -25,7 +25,7 @@ public class RecommendationRequestParserTest {
     private final RecommendationRequestParser recommendationRequestParser = new RecommendationRequestParser(backend);
 
     private RecommendationRequest parse(String settings) throws Exception {
-        OsuApiUser user = new OsuApiUser();
+        ApiUser user = new ApiUser();
         user.setUserId(1);
         return recommendationRequestParser.parseSamplerSettings(user, settings, new Default());
     }

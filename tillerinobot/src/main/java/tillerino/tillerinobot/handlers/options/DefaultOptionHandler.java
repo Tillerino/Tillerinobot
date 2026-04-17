@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 
@@ -19,7 +19,7 @@ public class DefaultOptionHandler extends OptionHandler {
     }
 
     @Override
-    protected void handleSet(String value, UserDataManager.UserData userData, OsuApiUser apiUser, Language lang)
+    protected void handleSet(String value, UserDataManager.UserData userData, ApiUser apiUser, Language lang)
             throws UserException, SQLException, IOException {
         if (value.isEmpty()) {
             userData.setDefaultRecommendationOptions(null);

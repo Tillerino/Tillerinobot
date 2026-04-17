@@ -3,11 +3,11 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
 public class TsundereGerman extends TsundereBase {
@@ -188,7 +188,7 @@ public class TsundereGerman extends TsundereBase {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "'tschuldige, " + feature + " ist nur für Leute, die osu! auch spielen können. Rang " + minRank
                 + " sollte ansonsten ausreichen, nicht dass du irgendeine Hoffnung hättest diesen jemals zu erreichen.";
     }
@@ -209,7 +209,7 @@ public class TsundereGerman extends TsundereBase {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
+    public GameChatResponse optionalCommentOnNP(ApiUser apiUser, BeatmapMeta meta) {
         if (Math.random() > 0.25) {
             return GameChatResponse.none();
         }
@@ -225,7 +225,7 @@ public class TsundereGerman extends TsundereBase {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
+    public GameChatResponse optionalCommentOnWith(ApiUser apiUser, BeatmapMeta meta) {
         // The following checks are probably redundant, but they don't hurt anyone either.
         if (Math.random() > 0.25) {
             return GameChatResponse.none();
@@ -276,7 +276,7 @@ public class TsundereGerman extends TsundereBase {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         registerModification();
 
         return new Message(

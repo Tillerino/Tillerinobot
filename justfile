@@ -5,6 +5,9 @@ mvn := "mvn"
 help:
   @just --list
 
+compile:
+  mvn clean spotless:apply test-compile -T 99
+
 # Clean and verify while building the Rust modules explicitly
 clean-verify:
   mvn clean verify -P rust

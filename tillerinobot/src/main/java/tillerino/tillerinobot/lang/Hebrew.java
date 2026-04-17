@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /** @author https://github.com/shavitush https://reddit.com/u/shavitush */
 public class Hebrew implements Language {
@@ -34,7 +34,7 @@ public class Hebrew implements Language {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("ביפ בופ");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -100,7 +100,7 @@ public class Hebrew implements Language {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("!בוא הנה, אתה").then(new Action(apiUser.getUserName() + " מחבק את"));
     }
 
@@ -117,7 +117,7 @@ public class Hebrew implements Language {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "." + minRank + " זמין רק לשחקנים שעברו את דרגה " + feature + " מצטער, כרגע";
     }
 
@@ -145,7 +145,7 @@ public class Hebrew implements Language {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message(".עזר לי ללמוד עברית shavitush");
     }
 

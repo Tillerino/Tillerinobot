@@ -3,12 +3,12 @@ package tillerino.tillerinobot.handlers;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Language;
 
@@ -22,7 +22,7 @@ public class DebugHandler implements CommandHandler {
     static final String DEBUG = "debug ";
 
     @Override
-    public GameChatResponse handle(String debugCommand, OsuApiUser debugApiUser, UserData debugUserData, Language lang)
+    public GameChatResponse handle(String debugCommand, ApiUser debugApiUser, UserData debugUserData, Language lang)
             throws UserException {
         if (!debugCommand.startsWith(DEBUG) || !debugUserData.isAllowedToDebug()) {
             return null;

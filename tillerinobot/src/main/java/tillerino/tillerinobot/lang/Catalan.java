@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /**
  * TRANSLATION NOTE:
@@ -43,7 +43,7 @@ public class Catalan extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -109,7 +109,7 @@ public class Catalan extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Vine aquí, tu!").then(new Action("abraça " + apiUser.getUserName()));
     }
 
@@ -128,7 +128,7 @@ public class Catalan extends AbstractMutableLanguage {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Ho sento, ara mateix " + feature + " només està disponible per a jugadors que hagin superat el rang "
                 + minRank + ".";
     }
@@ -156,7 +156,7 @@ public class Catalan extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message("[https://osu.ppy.sh/u/6753180 Underforest] em va ajudar a aprendre català");
     }
 

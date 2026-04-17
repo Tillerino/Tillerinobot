@@ -7,11 +7,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.data.ApiBeatmap;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
@@ -32,7 +32,7 @@ public class RecommendHandlerTest {
 
         when(userData.getDefaultRecommendationOptions()).thenReturn("dt");
         new RecommendHandler(manager, mock(LiveActivity.class))
-                .handle("r", mock(OsuApiUser.class), userData, new Default());
+                .handle("r", mock(ApiUser.class), userData, new Default());
         verify(manager).getRecommendation(any(), eq("dt"), any());
     }
 }

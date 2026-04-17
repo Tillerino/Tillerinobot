@@ -25,7 +25,6 @@ import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Loader;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
@@ -39,6 +38,7 @@ import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.ApiBeatmap;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.data.Player;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
@@ -87,7 +87,7 @@ public class RecommendationsManager {
      * @param message the remaining arguments ("r" or "recommend" were removed). null if an existing sampler should be
      *     reused.
      */
-    public Recommendation getRecommendation(@Nonnull OsuApiUser apiUser, @CheckForNull String message, Language lang)
+    public Recommendation getRecommendation(@Nonnull ApiUser apiUser, @CheckForNull String message, Language lang)
             throws UserException, SQLException, IOException, InterruptedException {
         int userid = apiUser.getUserId();
         /*
@@ -155,7 +155,7 @@ public class RecommendationsManager {
         return recommendation;
     }
 
-    public RecommendationRequest parseSamplerSettings(OsuApiUser apiUser, @Nonnull String message, Language lang)
+    public RecommendationRequest parseSamplerSettings(ApiUser apiUser, @Nonnull String message, Language lang)
             throws UserException, SQLException, IOException {
         return parser.parseSamplerSettings(apiUser, message, lang);
     }

@@ -6,7 +6,6 @@ import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.LiveActivity;
@@ -17,6 +16,7 @@ import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
 
@@ -26,7 +26,7 @@ public class WithHandler implements CommandHandler {
     private final DiffEstimateProvider diffEstimateProvider;
 
     @Override
-    public GameChatResponse handle(String originalMessage, OsuApiUser apiUser, UserData userData, Language lang)
+    public GameChatResponse handle(String originalMessage, ApiUser apiUser, UserData userData, Language lang)
             throws UserException, IOException, SQLException, InterruptedException {
         if (!originalMessage.toLowerCase().startsWith("with")) {
             return null;

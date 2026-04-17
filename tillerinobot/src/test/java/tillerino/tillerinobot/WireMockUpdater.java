@@ -25,6 +25,7 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
+import org.tillerino.ppaddict.util.Clock;
 import tillerino.tillerinobot.OsuApiV1.FromEnvModule;
 import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
 
@@ -38,13 +39,13 @@ class WireMockUpdater {
     public static final int BIG_BLACK = 131891;
     public static final int SONG_COMPILATION = 5047712;
 
-    @dagger.Component(modules = {UpdateModule.class, UrlsModule.class})
+    @dagger.Component(modules = {UpdateModule.class, UrlsModule.class, Clock.Module.class})
     @Singleton
     interface UpdateInjector {
         void inject(WireMockUpdater o);
     }
 
-    @dagger.Component(modules = {CheckModule.class, UrlsModule.class})
+    @dagger.Component(modules = {CheckModule.class, UrlsModule.class, Clock.Module.class})
     @Singleton
     interface CheckInjector {
         void inject(WireMockUpdater o);

@@ -13,7 +13,6 @@ import java.util.Objects;
 import javax.inject.Inject;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.MDC;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
@@ -21,6 +20,7 @@ import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.osutrack.Highscore;
@@ -41,11 +41,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
 
     @Override
     public GameChatResponse handleArgument(
-            String originalCommand,
-            String remaining,
-            OsuApiUser apiUser,
-            UserDataManager.UserData userData,
-            Language lang)
+            String originalCommand, String remaining, ApiUser apiUser, UserDataManager.UserData userData, Language lang)
             throws UserException, IOException, SQLException {
         MDC.put(MdcUtils.MDC_HANDLER, "u");
 
@@ -54,7 +50,7 @@ public class OsuTrackHandler extends CommandHandler.WithShorthand {
             userId = apiUser.getUserId();
         } else {
             // query someone else
-            OsuApiUser otherApiUser = null;
+            ApiUser otherApiUser = null;
             try {
                 otherApiUser = pullThrough.downloadUser(remaining);
             } catch (IOException e) {

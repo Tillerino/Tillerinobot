@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 public class Portuguese extends AbstractMutableLanguage {
     @Override
@@ -35,7 +35,7 @@ public class Portuguese extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -101,7 +101,7 @@ public class Portuguese extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Vem aqui!").then(new Action("abraça " + apiUser.getUserName()));
     }
 
@@ -118,7 +118,7 @@ public class Portuguese extends AbstractMutableLanguage {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Desculpe, mas no momento " + feature + " só está disponível para jogadores que passaram do rank "
                 + minRank + ".";
     }
@@ -146,7 +146,7 @@ public class Portuguese extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message(
                 "[https://osu.ppy.sh/u/ragingalien RagingAlien], [https://osu.ppy.sh/u/wow wow] e [https://osu.ppy.sh/u/Kanegae Kanegae] me ajudaram a aprender português! :D");
     }

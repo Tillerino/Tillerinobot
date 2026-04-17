@@ -22,7 +22,6 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.client.AbstractBeatmapTable;
 import org.tillerino.ppaddict.client.services.UserDataService;
@@ -42,6 +41,7 @@ import org.tillerino.ppaddict.shared.PpaddictException.NotLoggedIn;
 import org.tillerino.ppaddict.shared.Settings;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.OsuApi;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Default;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
@@ -188,7 +188,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
             if (linkedId != null) {
                 try {
-                    OsuApiUser user = pullThrough.getUser(linkedId, 0);
+                    ApiUser user = pullThrough.getUser(linkedId, 0);
                     data.nickname = user != null ? user.getUserName() : "(user not found)";
                 } catch (SQLException | IOException e) {
                     throw ExceptionsUtil.getLoggedWrappedException(log, e);

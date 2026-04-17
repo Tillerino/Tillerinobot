@@ -2,9 +2,9 @@ package tillerino.tillerinobot.lang;
 
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.recommendations.Recommendation;
 
 public abstract class TsundereBase extends AbstractMutableLanguage {
@@ -27,7 +27,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
     StringShuffler unknownBeatmapShuffler = new StringShuffler(ThreadLocalRandom.current());
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         String username = apiUser.getUserName();
         String greeting;
         // Greetings for <4 minutes, normal, and >4 days
@@ -57,7 +57,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
 
     @Nonnull
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         registerModification();
         // Responses move from tsun to dere with more hug attempts and recommendations
         recentHugs++;
@@ -84,7 +84,7 @@ public abstract class TsundereBase extends AbstractMutableLanguage {
     protected abstract GameChatResponse getHugResponseForHugLevel(String username, int hugLevel);
 
     @Override
-    public GameChatResponse optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
+    public GameChatResponse optionalCommentOnRecommendation(ApiUser apiUser, Recommendation recommendation) {
         registerModification();
         recentRecommendations++;
         return getOptionalCommentOnRecommendationResponse(recentRecommendations);

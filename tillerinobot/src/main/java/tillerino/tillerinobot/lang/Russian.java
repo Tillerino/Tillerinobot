@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /** @author https://github.com/firedigger https://osu.ppy.sh/u/firedigger */
 public class Russian implements Language {
@@ -37,7 +37,7 @@ public class Russian implements Language {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("бип боп");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -103,7 +103,7 @@ public class Russian implements Language {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Подойдите, ну же!").then(new Action("обнимает " + apiUser.getUserName()));
     }
 
@@ -122,7 +122,7 @@ public class Russian implements Language {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "К сожалению, " + feature + " доступна лишь игрокам с рангом выше " + minRank + ".";
     }
 
@@ -149,7 +149,7 @@ public class Russian implements Language {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message(
                 "Вы изъявили желание общаться на русском (Перевод сделан [https://osu.ppy.sh/u/firedigger firedigger])");
     }

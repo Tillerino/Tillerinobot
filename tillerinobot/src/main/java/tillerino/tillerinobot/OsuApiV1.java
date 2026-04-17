@@ -16,6 +16,8 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.tillerino.osuApiModel.Downloader;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiUser;
+import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
@@ -27,28 +29,34 @@ public class OsuApiV1 implements OsuApi {
 
     private final Downloader downloader;
 
+    private final Clock clock;
+
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
     @Inject
-    public OsuApiV1(@Named("osuapi.url") URL baseUrl, @Named("osuapi.key") String key, RateLimiter rateLimiter) {
-        this(new Downloader(baseUrl, key), rateLimiter);
+    public OsuApiV1(
+            @Named("osuapi.url") URL baseUrl, @Named("osuapi.key") String key, RateLimiter rateLimiter, Clock clock) {
+        this(new Downloader(baseUrl, key), rateLimiter, clock);
     }
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Wrapping")
-    public OsuApiV1(Downloader downloader, RateLimiter rateLimiter) {
+    public OsuApiV1(Downloader downloader, RateLimiter rateLimiter, Clock clock) {
         this.downloader = downloader;
         this.rateLimiter = rateLimiter;
+        this.clock = clock;
     }
 
     @Override
     public ApiUser getUser(int userId, int gameMode) throws IOException {
         limitRate();
-        return downloader.getUser(userId, gameMode, ApiUser.class);
+        return ApiUser.Mapper.INSTANCE.fromApi(
+                downloader.getUser(userId, gameMode, OsuApiUser.class), clock.currentTimeMillis());
     }
 
     @Override
     public ApiUser getUser(String username, int mode) throws IOException {
         limitRate();
-        return downloader.getUser(username, mode, ApiUser.class);
+        return ApiUser.Mapper.INSTANCE.fromApi(
+                downloader.getUser(username, mode, OsuApiUser.class), clock.currentTimeMillis());
     }
 
     @Override

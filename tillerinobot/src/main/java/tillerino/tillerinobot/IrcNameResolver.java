@@ -15,9 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tillerino.mormon.DatabaseManager;
 import org.tillerino.mormon.Persister.Action;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.data.UserNameMapping;
 
@@ -85,7 +85,7 @@ public class IrcNameResolver {
                 mapping.setFirstresolveattempt(System.currentTimeMillis());
             }
 
-            OsuApiUser user;
+            ApiUser user;
             try {
                 user = pullThrough.downloadUser(userName);
             } catch (IOException e) {
@@ -121,8 +121,8 @@ public class IrcNameResolver {
      * @return the resolved user or null if the user id does not exist in the API.
      */
     @CheckForNull
-    public OsuApiUser resolveManually(@UserId int userId) throws SQLException, IOException {
-        OsuApiUser user = pullThrough.getUser(userId, 1L);
+    public ApiUser resolveManually(@UserId int userId) throws SQLException, IOException {
+        ApiUser user = pullThrough.getUser(userId, 1L);
         if (user == null) {
             return null;
         }
@@ -132,7 +132,7 @@ public class IrcNameResolver {
     }
 
     @SuppressFBWarnings(value = "TQ", justification = "Producer")
-    public static @IRCName String getIrcUserName(OsuApiUser user) {
+    public static @IRCName String getIrcUserName(ApiUser user) {
         return user.getUserName().replace(' ', '_');
     }
 
@@ -159,8 +159,8 @@ public class IrcNameResolver {
      * @return if found, the osuApiUser belonging to the IRC user. Null otherwise.
      */
     @CheckForNull
-    public OsuApiUser redownloadUser(@IRCName String ircName) throws IOException, SQLException {
-        OsuApiUser apiUser = pullThrough.downloadUser(ircName);
+    public ApiUser redownloadUser(@IRCName String ircName) throws IOException, SQLException {
+        ApiUser apiUser = pullThrough.downloadUser(ircName);
         if (apiUser == null) {
             setMapping(ircName, -1);
         } else {

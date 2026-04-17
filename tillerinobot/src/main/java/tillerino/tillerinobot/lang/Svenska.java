@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /** @author https://osu.ppy.sh/u/3258429 SnickarN https://github.com/SnickarN- */
 public class Svenska extends AbstractMutableLanguage {
@@ -36,7 +36,7 @@ public class Svenska extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -103,7 +103,7 @@ public class Svenska extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Kom hit, du!").then(new Action("kram " + apiUser.getUserName()));
     }
 
@@ -122,7 +122,7 @@ public class Svenska extends AbstractMutableLanguage {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Förlåt, just nu är " + feature + "  bara tillgängligt för spelare som överträffat rank " + minRank
                 + ".";
     }
@@ -150,7 +150,7 @@ public class Svenska extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message(
                 "[https://osu.ppy.sh/u/3258429 SnickarN] och [https://osu.ppy.sh/u/8116579 Padnezz] hjälpte mig att lära mig svenska!");
     }

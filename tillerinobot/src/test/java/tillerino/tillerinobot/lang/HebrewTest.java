@@ -7,12 +7,12 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
+import tillerino.tillerinobot.data.ApiUser;
 
 public class HebrewTest {
     final Hebrew lang = new Hebrew();
 
-    final OsuApiUser apiUser = mock(OsuApiUser.class);
+    final ApiUser apiUser = mock(ApiUser.class);
 
     final boolean print = false;
 

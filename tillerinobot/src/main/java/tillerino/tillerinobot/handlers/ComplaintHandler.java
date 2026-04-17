@@ -7,11 +7,11 @@ import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.Recommendation;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
@@ -22,7 +22,7 @@ public class ComplaintHandler implements CommandHandler {
     private final RecommendationsManager manager;
 
     @Override
-    public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang) {
+    public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang) {
         if (getLevenshteinDistance(
                         command.toLowerCase().substring(0, Math.min("complain".length(), command.length())), "complain")
                 <= 2) {

@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 public class Farsi implements Language {
 
@@ -36,7 +36,7 @@ public class Farsi implements Language {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("bip boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -102,7 +102,7 @@ public class Farsi implements Language {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Bia injaa binam!").then(new Action("ra " + apiUser.getUserName() + " baghal mikone"));
     }
 
@@ -119,7 +119,7 @@ public class Farsi implements Language {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Bebaghshid, wali aalan " + feature
                 + " felan player-ha mitoonan estefaade konan ke rank-eshoon baalaatar az " + minRank + " hast.";
     }
@@ -147,7 +147,7 @@ public class Farsi implements Language {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message("ikhebepicmuis Farsi-harfzadano yaadamdaad!");
     }
 

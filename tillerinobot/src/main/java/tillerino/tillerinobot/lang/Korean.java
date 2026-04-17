@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /** @author https://github.com/jamkevin https://osu.ppy.sh/u/jamkevin */
 public class Korean implements Language {
@@ -37,7 +37,7 @@ public class Korean implements Language {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("띵동");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -103,7 +103,7 @@ public class Korean implements Language {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("이리 오세요!").then(new Action("(포옹) " + apiUser.getUserName()));
     }
 
@@ -122,7 +122,7 @@ public class Korean implements Language {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "죄송합니다, 현재는  " + feature + " 가  " + minRank + " 이상인 사람에게만 가능해요.";
     }
 
@@ -149,7 +149,7 @@ public class Korean implements Language {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message("언어가 한국어로 전환되었습니다. 번역: jamkevin :)");
     }
 

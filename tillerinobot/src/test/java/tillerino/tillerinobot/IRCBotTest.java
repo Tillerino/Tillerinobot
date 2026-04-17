@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.GameChatEvent;
@@ -126,22 +125,22 @@ public class IRCBotTest extends TestBase {
         doReturn(osuApiUser).when(pullThrough).getUser(eq(userid), anyLong());
         doReturn(1).when(backend).getDonator(userid);
 
-        doReturn(System.currentTimeMillis() - 1000).when(playerService).getLastActivity(any(OsuApiUser.class));
+        doReturn(System.currentTimeMillis() - 1000).when(playerService).getLastActivity(any(ApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), new Message("beep boop"));
 
         doReturn(System.currentTimeMillis() - 10 * 60 * 1000)
                 .when(playerService)
-                .getLastActivity(any(OsuApiUser.class));
+                .getLastActivity(any(ApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), new Message("Welcome back, TheDonator."));
 
         doReturn(System.currentTimeMillis() - 2L * 24 * 60 * 60 * 1000)
                 .when(playerService)
-                .getLastActivity(any(OsuApiUser.class));
+                .getLastActivity(any(ApiUser.class));
         verifyResponse(bot, preprocess(join("TheDonator")), messageContaining("TheDonator, "));
 
         doReturn(System.currentTimeMillis() - 8L * 24 * 60 * 60 * 1000)
                 .when(playerService)
-                .getLastActivity(any(OsuApiUser.class));
+                .getLastActivity(any(ApiUser.class));
         verifyResponse(
                 bot,
                 preprocess(join("TheDonator")),

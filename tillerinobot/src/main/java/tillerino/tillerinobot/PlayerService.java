@@ -7,9 +7,9 @@ import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.osuApiModel.types.UserId;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.Player;
 
 @Singleton
@@ -35,7 +35,7 @@ public class PlayerService {
         }
     }
 
-    long getLastActivity(@Nonnull OsuApiUser user) throws SQLException {
+    long getLastActivity(@Nonnull ApiUser user) throws SQLException {
         Player player;
         try (Database database = databaseManager.getDatabase()) {
             player = Player.getPlayer(database, user.getUserId());

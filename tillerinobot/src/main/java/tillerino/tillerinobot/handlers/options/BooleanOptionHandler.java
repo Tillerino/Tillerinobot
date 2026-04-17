@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.tillerino.osuApiModel.OsuApiUser;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 
 public abstract class BooleanOptionHandler extends OptionHandler {
@@ -16,7 +16,7 @@ public abstract class BooleanOptionHandler extends OptionHandler {
     }
 
     @Override
-    protected void handleSet(String value, UserData userData, OsuApiUser apiUser, Language lang)
+    protected void handleSet(String value, UserData userData, ApiUser apiUser, Language lang)
             throws UserException, SQLException, IOException {
         handleSetBoolean(parseBoolean(value, lang), userData);
     }

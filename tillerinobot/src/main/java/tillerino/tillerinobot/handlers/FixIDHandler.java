@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
@@ -13,6 +12,7 @@ import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.IrcNameResolver;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -21,7 +21,7 @@ public class FixIDHandler implements CommandHandler {
     private final IrcNameResolver resolver;
 
     @Override
-    public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+    public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
             throws UserException, IOException, SQLException {
 
         if (!command.toLowerCase().startsWith(COMMAND)) {
@@ -31,7 +31,7 @@ public class FixIDHandler implements CommandHandler {
         String idStr = command.substring(COMMAND.length()).trim();
         int id = parseId(idStr);
 
-        OsuApiUser user = resolver.resolveManually(id);
+        ApiUser user = resolver.resolveManually(id);
         if (user == null) {
             throw new UserException("That user-id does not exist :(");
         } else {

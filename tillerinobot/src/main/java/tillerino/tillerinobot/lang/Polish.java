@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /**
  * Polish language implementation. Pawwit https://osu.ppy.sh/u/2070907 & LilSilv https://github.com/LilSilv
@@ -39,7 +39,7 @@ public class Polish extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -105,7 +105,7 @@ public class Polish extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Chodź no tu!").then(new Action("przytula " + apiUser.getUserName()));
     }
 
@@ -124,7 +124,7 @@ public class Polish extends AbstractMutableLanguage {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Wybacz, ale w tym momencie " + feature + " jest dostępna tylko dla graczy, którzy przekroczyli pozycję "
                 + minRank + " w rankingu.";
     }
@@ -152,7 +152,7 @@ public class Polish extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message(
                 "[https://osu.ppy.sh/users/1698537 Pawwit] i [https://osu.ppy.sh/users/8488688 Lil Silv] nauczyli mnie mówić po polsku. Jeśli uważasz, że gdzieś się pomylili, napisz do nich na osu!");
     }

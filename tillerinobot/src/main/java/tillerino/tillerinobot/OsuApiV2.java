@@ -10,12 +10,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
+import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.GameMode;
 import org.tillerino.osuApiModel.v2.DownloaderV2;
 import org.tillerino.osuApiModel.v2.TokenHelper.Credentials;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
 import org.tillerino.ppaddict.ProdModule;
+import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import tillerino.tillerinobot.data.ApiScore;
 import tillerino.tillerinobot.data.ApiUser;
@@ -27,28 +29,33 @@ public class OsuApiV2 implements OsuApi {
 
     private final DownloaderV2 downloader;
 
+    private final Clock clock;
+
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
     @Inject
-    public OsuApiV2(@Named("osuapiv2.url") URI baseUrl, TokenCache tokenCache, RateLimiter rateLimiter) {
-        this(new DownloaderV2(baseUrl, tokenCache), rateLimiter);
+    public OsuApiV2(@Named("osuapiv2.url") URI baseUrl, TokenCache tokenCache, RateLimiter rateLimiter, Clock clock) {
+        this(new DownloaderV2(baseUrl, tokenCache), rateLimiter, clock);
     }
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Wrapping")
-    public OsuApiV2(DownloaderV2 downloader, RateLimiter rateLimiter) {
+    public OsuApiV2(DownloaderV2 downloader, RateLimiter rateLimiter, Clock clock) {
         this.downloader = downloader;
         this.rateLimiter = rateLimiter;
+        this.clock = clock;
     }
 
     @Override
     public ApiUser getUser(int userId, int gameMode) throws IOException {
         limitRate();
-        return downloader.getUser(userId, gameMode, ApiUser.class);
+        return ApiUser.Mapper.INSTANCE.fromApi(
+                downloader.getUser(userId, gameMode, OsuApiUser.class), clock.currentTimeMillis());
     }
 
     @Override
     public ApiUser getUser(String username, int mode) throws IOException {
         limitRate();
-        return downloader.getUser(username, mode, ApiUser.class);
+        return ApiUser.Mapper.INSTANCE.fromApi(
+                downloader.getUser(username, mode, OsuApiUser.class), clock.currentTimeMillis());
     }
 
     @Override

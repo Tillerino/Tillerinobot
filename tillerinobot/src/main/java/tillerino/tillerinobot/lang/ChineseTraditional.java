@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /** @author Tomoka Rin leoyao321@gmail.com https://osu.ppy.sh/u/125308 */
 public class ChineseTraditional extends AbstractMutableLanguage {
@@ -36,7 +36,7 @@ public class ChineseTraditional extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("哈囉!");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -102,7 +102,7 @@ public class ChineseTraditional extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("可以來我這邊一下嗎?").then(new Action("抱" + apiUser.getUserName()));
     }
 
@@ -121,7 +121,7 @@ public class ChineseTraditional extends AbstractMutableLanguage {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "抱歉在這個時間 " + feature + " 只開放給 " + minRank + "以上的人使用。";
     }
 
@@ -148,7 +148,7 @@ public class ChineseTraditional extends AbstractMutableLanguage {
     }
 
     @Override
-    public Message optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public Message optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message("是Tomoka Rin教我中文的，請多多指教。");
     }
 

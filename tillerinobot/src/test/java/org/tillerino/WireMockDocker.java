@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mockito.Mockito;
 import org.tillerino.osuApiModel.v2.TokenHelper.TokenCache;
+import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.DockerNetwork;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
 import tillerino.tillerinobot.*;
@@ -165,21 +166,23 @@ public class WireMockDocker implements BeforeEachCallback, AfterEachCallback {
         @Provides
         @Singleton
         @SneakyThrows
-        static OsuApiV1 osuApiV1() {
+        static OsuApiV1 osuApiV1(Clock clock) {
             return spy(new OsuApiV1(
                     URI.create(WireMockDocker.getExternalAddress() + "/api/").toURL(),
                     OsuApiV1Test.OSUAPI_V1_MOCK_KEY,
-                    RateLimiter.unlimited()));
+                    RateLimiter.unlimited(),
+                    clock));
         }
 
         @Provides
         @Singleton
-        static OsuApiV2 osuApiV2() {
+        static OsuApiV2 osuApiV2(Clock clock) {
             URI baseUrl = URI.create(WireMockDocker.getExternalAddress());
             return spy(new OsuApiV2(
                     baseUrl,
                     TokenCache.inMemory(baseUrl, OsuApiV2Test.OSUAPI_V2_MOCK_CREDENTIALS),
-                    RateLimiter.unlimited()));
+                    RateLimiter.unlimited(),
+                    clock));
         }
 
         @Provides

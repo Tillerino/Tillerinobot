@@ -8,9 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.LiveActivity;
 import tillerino.tillerinobot.*;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.handlers.RecommendHandler;
 import tillerino.tillerinobot.recommendations.RecommendationRequestParser;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
@@ -42,7 +42,7 @@ public class TsundereTest {
         // make a bullshit call to the handler four times
         for (int i = 0; i < 4; i++) {
             try {
-                handler.handle("r bullshit", mock(OsuApiUser.class), null, tsundere);
+                handler.handle("r bullshit", mock(ApiUser.class), null, tsundere);
                 // we should not get this far because we're expecting an exception
                 fail("there should be an exception");
             } catch (UserException e) {

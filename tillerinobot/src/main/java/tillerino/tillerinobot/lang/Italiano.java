@@ -3,10 +3,10 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Action;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
+import tillerino.tillerinobot.data.ApiUser;
 
 /**
  * Italian Language implementation. Thanks go to https://osu.ppy.sh/u/marcostudios and https://osu.ppy.sh/u/Howl for
@@ -39,7 +39,7 @@ public class Italiano extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime) {
+    public GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime) {
         if (inactiveTime < 60 * 1000) {
             return new Message("beep boop");
         } else if (inactiveTime < 24 * 60 * 60 * 1000) {
@@ -106,7 +106,7 @@ public class Italiano extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse hug(OsuApiUser apiUser) {
+    public GameChatResponse hug(ApiUser apiUser) {
         return new Message("Ehi tu! Vieni qui!").then(new Action("abbraccia " + apiUser.getUserName()));
     }
 
@@ -125,7 +125,7 @@ public class Italiano extends AbstractMutableLanguage {
     }
 
     @Override
-    public String featureRankRestricted(String feature, int minRank, OsuApiUser user) {
+    public String featureRankRestricted(String feature, int minRank, ApiUser user) {
         return "Spiacente, per il momento " + feature + " è disponibile per i giocatori che hanno superato il rank "
                 + minRank + ".";
     }
@@ -156,7 +156,7 @@ public class Italiano extends AbstractMutableLanguage {
     }
 
     @Override
-    public GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    public GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return new Message(
                 "[https://osu.ppy.sh/u/1273955 - Marco -] e [https://osu.ppy.sh/u/2751672 Howl] mi hanno insegnato l'italiano <3");
     }

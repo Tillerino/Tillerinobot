@@ -14,11 +14,11 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.OsuName;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.BotBackend;
+import tillerino.tillerinobot.data.ApiUser;
 
 public class LinkPpaddictHandlerTest {
     final BotBackend backend = mock(BotBackend.class);
@@ -58,8 +58,8 @@ public class LinkPpaddictHandlerTest {
                 .matches());
     }
 
-    OsuApiUser user(@UserId int id, @OsuName String name) {
-        OsuApiUser user = new OsuApiUser();
+    ApiUser user(@UserId int id, @OsuName String name) {
+        ApiUser user = new ApiUser();
         user.setUserId(id);
         user.setUserName(name);
         return user;

@@ -2,10 +2,10 @@ package tillerino.tillerinobot.handlers;
 
 import java.sql.SQLException;
 import javax.inject.Inject;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
@@ -19,7 +19,7 @@ public class ResetHandler implements CommandHandler {
     }
 
     @Override
-    public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+    public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
             throws SQLException {
         if (!command.equalsIgnoreCase("reset")) return null;
 

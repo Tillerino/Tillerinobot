@@ -10,7 +10,6 @@ import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.client.services.RecommendationsService;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.Beatmap;
@@ -18,6 +17,7 @@ import org.tillerino.ppaddict.shared.PpaddictException;
 import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserException;
 import tillerino.tillerinobot.UserException.RareUserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.GivenRecommendation;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
@@ -77,7 +77,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
         }
 
         try {
-            OsuApiUser apiUser = pullThrough.getUser(osuId, 0);
+            ApiUser apiUser = pullThrough.getUser(osuId, 0);
             for (int i = 0; i < 100 && recommendations.size() < 10; i++) {
                 try {
                     Recommendation recommendation = recommendationsManager.getRecommendation(
@@ -116,7 +116,7 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
                     userDataService.getServerUserData(userDataService.getCredentialsOrThrow(getThreadLocalRequest()));
             int osuId = linkedData.getLinkedOsuIdOrThrow();
             recommendationsManager.hideRecommendation(osuId, beatmapid, longMods);
-            OsuApiUser apiUser = pullThrough.getUser(osuId, 0);
+            ApiUser apiUser = pullThrough.getUser(osuId, 0);
             Recommendation recommendation = null;
             for (int i = 0; i < 10; i++) {
                 try {

@@ -10,12 +10,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.handlers.options.DefaultOptionHandler;
 import tillerino.tillerinobot.handlers.options.LangOptionHandler;
 import tillerino.tillerinobot.handlers.options.MapMetaDataOptionHandler;
@@ -44,7 +44,7 @@ public class OptionsHandler implements CommandHandler {
     }
 
     @Override
-    public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+    public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
             throws UserException, IOException, SQLException {
         boolean set = false;
 

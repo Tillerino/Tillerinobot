@@ -5,13 +5,13 @@ import java.security.SecureRandom;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Success;
 import tillerino.tillerinobot.BotBackend;
 import tillerino.tillerinobot.CommandHandler;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class LinkPpaddictHandler implements CommandHandler {
     private final BotBackend backend;
 
     @Override
-    public GameChatResponse handle(String command, OsuApiUser apiUser, UserData userData, Language lang)
+    public GameChatResponse handle(String command, ApiUser apiUser, UserData userData, Language lang)
             throws UserException {
         if (!TOKEN_PATTERN.matcher(command).matches()) {
             return null;

@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.MillisSinceEpoch;
 import org.tillerino.ppaddict.chat.GameChatEvent;
 import org.tillerino.ppaddict.chat.GameChatEventConsumer;
@@ -36,6 +35,7 @@ import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.UserDataManager.UserData;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.handlers.AccHandler;
@@ -115,7 +115,7 @@ public class IRCBot implements GameChatEventConsumer {
         GameChatResponse versionInfo = GameChatResponse.none();
         try {
             versionInfo = checkVersionInfo(action);
-            OsuApiUser apiUser = getUserOrThrow(action.getNick());
+            ApiUser apiUser = getUserOrThrow(action.getNick());
             try (UserData userData = userDataManager.loadUserData(apiUser.getUserId())) {
                 return versionInfo.then(userData.usingLanguage((Language lang) -> {
                     try {
@@ -224,7 +224,7 @@ public class IRCBot implements GameChatEventConsumer {
                     return fixIdResponse;
                 }
             }
-            OsuApiUser apiUser = getUserOrThrow(message.getNick());
+            ApiUser apiUser = getUserOrThrow(message.getNick());
             try (UserData userData = userDataManager.loadUserData(apiUser.getUserId())) {
                 return userData.usingLanguage((Language lang) -> {
                     GameChatResponse prelimResponse = GameChatResponse.none();
@@ -359,7 +359,7 @@ public class IRCBot implements GameChatEventConsumer {
 
         if (userid == null) return GameChatResponse.none();
 
-        OsuApiUser apiUser;
+        ApiUser apiUser;
         try {
             apiUser = pullThrough.getUser(userid, 0);
         } catch (IOException e) {
@@ -414,15 +414,14 @@ public class IRCBot implements GameChatEventConsumer {
     }
 
     @Nonnull
-    OsuApiUser getUserOrThrow(@IRCName String nick)
-            throws UserException, SQLException, IOException, InterruptedException {
+    ApiUser getUserOrThrow(@IRCName String nick) throws UserException, SQLException, IOException, InterruptedException {
         Integer userId;
         try (var _ = PhaseTimer.timeTask("resolve")) {
             userId = resolver.resolveIRCName(nick);
         }
 
         if (userId != null) {
-            OsuApiUser apiUser = pullThrough.getUser(userId, 60 * 60 * 1000L);
+            ApiUser apiUser = pullThrough.getUser(userId, 60 * 60 * 1000L);
 
             if (apiUser != null) {
                 String apiUserIrcName = IrcNameResolver.getIrcUserName(apiUser);

@@ -3,9 +3,9 @@ package tillerino.tillerinobot.lang;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import tillerino.tillerinobot.BeatmapMeta;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.recommendations.Recommendation;
 
 /**
@@ -55,7 +55,7 @@ public interface Language {
      * @param apiUser for more information about the user
      * @param inactiveTime time since the user was last seen in #osu in milliseconds
      */
-    GameChatResponse welcomeUser(OsuApiUser apiUser, long inactiveTime);
+    GameChatResponse welcomeUser(ApiUser apiUser, long inactiveTime);
 
     /**
      * The entire command that the user typed is not known.
@@ -106,7 +106,7 @@ public interface Language {
      * @param apiUser user object for more info
      */
     @Nonnull
-    GameChatResponse hug(OsuApiUser apiUser);
+    GameChatResponse hug(ApiUser apiUser);
 
     /** Response to !help command. */
     String help();
@@ -121,7 +121,7 @@ public interface Language {
      * @param minRank The minimum rank to be able to use this feature.
      * @param user ther user who is requesting the feature
      */
-    String featureRankRestricted(String feature, int minRank, OsuApiUser user);
+    String featureRankRestricted(String feature, int minRank, ApiUser user);
 
     /** The user requested a recommendation and both gave a mod and the nomod option. */
     String mixedNomodAndMods();
@@ -136,17 +136,17 @@ public interface Language {
     String notRanked();
 
     /** Comment after beatmap info was sent in response to /np */
-    default GameChatResponse optionalCommentOnNP(OsuApiUser apiUser, BeatmapMeta meta) {
+    default GameChatResponse optionalCommentOnNP(ApiUser apiUser, BeatmapMeta meta) {
         return GameChatResponse.none();
     }
 
     /** Comment after beatmap info was sent in response to !with */
-    default GameChatResponse optionalCommentOnWith(OsuApiUser apiUser, BeatmapMeta meta) {
+    default GameChatResponse optionalCommentOnWith(ApiUser apiUser, BeatmapMeta meta) {
         return GameChatResponse.none();
     }
 
     /** Comment after beatmap info was sent in response to !recommend */
-    default GameChatResponse optionalCommentOnRecommendation(OsuApiUser apiUser, Recommendation recommendation) {
+    default GameChatResponse optionalCommentOnRecommendation(ApiUser apiUser, Recommendation recommendation) {
         return GameChatResponse.none();
     }
 
@@ -158,7 +158,7 @@ public interface Language {
      *
      * @param apiUser
      */
-    default GameChatResponse optionalCommentOnLanguage(OsuApiUser apiUser) {
+    default GameChatResponse optionalCommentOnLanguage(ApiUser apiUser) {
         return GameChatResponse.none();
     }
 

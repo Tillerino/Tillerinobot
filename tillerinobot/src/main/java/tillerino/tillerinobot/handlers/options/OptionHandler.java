@@ -8,11 +8,11 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
-import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.ppaddict.chat.GameChatResponse;
 import org.tillerino.ppaddict.chat.GameChatResponse.Message;
 import tillerino.tillerinobot.UserDataManager.UserData;
 import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.lang.Language;
 
 public abstract class OptionHandler {
@@ -39,7 +39,7 @@ public abstract class OptionHandler {
 
     @CheckForNull
     public GameChatResponse handle(
-            String option, boolean set, String value, UserData userData, OsuApiUser apiUser, Language lang)
+            String option, boolean set, String value, UserData userData, ApiUser apiUser, Language lang)
             throws SQLException, IOException, UserException {
         if (!shouldHandle(option, userData.getHearts())) return null;
 
@@ -51,7 +51,7 @@ public abstract class OptionHandler {
         }
     }
 
-    protected GameChatResponse responseAfterSet(UserData userData, OsuApiUser apiUser) {
+    protected GameChatResponse responseAfterSet(UserData userData, ApiUser apiUser) {
         return handleGet(userData);
     }
 
@@ -61,7 +61,7 @@ public abstract class OptionHandler {
         return getLevenshteinDistance(option, optionName) <= 1;
     }
 
-    protected abstract void handleSet(String value, UserData userData, OsuApiUser apiUser, Language lang)
+    protected abstract void handleSet(String value, UserData userData, ApiUser apiUser, Language lang)
             throws UserException, SQLException, IOException;
 
     @Nonnull
