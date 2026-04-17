@@ -10,12 +10,14 @@ compile:
 
 # Clean and verify while building the Rust modules explicitly
 clean-verify:
-  mvn clean verify -P rust
+  mvn clean
+  mvn verify -P rust
 
 # Do more stupid things, faster :sunglasses:
 clean-verify-fast:
   mvn validate # spotless check first to prevent disappointments
-  mvn clean verify -T 3 -P rust
+  mvn clean
+  mvn verify -T 3 -P rust
 
 # Install the JARs into the Maven repository without testing anything.
 install:

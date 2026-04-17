@@ -8,8 +8,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.output.OutputFrame;
 import org.tillerino.ppaddict.util.ReusableContainerInitializer;
@@ -17,7 +15,6 @@ import org.tillerino.ppaddict.util.ReusableContainerInitializer;
 public class RabbitMqContainer {
     private static final String VIRTUAL_HOST = UUID.randomUUID().toString();
 
-    private static final Logger logger = LoggerFactory.getLogger("RABBIT");
     private static final RabbitMQContainer RABBIT_MQ = new RabbitMQContainer()
             .withNetwork(NETWORK)
             .withNetworkAliases("rabbitmq")
@@ -38,7 +35,7 @@ public class RabbitMqContainer {
                         trip = true;
                     }
                     if (trip) {
-                        logger.info(line);
+                        System.out.println("RABBIT: " + line);
                     }
                 }
             });

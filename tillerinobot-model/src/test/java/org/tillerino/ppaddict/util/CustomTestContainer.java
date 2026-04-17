@@ -3,8 +3,6 @@ package org.tillerino.ppaddict.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 
 public class CustomTestContainer extends GenericContainer<CustomTestContainer> {
@@ -21,8 +19,7 @@ public class CustomTestContainer extends GenericContainer<CustomTestContainer> {
     }
 
     public CustomTestContainer logging(String loggerName) {
-        Logger logger = LoggerFactory.getLogger(loggerName);
-        return withLogConsumer(frame -> logger.info(frame.getUtf8StringWithoutLineEnding()));
+        return withLogConsumer(frame -> System.out.println(loggerName + ": " + frame.getUtf8StringWithoutLineEnding()));
     }
 
     private void setUpLogging() {
