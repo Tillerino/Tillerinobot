@@ -12,11 +12,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +34,7 @@ public class LocalGameChatEventQueueTest {
     private final IRCBot coreHandler = mock(IRCBot.class);
 
     @RegisterExtension
-    public final ExecutorServiceRule exec = new ExecutorServiceRule(() -> Executors.newFixedThreadPool(2));
+    public final ExecutorServiceRule<ExecutorService> exec = ExecutorServiceRule.fixedThreadPool("lgceqt", 2);
 
     private LocalGameChatEventQueue queue;
 

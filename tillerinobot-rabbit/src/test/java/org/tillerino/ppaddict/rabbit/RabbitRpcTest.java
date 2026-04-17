@@ -11,6 +11,7 @@ import static org.tillerino.ppaddict.util.Result.ok;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.RpcServer;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.IntFunction;
@@ -27,7 +28,7 @@ import org.tillerino.ppaddict.util.Result;
 class RabbitRpcTest {
     @RegisterExtension
     @Order(1)
-    public final ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newCachedThreadPool);
+    public final ExecutorServiceRule<ExecutorService> exec = new ExecutorServiceRule<>(Executors::newCachedThreadPool);
 
     @RegisterExtension
     @Order(2)

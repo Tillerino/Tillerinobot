@@ -17,11 +17,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import javax.inject.Inject;
@@ -176,17 +172,18 @@ public class FullBotTest extends AbstractDatabaseTest {
     private final ThreadGroup clients = new ThreadGroup("Clients");
 
     @RegisterExtension
-    public final ExecutorServiceRule clientExec = new ExecutorServiceRule(() -> new ThreadPoolExecutor(
-            0,
-            Integer.MAX_VALUE,
-            1L,
-            TimeUnit.SECONDS,
-            new SynchronousQueue<>(),
-            r -> new Thread(clients, r, "Client")));
+    public final ExecutorServiceRule<ExecutorService> clientExec =
+            new ExecutorServiceRule<>(() -> new ThreadPoolExecutor(
+                    0,
+                    Integer.MAX_VALUE,
+                    1L,
+                    TimeUnit.SECONDS,
+                    new SynchronousQueue<>(),
+                    r -> new Thread(clients, r, "Client")));
 
     @RegisterExtension
     @Order(1)
-    public final ExecutorServiceRule exec = new ExecutorServiceRule(() -> new ThreadPoolExecutor(
+    public final ExecutorServiceRule<ExecutorService> exec = new ExecutorServiceRule<>(() -> new ThreadPoolExecutor(
             0, Integer.MAX_VALUE, 1L, TimeUnit.SECONDS, new SynchronousQueue<>(), r -> new Thread(r, "aux")));
 
     @RegisterExtension

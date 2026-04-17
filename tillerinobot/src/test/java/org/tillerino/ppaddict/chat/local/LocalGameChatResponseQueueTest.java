@@ -10,6 +10,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AutoClose;
@@ -41,7 +42,7 @@ public class LocalGameChatResponseQueueTest {
     private final AutoCloseable mocks = MockitoAnnotations.openMocks(this);
 
     @RegisterExtension
-    public final ExecutorServiceRule exec = ExecutorServiceRule.singleThread("response-queue");
+    public final ExecutorServiceRule<ExecutorService> exec = ExecutorServiceRule.singleThread("response-queue");
 
     private Future<?> queueFuture;
 

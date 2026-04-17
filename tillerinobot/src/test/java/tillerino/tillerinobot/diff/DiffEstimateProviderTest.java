@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import com.github.omkelderman.sandoku.DiffCalcResult;
 import com.github.omkelderman.sandoku.DiffResult;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -29,7 +30,8 @@ import tillerino.tillerinobot.data.DiffEstimate;
 
 public class DiffEstimateProviderTest extends TestBase {
     @RegisterExtension
-    public final ExecutorServiceRule exec = new ExecutorServiceRule(Executors::newSingleThreadExecutor);
+    public final ExecutorServiceRule<ExecutorService> exec =
+            new ExecutorServiceRule(Executors::newSingleThreadExecutor);
 
     @RegisterExtension
     public final LogRule logRule = TestAppender.rule(DiffEstimateProvider.class);

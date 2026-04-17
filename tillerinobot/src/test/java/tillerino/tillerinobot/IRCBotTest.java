@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +26,13 @@ import org.tillerino.ppaddict.chat.Joined;
 import org.tillerino.ppaddict.chat.PrivateAction;
 import org.tillerino.ppaddict.chat.PrivateMessage;
 import org.tillerino.ppaddict.chat.Sighted;
+import org.tillerino.ppaddict.util.ExecutorServiceRule;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.recommendations.BareRecommendation;
 import tillerino.tillerinobot.recommendations.Model;
-import tillerino.tillerinobot.testutil.SynchronousExecutorServiceRule;
 
 public class IRCBotTest extends TestBase {
     protected PrivateAction action(String nick, String action) {
@@ -53,7 +54,7 @@ public class IRCBotTest extends TestBase {
     }
 
     @RegisterExtension
-    public SynchronousExecutorServiceRule exec = new SynchronousExecutorServiceRule();
+    public ExecutorServiceRule<ExecutorService> exec = ExecutorServiceRule.synchronous();
 
     final boolean printResponses = false;
 

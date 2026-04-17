@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.tillerino.ppaddict.util.Result.ok;
 import static org.tillerino.ppaddict.util.TestAppender.mdc;
 
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import nl.altindag.log.model.LogEvent;
@@ -45,7 +46,7 @@ public class LoggingTest {
     public final LogRule logRule = TestAppender.rule(MessagePreprocessor.class, ResponsePostprocessor.class);
 
     @RegisterExtension
-    public final ExecutorServiceRule exec =
+    public final ExecutorServiceRule<ExecutorService> exec =
             ExecutorServiceRule.cachedThreadPool("bot-root").interruptOnShutdown();
 
     public final TestClock clock = new TestClock();
