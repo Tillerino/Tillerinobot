@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import lombok.NonNull;
-import org.apache.commons.collections4.IteratorUtils;
 import org.tillerino.mormon.Mapping.FieldManager;
 import org.tillerino.mormon.Persister.Action;
 
@@ -82,18 +81,7 @@ public record Database(Connection connection) implements AutoCloseable {
         return ps;
     }
 
-    public <T> UnpreparedStatement<List<T>> selectList(Class<T> cls) {
-        Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
-        return st -> {
-            try (PreparedStatement ps =
-                    prepareStatement("select " + mapping.fields() + " from `" + mapping.table() + "`", st)) {
-                ResultSet set = ps.executeQuery();
-                return IteratorUtils.toList(new ResultSetIterator<>(set, mapping));
-            }
-        };
-    }
-
-    public <T> UnpreparedStatement<Optional<T>> selectUnique(Class<T> cls) {
+  public <T> UnpreparedStatement<Optional<T>> selectUnique(Class<T> cls) {
         Mapping<T> mapping = Mapping.getOrCreateMapping(cls);
         return st -> {
             try (PreparedStatement ps =

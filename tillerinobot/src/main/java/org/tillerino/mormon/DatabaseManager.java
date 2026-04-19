@@ -6,8 +6,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLRecoverableException;
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -17,11 +15,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
-import org.apache.commons.lang3.function.FailableConsumer;
-import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.tillerino.mormon.Database.UnpreparedStatement;
 import org.tillerino.mormon.Persister.Action;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.PhaseTimer;
@@ -92,23 +87,7 @@ public class DatabaseManager implements AutoCloseable {
         pool.close();
     }
 
-    public <T> UnpreparedStatement<List<T>> selectList(Class<T> cls) {
-        return st -> {
-            try (Database db = getDatabase()) {
-                return db.selectList(cls).execute(st);
-            }
-        };
-    }
-
-    public <T> UnpreparedStatement<Optional<T>> selectUnique(Class<T> cls) {
-        return st -> {
-            try (Database db = getDatabase()) {
-                return db.selectUnique(cls).execute(st);
-            }
-        };
-    }
-
-    /** Borrows a connection and calls {@link Database#persist(Object, Action)} */
+  /** Borrows a connection and calls {@link Database#persist(Object, Action)} */
     public <T> int persist(@Nonnull @NonNull T obj, Action a) throws SQLException {
         try (Database db = getDatabase()) {
             return db.persist(obj, a);
@@ -122,19 +101,7 @@ public class DatabaseManager implements AutoCloseable {
         }
     }
 
-    public void onDatabase(FailableConsumer<Connection, SQLException> task) throws SQLException {
-        try (Database db = getDatabase()) {
-            task.accept(db.connection());
-        }
-    }
-
-    public <T> T getFromDatabase(FailableFunction<Connection, T, SQLException> task) throws SQLException {
-        try (Database db = getDatabase()) {
-            return task.apply(db.connection());
-        }
-    }
-
-    @dagger.Module(includes = RepoModule.class)
+  @dagger.Module(includes = RepoModule.class)
     public interface FromEnvModule {
         @dagger.Provides
         static @Named("mysql") Properties properties() {
