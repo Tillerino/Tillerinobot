@@ -276,9 +276,9 @@ public class IRCBot implements GameChatEventConsumer {
     }
 
     private GameChatResponse checkVersionInfo(final GameChatEvent user) throws SQLException {
-        int userVersion = backend.getLastVisitedVersion(user.getNick());
+        int userVersion = userDataManager.getLastVisitedVersion(user.getNick());
         if (userVersion < CURRENT_VERSION) {
-            backend.setLastVisitedVersion(user.getNick(), CURRENT_VERSION);
+            userDataManager.setLastVisitedVersion(user.getNick(), CURRENT_VERSION);
             if (userVersion == -1) {
                 return new Message(new Default().help());
             }

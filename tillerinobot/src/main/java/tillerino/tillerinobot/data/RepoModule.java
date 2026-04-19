@@ -45,4 +45,7 @@ public interface RepoModule {
 
     @dagger.Binds
     PpaddictUser.Repo ppaddictUserRepo(PpaddictUser$RepoImpl impl);
+
+    @dagger.Binds
+    BotUser.Repo botUserRepo(BotUser$RepoImpl impl);
 }

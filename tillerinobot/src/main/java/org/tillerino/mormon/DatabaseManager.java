@@ -7,17 +7,14 @@ import java.sql.SQLException;
 import java.sql.SQLRecoverableException;
 import java.time.Duration;
 import java.util.Properties;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.data.RepoModule;
@@ -87,21 +84,7 @@ public class DatabaseManager implements AutoCloseable {
         pool.close();
     }
 
-  /** Borrows a connection and calls {@link Database#persist(Object, Action)} */
-    public <T> int persist(@Nonnull @NonNull T obj, Action a) throws SQLException {
-        try (Database db = getDatabase()) {
-            return db.persist(obj, a);
-        }
-    }
-
-    /** Borrows a connection and calls {@link Database#delete(Object)} */
-    public <T> int delete(@NonNull T obj) throws SQLException {
-        try (Database db = getDatabase()) {
-            return db.delete(obj);
-        }
-    }
-
-  @dagger.Module(includes = RepoModule.class)
+    @dagger.Module(includes = RepoModule.class)
     public interface FromEnvModule {
         @dagger.Provides
         static @Named("mysql") Properties properties() {

@@ -63,16 +63,17 @@ public class MockData {
             int id,
             BotBackend botBackend,
             OsuApi api,
-            Recommender recommender)
+            Recommender recommender,
+            UserDataManager userDataManager)
             throws Exception {
 
         AtomicInteger lastVisited = new AtomicInteger();
-        doAnswer(_ -> lastVisited.get()).when(botBackend).getLastVisitedVersion(username);
+        doAnswer(_ -> lastVisited.get()).when(userDataManager).getLastVisitedVersion(username);
         doAnswer(inv -> {
                     lastVisited.set(inv.getArgument(1));
                     return null;
                 })
-                .when(botBackend)
+                .when(userDataManager)
                 .setLastVisitedVersion(eq(username), anyInt());
 
         doReturn(isDonator ? 1 : 0).when(botBackend).getDonator(id);

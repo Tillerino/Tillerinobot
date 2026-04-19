@@ -72,5 +72,8 @@ public class GivenRecommendation {
                 "update givenrecommendations set hidden = true where `userid` = :userId and `beatmapid` = :beatmapid and `mods` = :mods")
         void hide(Connection c, @UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods)
                 throws SQLException;
+
+        @JdbcUpdate("update givenrecommendations set forgotten = true where userid = :userId")
+        void forget(Connection connection, @UserId int userId) throws SQLException;
     }
 }

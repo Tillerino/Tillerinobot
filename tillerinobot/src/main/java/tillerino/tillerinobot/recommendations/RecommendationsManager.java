@@ -10,7 +10,6 @@ import static org.tillerino.osuApiModel.Mods.getMods;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Loader;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -232,11 +230,8 @@ public class RecommendationsManager {
 
     /** forgets all given recommendations of the past for a single user */
     public void forgetRecommendations(@UserId int user) throws SQLException {
-        try (Database db = dbm.getDatabase();
-                PreparedStatement statement =
-                        db.prepare("update givenrecommendations set forgotten = true where userid = ?")) {
-            Loader.setParameters(statement, user);
-            statement.executeUpdate();
+        try (Database db = dbm.getDatabase()) {
+            givenRecommendationRepo.forget(db.connection(), user);
         }
     }
 

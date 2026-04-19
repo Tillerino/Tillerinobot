@@ -15,14 +15,8 @@ import org.tillerino.ppaddict.config.DatabaseConfigService;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.rest.AuthenticationServiceImpl;
 import org.tillerino.ppaddict.util.Clock;
-import tillerino.tillerinobot.data.ApiBeatmap;
-import tillerino.tillerinobot.data.ApiScore;
-import tillerino.tillerinobot.data.ApiUser;
-import tillerino.tillerinobot.data.DiffEstimate;
-import tillerino.tillerinobot.data.GivenRecommendation;
-import tillerino.tillerinobot.data.Player;
-import tillerino.tillerinobot.data.PullThrough;
-import tillerino.tillerinobot.data.UserTop50Entry;
+import tillerino.tillerinobot.data.*;
+import tillerino.tillerinobot.data.BotUserData.Repo;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.osutrack.OsutrackDownloader;
 import tillerino.tillerinobot.osutrack.TestOsutrackDownloader;
@@ -150,5 +144,12 @@ public interface TestBaseModule {
     @Named("standard")
     static Recommender standardRecommender() {
         return mock(Recommender.class);
+    }
+
+    @Provides
+    @Singleton
+    static UserDataManager userDataManager(
+            BotBackend backend, DatabaseManager dbm, Repo repo, BotUser.Repo botUserRepo) {
+        return spy(new UserDataManager(backend, dbm, repo, botUserRepo));
     }
 }

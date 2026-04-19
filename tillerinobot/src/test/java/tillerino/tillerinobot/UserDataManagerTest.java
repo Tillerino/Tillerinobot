@@ -40,7 +40,7 @@ public class UserDataManagerTest extends TestBase {
     }
 
     private void reloadManager() {
-        userDataManager = new UserDataManager(null, dbm, botUserDataRepo);
+        userDataManager = new UserDataManager(null, dbm, botUserDataRepo, botUserRepo);
     }
 
     @Test

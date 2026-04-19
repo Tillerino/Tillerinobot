@@ -221,6 +221,9 @@ public class FullBotTest extends AbstractDatabaseTest {
     @Inject
     DiffEstimateProvider diffEstimateProvider;
 
+    @Inject
+    UserDataManager userDataManager;
+
     @Override
     public void createEntityManager() {}
 
@@ -240,7 +243,7 @@ public class FullBotTest extends AbstractDatabaseTest {
         connect.get(10, TimeUnit.SECONDS);
 
         for (int botNumber = 0; botNumber < users; botNumber++) {
-            MockData.mockUser("user" + botNumber, false, 12, 1000, 1, backend, osuApi, recommender);
+            MockData.mockUser("user" + botNumber, false, 12, 1000, 1, backend, osuApi, recommender, userDataManager);
         }
         TestBase.mockRecommendations(recommender);
         TestBase.mockBeatmapMetas(diffEstimateProvider);

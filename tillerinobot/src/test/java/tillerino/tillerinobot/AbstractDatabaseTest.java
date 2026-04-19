@@ -50,6 +50,9 @@ public abstract class AbstractDatabaseTest {
     protected BotUserData.Repo botUserDataRepo;
 
     @Inject
+    protected BotUser.Repo botUserRepo;
+
+    @Inject
     protected DiffEstimate.Repo diffEstimateRepo;
 
     @Inject

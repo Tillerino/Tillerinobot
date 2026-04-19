@@ -98,7 +98,8 @@ public class LocalPpaddict {
                 OsuApi osuApi,
                 Recommender recommender,
                 PpaddictLinkKey.Repo linkKeyRepo,
-                PpaddictUser.Repo ppaddictUserRepo) {
+                PpaddictUser.Repo ppaddictUserRepo,
+                UserDataManager userDataManager) {
             final String osuOAuthPrefix = OsuOauth.OSU_AUTH_SERVICE_IDENTIFIER + ":";
 
             return new PpaddictUserDataService(dbm, clock, linkKeyRepo, ppaddictUserRepo) {
@@ -107,7 +108,16 @@ public class LocalPpaddict {
                 public String getLinkString(String id, String displayName) {
                     if (id.startsWith(osuOAuthPrefix)) {
                         int osuId = Integer.parseInt(id.substring(osuOAuthPrefix.length()));
-                        MockData.mockUser(displayName, false, 100000, 1000, osuId, botBackend, osuApi, recommender);
+                        MockData.mockUser(
+                                displayName,
+                                false,
+                                100000,
+                                1000,
+                                osuId,
+                                botBackend,
+                                osuApi,
+                                recommender,
+                                userDataManager);
                     }
                     return super.getLinkString(id, displayName);
                 }

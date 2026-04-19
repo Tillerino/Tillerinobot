@@ -6,6 +6,7 @@
 **/tillerinobot-db.json
 ppaddict-db.json
 .gwt
+*.log
 
 # IntelliJ IDEA
 **/.idea

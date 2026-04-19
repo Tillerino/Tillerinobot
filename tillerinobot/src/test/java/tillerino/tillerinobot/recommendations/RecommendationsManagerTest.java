@@ -30,7 +30,7 @@ public class RecommendationsManagerTest extends TestBase {
     @BeforeEach
     public void createUser() throws Exception {
         TestBase.mockBeatmapMetas(diffEstimateProvider);
-        MockData.mockUser("donator", true, 1, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("donator", true, 1, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
 
         user = pullThrough.downloadUser("donator");
     }
@@ -154,7 +154,7 @@ public class RecommendationsManagerTest extends TestBase {
 
     @Test
     public void gamma7NotRestricted() throws Exception {
-        MockData.mockUser("guy", false, 123, 123, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("guy", false, 123, 123, 123, backend, osuApi, standardRecommender, userDataManager);
         TestBase.mockRecommendations(recommender);
         user = pullThrough.downloadUser("guy");
         assertThat(recommendationsManager.getRecommendation(user, "gamma7", new Default()))
@@ -177,7 +177,7 @@ public class RecommendationsManagerTest extends TestBase {
     }
 
     private void runShift(String mode, int limit) throws Exception {
-        MockData.mockUser("guy", true, 123, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("guy", true, 123, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
         TestBase.mockRecommendations(standardRecommender);
 
         user = pullThrough.downloadUser("guy");

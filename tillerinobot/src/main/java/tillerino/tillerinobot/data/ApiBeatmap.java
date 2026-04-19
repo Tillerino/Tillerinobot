@@ -279,6 +279,11 @@ public class ApiBeatmap {
         @JdbcSelect(where = "`mode` = 0 and `mods` = 0", fetchSize = 1000)
         Iterable<ApiBeatmap> selectAllOsuNomod(Connection c) throws SQLException;
 
+        @JdbcSelect(
+                where =
+                        "`mods` = 0 and `downloaded` < :currentTimeMillis * 0.9 + greatest(approvedDate, lastUpdate) / 10 limit 1000")
+        List<ApiBeatmap> selectOutdated(Connection connection, long currentTimeMillis) throws SQLException;
+
         @JdbcSelect(where = "`fileMd5` = :fileMd5")
         Optional<ApiBeatmap> findByFileMd5(Connection c, String fileMd5) throws SQLException;
 

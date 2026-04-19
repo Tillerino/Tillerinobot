@@ -178,6 +178,19 @@ CREATE TABLE `players` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `ppaddictcredentials`
+--
+
+CREATE TABLE `ppaddictcredentials` (
+  `cookie` char(32) NOT NULL,
+  `identifier` tinytext NOT NULL,
+  `displayName` tinytext NOT NULL,
+  `expires` bigint NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `ppaddictlinkkeys`
 --
 
@@ -297,6 +310,12 @@ ALTER TABLE `givenrecommendations`
 ALTER TABLE `players`
   ADD PRIMARY KEY (`userid`),
   ADD KEY `agetop50` (`agetop50`);
+
+--
+-- Indexes for table `ppaddictcredentials`
+--
+ALTER TABLE `ppaddictcredentials`
+  ADD PRIMARY KEY (`cookie`);
 
 --
 -- Indexes for table `ppaddictlinkkeys`

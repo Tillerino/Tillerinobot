@@ -1,5 +1,6 @@
 package org.tillerino.ppaddict;
 
+import dagger.Binds;
 import io.undertow.Handlers;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
@@ -9,10 +10,20 @@ import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
 import jakarta.servlet.ServletException;
 import java.util.function.Consumer;
+import org.tillerino.ppaddict.server.PpaddictBackend;
+import org.tillerino.ppaddict.server.PpaddictBackendImpl;
+import org.tillerino.ppaddict.server.PpaddictCredentials;
+import org.tillerino.ppaddict.server.PpaddictCredentials$RepoImpl;
 
-public class PpaddictModule {
+@dagger.Module
+public interface PpaddictModule {
+    @Binds
+    PpaddictBackend ppaddictBackend(PpaddictBackendImpl ppaddictBackend);
 
-    public static PathHandler createFilterPathHandler(Consumer<DeploymentInfo> config) throws ServletException {
+    @dagger.Binds
+    PpaddictCredentials.Repo credentialsRepo(PpaddictCredentials$RepoImpl impl);
+
+    static PathHandler createFilterPathHandler(Consumer<DeploymentInfo> config) throws ServletException {
         DeploymentInfo servletBuilder = Servlets.deployment()
                 .setClassLoader(PpaddictModule.class.getClassLoader())
                 .setContextPath("/")

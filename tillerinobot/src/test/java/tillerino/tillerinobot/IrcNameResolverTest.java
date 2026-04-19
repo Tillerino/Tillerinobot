@@ -13,7 +13,7 @@ public class IrcNameResolverTest extends TestBase {
         assertNull(ircNameResolver.resolveIRCName("anybody"));
 
         userNameMappingRepo.deleteAll(db.connection());
-        MockData.mockUser("anybody", false, 1000, 1000, 1, backend, osuApi, standardRecommender);
+        MockData.mockUser("anybody", false, 1000, 1000, 1, backend, osuApi, standardRecommender, userDataManager);
         assertNotNull(ircNameResolver.resolveIRCName("anybody"));
 
         assertThat(userNameMappingRepo.get(db.connection(), "anybody"))
@@ -23,7 +23,16 @@ public class IrcNameResolverTest extends TestBase {
     @Test
     public void testFix() throws Exception {
         userNameMappingRepo.deleteAll(db.connection());
-        MockData.mockUser("this_underscore space_bullshit", false, 1000, 1000, 1, backend, osuApi, standardRecommender);
+        MockData.mockUser(
+                "this_underscore space_bullshit",
+                false,
+                1000,
+                1000,
+                1,
+                backend,
+                osuApi,
+                standardRecommender,
+                userDataManager);
         assertNull(ircNameResolver.resolveIRCName("this_underscore_space_bullshit"));
         ircNameResolver.resolveManually(
                 pullThrough.downloadUser("this_underscore space_bullshit").getUserId());

@@ -7,20 +7,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.UnaryOperator;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Loader;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
@@ -31,6 +27,7 @@ import tillerino.tillerinobot.diff.PercentageEstimatesImpl;
 
 @Singleton
 @Slf4j
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class PpaddictBackendImpl implements PpaddictBackend {
     private final DatabaseManager manager;
 
@@ -40,19 +37,24 @@ public class PpaddictBackendImpl implements PpaddictBackend {
 
     private final ApiBeatmap.Repo apiBeatmapRepo;
 
+    private final PpaddictCredentials.Repo credentialsRepo;
+
     @Override
     public PpaddictCredentials resolveCookie(String cookie) throws SQLException {
-        try (Database database = manager.getDatabase();
-                Loader<PpaddictCredentials> credentials =
-                        database.loader(PpaddictCredentials.class, "where `cookie` = ? and `expires` > ?")) {
-            return credentials.queryUnique(cookie, System.currentTimeMillis()).orElse(null);
+        try (Database database = manager.getDatabase()) {
+            return credentialsRepo
+                    .findByCookie(database.connection(), cookie, System.currentTimeMillis())
+                    .orElse(null);
         }
     }
 
     @Override
     public String createCookie(Credentials userIdentifier) throws SQLException {
         try (Database database = manager.getDatabase()) {
-            return PpaddictCredentials.createKey(database, userIdentifier).getCookie();
+            PpaddictCredentials pC = new PpaddictCredentials(userIdentifier);
+            pC.setCookie(PpaddictCredentials.generateUniqueCookie(database.connection()));
+            credentialsRepo.insert(database.connection(), pC);
+            return pC.getCookie();
         }
     }
 
@@ -73,7 +75,8 @@ public class PpaddictBackendImpl implements PpaddictBackend {
         }
     }
 
-    void loadAllBeatmaps(BiConsumer<BeatmapWithMods, BeatmapData> target, Map<BeatmapWithMods, BeatmapData> current)
+    private void loadAllBeatmaps(
+            BiConsumer<BeatmapWithMods, BeatmapData> target, Map<BeatmapWithMods, BeatmapData> current)
             throws SQLException {
         log.debug("loading beatmaps");
 
@@ -177,53 +180,39 @@ public class PpaddictBackendImpl implements PpaddictBackend {
         return beatmaps;
     }
 
-    @Inject
-    public PpaddictBackendImpl(
-            DatabaseManager manager,
-            ScheduledExecutorService exec,
-            OsuApi downloader,
-            DiffEstimate.Repo diffEstimateRepo,
-            ApiBeatmap.Repo apiBeatmapRepo) {
-        this.manager = manager;
-        this.downloader = downloader;
-        this.diffEstimateRepo = diffEstimateRepo;
-        this.apiBeatmapRepo = apiBeatmapRepo;
-        if (exec != null) {
-            exec.scheduleWithFixedDelay(
-                    () -> {
-                        try {
-                            if (!cachedBeatmaps.isDone()) {
-                                // when ppaddict starts, we run the risk of blocking calls for a looooong time
-                                // this is especially crappy because the initial user data call waits for the beatmaps
-                                // so instead we just offer partially loaded data, but at least it's there :)
-                                Map<BeatmapWithMods, BeatmapData> fillslowly = new ConcurrentHashMap<>();
-                                cachedBeatmaps.complete(fillslowly);
-                                loadAllBeatmaps(fillslowly::put, Collections.emptyMap());
-                                beatmapsGeneration.set(0);
-                            } else {
-                                Map<BeatmapWithMods, BeatmapData> current = cachedBeatmaps.get();
-                                Map<BeatmapWithMods, BeatmapData> replace = new ConcurrentHashMap<>();
-                                loadAllBeatmaps(
-                                        (k, v) -> {
-                                            // put in current map to avoid using twice as much memory
-                                            current.put(k, v);
-                                            replace.put(k, v);
-                                        },
-                                        current);
-                                // replace to make sure that deletions take place
-                                cachedBeatmaps.obtrudeValue(replace);
-                                beatmapsGeneration.incrementAndGet();
-                            }
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            log.warn("interrupted loading beatmaps", e);
-                        } catch (Exception e) {
-                            log.error("error loading beatmaps", e);
-                        }
-                    },
-                    0,
-                    15,
-                    TimeUnit.MINUTES);
+    public void scheduleUpdates(ScheduledExecutorService exec) {
+        exec.scheduleWithFixedDelay(this::reloadBeatmaps, 0, 15, TimeUnit.MINUTES);
+    }
+
+    void reloadBeatmaps() {
+        try {
+            if (!cachedBeatmaps.isDone()) {
+                // when ppaddict starts, we run the risk of blocking calls for a looooong time
+                // this is especially crappy because the initial user data call waits for the beatmaps
+                // so instead we just offer partially loaded data, but at least it's there :)
+                Map<BeatmapWithMods, BeatmapData> fillslowly = new ConcurrentHashMap<>();
+                cachedBeatmaps.complete(fillslowly);
+                loadAllBeatmaps(fillslowly::put, Collections.emptyMap());
+                beatmapsGeneration.set(0);
+            } else {
+                Map<BeatmapWithMods, BeatmapData> current = cachedBeatmaps.get();
+                Map<BeatmapWithMods, BeatmapData> replace = new ConcurrentHashMap<>();
+                loadAllBeatmaps(
+                        (k, v) -> {
+                            // put in current map to avoid using twice as much memory
+                            current.put(k, v);
+                            replace.put(k, v);
+                        },
+                        current);
+                // replace to make sure that deletions take place
+                cachedBeatmaps.obtrudeValue(replace);
+                beatmapsGeneration.incrementAndGet();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("interrupted loading beatmaps", e);
+        } catch (Exception e) {
+            log.error("error loading beatmaps", e);
         }
     }
 

@@ -87,6 +87,8 @@ public class LocalConsoleTillerinobot {
         Recommender recommender();
 
         OsuApi osuApi();
+
+        UserDataManager userDataManager();
     }
 
     @dagger.Module
@@ -213,6 +215,7 @@ public class LocalConsoleTillerinobot {
         final PullThrough pullThrough;
         final OsuApi osuApi;
         final Recommender recommender;
+        final UserDataManager userDataManager;
 
         final AtomicBoolean running = new AtomicBoolean(true);
         String username;
@@ -248,7 +251,7 @@ public class LocalConsoleTillerinobot {
             System.out.println("how much pp do you have?");
             final double pp = Double.parseDouble(IO.readln());
 
-            MockData.mockUser(username, donator, rank, pp, 1, backend, osuApi, recommender);
+            MockData.mockUser(username, donator, rank, pp, 1, backend, osuApi, recommender, userDataManager);
             resolver.resolveManually(pullThrough.downloadUser(username).getUserId());
 
             System.out.println("Welcome to the Tillerinobot simulator");
