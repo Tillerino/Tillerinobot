@@ -39,9 +39,9 @@ public class RecommendationsManagerTest extends TestBase {
     public void testAutoIncrement() throws SQLException {
         GivenRecommendation rec = new GivenRecommendation(323456789, 2, 3, 4);
 
-        givenRecommendationRepo.insert(db.connection(), rec);
+        givenRecommendationRepo.insert(db, rec);
 
-        List<GivenRecommendation> all = givenRecommendationRepo.getAll(db.connection());
+        List<GivenRecommendation> all = givenRecommendationRepo.getAll(db);
         assertThat(all).hasSize(1);
         GivenRecommendation givenRecommendation = all.get(0);
         assertThat(givenRecommendation.getId()).isPositive().isNotEqualTo(323456789);

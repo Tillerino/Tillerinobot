@@ -231,7 +231,7 @@ public class RecommendationsManager {
     /** forgets all given recommendations of the past for a single user */
     public void forgetRecommendations(@UserId int user) throws SQLException {
         try (Database db = dbm.getDatabase()) {
-            givenRecommendationRepo.forget(db.connection(), user);
+            givenRecommendationRepo.forget(db, user);
         }
     }
 
@@ -241,7 +241,7 @@ public class RecommendationsManager {
                 Database db = dbm.getDatabase()) {
             GivenRecommendation givenRecommendation =
                     new GivenRecommendation(userid, beatmapid, System.currentTimeMillis(), mods);
-            givenRecommendationRepo.insert(db.connection(), givenRecommendation);
+            givenRecommendationRepo.insert(db, givenRecommendation);
         }
     }
 
@@ -253,7 +253,7 @@ public class RecommendationsManager {
     public List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) throws SQLException {
         try (Database db = dbm.getDatabase()) {
             long cutoffDate = System.currentTimeMillis() - 28L * 24 * 60 * 60 * 1000;
-            return givenRecommendationRepo.loadRecent(db.connection(), userid, cutoffDate);
+            return givenRecommendationRepo.loadRecent(db, userid, cutoffDate);
         }
     }
 
@@ -264,7 +264,7 @@ public class RecommendationsManager {
     public void hideRecommendation(@UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods)
             throws SQLException {
         try (Database db = dbm.getDatabase()) {
-            givenRecommendationRepo.hide(db.connection(), userId, beatmapid, mods);
+            givenRecommendationRepo.hide(db, userId, beatmapid, mods);
         }
     }
 
@@ -275,7 +275,7 @@ public class RecommendationsManager {
      */
     public List<GivenRecommendation> loadVisibleRecommendations(@UserId int userId) throws SQLException {
         try (Database db = dbm.getDatabase()) {
-            return givenRecommendationRepo.loadVisible(db.connection(), userId);
+            return givenRecommendationRepo.loadVisible(db, userId);
         }
     }
 

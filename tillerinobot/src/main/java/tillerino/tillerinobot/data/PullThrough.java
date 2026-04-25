@@ -35,8 +35,8 @@ public class PullThrough {
      */
     @CheckForNull
     public ApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException {
-        try (Database database = dbm.getDatabase()) {
-            return ApiUser.loadOrDownload(apiUserRepo, database.connection(), userid, maxAge, this.downloader.get());
+        try (Database db = dbm.getDatabase()) {
+            return ApiUser.loadOrDownload(apiUserRepo, db, userid, maxAge, this.downloader.get());
         }
     }
 
@@ -50,8 +50,8 @@ public class PullThrough {
         }
 
         if (user != null) {
-            try (Database database = dbm.getDatabase()) {
-                apiUserRepo.replace(database.connection(), user);
+            try (Database db = dbm.getDatabase()) {
+                apiUserRepo.replace(db, user);
             }
         }
         return user;

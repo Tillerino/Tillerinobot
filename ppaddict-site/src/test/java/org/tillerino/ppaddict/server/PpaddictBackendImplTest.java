@@ -43,7 +43,7 @@ public class PpaddictBackendImplTest extends AbstractPpaddictTest {
         estimate.setBeatmapid(131891);
         estimate.setSuccess(true);
         estimate.setMd5("notset");
-        diffEstimateRepo.insert(db.connection(), estimate);
+        diffEstimateRepo.insert(db, estimate);
 
         CountDownLatch blocker = new CountDownLatch(1);
         doAnswer(x -> {
@@ -79,13 +79,13 @@ public class PpaddictBackendImplTest extends AbstractPpaddictTest {
         estimate.setBeatmapid(1234);
         estimate.setSuccess(true);
         estimate.setMd5("notset");
-        diffEstimateRepo.insert(db.connection(), estimate);
-        Assertions.assertThat(diffEstimateRepo.getAll(db.connection())).isNotEmpty();
+        diffEstimateRepo.insert(db, estimate);
+        Assertions.assertThat(diffEstimateRepo.getAll(db)).isNotEmpty();
 
         doReturn(null).when(osuApi).getBeatmap(1234, 0);
         ppaddictBackend.reloadBeatmaps();
 
-        Assertions.assertThat(diffEstimateRepo.getAll(db.connection())).isEmpty();
+        Assertions.assertThat(diffEstimateRepo.getAll(db)).isEmpty();
     }
 
     /**

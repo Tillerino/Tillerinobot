@@ -201,7 +201,7 @@ public class ApiBeatmap {
             }
 
             if (beatmap == null) {
-                repo.delete(c, beatmapid, mods);
+                repo.deleteByBeatmapIdAndMods(c, beatmapid, mods);
                 return null;
             }
 
@@ -274,7 +274,8 @@ public class ApiBeatmap {
         void insert(Connection c, ApiBeatmap a) throws SQLException;
 
         @JdbcUpdate("DELETE FROM apibeatmaps WHERE `beatmapId` = :beatmapId AND `mods` = :mods")
-        void delete(Connection c, @BeatmapId int beatmapId, @BitwiseMods long mods) throws SQLException;
+        void deleteByBeatmapIdAndMods(Connection c, @BeatmapId int beatmapId, @BitwiseMods long mods)
+                throws SQLException;
 
         @JdbcSelect(where = "`mode` = 0 and `mods` = 0", fetchSize = 1000)
         Iterable<ApiBeatmap> selectAllOsuNomod(Connection c) throws SQLException;

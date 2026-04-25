@@ -37,7 +37,7 @@ public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
         BotConfig botConfig = new BotConfig();
         botConfig.setPath("api-scores-maintenance");
         botConfig.setValue("false");
-        repo.set(db.connection(), botConfig);
+        repo.set(db, botConfig);
         assertThat(config.scoresMaintenance()).isFalse();
     }
 
@@ -46,7 +46,7 @@ public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
         BotConfig botConfig = new BotConfig();
         botConfig.setPath("api-scores-maintenance");
         botConfig.setValue("true");
-        repo.set(db.connection(), botConfig);
+        repo.set(db, botConfig);
         assertThat(config.scoresMaintenance()).isTrue();
     }
 }

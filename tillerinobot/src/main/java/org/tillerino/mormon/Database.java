@@ -3,6 +3,7 @@ package org.tillerino.mormon;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.SQLException;
+import lombok.experimental.Delegate;
 
 /**
  * Wrapper around a {@link Connection} which is used to create {@link Persister} and {@link Loader} instances along with
@@ -13,7 +14,7 @@ import java.sql.SQLException;
  * implementation will only return the actual connection back to the pool.
  */
 @SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
-public record Database(Connection connection) implements AutoCloseable {
+public record Database(@Delegate Connection connection) implements AutoCloseable, Connection {
 
     @Override
     public void close() throws SQLException {

@@ -71,17 +71,16 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
     @Override
     public String getFile() {
         try (Database db = dbm.getDatabase()) {
-            ActualBeatmap found =
-                    repo.findOneById(db.connection(), beatmap.getBeatmapId()).orElse(null);
+            ActualBeatmap found = repo.findOneById(db, beatmap.getBeatmapId()).orElse(null);
             if (found != null) {
                 if (found.getHash() == null || found.getHash().isEmpty()) {
                     found.setHash(md5Hex(found.decompressedContent()));
-                    repo.replace(db.connection(), found);
+                    repo.replace(db, found);
                 }
                 byte[] content = found.getContent();
                 if (content != null) {
                     found.compressContent(content);
-                    repo.replace(db.connection(), found);
+                    repo.replace(db, found);
                 }
             }
             if (found == null
@@ -98,7 +97,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
                 found.compressContent(downloaded.getBytes(UTF_8));
                 found.setDownloaded(System.currentTimeMillis());
                 found.setHash(md5Hex(downloaded));
-                repo.replace(db.connection(), found);
+                repo.replace(db, found);
             }
             if (!found.getHash().equals(beatmap.getFileMd5())) {
                 throw new WebApplicationException(Response.status(Status.BAD_GATEWAY)
@@ -123,8 +122,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
                         String.format("Hash does not match. Expected: %s Actual: %s", beatmap.getFileMd5(), hash),
                         Status.FORBIDDEN);
             }
-            ActualBeatmap found =
-                    repo.findOneById(db.connection(), beatmap.getBeatmapId()).orElse(null);
+            ActualBeatmap found = repo.findOneById(db, beatmap.getBeatmapId()).orElse(null);
             if (found == null) {
                 found = new ActualBeatmap();
                 found.setBeatmapid(beatmap.getBeatmapId());
@@ -132,7 +130,7 @@ public abstract class AbstractBeatmapResource implements BeatmapResource {
             found.compressContent(content.getBytes(UTF_8));
             found.setDownloaded(System.currentTimeMillis());
             found.setHash(hash);
-            repo.replace(db.connection(), found);
+            repo.replace(db, found);
         } catch (SQLException e) {
             log.error("database error", e);
             throw new InternalServerErrorException();

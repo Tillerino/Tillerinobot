@@ -41,19 +41,19 @@ public class PpaddictBackendImpl implements PpaddictBackend {
 
     @Override
     public PpaddictCredentials resolveCookie(String cookie) throws SQLException {
-        try (Database database = manager.getDatabase()) {
+        try (Database db = manager.getDatabase()) {
             return credentialsRepo
-                    .findByCookie(database.connection(), cookie, System.currentTimeMillis())
+                    .findByCookie(db, cookie, System.currentTimeMillis())
                     .orElse(null);
         }
     }
 
     @Override
     public String createCookie(Credentials userIdentifier) throws SQLException {
-        try (Database database = manager.getDatabase()) {
+        try (Database db = manager.getDatabase()) {
             PpaddictCredentials pC = new PpaddictCredentials(userIdentifier);
-            pC.setCookie(PpaddictCredentials.generateUniqueCookie(database.connection()));
-            credentialsRepo.insert(database.connection(), pC);
+            pC.setCookie(PpaddictCredentials.generateUniqueCookie(db));
+            credentialsRepo.insert(db, pC);
             return pC.getCookie();
         }
     }
@@ -80,12 +80,12 @@ public class PpaddictBackendImpl implements PpaddictBackend {
             throws SQLException {
         log.debug("loading beatmaps");
 
-        try (Database database = manager.getDatabase();
+        try (Database db = manager.getDatabase();
                 Database secondConnection = manager.getDatabase()) {
             Map<Integer, OsuApiBeatmapForPpaddict> beatmaps = loadAllApiBeatmaps(secondConnection, current);
             List<Integer> deleteEstimates = new ArrayList<>();
 
-            for (DiffEstimate estimate : diffEstimateRepo.iterateSuccessful(database.connection())) {
+            for (DiffEstimate estimate : diffEstimateRepo.iterateSuccessful(db)) {
                 if (Thread.interrupted()) {
                     log.info("aborted loading beatmaps");
                     Thread.currentThread().interrupt();
@@ -97,12 +97,7 @@ public class PpaddictBackendImpl implements PpaddictBackend {
                 if (apiBeatmap == null) {
                     try {
                         apiBeatmap = OsuApiBeatmapForPpaddict.Mapper.INSTANCE.shrink(ApiBeatmap.loadOrDownload(
-                                apiBeatmapRepo,
-                                secondConnection.connection(),
-                                estimate.getBeatmapid(),
-                                0,
-                                0,
-                                downloader));
+                                apiBeatmapRepo, secondConnection, estimate.getBeatmapid(), 0, 0, downloader));
                         if (apiBeatmap != null) {
                             // since this is very rare, we don't worry about de-duplicating strings here
                             beatmaps.put(key.beatmap(), apiBeatmap);
@@ -128,7 +123,7 @@ public class PpaddictBackendImpl implements PpaddictBackend {
             }
 
             for (Integer beatmapId : deleteEstimates) {
-                diffEstimateRepo.deleteByBeatmapId(database.connection(), beatmapId);
+                diffEstimateRepo.deleteByBeatmapId(db, beatmapId);
             }
         }
         log.debug("done loading beatmaps");
@@ -147,7 +142,7 @@ public class PpaddictBackendImpl implements PpaddictBackend {
             stringDeduplicator.apply(v.beatmap().getVersion());
         });
 
-        apiBeatmapRepo.selectAllOsuNomod(database.connection()).forEach(b -> {
+        apiBeatmapRepo.selectAllOsuNomod(database).forEach(b -> {
             // saves a loooooot of memory:
             // before we had: 293k OsuApiBeatmap instances (53MB) (one boxed field, all other fields strings)
             // 2.4M String instances (58MB)

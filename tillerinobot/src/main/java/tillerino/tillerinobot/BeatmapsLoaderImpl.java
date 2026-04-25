@@ -21,7 +21,7 @@ public class BeatmapsLoaderImpl implements BeatmapsLoader {
     @Override
     public ApiBeatmap getBeatmap(int beatmapId, long mods) throws SQLException, IOException {
         try (Database db = databaseManager.getDatabase()) {
-            return ApiBeatmap.loadOrDownload(repo, db.connection(), beatmapId, mods, 0, downloader);
+            return ApiBeatmap.loadOrDownload(repo, db, beatmapId, mods, 0, downloader);
         }
     }
 }

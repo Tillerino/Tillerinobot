@@ -81,7 +81,7 @@ public class ApiUser {
             throws SQLException, IOException {
         ApiUser user;
         try (var _ = PhaseTimer.timeTask("loadUser")) {
-            user = repo.find(c, userid).orElse(null);
+            user = repo.findByUserId(c, userid).orElse(null);
         }
 
         if (user == null || (maxAge > 0 && user.downloaded < System.currentTimeMillis() - maxAge)) {
@@ -115,7 +115,7 @@ public class ApiUser {
     @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
     public interface Repo {
         @JdbcSelect("select * from apiusers where userId = :userId")
-        Optional<ApiUser> find(Connection c, @UserId int userId) throws SQLException;
+        Optional<ApiUser> findByUserId(Connection c, @UserId int userId) throws SQLException;
 
         @JdbcInsert("REPLACE INTO apiusers (u.#columns) VALUES (:u.#values)")
         void replace(Connection c, ApiUser u) throws SQLException;

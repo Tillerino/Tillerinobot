@@ -44,7 +44,7 @@ public class PpaddictUserDataService {
     public Optional<PersistentUserData> loadUserData(@PpaddictId String identifier) {
         Optional<PpaddictUser> userMaybe;
         try (Database db = dbm.getDatabase()) {
-            userMaybe = ppaddictUserRepo.findByIdentifier(db.connection(), identifier);
+            userMaybe = ppaddictUserRepo.findByIdentifier(db, identifier);
         } catch (SQLException e) {
             throw new RuntimeException("Error loading user", e);
         }
@@ -64,9 +64,8 @@ public class PpaddictUserDataService {
 
     public void saveUserData(@PpaddictId String identifier, PersistentUserData userData) throws SQLException {
         try (Database db = dbm.getDatabase()) {
-            PpaddictUser row = ppaddictUserRepo
-                    .findByIdentifier(db.connection(), identifier)
-                    .orElse(new PpaddictUser(identifier, null, null));
+            PpaddictUser row =
+                    ppaddictUserRepo.findByIdentifier(db, identifier).orElse(new PpaddictUser(identifier, null, null));
             if (row.getForward() != null) {
                 saveUserData(row.getForward(), userData);
             } else {
@@ -77,7 +76,7 @@ public class PpaddictUserDataService {
                     throw new RuntimeException("Error serializing JSON", e);
                 }
                 row.setData(serialized);
-                ppaddictUserRepo.replace(db.connection(), row);
+                ppaddictUserRepo.replace(db, row);
             }
         }
     }
@@ -87,7 +86,7 @@ public class PpaddictUserDataService {
                 id, displayName, LinkPpaddictHandler.newKey(), clock.currentTimeMillis() + 60 * 1000L);
 
         try (Database db = dbm.getDatabase()) {
-            linkKeyRepo.insert(db.connection(), key);
+            linkKeyRepo.insert(db, key);
         }
 
         return key.getLinkKey();
@@ -105,7 +104,7 @@ public class PpaddictUserDataService {
         Optional<PpaddictLinkKey> validLink;
         try (Database db = dbm.getDatabase()) {
             validLink = linkKeyRepo
-                    .findByLinkKey(db.connection(), token)
+                    .findByLinkKey(db, token)
                     .filter(l -> l.getExpires() > clock.currentTimeMillis())
                     .filter(
                             link -> !link.getIdentifier().startsWith("osu:")
@@ -119,7 +118,7 @@ public class PpaddictUserDataService {
         PpaddictUser authenticatedUser;
         try (Database db = dbm.getDatabase()) {
             authenticatedUser = ppaddictUserRepo
-                    .findByIdentifier(db.connection(), link.getIdentifier())
+                    .findByIdentifier(db, link.getIdentifier())
                     .orElseGet(() -> new PpaddictUser(link.getIdentifier(), null, null));
         }
         if (authenticatedUser.getForward() != null) {
@@ -142,7 +141,7 @@ public class PpaddictUserDataService {
 
         authenticatedUser.setForward(osuIdentifier);
         try (Database db = dbm.getDatabase()) {
-            ppaddictUserRepo.replace(db.connection(), authenticatedUser);
+            ppaddictUserRepo.replace(db, authenticatedUser);
         }
 
         return Optional.of(link.getDisplayName());

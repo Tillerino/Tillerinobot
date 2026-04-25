@@ -1,6 +1,7 @@
 package tillerino.tillerinobot.data;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import org.tillerino.jagger.annotations.JsonConfig;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
 
+@Table(name = "usernames")
 @Data
 public class UserNameMapping {
     @IRCName
@@ -31,8 +33,8 @@ public class UserNameMapping {
     @JdbcConfig(quoteChar = "`")
     @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
     public interface Repo {
-        @JdbcSelect("select * from usernames where userName = :userName")
-        Optional<UserNameMapping> get(Connection c, String userName) throws SQLException;
+        @JdbcSelect(where = "userName = :userName")
+        Optional<UserNameMapping> findByUserName(Connection c, String userName) throws SQLException;
 
         @JdbcInsert("REPLACE INTO usernames (mapping.#columns) VALUES (:mapping.#values)")
         void replace(Connection c, UserNameMapping mapping) throws SQLException;

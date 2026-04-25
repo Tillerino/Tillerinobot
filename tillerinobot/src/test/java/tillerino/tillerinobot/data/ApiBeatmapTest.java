@@ -8,13 +8,13 @@ import tillerino.tillerinobot.TestBase;
 public class ApiBeatmapTest extends TestBase {
     @Test
     public void testSchema() throws Exception {
-        assertNotNull(ApiBeatmap.loadOrDownload(apiBeatmapRepo, db.connection(), 131891, 0L, 0, osuApiV1));
+        assertNotNull(ApiBeatmap.loadOrDownload(apiBeatmapRepo, db, 131891, 0L, 0, osuApiV1));
     }
 
     @Test
     public void testStoring() throws Exception {
         ApiBeatmap original = newApiBeatmap();
-        apiBeatmapRepo.insert(db.connection(), original);
+        apiBeatmapRepo.insert(db, original);
     }
 
     public static ApiBeatmap newApiBeatmap() {

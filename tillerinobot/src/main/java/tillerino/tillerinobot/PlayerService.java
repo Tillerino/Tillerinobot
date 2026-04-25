@@ -47,31 +47,31 @@ public class PlayerService {
      * @throws SQLException only on connection errors
      */
     void registerActivity(@UserId int userid, @MillisSinceEpoch long timestamp) throws SQLException {
-        try (Database database = databaseManager.getDatabase()) {
-            repo.updateLastSeen(database.connection(), userid, timestamp);
+        try (Database db = databaseManager.getDatabase()) {
+            repo.updateLastSeen(db, userid, timestamp);
         }
     }
 
     long getLastActivity(@Nonnull ApiUser user) throws SQLException {
         Player player;
-        try (Database database = databaseManager.getDatabase()) {
-            player = getPlayer(database, user.getUserId());
+        try (Database db = databaseManager.getDatabase()) {
+            player = getPlayer(db, user.getUserId());
         }
         return player.getLastseen();
     }
 
     public Player getPlayer(Database database, @UserId int userid) throws SQLException {
         {
-            Optional<Player> player = repo.getPlayer(database.connection(), userid);
+            Optional<Player> player = repo.getPlayer(database, userid);
             if (player.isPresent()) return player.get();
         }
         Player player = new Player(userid);
-        repo.insertPlayer(database.connection(), player);
+        repo.insertPlayer(database, player);
         return player;
     }
 
     public Optional<Player> getPlayerForUpdate(Database d) throws SQLException {
-        return repo.getPlayerForUpdate(d.connection());
+        return repo.getPlayerForUpdate(d);
     }
 
     public void updateTop50(
@@ -102,12 +102,12 @@ public class PlayerService {
         }
 
         try (var _ = PhaseTimer.timeTask("persistTop50")) {
-            scoreRepo.replaceAll(database.connection(), scores);
-            top50EntryRepo.replaceAll(database.connection(), top50Entries);
+            scoreRepo.replaceAll(database, scores);
+            top50EntryRepo.replaceAll(database, top50Entries);
         }
 
         player.setLastupdatetop50(clock.currentTimeMillis());
         player.setAgetop50(player.getLastseen() - player.getLastupdatetop50());
-        repo.updateLastUpdate(database.connection(), player);
+        repo.updateLastUpdate(database, player);
     }
 }

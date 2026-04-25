@@ -38,13 +38,13 @@ public class AbstractBeatmapResourceTest extends TestBase {
     public void testMigrations() throws Exception {
         String content = "hello";
         // save without hash for backwards compatibility
-        actualBeatmapRepo.insert(db.connection(), new ActualBeatmap(12, content.getBytes(), null, 1, ""));
+        actualBeatmapRepo.insert(db, new ActualBeatmap(12, content.getBytes(), null, 1, ""));
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(content));
         assertEquals(content, resource.getFile());
         verifyNoInteractions(beatmapDownloader);
         // data was compressed after the fact
-        assertThat(actualBeatmapRepo.findOneById(db.connection(), 12))
+        assertThat(actualBeatmapRepo.findOneById(db, 12))
                 .hasValueSatisfying(ab -> assertThat(ab).hasFieldOrPropertyWithValue("content", null));
     }
 
@@ -52,8 +52,7 @@ public class AbstractBeatmapResourceTest extends TestBase {
     public void testRedownloadOnWrongHash() throws Exception {
         String oldContent = "hello";
         String newContent = "world";
-        actualBeatmapRepo.insert(
-                db.connection(), new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)));
+        actualBeatmapRepo.insert(db, new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)));
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(newContent));
         doReturn(newContent).when(beatmapDownloader).getActualBeatmap(12);

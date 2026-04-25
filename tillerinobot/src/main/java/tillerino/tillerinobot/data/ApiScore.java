@@ -1,6 +1,9 @@
 package tillerino.tillerinobot.data;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.annotation.CheckForNull;
@@ -21,13 +24,13 @@ import org.tillerino.osuApiModel.types.*;
 
 @Data
 @EqualsAndHashCode
+@Table(name = "apiscores")
 @ToString
-@jakarta.persistence.Table(name = "apiscores")
 public class ApiScore implements java.io.Serializable {
     public long downloaded = System.currentTimeMillis();
 
     @BeatmapId
-    @jakarta.persistence.Id
+    @Id
     private int beatmapId;
 
     private long score;
@@ -51,7 +54,7 @@ public class ApiScore implements java.io.Serializable {
     private long mods;
 
     @UserId
-    @jakarta.persistence.Id
+    @Id
     private int userId;
 
     @JsonDeserialize(using = DateToLong.class)
@@ -66,7 +69,7 @@ public class ApiScore implements java.io.Serializable {
     @GameMode
     private int mode;
 
-    @jakarta.persistence.Transient
+    @Transient
     public double getAccuracy() {
         return OsuApiScore.getAccuracy(count300, count100, count50, countMiss);
     }

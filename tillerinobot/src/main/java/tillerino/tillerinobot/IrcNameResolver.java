@@ -67,8 +67,8 @@ public class IrcNameResolver {
     @CheckForNull
     public Integer getIDByUserName(@IRCName String userName) throws IOException, SQLException {
         UserNameMapping mapping;
-        try (Database database = dbm.getDatabase()) {
-            mapping = userNameMappingRepo.get(database.connection(), userName).orElse(null);
+        try (Database db = dbm.getDatabase()) {
+            mapping = userNameMappingRepo.findByUserName(db, userName).orElse(null);
         }
 
         long maxAge = 90L * 24 * 60 * 60 * 1000;
@@ -107,8 +107,8 @@ public class IrcNameResolver {
 
             mapping.setResolved(System.currentTimeMillis());
 
-            try (Database database = dbm.getDatabase()) {
-                userNameMappingRepo.replace(database.connection(), mapping);
+            try (Database db = dbm.getDatabase()) {
+                userNameMappingRepo.replace(db, mapping);
             }
         }
 
@@ -148,12 +148,12 @@ public class IrcNameResolver {
      * @param userId the osu! user id
      */
     public void setMapping(@IRCName String ircName, @UserId int userId) throws SQLException {
-        try (Database database = dbm.getDatabase()) {
+        try (Database db = dbm.getDatabase()) {
             UserNameMapping mapping = new UserNameMapping();
             mapping.setResolved(System.currentTimeMillis());
             mapping.setUserid(userId);
             mapping.setUserName(ircName);
-            userNameMappingRepo.replace(database.connection(), mapping);
+            userNameMappingRepo.replace(db, mapping);
             resolvedIRCNames.invalidate(ircName);
         }
     }

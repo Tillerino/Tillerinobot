@@ -78,7 +78,7 @@ public class DiffEstimateProvider {
         Set<BeatmapWithMods> noMods =
                 beatmaps.stream().map(BeatmapWithMods::nomod).collect(Collectors.toSet());
         Map<BeatmapWithMods, ApiBeatmap> apiBeatmaps =
-                ApiBeatmap.loadOrDownload(apiBeatmapRepo, database.connection(), noMods, 0, downloader);
+                ApiBeatmap.loadOrDownload(apiBeatmapRepo, database, noMods, 0, downloader);
         Map<BeatmapWithMods, DiffEstimate> diffEstimates = loadMultiple(
                 database, beatmaps.stream().map(BeatmapWithMods::diffMods).collect(Collectors.toSet()));
 
@@ -115,7 +115,7 @@ public class DiffEstimateProvider {
         if (cachedBeatmap != null && cachedBeatmap.getApproved() != OsuApiBeatmap.RANKED) {
             cachedBeatmap = ApiBeatmap.loadOrDownload(
                     apiBeatmapRepo,
-                    database.connection(),
+                    database,
                     beatmapid,
                     0,
                     cachedBeatmap.getApproved() == OsuApiBeatmap.APPROVED ? 24 * 60 * 60 * 1000 : 10000,
@@ -125,7 +125,7 @@ public class DiffEstimateProvider {
         final long diffMods = getDiffMods(originalMods);
         if (cachedBeatmap == null) {
             // doesn't never existed or was deleted
-            repo.deleteByBeatmapIdAndMods(database.connection(), beatmapid, diffMods);
+            repo.deleteByBeatmapId(database, beatmapid);
             return null;
         }
 
@@ -147,7 +147,7 @@ public class DiffEstimateProvider {
                 calculatorSemaphore.release();
             }
 
-            repo.replace(database.connection(), estimate);
+            repo.replace(database, estimate);
         }
 
         if (estimate.success) {
@@ -231,7 +231,7 @@ public class DiffEstimateProvider {
         try (Database db = dbm.getDatabase()) {
             for (; ; ) {
                 MDC.clear();
-                Optional<DiffEstimate> outdated = repo.getOutdated(db.connection(), SanDoku.VERSION);
+                Optional<DiffEstimate> outdated = repo.findOneOutdated(db, SanDoku.VERSION);
                 if (outdated.isEmpty()) {
                     return true;
                 }
@@ -267,9 +267,9 @@ public class DiffEstimateProvider {
         }
 
         try (var _ = PhaseTimer.timeTask("loadOrCalculateEstimates");
-                Database database = dbm.getDatabase()) {
+                Database db = dbm.getDatabase()) {
             // try to load with these exact mods
-            BeatmapImpl diffEstimate = loadOrCalculate(database, beatmapId, mods);
+            BeatmapImpl diffEstimate = loadOrCalculate(db, beatmapId, mods);
 
             if (diffEstimate != null) {
                 return new PercentageEstimatesImpl(diffEstimate, mods);
@@ -293,8 +293,8 @@ public class DiffEstimateProvider {
         String combinations = beatmaps.stream()
                 .map(bwm -> "(" + bwm.beatmap() + "," + bwm.mods() + ")")
                 .collect(Collectors.joining(",", "(", ")"));
-        try (PreparedStatement ps = database.connection()
-                        .prepareStatement("select * from diffestimates where (beatmapid, mods) in " + combinations);
+        try (PreparedStatement ps = database.prepareStatement(
+                        "select * from diffestimates where (beatmapid, mods) in " + combinations);
                 ResultSet rs = ps.executeQuery()) {
             return repo.getMultiple(rs).stream()
                     .collect(Collectors.toMap(e -> new BeatmapWithMods(e.beatmapid, e.mods), e -> e));
@@ -305,9 +305,9 @@ public class DiffEstimateProvider {
             throws SQLException, IOException, InterruptedException {
         ApiBeatmap beatmap;
         long diffMods = DiffEstimateProvider.getDiffMods(mods);
-        try (Database database = dbm.getDatabase()) {
+        try (Database db = dbm.getDatabase()) {
             beatmap = ApiBeatmap.loadOrDownload(
-                    apiBeatmapRepo, database.connection(), beatmapid, diffMods, 7L * 24 * 60 * 60 * 1000, downloader);
+                    apiBeatmapRepo, db, beatmapid, diffMods, 7L * 24 * 60 * 60 * 1000, downloader);
         } catch (SQLException e) {
             throw new SQLException("exception loading beatmap " + beatmapid + " mods " + diffMods, e);
         }

@@ -19,7 +19,7 @@ public class DatabaseConfigService implements ConfigService {
     @Override
     public Optional<String> config(String key) {
         try (Database db = dbm.getDatabase()) {
-            return repo.get(db.connection(), key).map(BotConfig::getValue);
+            return repo.get(db, key).map(BotConfig::getValue);
         } catch (SQLException e) {
             throw new ContextedRuntimeException("Unable to load config", e).addContextValue("key", key);
         }

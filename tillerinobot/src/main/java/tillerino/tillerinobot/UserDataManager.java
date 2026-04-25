@@ -238,7 +238,7 @@ public class UserDataManager {
     public UserData loadUserData(@UserId int userid) throws SQLException {
         try (var _ = PhaseTimer.timeTask("loadUserData");
                 Database db = dbm.getDatabase()) {
-            BotUserData data = repo.get(db.connection(), userid).orElse(null);
+            BotUserData data = repo.get(db, userid).orElse(null);
 
             UserData options;
             if (data == null || StringUtils.isEmpty(data.getUserdata())) {
@@ -280,7 +280,7 @@ public class UserDataManager {
             data.setUserId(options.userid);
             data.setUserdata(serialized);
             try (Database db = dbm.getDatabase()) {
-                repo.set(db.connection(), data);
+                repo.set(db, data);
             }
             options.setChanged(false);
         }
@@ -288,9 +288,9 @@ public class UserDataManager {
 
     public int getLastVisitedVersion(String nick) throws SQLException {
         try (var _ = PhaseTimer.timeTask("getLastVisitedVersion");
-                Database database = dbm.getDatabase()) {
+                Database db = dbm.getDatabase()) {
             return botUserRepo
-                    .findByUsername(database.connection(), nick)
+                    .findByUsername(db, nick)
                     .map(BotUser::getVersionVisited)
                     .orElse(-1);
         }
@@ -298,8 +298,8 @@ public class UserDataManager {
 
     public void setLastVisitedVersion(String nick, int version) throws SQLException {
         try (var _ = PhaseTimer.timeTask("setLastVisitedVersion");
-                Database database = dbm.getDatabase()) {
-            botUserRepo.replace(database.connection(), new BotUser(nick, version));
+                Database db = dbm.getDatabase()) {
+            botUserRepo.replace(db, new BotUser(nick, version));
         }
     }
 }

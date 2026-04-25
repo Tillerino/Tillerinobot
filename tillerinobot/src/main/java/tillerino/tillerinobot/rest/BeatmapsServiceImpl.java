@@ -43,9 +43,8 @@ public class BeatmapsServiceImpl implements BeatmapsService {
 
     @Override
     public BeatmapResource byId(int id) {
-        try (Database database = databaseManager.getDatabase()) {
-            ApiBeatmap beatmap =
-                    ApiBeatmap.loadOrDownload(apiBeatmapRepo, database.connection(), id, 0L, 0, apiDownloader);
+        try (Database db = databaseManager.getDatabase()) {
+            ApiBeatmap beatmap = ApiBeatmap.loadOrDownload(apiBeatmapRepo, db, id, 0L, 0, apiDownloader);
             if (beatmap == null) {
                 throw new NotFoundException();
             }
@@ -63,7 +62,7 @@ public class BeatmapsServiceImpl implements BeatmapsService {
     @Override
     public BeatmapResource byHash(String hash) {
         try (Database db = databaseManager.getDatabase()) {
-            ApiBeatmap beatmap = ApiBeatmap.findByFileMd5(apiBeatmapRepo, db.connection(), hash);
+            ApiBeatmap beatmap = ApiBeatmap.findByFileMd5(apiBeatmapRepo, db, hash);
             if (beatmap == null) {
                 throw new NotFoundException();
             }

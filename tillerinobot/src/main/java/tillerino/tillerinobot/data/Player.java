@@ -16,8 +16,8 @@ import org.tillerino.osuApiModel.types.UserId;
 
 /** An osu! player who is not necessarily a bot user. */
 @Data
-@NoArgsConstructor
 @Table(name = "players")
+@NoArgsConstructor
 public class Player {
     @UserId
     @Id

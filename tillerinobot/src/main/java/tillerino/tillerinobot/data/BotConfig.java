@@ -9,7 +9,6 @@ import javax.inject.Singleton;
 import lombok.Data;
 import org.tillerino.jagger.annotations.JdbcInsert;
 import org.tillerino.jagger.annotations.JdbcSelect;
-import org.tillerino.jagger.annotations.JdbcUpdate;
 import org.tillerino.jagger.annotations.JsonConfig;
 
 /** Configuration that can be changed while the bot runs. This is stored as simple key-value in the database. */
@@ -28,8 +27,5 @@ public class BotConfig {
         @JdbcInsert(
                 "insert into botconfig (path, value) values (:config.path, :config.value) on duplicate key update value = :config.value")
         void set(Connection c, BotConfig config) throws SQLException;
-
-        @JdbcUpdate("delete from botconfig where path = :path")
-        void delete(Connection c, String path) throws SQLException;
     }
 }
