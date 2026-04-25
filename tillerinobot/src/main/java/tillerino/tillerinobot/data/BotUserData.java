@@ -32,8 +32,9 @@ public class BotUserData {
         @JdbcSelect(where = "`userId` = :userId")
         Optional<BotUserData> get(Connection c, @UserId int userId) throws SQLException;
 
-        @JdbcInsert(
-                "insert into userdata (userId, userdata) values (:data.userId, :data.userdata) on duplicate key update userdata = :data.userdata")
+        @JdbcInsert("""
+                insert into `userdata` (`data.#insertColumns`) values (:data.#insertValues) \
+                on duplicate key update `userdata` = :data.userdata""")
         void set(Connection c, BotUserData data) throws SQLException;
     }
 }

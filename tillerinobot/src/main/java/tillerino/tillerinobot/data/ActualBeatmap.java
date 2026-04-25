@@ -82,7 +82,7 @@ public class ActualBeatmap {
     @JdbcConfig(quoteChar = "`")
     @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
     public interface Repo {
-        @JdbcSelect(where = "beatmapid = :beatmapid")
+        @JdbcSelect(where = "`beatmapid` = :beatmapid")
         Optional<ActualBeatmap> findOneById(Connection c, @BeatmapId int beatmapid) throws SQLException;
 
         @JdbcInsert

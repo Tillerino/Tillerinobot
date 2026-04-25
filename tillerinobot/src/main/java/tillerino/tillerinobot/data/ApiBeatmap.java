@@ -267,7 +267,7 @@ public class ApiBeatmap {
     @JdbcConfig(quoteChar = "`")
     @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
     public interface Repo {
-        @JdbcInsert("REPLACE INTO apibeatmaps (a.#columns) VALUES (:a.#values)")
+        @JdbcInsert("REPLACE INTO apibeatmaps (`a.#columns`) VALUES (:a.#values)")
         void replace(Connection c, ApiBeatmap a) throws SQLException;
 
         @JdbcInsert

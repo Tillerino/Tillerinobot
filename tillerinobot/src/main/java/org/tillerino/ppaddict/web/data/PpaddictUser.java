@@ -39,7 +39,7 @@ public class PpaddictUser {
         @JdbcInsert
         void insert(Connection c, PpaddictUser u) throws SQLException;
 
-        @JdbcUpdate("replace into ppaddictusers (u.#columns) values (:u.#values)")
+        @JdbcUpdate("replace into `ppaddictusers` (u.#columns) values (:u.#values)")
         void replace(Connection c, PpaddictUser u) throws SQLException;
 
         @JdbcSelect(where = "`identifier` = :identifier")

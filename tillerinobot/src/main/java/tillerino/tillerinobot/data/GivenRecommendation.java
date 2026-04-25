@@ -62,18 +62,18 @@ public class GivenRecommendation {
         @JdbcSelect
         List<GivenRecommendation> getAll(Connection c) throws SQLException;
 
-        @JdbcSelect(where = "`userid` = :userid and `date` > :cutoffDate and not forgotten order by `date` desc")
+        @JdbcSelect(where = "`userid` = :userid and `date` > :cutoffDate and not `forgotten` order by `date` desc")
         List<GivenRecommendation> loadRecent(Connection c, @UserId int userid, long cutoffDate) throws SQLException;
 
-        @JdbcSelect(where = "`userid` = :userid and not hidden order by `date` desc")
+        @JdbcSelect(where = "`userid` = :userid and not `hidden` order by `date` desc")
         List<GivenRecommendation> loadVisible(Connection c, @UserId int userid) throws SQLException;
 
         @JdbcUpdate(
-                "update givenrecommendations set hidden = true where `userid` = :userId and `beatmapid` = :beatmapid and `mods` = :mods")
+                "update `givenrecommendations` set `hidden` = true where `userid` = :userId and `beatmapid` = :beatmapid and `mods` = :mods")
         void hide(Connection c, @UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods)
                 throws SQLException;
 
-        @JdbcUpdate("update givenrecommendations set forgotten = true where userid = :userId")
+        @JdbcUpdate("update `givenrecommendations` set `forgotten` = true where `userid` = :userId")
         void forget(Connection connection, @UserId int userId) throws SQLException;
     }
 }

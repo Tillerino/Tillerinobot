@@ -29,7 +29,7 @@ public class UserTop50Entry {
     @JdbcConfig(quoteChar = "`")
     @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
     public interface Repo {
-        @JdbcInsert("replace into usertop50 (s.#columns) values (:s.#values)")
+        @JdbcInsert("replace into `usertop50` (`s.#columns`) values (:s.#values)")
         void replaceAll(Connection c, Iterable<UserTop50Entry> s) throws SQLException;
 
         @JdbcInsert

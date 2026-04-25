@@ -33,13 +33,13 @@ public class UserNameMapping {
     @JdbcConfig(quoteChar = "`")
     @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
     public interface Repo {
-        @JdbcSelect(where = "userName = :userName")
+        @JdbcSelect(where = "`userName` = :userName")
         Optional<UserNameMapping> findByUserName(Connection c, String userName) throws SQLException;
 
-        @JdbcInsert("REPLACE INTO usernames (mapping.#columns) VALUES (:mapping.#values)")
+        @JdbcInsert("REPLACE INTO `usernames` (`mapping.#columns`) VALUES (:mapping.#values)")
         void replace(Connection c, UserNameMapping mapping) throws SQLException;
 
-        @JdbcUpdate("delete from usernames")
+        @JdbcUpdate("DELETE FROM `usernames`")
         void deleteAll(Connection c) throws SQLException;
     }
 }

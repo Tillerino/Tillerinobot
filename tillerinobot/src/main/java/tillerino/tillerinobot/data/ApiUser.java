@@ -114,10 +114,10 @@ public class ApiUser {
     @JdbcConfig(quoteChar = "`")
     @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
     public interface Repo {
-        @JdbcSelect("select * from apiusers where userId = :userId")
+        @JdbcSelect(where = "`userId` = :userId")
         Optional<ApiUser> findByUserId(Connection c, @UserId int userId) throws SQLException;
 
-        @JdbcInsert("REPLACE INTO apiusers (u.#columns) VALUES (:u.#values)")
+        @JdbcInsert("REPLACE INTO `apiusers` (`u.#columns`) VALUES (:u.#values)")
         void replace(Connection c, ApiUser u) throws SQLException;
     }
 }

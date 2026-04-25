@@ -149,7 +149,7 @@ public class DiffEstimate {
         Optional<DiffEstimate> findByBeatmapIdAndMods(Connection c, @BeatmapId int beatmapid, @BitwiseMods long mods)
                 throws SQLException;
 
-        @JdbcSelect("select * from diffestimates where dataVersion != :version limit 1")
+        @JdbcSelect(where = "`dataVersion` != :version limit 1")
         Optional<DiffEstimate> findOneOutdated(Connection c, int version) throws SQLException;
 
         @JdbcSelect(where = "`success`")
@@ -164,7 +164,7 @@ public class DiffEstimate {
         @JdbcSelect
         List<DiffEstimate> getMultiple(ResultSet resultSet) throws SQLException;
 
-        @JdbcUpdate("DELETE from diffestimates where `beatmapid` = :beatmapid")
+        @JdbcUpdate("DELETE from `diffestimates` where `beatmapid` = :beatmapid")
         void deleteByBeatmapId(Connection c, @BeatmapId int beatmapid) throws SQLException;
     }
 }

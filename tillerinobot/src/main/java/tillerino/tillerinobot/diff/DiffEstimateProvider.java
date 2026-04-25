@@ -294,7 +294,7 @@ public class DiffEstimateProvider {
                 .map(bwm -> "(" + bwm.beatmap() + "," + bwm.mods() + ")")
                 .collect(Collectors.joining(",", "(", ")"));
         try (PreparedStatement ps = database.prepareStatement(
-                        "select * from diffestimates where (beatmapid, mods) in " + combinations);
+                        "select * from `diffestimates` where (`beatmapid`, `mods`) in " + combinations);
                 ResultSet rs = ps.executeQuery()) {
             return repo.getMultiple(rs).stream()
                     .collect(Collectors.toMap(e -> new BeatmapWithMods(e.beatmapid, e.mods), e -> e));
