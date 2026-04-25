@@ -28,7 +28,7 @@ public class AccHandlerTest extends TestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-        MockData.mockUser("user", false, 123, 123.0, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 123, 123.0, 123, backend, osuApi, standardRecommender, userDataManager);
         mockBeatmapMetas(diffEstimateProvider);
         userData = spy(userDataManager.loadUserData(1));
         userData.setLastSongInfo(new BeatmapWithMods(0, 0));

@@ -13,8 +13,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.chat.IRCName;
 import tillerino.tillerinobot.data.ApiUser;
@@ -26,6 +26,8 @@ import tillerino.tillerinobot.data.UserNameMapping;
 @Singleton
 public class IrcNameResolver {
     private final DatabaseManager dbm;
+
+    private final UserNameMapping.Repo userNameMappingRepo;
 
     private final PullThrough pullThrough;
 
@@ -64,9 +66,10 @@ public class IrcNameResolver {
 
     @CheckForNull
     public Integer getIDByUserName(@IRCName String userName) throws IOException, SQLException {
-        UserNameMapping mapping = dbm.selectUnique(UserNameMapping.class)
-                .execute("where userName = ", userName)
-                .orElse(null);
+        UserNameMapping mapping;
+        try (Database db = dbm.getDatabase()) {
+            mapping = userNameMappingRepo.findByUserName(db, userName).orElse(null);
+        }
 
         long maxAge = 90L * 24 * 60 * 60 * 1000;
         if (System.currentTimeMillis() < 1483747380000L /* sometime January 7th, 2017*/) {
@@ -104,7 +107,9 @@ public class IrcNameResolver {
 
             mapping.setResolved(System.currentTimeMillis());
 
-            dbm.persist(mapping, Action.REPLACE);
+            try (Database db = dbm.getDatabase()) {
+                userNameMappingRepo.replace(db, mapping);
+            }
         }
 
         if (mapping.getUserid() == -1) {
@@ -143,12 +148,14 @@ public class IrcNameResolver {
      * @param userId the osu! user id
      */
     public void setMapping(@IRCName String ircName, @UserId int userId) throws SQLException {
-        UserNameMapping mapping = new UserNameMapping();
-        mapping.setResolved(System.currentTimeMillis());
-        mapping.setUserid(userId);
-        mapping.setUserName(ircName);
-        dbm.persist(mapping, Action.REPLACE);
-        resolvedIRCNames.invalidate(ircName);
+        try (Database db = dbm.getDatabase()) {
+            UserNameMapping mapping = new UserNameMapping();
+            mapping.setResolved(System.currentTimeMillis());
+            mapping.setUserid(userId);
+            mapping.setUserName(ircName);
+            userNameMappingRepo.replace(db, mapping);
+            resolvedIRCNames.invalidate(ircName);
+        }
     }
 
     /**

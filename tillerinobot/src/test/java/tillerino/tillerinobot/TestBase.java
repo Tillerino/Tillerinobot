@@ -42,16 +42,19 @@ public abstract class TestBase extends AbstractDatabaseTest {
     @Inject
     GameChatResponseQueue queue;
 
-    @dagger.Component(
-            modules = {
+    @dagger.Module(
+            includes = {
                 DockeredMysqlModule.class,
                 TestBaseModule.class,
-                Module.class,
+                WireMockDocker.Module.class,
                 LiveActivityMockModule.class,
                 TestClock.Module.class,
                 GameChatResponseQueueMockModule.class,
                 GameChatClientMockModule.class
             })
+    public interface Module {}
+
+    @dagger.Component(modules = Module.class)
     @Singleton
     interface Injector {
         void inject(TestBase t);

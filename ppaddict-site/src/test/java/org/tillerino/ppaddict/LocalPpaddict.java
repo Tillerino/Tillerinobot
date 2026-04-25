@@ -20,6 +20,8 @@ import org.tillerino.ppaddict.server.auth.AuthArriveService;
 import org.tillerino.ppaddict.server.auth.implementations.OsuOauth;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.TestClock;
+import org.tillerino.ppaddict.web.data.PpaddictLinkKey;
+import org.tillerino.ppaddict.web.data.PpaddictUser;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.AbstractDatabaseTest.DockeredMysqlModule;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
@@ -90,16 +92,32 @@ public class LocalPpaddict {
         @dagger.Provides
         @Singleton
         static PpaddictUserDataService getPpaddictUserDataService(
-                DatabaseManager linkKeys, Clock clock, BotBackend botBackend, OsuApi osuApi, Recommender recommender) {
+                DatabaseManager dbm,
+                Clock clock,
+                BotBackend botBackend,
+                OsuApi osuApi,
+                Recommender recommender,
+                PpaddictLinkKey.Repo linkKeyRepo,
+                PpaddictUser.Repo ppaddictUserRepo,
+                UserDataManager userDataManager) {
             final String osuOAuthPrefix = OsuOauth.OSU_AUTH_SERVICE_IDENTIFIER + ":";
 
-            return new PpaddictUserDataService(linkKeys, clock) {
+            return new PpaddictUserDataService(dbm, clock, linkKeyRepo, ppaddictUserRepo) {
                 @Override
                 @SneakyThrows
                 public String getLinkString(String id, String displayName) {
                     if (id.startsWith(osuOAuthPrefix)) {
                         int osuId = Integer.parseInt(id.substring(osuOAuthPrefix.length()));
-                        MockData.mockUser(displayName, false, 100000, 1000, osuId, botBackend, osuApi, recommender);
+                        MockData.mockUser(
+                                displayName,
+                                false,
+                                100000,
+                                1000,
+                                osuId,
+                                botBackend,
+                                osuApi,
+                                recommender,
+                                userDataManager);
                     }
                     return super.getLinkString(id, displayName);
                 }

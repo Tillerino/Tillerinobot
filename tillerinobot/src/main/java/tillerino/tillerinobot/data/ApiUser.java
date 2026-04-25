@@ -1,18 +1,23 @@
 package tillerino.tillerinobot.data;
 
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Optional;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
-import org.tillerino.mormon.Database;
-import org.tillerino.mormon.KeyColumn;
-import org.tillerino.mormon.Persister;
-import org.tillerino.mormon.Persister.Action;
-import org.tillerino.mormon.Table;
+import org.tillerino.jagger.annotations.JdbcConfig;
+import org.tillerino.jagger.annotations.JdbcInsert;
+import org.tillerino.jagger.annotations.JdbcSelect;
+import org.tillerino.jagger.annotations.JsonConfig;
 import org.tillerino.osuApiModel.GameModes;
 import org.tillerino.osuApiModel.OsuApiUser;
 import org.tillerino.osuApiModel.types.GameMode;
@@ -21,14 +26,14 @@ import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.util.PhaseTimer;
 import tillerino.tillerinobot.OsuApi;
 
-@Table("apiusers")
+@Table(name = "apiusers")
 @Data
 @EqualsAndHashCode
-@KeyColumn("userId")
 @ToString
 public class ApiUser {
     long downloaded = System.currentTimeMillis();
 
+    @Id
     @UserId
     private int userId;
 
@@ -67,17 +72,16 @@ public class ApiUser {
 
     private String country;
 
+    @Id
     @GameMode
     private int mode;
 
     /** @param maxAge if > 0, maximum age in milliseconds */
-    public static ApiUser loadOrDownload(Database database, @UserId int userid, long maxAge, OsuApi downloader)
+    public static ApiUser loadOrDownload(Repo repo, Connection c, @UserId int userid, long maxAge, OsuApi downloader)
             throws SQLException, IOException {
         ApiUser user;
         try (var _ = PhaseTimer.timeTask("loadUser")) {
-            user = database.selectUnique(ApiUser.class)
-                    .execute("where userId = ", userid)
-                    .orElse(null);
+            user = repo.findByUserId(c, userid).orElse(null);
         }
 
         if (user == null || (maxAge > 0 && user.downloaded < System.currentTimeMillis() - maxAge)) {
@@ -89,9 +93,8 @@ public class ApiUser {
 
             if (user == null) return null;
 
-            try (var _ = PhaseTimer.timeTask("persistUser");
-                    Persister<ApiUser> persister = database.persister(ApiUser.class, Action.REPLACE)) {
-                persister.persist(user);
+            try (var _ = PhaseTimer.timeTask("persistUser")) {
+                repo.replace(c, user);
             }
         }
 
@@ -106,5 +109,15 @@ public class ApiUser {
         ApiUser fromApi(OsuApiUser api, long downloaded);
 
         OsuApiUser toApi(ApiUser api);
+    }
+
+    @JdbcConfig(quoteChar = "`")
+    @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
+    public interface Repo {
+        @JdbcSelect("select * from apiusers where userId = :userId")
+        Optional<ApiUser> findByUserId(Connection c, @UserId int userId) throws SQLException;
+
+        @JdbcInsert("REPLACE INTO apiusers (u.#columns) VALUES (:u.#values)")
+        void replace(Connection c, ApiUser u) throws SQLException;
     }
 }

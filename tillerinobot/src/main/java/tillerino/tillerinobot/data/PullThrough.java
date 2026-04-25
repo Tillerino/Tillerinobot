@@ -10,8 +10,6 @@ import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Persister;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.GameModes;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.util.PhaseTimer;
@@ -20,6 +18,8 @@ import tillerino.tillerinobot.OsuApi;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class PullThrough {
     private final DatabaseManager dbm;
+
+    private final ApiUser.Repo apiUserRepo;
 
     private final Lazy<OsuApi> downloader;
 
@@ -35,8 +35,8 @@ public class PullThrough {
      */
     @CheckForNull
     public ApiUser getUser(@UserId int userid, long maxAge) throws SQLException, IOException {
-        try (Database database = dbm.getDatabase()) {
-            return ApiUser.loadOrDownload(database, userid, maxAge, this.downloader.get());
+        try (Database db = dbm.getDatabase()) {
+            return ApiUser.loadOrDownload(apiUserRepo, db, userid, maxAge, this.downloader.get());
         }
     }
 
@@ -50,9 +50,8 @@ public class PullThrough {
         }
 
         if (user != null) {
-            try (Database database = dbm.getDatabase();
-                    Persister<ApiUser> persisterApiUser = database.persister(ApiUser.class, Action.REPLACE)) {
-                persisterApiUser.persist(user);
+            try (Database db = dbm.getDatabase()) {
+                apiUserRepo.replace(db, user);
             }
         }
         return user;

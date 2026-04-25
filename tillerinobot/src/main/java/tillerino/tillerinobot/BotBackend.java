@@ -1,18 +1,10 @@
 package tillerino.tillerinobot;
 
-import java.sql.SQLException;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import org.tillerino.osuApiModel.types.UserId;
-import org.tillerino.ppaddict.chat.IRCName;
 import tillerino.tillerinobot.data.ApiUser;
 
 public interface BotBackend {
-    /** @return the last version of the bot that was visited by this user. -1 if no information available. */
-    int getLastVisitedVersion(@Nonnull @IRCName String nick) throws SQLException;
-
-    void setLastVisitedVersion(@Nonnull @IRCName String nick, int version) throws SQLException;
-
     /**
      * Checks if a user is a donator/patron.
      *

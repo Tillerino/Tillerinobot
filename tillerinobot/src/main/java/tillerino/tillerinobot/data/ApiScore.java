@@ -1,31 +1,36 @@
 package tillerino.tillerinobot.data;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import java.sql.Connection;
+import java.sql.SQLException;
 import javax.annotation.CheckForNull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
-import org.tillerino.mormon.KeyColumn;
-import org.tillerino.mormon.Table;
+import org.tillerino.jagger.annotations.JdbcConfig;
+import org.tillerino.jagger.annotations.JdbcInsert;
+import org.tillerino.jagger.annotations.JsonConfig;
 import org.tillerino.osuApiModel.OsuApiScore;
 import org.tillerino.osuApiModel.deserializer.DateToLong;
 import org.tillerino.osuApiModel.types.*;
-import tillerino.tillerinobot.data.ApiBeatmap.Mapper;
 
 @Data
 @EqualsAndHashCode
-@Table("apiscores")
+@Table(name = "apiscores")
 @ToString
-@Slf4j
-@KeyColumn({"userId", "beatmapId"})
-public class ApiScore {
+public class ApiScore implements java.io.Serializable {
     public long downloaded = System.currentTimeMillis();
 
     @BeatmapId
+    @Id
     private int beatmapId;
 
     private long score;
@@ -49,6 +54,7 @@ public class ApiScore {
     private long mods;
 
     @UserId
+    @Id
     private int userId;
 
     @JsonDeserialize(using = DateToLong.class)
@@ -63,8 +69,19 @@ public class ApiScore {
     @GameMode
     private int mode;
 
+    @Transient
     public double getAccuracy() {
         return OsuApiScore.getAccuracy(count300, count100, count50, countMiss);
+    }
+
+    @JdbcConfig(quoteChar = "`")
+    @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
+    public interface Repo {
+        @JdbcInsert("replace into apiscores (`s.#columns`) values (:s.#values)")
+        void replaceAll(Connection c, Iterable<ApiScore> s) throws SQLException;
+
+        @JdbcInsert
+        void insert(Connection c, ApiScore s) throws SQLException;
     }
 
     @org.mapstruct.Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
@@ -73,8 +90,5 @@ public class ApiScore {
 
         @Mapping(target = "downloaded", source = "downloaded")
         ApiScore fromApi(OsuApiScore api, long downloaded);
-
-        @Mapping(target = "modsList", ignore = true)
-        OsuApiScore toApi(ApiScore api);
     }
 }

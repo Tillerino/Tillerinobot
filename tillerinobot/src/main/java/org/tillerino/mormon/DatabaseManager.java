@@ -6,23 +6,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLRecoverableException;
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.tillerino.mormon.Database.UnpreparedStatement;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.ppaddict.util.MaintenanceException;
 import org.tillerino.ppaddict.util.PhaseTimer;
+import tillerino.tillerinobot.data.RepoModule;
 
 @Slf4j
 @Singleton
@@ -67,6 +62,7 @@ public class DatabaseManager implements AutoCloseable {
 
         return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database
                 + "?user=" + user + "&password=" + password
+                + "&allowPublicKeyRetrieval=true" // for local markov
                 + "&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&useSSL=false");
     }
 
@@ -88,37 +84,7 @@ public class DatabaseManager implements AutoCloseable {
         pool.close();
     }
 
-    public <T> UnpreparedStatement<List<T>> selectList(Class<T> cls) {
-        return st -> {
-            try (Database db = getDatabase()) {
-                return db.selectList(cls).execute(st);
-            }
-        };
-    }
-
-    public <T> UnpreparedStatement<Optional<T>> selectUnique(Class<T> cls) {
-        return st -> {
-            try (Database db = getDatabase()) {
-                return db.selectUnique(cls).execute(st);
-            }
-        };
-    }
-
-    /** Borrows a connection and calls {@link Database#persist(Object, Action)} */
-    public <T> int persist(@Nonnull @NonNull T obj, Action a) throws SQLException {
-        try (Database db = getDatabase()) {
-            return db.persist(obj, a);
-        }
-    }
-
-    /** Borrows a connection and calls {@link Database#delete(Object)} */
-    public <T> int delete(@NonNull T obj) throws SQLException {
-        try (Database db = getDatabase()) {
-            return db.delete(obj);
-        }
-    }
-
-    @dagger.Module
+    @dagger.Module(includes = RepoModule.class)
     public interface FromEnvModule {
         @dagger.Provides
         static @Named("mysql") Properties properties() {

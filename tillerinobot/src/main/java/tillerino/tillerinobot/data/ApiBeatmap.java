@@ -3,28 +3,35 @@ package tillerino.tillerinobot.data;
 import static java.util.stream.Collectors.toMap;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
-import org.tillerino.mormon.Database;
-import org.tillerino.mormon.KeyColumn;
-import org.tillerino.mormon.Loader;
-import org.tillerino.mormon.Persister;
-import org.tillerino.mormon.Persister.Action;
-import org.tillerino.mormon.Table;
+import org.tillerino.jagger.annotations.JdbcConfig;
+import org.tillerino.jagger.annotations.JdbcInsert;
+import org.tillerino.jagger.annotations.JdbcSelect;
+import org.tillerino.jagger.annotations.JdbcUpdate;
+import org.tillerino.jagger.annotations.JsonConfig;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import org.tillerino.osuApiModel.types.*;
 import org.tillerino.ppaddict.util.PhaseTimer;
@@ -34,16 +41,17 @@ import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 /** Stores on {@link OsuApiBeatmap} object in the database. */
 @Data
 @EqualsAndHashCode
-@Table("apibeatmaps")
-@KeyColumn({"beatmapId", "mods"})
+@Table(name = "apibeatmaps")
 @ToString(callSuper = true)
 public class ApiBeatmap {
     @MillisSinceEpoch
     public long downloaded = System.currentTimeMillis();
 
+    @Id
     @BitwiseMods
     public long mods = 0;
 
+    @Id
     @BeatmapId
     private int beatmapId;
 
@@ -158,15 +166,16 @@ public class ApiBeatmap {
     /** @param maxAge if > 0, maximum age in milliseconds */
     @CheckForNull
     public static ApiBeatmap loadOrDownload(
-            Database database, @BeatmapId int beatmapid, @BitwiseMods long mods, long maxAge, OsuApi downloader)
+            Repo repo, Connection c, @BeatmapId int beatmapid, @BitwiseMods long mods, long maxAge, OsuApi downloader)
             throws SQLException, IOException {
         BeatmapWithMods idAndMods = new BeatmapWithMods(beatmapid, mods);
-        return loadOrDownload(database, List.of(idAndMods), maxAge, downloader).get(idAndMods);
+        return loadOrDownload(repo, c, List.of(idAndMods), maxAge, downloader).get(idAndMods);
     }
 
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     private static ApiBeatmap loadOrDownloadPreloaded(
-            Database database,
+            Repo repo,
+            Connection c,
             @BeatmapId int beatmapid,
             @BitwiseMods long mods,
             long maxAge,
@@ -192,15 +201,13 @@ public class ApiBeatmap {
             }
 
             if (beatmap == null) {
-                var _ = database.deleteFrom(ApiBeatmap.class)
-                        .execute("where `beatmapId` = ", beatmapid, " and `mods` = ", mods);
+                repo.deleteByBeatmapIdAndMods(c, beatmapid, mods);
                 return null;
             }
 
-            try (var _ = PhaseTimer.timeTask("persistBeatmap");
-                    Persister<ApiBeatmap> persister = database.persister(ApiBeatmap.class, Action.REPLACE)) {
+            try (var _ = PhaseTimer.timeTask("persistBeatmap")) {
                 beatmap.setMods(mods);
-                persister.persist(beatmap);
+                repo.replace(c, beatmap);
             }
         }
 
@@ -212,7 +219,7 @@ public class ApiBeatmap {
      * @return might not contain entries for all requests
      */
     public static Map<BeatmapWithMods, ApiBeatmap> loadOrDownload(
-            Database database, Collection<BeatmapWithMods> beatmapsWithMods, long maxAge, OsuApi downloader)
+            Repo repo, Connection c, Collection<BeatmapWithMods> beatmapsWithMods, long maxAge, OsuApi downloader)
             throws SQLException, IOException {
         if (beatmapsWithMods.isEmpty()) {
             return Collections.emptyMap();
@@ -224,16 +231,17 @@ public class ApiBeatmap {
                 .collect(Collectors.joining(",", "(", ")"));
         Map<BeatmapWithMods, ApiBeatmap> loaded;
         try (var _ = PhaseTimer.timeTask("loadBeatmaps");
-                Loader<ApiBeatmap> loader =
-                        database.loader(ApiBeatmap.class, "where (`beatmapid`, `mods`) in " + combinations)) {
-            loaded = loader.queryList().stream().collect(toMap(ApiBeatmap::idAndMods, Function.identity()));
+                PreparedStatement ps =
+                        c.prepareStatement("select * from apibeatmaps where (beatmapid, mods) in " + combinations);
+                ResultSet rs = ps.executeQuery()) {
+            loaded = repo.getMultiple(rs).stream().collect(toMap(ApiBeatmap::idAndMods, Function.identity()));
         }
 
         // hit rate will be very high
         Map<BeatmapWithMods, ApiBeatmap> allFresh = new LinkedHashMap<>();
         for (BeatmapWithMods idAndMods : beatmapsWithMods) {
             ApiBeatmap fresh = loadOrDownloadPreloaded(
-                    database, idAndMods.beatmap(), idAndMods.mods(), maxAge, downloader, loaded.get(idAndMods));
+                    repo, c, idAndMods.beatmap(), idAndMods.mods(), maxAge, downloader, loaded.get(idAndMods));
             if (fresh != null) {
                 allFresh.put(idAndMods, fresh);
             }
@@ -250,5 +258,37 @@ public class ApiBeatmap {
         ApiBeatmap fromApi(OsuApiBeatmap api, @BitwiseMods long mods, long downloaded);
 
         OsuApiBeatmap toApi(ApiBeatmap api);
+    }
+
+    public static ApiBeatmap findByFileMd5(Repo repo, Connection c, String fileMd5) throws SQLException {
+        return repo.findByFileMd5(c, fileMd5).orElse(null);
+    }
+
+    @JdbcConfig(quoteChar = "`")
+    @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
+    public interface Repo {
+        @JdbcInsert("REPLACE INTO apibeatmaps (a.#columns) VALUES (:a.#values)")
+        void replace(Connection c, ApiBeatmap a) throws SQLException;
+
+        @JdbcInsert
+        void insert(Connection c, ApiBeatmap a) throws SQLException;
+
+        @JdbcUpdate("DELETE FROM apibeatmaps WHERE `beatmapId` = :beatmapId AND `mods` = :mods")
+        void deleteByBeatmapIdAndMods(Connection c, @BeatmapId int beatmapId, @BitwiseMods long mods)
+                throws SQLException;
+
+        @JdbcSelect(where = "`mode` = 0 and `mods` = 0", fetchSize = 1000)
+        Iterable<ApiBeatmap> selectAllOsuNomod(Connection c) throws SQLException;
+
+        @JdbcSelect(
+                where =
+                        "`mods` = 0 and `downloaded` < :currentTimeMillis * 0.9 + greatest(approvedDate, lastUpdate) / 10 limit 1000")
+        List<ApiBeatmap> selectOutdated(Connection connection, long currentTimeMillis) throws SQLException;
+
+        @JdbcSelect(where = "`fileMd5` = :fileMd5")
+        Optional<ApiBeatmap> findByFileMd5(Connection c, String fileMd5) throws SQLException;
+
+        @JdbcSelect
+        List<ApiBeatmap> getMultiple(ResultSet resultSet) throws SQLException;
     }
 }

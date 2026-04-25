@@ -2,30 +2,10 @@ package org.tillerino.ppaddict.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.apache.commons.lang3.function.Failable;
 import org.junit.jupiter.api.Test;
-import org.tillerino.ppaddict.util.TestClock;
-import tillerino.tillerinobot.AbstractDatabaseTest;
 
-public class PpaddictUserDataServiceTest extends AbstractDatabaseTest {
-    @Component(modules = {TestClock.Module.class, DockeredMysqlModule.class})
-    @Singleton
-    interface Injector {
-        void inject(PpaddictUserDataServiceTest t);
-    }
-
-    {
-        DaggerPpaddictUserDataServiceTest_Injector.create().inject(this);
-    }
-
-    @Inject
-    TestClock clock;
-
-    @Inject
-    PpaddictUserDataService userDataService;
+public class PpaddictUserDataServiceTest extends AbstractPpaddictTest {
 
     @Test
     public void testServerUserData() throws Exception {

@@ -9,8 +9,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.web.data.PpaddictLinkKey;
@@ -24,6 +24,10 @@ public class PpaddictUserDataService {
     private final DatabaseManager dbm;
 
     private final Clock clock;
+
+    private final PpaddictLinkKey.Repo linkKeyRepo;
+
+    private final PpaddictUser.Repo ppaddictUserRepo;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,8 +43,8 @@ public class PpaddictUserDataService {
 
     public Optional<PersistentUserData> loadUserData(@PpaddictId String identifier) {
         Optional<PpaddictUser> userMaybe;
-        try {
-            userMaybe = dbm.selectUnique(PpaddictUser.class).execute("where identifier = ", identifier);
+        try (Database db = dbm.getDatabase()) {
+            userMaybe = ppaddictUserRepo.findByIdentifier(db, identifier);
         } catch (SQLException e) {
             throw new RuntimeException("Error loading user", e);
         }
@@ -59,20 +63,21 @@ public class PpaddictUserDataService {
     }
 
     public void saveUserData(@PpaddictId String identifier, PersistentUserData userData) throws SQLException {
-        PpaddictUser row = dbm.selectUnique(PpaddictUser.class)
-                .execute("where identifier = ", identifier)
-                .orElse(new PpaddictUser(identifier, null, null));
-        if (row.getForward() != null) {
-            saveUserData(row.getForward(), userData);
-        } else {
-            String serialized;
-            try {
-                serialized = objectMapper.writeValueAsString(userData);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Error serializing JSON", e);
+        try (Database db = dbm.getDatabase()) {
+            PpaddictUser row =
+                    ppaddictUserRepo.findByIdentifier(db, identifier).orElse(new PpaddictUser(identifier, null, null));
+            if (row.getForward() != null) {
+                saveUserData(row.getForward(), userData);
+            } else {
+                String serialized;
+                try {
+                    serialized = objectMapper.writeValueAsString(userData);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException("Error serializing JSON", e);
+                }
+                row.setData(serialized);
+                ppaddictUserRepo.replace(db, row);
             }
-            row.setData(serialized);
-            dbm.persist(row, Action.REPLACE);
         }
     }
 
@@ -80,7 +85,9 @@ public class PpaddictUserDataService {
         PpaddictLinkKey key = new PpaddictLinkKey(
                 id, displayName, LinkPpaddictHandler.newKey(), clock.currentTimeMillis() + 60 * 1000L);
 
-        dbm.persist(key, Action.INSERT);
+        try (Database db = dbm.getDatabase()) {
+            linkKeyRepo.insert(db, key);
+        }
 
         return key.getLinkKey();
     }
@@ -94,20 +101,26 @@ public class PpaddictUserDataService {
      * @throws SQLException
      */
     public Optional<String> tryLinkToPpaddict(String token, @UserId int osuUserId) throws SQLException {
-        Optional<PpaddictLinkKey> validLink = dbm.selectUnique(PpaddictLinkKey.class)
-                .execute("where linkKey = ", token)
-                .filter(l -> l.getExpires() > clock.currentTimeMillis())
-                .filter(
-                        link -> !link.getIdentifier().startsWith("osu:")
-                        // don't chain links
-                        );
+        Optional<PpaddictLinkKey> validLink;
+        try (Database db = dbm.getDatabase()) {
+            validLink = linkKeyRepo
+                    .findByLinkKey(db, token)
+                    .filter(l -> l.getExpires() > clock.currentTimeMillis())
+                    .filter(
+                            link -> !link.getIdentifier().startsWith("osu:")
+                            // don't chain links
+                            );
+        }
         if (!validLink.isPresent()) {
             return Optional.empty();
         }
         PpaddictLinkKey link = validLink.get();
-        PpaddictUser authenticatedUser = dbm.selectUnique(PpaddictUser.class)
-                .execute("where identifier = ", link.getIdentifier())
-                .orElseGet(() -> new PpaddictUser(link.getIdentifier(), null, null));
+        PpaddictUser authenticatedUser;
+        try (Database db = dbm.getDatabase()) {
+            authenticatedUser = ppaddictUserRepo
+                    .findByIdentifier(db, link.getIdentifier())
+                    .orElseGet(() -> new PpaddictUser(link.getIdentifier(), null, null));
+        }
         if (authenticatedUser.getForward() != null) {
             // don't change existing forwards
             return Optional.empty();
@@ -127,9 +140,10 @@ public class PpaddictUserDataService {
         }
 
         authenticatedUser.setForward(osuIdentifier);
-        dbm.persist(authenticatedUser, Action.REPLACE);
+        try (Database db = dbm.getDatabase()) {
+            ppaddictUserRepo.replace(db, authenticatedUser);
+        }
 
-        dbm.delete(link);
         return Optional.of(link.getDisplayName());
     }
 

@@ -27,6 +27,10 @@
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>1.6.2</version>
@@ -41,6 +45,10 @@
             <groupId>javax.websocket</groupId>
             <artifactId>javax.websocket-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.tillerino.jagger</groupId>
+            <artifactId>jagger-core</artifactId>
         </dependency>
         <!-- libraries -->
         <dependency>

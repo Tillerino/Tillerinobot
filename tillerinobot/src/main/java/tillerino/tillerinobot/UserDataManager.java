@@ -20,18 +20,20 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
+import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
 import org.tillerino.osuApiModel.types.UserId;
 import org.tillerino.ppaddict.util.PhaseTimer;
+import tillerino.tillerinobot.data.BotUser;
 import tillerino.tillerinobot.data.BotUserData;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.lang.Language;
@@ -41,6 +43,7 @@ import tillerino.tillerinobot.util.IsMutable;
 @Singleton
 @SuppressFBWarnings(value = "SA_LOCAL_SELF_COMPARISON", justification = "Looks like a bug")
 @Slf4j
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UserDataManager {
     /**
      * Bot-specific user data. It is only saved when changed and responsible for determining if it has been changed.
@@ -215,12 +218,9 @@ public class UserDataManager {
 
     private final DatabaseManager dbm;
 
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Injection")
-    @Inject
-    public UserDataManager(BotBackend backend, DatabaseManager dbm) {
-        this.backend = backend;
-        this.dbm = dbm;
-    }
+    private final BotUserData.Repo repo;
+
+    private final BotUser.Repo botUserRepo;
 
     /**
      * This is a very specially JSON de-/serializer which we use for the weird way we set up serialization. We always
@@ -236,10 +236,9 @@ public class UserDataManager {
             .registerModule(new ParameterNamesModule());
 
     public UserData loadUserData(@UserId int userid) throws SQLException {
-        try (var _ = PhaseTimer.timeTask("loadUserData")) {
-            BotUserData data = dbm.selectUnique(BotUserData.class)
-                    .execute("where userId = ", userid)
-                    .orElse(null);
+        try (var _ = PhaseTimer.timeTask("loadUserData");
+                Database db = dbm.getDatabase()) {
+            BotUserData data = repo.get(db, userid).orElse(null);
 
             UserData options;
             if (data == null || StringUtils.isEmpty(data.getUserdata())) {
@@ -280,8 +279,27 @@ public class UserDataManager {
             BotUserData data = new BotUserData();
             data.setUserId(options.userid);
             data.setUserdata(serialized);
-            dbm.persist(data, Action.REPLACE);
+            try (Database db = dbm.getDatabase()) {
+                repo.set(db, data);
+            }
             options.setChanged(false);
+        }
+    }
+
+    public int getLastVisitedVersion(String nick) throws SQLException {
+        try (var _ = PhaseTimer.timeTask("getLastVisitedVersion");
+                Database db = dbm.getDatabase()) {
+            return botUserRepo
+                    .findByUsername(db, nick)
+                    .map(BotUser::getVersionVisited)
+                    .orElse(-1);
+        }
+    }
+
+    public void setLastVisitedVersion(String nick, int version) throws SQLException {
+        try (var _ = PhaseTimer.timeTask("setLastVisitedVersion");
+                Database db = dbm.getDatabase()) {
+            botUserRepo.replace(db, new BotUser(nick, version));
         }
     }
 }

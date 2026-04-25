@@ -72,11 +72,29 @@ public class LoggingTest {
         exec.submit(injector.localGameChatEventQueue());
         exec.submit(injector.localGameChatResponseQueue());
 
-        MockData.mockUser("irc-guy", false, 1000, 1000, 1, backend, injector.osuApi(), injector.recommender());
-        MockData.mockUser("other-guy", true, 1000, 1000, 2, backend, injector.osuApi(), injector.recommender());
+        MockData.mockUser(
+                "irc-guy",
+                false,
+                1000,
+                1000,
+                1,
+                backend,
+                injector.osuApi(),
+                injector.recommender(),
+                injector.userDataManager());
+        MockData.mockUser(
+                "other-guy",
+                true,
+                1000,
+                1000,
+                2,
+                backend,
+                injector.osuApi(),
+                injector.recommender(),
+                injector.userDataManager());
         TestBase.mockRecommendations(injector.recommender());
         TestBase.mockBeatmapMetas(injector.diffEstimateProvider());
-        backend.setLastVisitedVersion("irc-guy", IRCBot.CURRENT_VERSION);
+        injector.userDataManager().setLastVisitedVersion("irc-guy", IRCBot.CURRENT_VERSION);
 
         doAnswer(_ -> ok(new GameChatWriter.Response(14L))).when(out).message(anyString(), any());
         doReturn(ok(new GameChatWriter.Response(null))).when(out).action(any(), any());

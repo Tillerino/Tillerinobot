@@ -21,7 +21,7 @@ class WithHandlerTest extends TestBase {
 
     @BeforeEach
     void setUp() throws Exception {
-        MockData.mockUser("user", false, 123, 123.0, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 123, 123.0, 123, backend, osuApi, standardRecommender, userDataManager);
         mockBeatmapMetas(diffEstimateProvider);
         userData = spy(userDataManager.loadUserData(1));
         // Set a last song info for the with handler to work with

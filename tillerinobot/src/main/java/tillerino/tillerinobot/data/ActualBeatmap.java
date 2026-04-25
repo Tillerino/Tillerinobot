@@ -1,27 +1,37 @@
 package tillerino.tillerinobot.data;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import org.tillerino.mormon.KeyColumn;
-import org.tillerino.mormon.Table;
+import org.tillerino.jagger.annotations.JdbcConfig;
+import org.tillerino.jagger.annotations.JdbcInsert;
+import org.tillerino.jagger.annotations.JdbcSelect;
+import org.tillerino.jagger.annotations.JsonConfig;
+import org.tillerino.osuApiModel.types.BeatmapId;
 
-@Table("actualbeatmaps")
-@KeyColumn("beatmapid")
+@Table(name = "actualbeatmaps")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuppressFBWarnings(value = "EI")
 public class ActualBeatmap {
+    @Id
     @Nonnull
     private Integer beatmapid = 0;
 
@@ -67,5 +77,18 @@ public class ActualBeatmap {
             throw new IllegalStateException("Decompression failed", e);
         }
         gzipContent = baos.toByteArray();
+    }
+
+    @JdbcConfig(quoteChar = "`")
+    @JsonConfig(onGeneratedClass = Singleton.class, onGeneratedConstructors = Inject.class)
+    public interface Repo {
+        @JdbcSelect(where = "beatmapid = :beatmapid")
+        Optional<ActualBeatmap> findOneById(Connection c, @BeatmapId int beatmapid) throws SQLException;
+
+        @JdbcInsert
+        void insert(Connection c, ActualBeatmap entity) throws SQLException;
+
+        @JdbcInsert("REPLACE INTO `actualbeatmaps` (`entity.#columns`) VALUES (:entity.#values)")
+        void replace(Connection c, ActualBeatmap entity) throws SQLException;
     }
 }

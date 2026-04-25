@@ -39,7 +39,7 @@ public class LinkPpaddictHandlerTest {
 
     @Test
     public void testPatreon() throws Exception {
-        doReturn("yeah").when(backend).tryLinkToPatreon("12345678901234567890123456789012", user(12345, "usr"));
+        doReturn("yeah").when(backend).tryLinkToPatreon(eq("12345678901234567890123456789012"), eq(user(12345, "usr")));
         assertThat(handler.handle("12345678901234567890123456789012", user(12345, "usr"), null, null))
                 .isInstanceOfSatisfying(Success.class, s -> assertThat((Object) s)
                         .hasFieldOrPropertyWithValue("content", "linked to yeah"));

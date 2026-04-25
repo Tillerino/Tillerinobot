@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import jakarta.ws.rs.WebApplicationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
 import tillerino.tillerinobot.TestBase;
 import tillerino.tillerinobot.data.ActualBeatmap;
@@ -27,7 +26,7 @@ public class AbstractBeatmapResourceTest extends TestBase {
 
     @BeforeEach
     public void init() {
-        resource = new AbstractBeatmapResource(dbm, beatmapDownloader, beatmap) {
+        resource = new AbstractBeatmapResource(dbm, beatmapDownloader, beatmap, actualBeatmapRepo) {
             @Override
             public OsuApiBeatmap get() {
                 throw new UnsupportedOperationException();
@@ -39,13 +38,13 @@ public class AbstractBeatmapResourceTest extends TestBase {
     public void testMigrations() throws Exception {
         String content = "hello";
         // save without hash for backwards compatibility
-        dbm.persist(new ActualBeatmap(12, content.getBytes(), null, 1, ""), Action.INSERT);
+        actualBeatmapRepo.insert(db, new ActualBeatmap(12, content.getBytes(), null, 1, ""));
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(content));
         assertEquals(content, resource.getFile());
         verifyNoInteractions(beatmapDownloader);
         // data was compressed after the fact
-        assertThat(dbm.selectUnique(ActualBeatmap.class).execute("where beatmapid = ", 12))
+        assertThat(actualBeatmapRepo.findOneById(db, 12))
                 .hasValueSatisfying(ab -> assertThat(ab).hasFieldOrPropertyWithValue("content", null));
     }
 
@@ -53,7 +52,7 @@ public class AbstractBeatmapResourceTest extends TestBase {
     public void testRedownloadOnWrongHash() throws Exception {
         String oldContent = "hello";
         String newContent = "world";
-        dbm.persist(new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)), Action.INSERT);
+        actualBeatmapRepo.insert(db, new ActualBeatmap(12, oldContent.getBytes(), null, 1, md5Hex(oldContent)));
         beatmap.setBeatmapId(12);
         beatmap.setFileMd5(md5Hex(newContent));
         doReturn(newContent).when(beatmapDownloader).getActualBeatmap(12);

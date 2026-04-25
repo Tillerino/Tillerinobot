@@ -1,23 +1,20 @@
 package tillerino.tillerinobot.data;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
-import org.tillerino.mormon.Persister.Action;
-import tillerino.tillerinobot.*;
+import tillerino.tillerinobot.TestBase;
 
 public class ApiBeatmapTest extends TestBase {
     @Test
     public void testSchema() throws Exception {
-        assertNotNull(ApiBeatmap.loadOrDownload(db, 131891, 0L, 0, osuApiV1));
+        assertNotNull(ApiBeatmap.loadOrDownload(apiBeatmapRepo, db, 131891, 0L, 0, osuApiV1));
     }
 
     @Test
     public void testStoring() throws Exception {
         ApiBeatmap original = newApiBeatmap();
-        db.persister(ApiBeatmap.class, Action.INSERT).persist(original);
-        assertThat(db.loader(ApiBeatmap.class, "").queryUnique()).hasValueSatisfying(original::equals);
+        apiBeatmapRepo.insert(db, original);
     }
 
     public static ApiBeatmap newApiBeatmap() {

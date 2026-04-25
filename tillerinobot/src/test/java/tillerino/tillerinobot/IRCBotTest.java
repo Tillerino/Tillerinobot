@@ -81,18 +81,18 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void testVersionMessage() throws Exception {
-        MockData.mockUser("user", false, 0, 0, 123, backend, osuApi, standardRecommender);
-        backend.setLastVisitedVersion("user", 0);
+        MockData.mockUser("user", false, 0, 0, 123, backend, osuApi, standardRecommender, userDataManager);
+        userDataManager.setLastVisitedVersion("user", 0);
 
         verifyResponse(bot, message("user", "!recommend"), new Message(IRCBot.VERSION_MESSAGE).then(singleResponse()));
-        verify(backend, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.CURRENT_VERSION));
+        verify(userDataManager, times(1)).setLastVisitedVersion(anyString(), eq(IRCBot.CURRENT_VERSION));
 
         verifyResponse(bot, message("user", "!recommend"), singleResponse());
     }
 
     @Test
     public void testWrongStrings() throws Exception {
-        MockData.mockUser("user", false, 100, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 100, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
         turnOffVersionMessage();
         mockRecommendations(standardRecommender);
         mockBeatmapMetas(diffEstimateProvider);
@@ -107,7 +107,7 @@ public class IRCBotTest extends TestBase {
     /** Just checks that nothing crashes without an actual command. */
     @Test
     public void testNoCommand() throws Exception {
-        MockData.mockUser("user", false, 100, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 100, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
         turnOffVersionMessage();
 
         verifyResponse(bot, message("user", "no command"), GameChatResponse.none());
@@ -115,8 +115,8 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void testWelcomeIfDonator() throws Exception {
-        MockData.mockUser("TheDonator", true, 1, 1, 123, backend, osuApi, standardRecommender);
-        doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
+        MockData.mockUser("TheDonator", true, 1, 1, 123, backend, osuApi, standardRecommender, userDataManager);
+        doReturn(IRCBot.CURRENT_VERSION).when(userDataManager).getLastVisitedVersion(anyString());
         int userid = ircNameResolver.getIDByUserName("TheDonator");
 
         ApiUser osuApiUser = mock(ApiUser.class);
@@ -153,7 +153,7 @@ public class IRCBotTest extends TestBase {
     public void testHugs() throws Exception {
         turnOffVersionMessage();
 
-        MockData.mockUser("donator", true, 0, 0, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("donator", true, 0, 0, 123, backend, osuApi, standardRecommender, userDataManager);
 
         verifyResponse(
                 bot,
@@ -163,7 +163,7 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void testComplaint() throws Exception {
-        MockData.mockUser("user", false, 0, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 0, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
         turnOffVersionMessage();
         mockRecommendations(standardRecommender);
         mockBeatmapMetas(diffEstimateProvider);
@@ -177,7 +177,7 @@ public class IRCBotTest extends TestBase {
     public void testResetHandler() throws Exception {
         turnOffVersionMessage();
 
-        MockData.mockUser("user", false, 0, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 0, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
 
         verifyResponse(bot, message("user", "!reset"), anyResponse());
 
@@ -188,7 +188,7 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void testProperEmptySamplerHandling() throws Exception {
-        MockData.mockUser("user", false, 0, 1000, 1, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 0, 1000, 1, backend, osuApi, standardRecommender, userDataManager);
         mockBeatmapMetas(diffEstimateProvider);
 
         doReturn(List.of(new BareRecommendation(1, 0, null, null, 0)))
@@ -199,7 +199,7 @@ public class IRCBotTest extends TestBase {
                 .loadRecommendations(any(), Mockito.argThat(l -> !l.isEmpty()), any(), anyBoolean(), anyLong());
         doReturn(Collections.emptyList()).when(standardRecommender).loadTopPlays(1);
 
-        doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion("user");
+        doReturn(IRCBot.CURRENT_VERSION).when(userDataManager).getLastVisitedVersion("user");
 
         verifyResponse(bot, message("user", "!r"), successContaining("/b/1"));
 
@@ -215,7 +215,7 @@ public class IRCBotTest extends TestBase {
     @Test
     public void testGammaDefault() throws Exception {
         turnOffVersionMessage();
-        MockData.mockUser("user", false, 75000, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 75000, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
 
         verifyResponse(bot, message("user", "!R"), anyResponse());
 
@@ -232,10 +232,13 @@ public class IRCBotTest extends TestBase {
                             "2 new highscores:[https://osu.ppy.sh/b/768986 #7]: 414.06pp; [https://osu.ppy.sh/b/693195 #89]: 331.89pp; View your recent hiscores on [https://ameobea.me/osutrack/user/fartownik osu!track]."));
 
     private void hintOsutrackUsers() throws Exception {
-        MockData.mockUser("oliebol", false, 125000, 1000, 2756335, backend, osuApi, standardRecommender);
-        MockData.mockUser("fartownik", false, 125000, 1000, 56917, backend, osuApi, standardRecommender);
-        MockData.mockUser("unknown", false, 125000, 1000, 1234, backend, osuApi, standardRecommender);
-        MockData.mockUser("has space", false, 125000, 1000, 2345, backend, osuApi, standardRecommender);
+        MockData.mockUser(
+                "oliebol", false, 125000, 1000, 2756335, backend, osuApi, standardRecommender, userDataManager);
+        MockData.mockUser(
+                "fartownik", false, 125000, 1000, 56917, backend, osuApi, standardRecommender, userDataManager);
+        MockData.mockUser("unknown", false, 125000, 1000, 1234, backend, osuApi, standardRecommender, userDataManager);
+        MockData.mockUser(
+                "has space", false, 125000, 1000, 2345, backend, osuApi, standardRecommender, userDataManager);
     }
 
     @Test
@@ -284,7 +287,7 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void testOsutrackServerError() throws Exception {
-        MockData.mockUser("unknown", false, 125000, 1000, 1234, backend, osuApi, standardRecommender);
+        MockData.mockUser("unknown", false, 125000, 1000, 1234, backend, osuApi, standardRecommender, userDataManager);
         turnOffVersionMessage();
         doThrow(new InternalServerErrorException()).when(osutrackDownloader).getUpdate(1234);
 
@@ -296,7 +299,7 @@ public class IRCBotTest extends TestBase {
     }
 
     void turnOffVersionMessage() throws SQLException {
-        doReturn(IRCBot.CURRENT_VERSION).when(backend).getLastVisitedVersion(anyString());
+        doReturn(IRCBot.CURRENT_VERSION).when(userDataManager).getLastVisitedVersion(anyString());
     }
 
     @Test
@@ -316,7 +319,7 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void testMaintenanceOnSight() throws Exception {
-        MockData.mockUser("aRareUserAppears", false, 123, 123, 18, backend, osuApiV1, recommender);
+        MockData.mockUser("aRareUserAppears", false, 123, 123, 18, backend, osuApiV1, recommender, userDataManager);
 
         Sighted event = preprocess(new Sighted(12, "aRareUserAppears", 15));
         bot.onEvent(event);
@@ -326,7 +329,7 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void testNp() throws Exception {
-        MockData.mockUser("user", false, 1000, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 1000, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
         mockBeatmapMetas(diffEstimateProvider);
         turnOffVersionMessage();
         verifyResponse(bot, action("user", "is listening to [https://osu.ppy.sh/b/125 map]"), successContaining("pp"));
@@ -334,7 +337,7 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void maintenance() throws Exception {
-        MockData.mockUser("user", false, 1000, 1000, 1, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 1000, 1000, 1, backend, osuApi, standardRecommender, userDataManager);
         doThrow(MaintenanceException.class).when(standardRecommender).loadTopPlays(1);
         turnOffVersionMessage();
         verifyResponse(bot, message("user", "!r"), messageContaining("maintenance"));
@@ -342,7 +345,7 @@ public class IRCBotTest extends TestBase {
 
     @Test
     public void v2ApiTriggersUpdate() throws Exception {
-        MockData.mockUser("user", false, 1000, 1000, 2070907, backend, osuApi, standardRecommender);
+        MockData.mockUser("user", false, 1000, 1000, 2070907, backend, osuApi, standardRecommender, userDataManager);
         turnOffVersionMessage();
 
         verifyResponse(bot, message("user", "!set v2 on"), messageContaining("v2 API: ON"));

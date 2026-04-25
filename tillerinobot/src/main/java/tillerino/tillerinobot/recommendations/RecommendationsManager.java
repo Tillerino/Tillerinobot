@@ -10,7 +10,6 @@ import static org.tillerino.osuApiModel.Mods.getMods;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Loader;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BitwiseMods;
@@ -32,10 +29,7 @@ import org.tillerino.ppaddict.config.ConfigService;
 import org.tillerino.ppaddict.util.Clock;
 import org.tillerino.ppaddict.util.MdcUtils;
 import org.tillerino.ppaddict.util.PhaseTimer;
-import tillerino.tillerinobot.BeatmapMeta;
-import tillerino.tillerinobot.BeatmapsLoader;
-import tillerino.tillerinobot.OsuApi;
-import tillerino.tillerinobot.UserException;
+import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.UserException.RareUserException;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiUser;
@@ -62,6 +56,8 @@ public class RecommendationsManager {
     private final Clock clock;
     private final ConfigService config;
     private final DiffEstimateProvider diffEstimateProvider;
+    private final PlayerService playerService;
+    private final GivenRecommendation.Repo givenRecommendationRepo;
 
     private final Cache<Integer, Recommendation> lastRecommendation =
             CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
@@ -234,20 +230,18 @@ public class RecommendationsManager {
 
     /** forgets all given recommendations of the past for a single user */
     public void forgetRecommendations(@UserId int user) throws SQLException {
-        try (Database db = dbm.getDatabase();
-                PreparedStatement statement =
-                        db.prepare("update givenrecommendations set forgotten = true where userid = ?")) {
-            Loader.setParameters(statement, user);
-            statement.executeUpdate();
+        try (Database db = dbm.getDatabase()) {
+            givenRecommendationRepo.forget(db, user);
         }
     }
 
     public void saveGivenRecommendation(@UserId int userid, @BeatmapId int beatmapid, @BitwiseMods long mods)
             throws SQLException {
-        try (var _ = PhaseTimer.timeTask("saveRecommendation")) {
+        try (var _ = PhaseTimer.timeTask("saveRecommendation");
+                Database db = dbm.getDatabase()) {
             GivenRecommendation givenRecommendation =
                     new GivenRecommendation(userid, beatmapid, System.currentTimeMillis(), mods);
-            dbm.persist(givenRecommendation, Action.INSERT);
+            givenRecommendationRepo.insert(db, givenRecommendation);
         }
     }
 
@@ -257,11 +251,9 @@ public class RecommendationsManager {
      * @return ordered by date given from newest to oldest
      */
     public List<GivenRecommendation> loadGivenRecommendations(@UserId int userid) throws SQLException {
-        try (Database db = dbm.getDatabase();
-                Loader<GivenRecommendation> loader = db.loader(
-                        GivenRecommendation.class,
-                        "where userid = ? and `date` > ? and not forgotten order by `date` desc")) {
-            return loader.queryList(userid, System.currentTimeMillis() - 28L * 24 * 60 * 60 * 1000);
+        try (Database db = dbm.getDatabase()) {
+            long cutoffDate = System.currentTimeMillis() - 28L * 24 * 60 * 60 * 1000;
+            return givenRecommendationRepo.loadRecent(db, userid, cutoffDate);
         }
     }
 
@@ -271,11 +263,8 @@ public class RecommendationsManager {
      */
     public void hideRecommendation(@UserId int userId, @BeatmapId int beatmapid, @BitwiseMods long mods)
             throws SQLException {
-        try (Database db = dbm.getDatabase();
-                PreparedStatement statement = db.prepare(
-                        "update givenrecommendations set hidden = true where userid = ? and beatmapid = ? and mods = ?")) {
-            Loader.setParameters(statement, userId, beatmapid, mods);
-            statement.executeUpdate();
+        try (Database db = dbm.getDatabase()) {
+            givenRecommendationRepo.hide(db, userId, beatmapid, mods);
         }
     }
 
@@ -285,16 +274,15 @@ public class RecommendationsManager {
      * @return ordered by date given from newest to oldest
      */
     public List<GivenRecommendation> loadVisibleRecommendations(@UserId int userId) throws SQLException {
-        try (Database db = dbm.getDatabase();
-                Loader<GivenRecommendation> loader =
-                        db.loader(GivenRecommendation.class, "where userid = ? and not hidden order by `date` desc")) {
-            return loader.queryList(userId);
+        try (Database db = dbm.getDatabase()) {
+            return givenRecommendationRepo.loadVisible(db, userId);
         }
     }
 
     public void forceUpdateTopScores(@UserId int userId) throws SQLException, IOException {
         try (Database db = dbm.getDatabase()) {
-            Player.getPlayer(db, userId).updateTop50(db, 0, osuApi, clock, config);
+            Player player = playerService.getPlayer(db, userId);
+            playerService.updateTop50(db, player, 0, osuApi, clock, config);
         }
     }
 }

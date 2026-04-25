@@ -3,10 +3,10 @@ package org.tillerino.ppaddict.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dagger.Component;
+import java.sql.SQLException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.junit.jupiter.api.Test;
-import org.tillerino.mormon.Persister.Action;
 import tillerino.tillerinobot.AbstractDatabaseTest;
 import tillerino.tillerinobot.data.BotConfig;
 
@@ -24,26 +24,29 @@ public class DatabaseConfigServiceTest extends AbstractDatabaseTest {
     @Inject
     ConfigService config;
 
+    @Inject
+    BotConfig.Repo repo;
+
     @Test
     public void noConfigIsDefault() {
         assertThat(config.scoresMaintenance()).isFalse();
     }
 
     @Test
-    public void falsee() throws Exception {
+    public void falsee() throws SQLException {
         BotConfig botConfig = new BotConfig();
         botConfig.setPath("api-scores-maintenance");
         botConfig.setValue("false");
-        db.persist(botConfig, Action.INSERT);
+        repo.set(db, botConfig);
         assertThat(config.scoresMaintenance()).isFalse();
     }
 
     @Test
-    public void truee() throws Exception {
+    public void truee() throws SQLException {
         BotConfig botConfig = new BotConfig();
         botConfig.setPath("api-scores-maintenance");
         botConfig.setValue("true");
-        db.persist(botConfig, Action.INSERT);
+        repo.set(db, botConfig);
         assertThat(config.scoresMaintenance()).isTrue();
     }
 }

@@ -17,8 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tillerino.mormon.Loader;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.Mods;
 import tillerino.tillerinobot.*;
 import tillerino.tillerinobot.data.ApiUser;
@@ -32,7 +30,7 @@ public class RecommendationsManagerTest extends TestBase {
     @BeforeEach
     public void createUser() throws Exception {
         TestBase.mockBeatmapMetas(diffEstimateProvider);
-        MockData.mockUser("donator", true, 1, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("donator", true, 1, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
 
         user = pullThrough.downloadUser("donator");
     }
@@ -41,12 +39,12 @@ public class RecommendationsManagerTest extends TestBase {
     public void testAutoIncrement() throws SQLException {
         GivenRecommendation rec = new GivenRecommendation(323456789, 2, 3, 4);
 
-        dbm.persist(rec, Action.INSERT);
+        givenRecommendationRepo.insert(db, rec);
 
-        try (Loader<GivenRecommendation> loader = db.loader(GivenRecommendation.class, "")) {
-            GivenRecommendation givenRecommendation = loader.queryUnique().get();
-            assertThat(givenRecommendation.getId()).isPositive().isNotEqualTo(323456789);
-        }
+        List<GivenRecommendation> all = givenRecommendationRepo.getAll(db);
+        assertThat(all).hasSize(1);
+        GivenRecommendation givenRecommendation = all.get(0);
+        assertThat(givenRecommendation.getId()).isPositive().isNotEqualTo(323456789);
     }
 
     @Test
@@ -156,7 +154,7 @@ public class RecommendationsManagerTest extends TestBase {
 
     @Test
     public void gamma7NotRestricted() throws Exception {
-        MockData.mockUser("guy", false, 123, 123, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("guy", false, 123, 123, 123, backend, osuApi, standardRecommender, userDataManager);
         TestBase.mockRecommendations(recommender);
         user = pullThrough.downloadUser("guy");
         assertThat(recommendationsManager.getRecommendation(user, "gamma7", new Default()))
@@ -179,7 +177,7 @@ public class RecommendationsManagerTest extends TestBase {
     }
 
     private void runShift(String mode, int limit) throws Exception {
-        MockData.mockUser("guy", true, 123, 1000, 123, backend, osuApi, standardRecommender);
+        MockData.mockUser("guy", true, 123, 1000, 123, backend, osuApi, standardRecommender, userDataManager);
         TestBase.mockRecommendations(standardRecommender);
 
         user = pullThrough.downloadUser("guy");

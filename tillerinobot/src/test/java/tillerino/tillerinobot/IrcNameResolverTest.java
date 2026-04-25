@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import tillerino.tillerinobot.data.UserNameMapping;
 
 public class IrcNameResolverTest extends TestBase {
 
@@ -13,17 +12,27 @@ public class IrcNameResolverTest extends TestBase {
     public void testBasic() throws Exception {
         assertNull(ircNameResolver.resolveIRCName("anybody"));
 
-        db.truncate(UserNameMapping.class);
-        MockData.mockUser("anybody", false, 1000, 1000, 1, backend, osuApi, standardRecommender);
+        userNameMappingRepo.deleteAll(db);
+        MockData.mockUser("anybody", false, 1000, 1000, 1, backend, osuApi, standardRecommender, userDataManager);
         assertNotNull(ircNameResolver.resolveIRCName("anybody"));
 
-        assertThat(db.selectUnique(UserNameMapping.class).execute("where userName = ", "anybody"))
+        assertThat(userNameMappingRepo.findByUserName(db, "anybody"))
                 .hasValueSatisfying(m -> assertThat(m.getUserid()).isEqualTo(1));
     }
 
     @Test
     public void testFix() throws Exception {
-        MockData.mockUser("this_underscore space_bullshit", false, 1000, 1000, 1, backend, osuApi, standardRecommender);
+        userNameMappingRepo.deleteAll(db);
+        MockData.mockUser(
+                "this_underscore space_bullshit",
+                false,
+                1000,
+                1000,
+                1,
+                backend,
+                osuApi,
+                standardRecommender,
+                userDataManager);
         assertNull(ircNameResolver.resolveIRCName("this_underscore_space_bullshit"));
         ircNameResolver.resolveManually(
                 pullThrough.downloadUser("this_underscore space_bullshit").getUserId());

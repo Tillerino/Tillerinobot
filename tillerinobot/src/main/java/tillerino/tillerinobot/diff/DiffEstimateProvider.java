@@ -11,6 +11,8 @@ import jakarta.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -24,9 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.tillerino.mormon.Database;
 import org.tillerino.mormon.DatabaseManager;
-import org.tillerino.mormon.Loader;
-import org.tillerino.mormon.Persister;
-import org.tillerino.mormon.Persister.Action;
 import org.tillerino.osuApiModel.GameModes;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
@@ -63,6 +62,10 @@ public class DiffEstimateProvider {
 
     private final DatabaseManager dbm;
 
+    private final DiffEstimate.Repo repo;
+
+    private final ApiBeatmap.Repo apiBeatmapRepo;
+
     /**
      * Load or calculate diff estimates for multiple beatmaps.
      *
@@ -74,8 +77,9 @@ public class DiffEstimateProvider {
             throws SQLException, IOException, InterruptedException {
         Set<BeatmapWithMods> noMods =
                 beatmaps.stream().map(BeatmapWithMods::nomod).collect(Collectors.toSet());
-        Map<BeatmapWithMods, ApiBeatmap> apiBeatmaps = ApiBeatmap.loadOrDownload(database, noMods, 0, downloader);
-        Map<BeatmapWithMods, DiffEstimate> diffEstimates = DiffEstimate.loadMultiple(
+        Map<BeatmapWithMods, ApiBeatmap> apiBeatmaps =
+                ApiBeatmap.loadOrDownload(apiBeatmapRepo, database, noMods, 0, downloader);
+        Map<BeatmapWithMods, DiffEstimate> diffEstimates = loadMultiple(
                 database, beatmaps.stream().map(BeatmapWithMods::diffMods).collect(Collectors.toSet()));
 
         Map<BeatmapWithMods, BeatmapImpl> result = new LinkedHashMap<>();
@@ -110,6 +114,7 @@ public class DiffEstimateProvider {
             throws SQLException, IOException, InterruptedException {
         if (cachedBeatmap != null && cachedBeatmap.getApproved() != OsuApiBeatmap.RANKED) {
             cachedBeatmap = ApiBeatmap.loadOrDownload(
+                    apiBeatmapRepo,
                     database,
                     beatmapid,
                     0,
@@ -120,14 +125,13 @@ public class DiffEstimateProvider {
         final long diffMods = getDiffMods(originalMods);
         if (cachedBeatmap == null) {
             // doesn't never existed or was deleted
-            var _ = database.deleteFrom(DiffEstimate.class)
-                    .execute("where beatmapid = ", beatmapid, " and mods = ", diffMods);
+            repo.deleteByBeatmapId(database, beatmapid);
             return null;
         }
 
         if (estimate == null
-                || estimate.getDataVersion() != SanDoku.VERSION
-                || !Objects.equals(estimate.getMd5(), cachedBeatmap.getFileMd5())) {
+                || estimate.dataVersion != SanDoku.VERSION
+                || !Objects.equals(estimate.md5, cachedBeatmap.getFileMd5())) {
             if (!calculatorSemaphore.tryAcquire(1, TimeUnit.SECONDS)) {
                 if (estimate != null && estimate.success) {
                     return DiffEstimate.DiffEstimateToBeatmapImplMapper.INSTANCE.map(estimate);
@@ -143,9 +147,7 @@ public class DiffEstimateProvider {
                 calculatorSemaphore.release();
             }
 
-            try (Persister<DiffEstimate> persister = database.persister(DiffEstimate.class, Action.REPLACE)) {
-                persister.persist(estimate);
-            }
+            repo.replace(database, estimate);
         }
 
         if (estimate.success) {
@@ -226,11 +228,10 @@ public class DiffEstimateProvider {
 
     /** @return true if everything is up-to-date, false if should be called again in a little while. */
     boolean updateDiffEstimates() throws InterruptedException {
-        try (Database db = dbm.getDatabase();
-                Loader<DiffEstimate> loader = db.loader(DiffEstimate.class, "where `dataVersion` != ? limit 1")) {
+        try (Database db = dbm.getDatabase()) {
             for (; ; ) {
                 MDC.clear();
-                Optional<DiffEstimate> outdated = loader.queryUnique(SanDoku.VERSION);
+                Optional<DiffEstimate> outdated = repo.findOneOutdated(db, SanDoku.VERSION);
                 if (outdated.isEmpty()) {
                     return true;
                 }
@@ -266,9 +267,9 @@ public class DiffEstimateProvider {
         }
 
         try (var _ = PhaseTimer.timeTask("loadOrCalculateEstimates");
-                Database database = dbm.getDatabase()) {
+                Database db = dbm.getDatabase()) {
             // try to load with these exact mods
-            BeatmapImpl diffEstimate = loadOrCalculate(database, beatmapId, mods);
+            BeatmapImpl diffEstimate = loadOrCalculate(db, beatmapId, mods);
 
             if (diffEstimate != null) {
                 return new PercentageEstimatesImpl(diffEstimate, mods);
@@ -278,12 +279,35 @@ public class DiffEstimateProvider {
         }
     }
 
+    /**
+     * Load multiple diff estimates at once.
+     *
+     * @param beatmaps performance penalty if not unique, but will not throw up
+     * @return entries for all diff estimates that could be found. Will not throw if some are missing.
+     */
+    public Map<BeatmapWithMods, DiffEstimate> loadMultiple(Database database, Collection<BeatmapWithMods> beatmaps)
+            throws SQLException {
+        if (beatmaps.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        String combinations = beatmaps.stream()
+                .map(bwm -> "(" + bwm.beatmap() + "," + bwm.mods() + ")")
+                .collect(Collectors.joining(",", "(", ")"));
+        try (PreparedStatement ps = database.prepareStatement(
+                        "select * from diffestimates where (beatmapid, mods) in " + combinations);
+                ResultSet rs = ps.executeQuery()) {
+            return repo.getMultiple(rs).stream()
+                    .collect(Collectors.toMap(e -> new BeatmapWithMods(e.beatmapid, e.mods), e -> e));
+        }
+    }
+
     public BeatmapMeta loadBeatmap(final @BeatmapId int beatmapid, @BitwiseMods long mods)
             throws SQLException, IOException, InterruptedException {
         ApiBeatmap beatmap;
         long diffMods = DiffEstimateProvider.getDiffMods(mods);
-        try (Database database = dbm.getDatabase()) {
-            beatmap = ApiBeatmap.loadOrDownload(database, beatmapid, diffMods, 7L * 24 * 60 * 60 * 1000, downloader);
+        try (Database db = dbm.getDatabase()) {
+            beatmap = ApiBeatmap.loadOrDownload(
+                    apiBeatmapRepo, db, beatmapid, diffMods, 7L * 24 * 60 * 60 * 1000, downloader);
         } catch (SQLException e) {
             throw new SQLException("exception loading beatmap " + beatmapid + " mods " + diffMods, e);
         }
