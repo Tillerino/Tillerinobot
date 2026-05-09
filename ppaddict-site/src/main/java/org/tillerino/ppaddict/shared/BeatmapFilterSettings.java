@@ -30,7 +30,7 @@ public class BeatmapFilterSettings implements IsSerializable {
     }
 
     public void setLowAccuracy(double lowAccuracy) throws OutOfBoundsException {
-        this.lowAccuracy = PpaddictException.checkBounds("High accuracy", lowAccuracy, 0, highAccuracy);
+        this.lowAccuracy = PpaddictException.checkBounds("Low accuracy", lowAccuracy, 17, highAccuracy);
     }
 
     public double getHighAccuracy() {
