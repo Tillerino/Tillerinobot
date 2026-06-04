@@ -17,11 +17,15 @@ a { color: rgb(222, 51, 151); text-decoration: none; }
 
 
 /* Beatmaps table */
-.table-container { max-height: calc(100vh - 200px); overflow-y: auto; }
+.table-scroll { max-height: calc(100vh - 200px); overflow-y: auto; }
 table.beatmaps { border-collapse: collapse; width: 100%; table-layout: fixed; }
 table.beatmaps td, table.beatmaps th { padding: 10px; }
 table.beatmaps thead th { position: sticky; top: 0; background: white; z-index: 1; white-space: nowrap; color: #9ea0b6; }
 table.beatmaps tbody tr:hover { background-color: #ddd; }
+
+/* Pager below the table */
+.pager { text-align: center; padding: 10px; color: #9ea0b6; }
+.pager button { text-decoration: none; }
 
 
 

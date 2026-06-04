@@ -11,8 +11,10 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
+import org.tillerino.ppaddict.server.PersistentUserData;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
 import org.tillerino.ppaddict.shared.*;
 
@@ -33,7 +35,19 @@ public class BeatmapTableResource {
     }
 
     @GET
-    @Path("/table")
+    @Path("/initial")
+    @Produces(MediaType.TEXT_HTML)
+    public String getTable(HttpServletRequest httpServletRequest) throws PpaddictException {
+        PersistentUserData userData = getUserData(httpServletRequest);
+        BeatmapRangeRequest request = userData != null ? userData.getLastRequest() : null;
+        if (request == null) {
+            request = new BeatmapRangeRequest();
+        }
+        return execute(false, request, userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS);
+    }
+
+    @GET
+    @Path("/update")
     @Produces(MediaType.TEXT_HTML)
     public String getTable(
             HttpServletRequest httpServletRequest,
@@ -47,56 +61,96 @@ public class BeatmapTableResource {
         request.direction = ss;
 
         if (sortBy != null && !sortBy.isEmpty()) {
-            try {
-                request.sortBy = BeatmapRangeRequest.Sort.valueOf(sortBy);
-            } catch (IllegalArgumentException e) {
-                // ignore invalid sortBy
-            }
+            request.sortBy = BeatmapRangeRequest.Sort.valueOf(sortBy);
         }
 
-        Settings settings = Settings.DEFAULT_SETTINGS;
+        PersistentUserData userData = getUserData(httpServletRequest);
+
+        return execute(onlyRows, request, userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS);
+    }
+
+    @CheckForNull
+    private PersistentUserData getUserData(HttpServletRequest httpServletRequest) throws PpaddictException {
+        PersistentUserData userData = null;
         var credentials = userDataService.getCredentials(httpServletRequest);
         if (credentials != null) {
-            settings = userDataService.getServerUserData(credentials).getSettings();
+            userData = userDataService.getServerUserData(credentials);
         }
+        return userData;
+    }
 
+    private String execute(boolean onlyRows, BeatmapRangeRequest request, Settings settings) throws PpaddictException {
         BeatmapBundle bundle = beatmapTableService.getRange(request);
 
-        StringBuilder html = onlyRows ? new StringBuilder() : formatBeatmapsTableHeader(settings, request.sortBy, ss);
+        StringBuilder html = new StringBuilder();
+        if (!onlyRows) {
+            html.append("<div class=\"table-scroll\">");
+            html.append(formatBeatmapsTableHeader(settings, request.sortBy, request.direction));
+        }
         for (var beatmap : bundle.beatmaps) {
             formatBeatmapTablesRow(beatmap, html);
         }
 
-        int nextStart = start + request.length;
+        int nextStart = request.start + request.length;
         if (nextStart < bundle.available) {
             StringBuilder url = new StringBuilder(
-                    String.format("/htmx/beatmaps/table?start=%d&length=%d&onlyRows=true", nextStart, request.length));
+                    String.format("/htmx/beatmaps/update?start=%d&length=%d&onlyRows=true", nextStart, request.length));
             if (request.sortBy != null) {
                 url.append("&sortBy=").append(request.sortBy);
             }
-            url.append("&ss=").append(ss);
+            url.append("&ss=").append(request.direction);
             html.append(String.format("""
-                <tr hx-get="%s"
-                    hx-trigger="intersect once"
-                    hx-swap="outerHTML">
-                  <td colspan="12" style="text-align:center; padding: 10px; color: gray;">
-                    Loading more...
-                  </td>
-                </tr>""", url));
+            <tr hx-get="%s"
+                hx-trigger="intersect once"
+                hx-swap="outerHTML">
+              <td colspan="12" style="text-align:center; padding: 10px; color: gray;">
+                Loading more...
+              </td>
+            </tr>""", url));
         }
 
         if (!onlyRows) {
-            html.append("</tbody></table>");
+            html.append("</tbody></table></div>");
+            html.append(formatPager(request, bundle.available));
         }
         return html.toString();
     }
 
-    private record Col(String label, BeatmapRangeRequest.Sort sortKey, String width) {}
+    private static String formatPager(BeatmapRangeRequest request, int available) {
+        int length = request.length;
+
+        return "<div class=\"pager\">%s %s %d-%d of %d %s %s %s</div>"
+                .formatted(
+                        pageButton(0, request, available, "⇤"),
+                        pageButton(Math.max(0, request.start - length), request, available, "←"),
+                        request.start + 1,
+                        Math.min(request.start + length, available),
+                        available,
+                        pageButton(request.start + length, request, available, "→"),
+                        pageButton(request.start + 10 * length, request, available, "↠"),
+                        pageButton(available - length, request, available, "⇥"));
+    }
+
+    private static String pageButton(int pageStart, BeatmapRangeRequest request, int available, String label) {
+        boolean enabled = pageStart >= 0 && pageStart < available && pageStart != request.start;
+        if (enabled) {
+            StringBuilder url = new StringBuilder();
+            url.append("/htmx/beatmaps/update?start=").append(pageStart);
+            if (request.sortBy != null) {
+                url.append("&sortBy=").append(request.sortBy);
+            }
+            url.append("&ss=").append(request.direction);
+            return String.format("<button hx-get=\"%s\" hx-target=\".table-container\">%s</button>", url, label);
+        }
+        return "<span>" + label + "</span>";
+    }
 
     private static StringBuilder formatBeatmapsTableHeader(
             Settings settings, BeatmapRangeRequest.Sort currentSort, int ss) {
         String lowAcc = percentageFormat.format(settings.getLowAccuracy()) + "%";
         String highAcc = percentageFormat.format(settings.getHighAccuracy()) + "%";
+
+        record Col(String label, BeatmapRangeRequest.Sort sortKey, String width) {}
 
         Col[] cols = {
             new Col("", null, "117px"),
@@ -131,7 +185,7 @@ public class BeatmapTableResource {
                 String sortByEncoded = URLEncoder.encode(col.sortKey.name(), StandardCharsets.UTF_8);
                 String arrow = isActive ? (direction == 1 ? "↑" : "↓") : "";
                 html.append(String.format(
-                        "<th class=\"numeric-cell\">%s<button type=\"button\" hx-get=\"/htmx/beatmaps/table?sortBy=%s&ss=%d\" hx-target=\".table-container\">%s</button></th>",
+                        "<th class=\"numeric-cell\">%s<button type=\"button\" hx-get=\"/htmx/beatmaps/update?sortBy=%s&ss=%d\" hx-target=\".table-container\">%s</button></th>",
                         arrow, sortByEncoded, direction, col.label));
             } else if (col.label.isEmpty()) {
                 html.append("<th></th>");

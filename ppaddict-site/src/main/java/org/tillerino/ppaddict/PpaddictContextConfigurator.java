@@ -35,7 +35,8 @@ public class PpaddictContextConfigurator {
         addServlet(deploymentInfo, "/ppaddict/beatmaps", beatmapTableService);
         addServlet(deploymentInfo, "/ppaddict/user", userDataService);
         addServlet(deploymentInfo, "/ppaddict/recommendations", recommendationsService);
-        addServlet(deploymentInfo, "/htmx/*", new ServletContainer(new ResourceConfig().register(beatmapTableResource)));
+        addServlet(
+                deploymentInfo, "/htmx/*", new ServletContainer(new ResourceConfig().register(beatmapTableResource)));
 
         addServlet(deploymentInfo, AuthLeaveService.PATH, authLeaveService);
         addServlet(deploymentInfo, AuthArriveService.PATH, authArriveService);
