@@ -8,7 +8,9 @@ import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
+import io.undertow.servlet.api.LoggingExceptionHandler;
 import jakarta.servlet.ServletException;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.PpaddictBackendImpl;
@@ -30,6 +32,7 @@ public interface PpaddictModule {
                 .setDeploymentName("test.war")
                 .addWelcomePage("Ppaddict.html")
                 .addErrorPage(new ErrorPage("/error.html"))
+                .setExceptionHandler(new LoggingExceptionHandler(Map.of()))
                 .setResourceManager(new ClassPathResourceManager(PpaddictModule.class.getClassLoader(), "static"));
 
         config.accept(servletBuilder);
