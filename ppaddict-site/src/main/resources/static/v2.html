@@ -6,6 +6,22 @@
     <title>ppaddict v2</title>
     <link rel="stylesheet" href="styles.css">
     <script src="htmx-2.0.10.min.js"></script>
+    <script>
+        htmx.defineExtension('postrangerequest', {
+            onEvent: function (name, evt) {
+                if (name === "htmx:configRequest") {
+                    evt.detail.headers['Content-Type'] = "application/json"
+                }
+            },
+            encodeParameters: function(xhr, parameters, elt) {
+                let base = parameters.copy ? JSON.parse(JSON.stringify(window.__rangeRequest)) : window.__rangeRequest;
+                delete parameters.copy
+
+                Object.assign(base, parameters)
+                return (JSON.stringify(base))
+            }
+        });
+    </script>
 </head>
 <body>
     <h1>ppaddict+!r</h1>
