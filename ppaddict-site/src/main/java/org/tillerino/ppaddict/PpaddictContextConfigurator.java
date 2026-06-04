@@ -4,6 +4,9 @@ import io.undertow.servlet.api.*;
 import jakarta.servlet.Servlet;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
+import org.tillerino.ppaddict.rest.BeatmapTableResource;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.PpaddictContextFilter;
 import org.tillerino.ppaddict.server.RecommendationsServiceImpl;
@@ -18,6 +21,10 @@ public class PpaddictContextConfigurator {
     private final UserDataServiceImpl userDataService;
     private final RecommendationsServiceImpl recommendationsService;
 
+    // v2
+
+    private final BeatmapTableResource beatmapTableResource;
+
     private final AuthLeaveService authLeaveService;
     private final AuthArriveService authArriveService;
     private final AuthLogoutService authLogoutService;
@@ -28,6 +35,7 @@ public class PpaddictContextConfigurator {
         addServlet(deploymentInfo, "/ppaddict/beatmaps", beatmapTableService);
         addServlet(deploymentInfo, "/ppaddict/user", userDataService);
         addServlet(deploymentInfo, "/ppaddict/recommendations", recommendationsService);
+        addServlet(deploymentInfo, "/htmx/*", new ServletContainer(new ResourceConfig().register(beatmapTableResource)));
 
         addServlet(deploymentInfo, AuthLeaveService.PATH, authLeaveService);
         addServlet(deploymentInfo, AuthArriveService.PATH, authArriveService);

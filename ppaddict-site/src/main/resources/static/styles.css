@@ -1,0 +1,27 @@
+/* Keep short lists on a single line */
+
+@font-face {
+  font-family: 'Cabin';
+  src: url('/Cabin-SemiBold.ttf') format('truetype');
+  font-style: normal;
+  font-display: swap;
+}
+
+body { width: 1100px; }
+body, button { font-family: 'Cabin', sans-serif; font-size: 16px; }
+button { border: none; background: none; text-decoration: underline; cursor: pointer; color: #9ea0b6; }
+h1 { font-size: 36pt; font-weight: 400; margin-left: .3em; margin-top: .3em; }
+a { color: rgb(222, 51, 151); text-decoration: none; }
+
+.numeric-cell { text-align: right; }
+
+
+/* Beatmaps table */
+.table-container { max-height: calc(100vh - 200px); overflow-y: auto; }
+table.beatmaps { border-collapse: collapse; width: 100%; table-layout: fixed; }
+table.beatmaps td, table.beatmaps th { padding: 10px; }
+table.beatmaps thead th { position: sticky; top: 0; background: white; z-index: 1; white-space: nowrap; color: #9ea0b6; }
+table.beatmaps tbody tr:hover { background-color: #ddd; }
+
+
+

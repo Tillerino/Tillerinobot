@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ppaddict v2</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="htmx-2.0.10.min.js"></script>
+</head>
+<body>
+    <h1>ppaddict+!r</h1>
+    <div class="table-container" hx-get="/htmx/beatmaps/table?start=0&length=50" hx-trigger="load">
+        Loading beatmaps...
+    </div>
+</body>
+
+</html>
