@@ -150,7 +150,7 @@ public class SearchesCell extends CompositeCell<Searches> {
 
             @Override
             public String getValue(Searches object) {
-                return object.getSearchText();
+                return object.getSafeSearchText();
             }
         });
 
@@ -188,7 +188,7 @@ public class SearchesCell extends CompositeCell<Searches> {
 
             @Override
             public String getValue(Searches object) {
-                return object.getSearchComment();
+                return object.getSafeSearchComment();
             }
         });
 

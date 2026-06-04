@@ -34,7 +34,7 @@ public class BeatmapRangeRequest extends BeatmapFilter {
     @Override
     public String toString() {
         return start + " " + length + " " + sortBy + " " + direction + " "
-                + getSearches().getSearchText() + " AR " + aR + " CS " + cS + " expected " + expectedPP
+                + getSearches().getSafeSearchText() + " AR " + aR + " CS " + cS + " expected " + expectedPP
                 + " perfect " + perfectPP + " mapLength " + mapLength + " " + getSearches();
     }
 }

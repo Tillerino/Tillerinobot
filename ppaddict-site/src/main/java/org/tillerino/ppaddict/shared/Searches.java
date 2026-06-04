@@ -1,5 +1,6 @@
 package org.tillerino.ppaddict.shared;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -27,6 +28,7 @@ public class Searches implements IsSerializable {
     @BeatmapSetId
     private Integer setId;
 
+    @JsonIgnore
     public Searches getCopy() {
         Searches copy = new Searches();
         copy.setSearchText(searchText);
@@ -41,15 +43,17 @@ public class Searches implements IsSerializable {
         return string.trim();
     }
 
+    @JsonIgnore
     @Nonnull
     /** @return not null and trimmed */
-    public String getSearchComment() {
+    public String getSafeSearchComment() {
         return nonNullTrimmed(searchComment);
     }
 
+    @JsonIgnore
     @Nonnull
     /** @return not null and trimmed */
-    public String getSearchText() {
+    public String getSafeSearchText() {
         return nonNullTrimmed(searchText);
     }
 

@@ -414,10 +414,10 @@ public class AllBeatmapsTable extends AbstractBeatmapTable implements HasHelpEle
                 () -> provider.getRequest().getSearches().getCopy());
 
         footer.setUpdater(value -> {
-            if (value.getSearchComment()
-                            .equals(provider.getRequest().getSearches().getSearchComment())
-                    && value.getSearchText()
-                            .equals(provider.getRequest().getSearches().getSearchText())) {
+            if (value.getSafeSearchComment()
+                            .equals(provider.getRequest().getSearches().getSafeSearchComment())
+                    && value.getSafeSearchText()
+                            .equals(provider.getRequest().getSearches().getSafeSearchText())) {
                 return;
             }
 

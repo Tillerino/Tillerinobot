@@ -1,5 +1,6 @@
 package org.tillerino.ppaddict.shared;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class MinMax implements IsSerializable {
@@ -19,6 +20,7 @@ public class MinMax implements IsSerializable {
     public Integer min;
     public Integer max;
 
+    @JsonIgnore
     public MinMax getCopy() {
         return new MinMax(min, max);
     }

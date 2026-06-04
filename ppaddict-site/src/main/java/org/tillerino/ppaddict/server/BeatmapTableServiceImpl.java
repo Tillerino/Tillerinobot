@@ -134,14 +134,14 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
          * prepare search objects
          */
         String textSearchNeedle;
-        if (!request.getSearches().getSearchText().isEmpty()) {
-            textSearchNeedle = request.getSearches().getSearchText().trim().toLowerCase();
+        if (!request.getSearches().getSafeSearchText().isEmpty()) {
+            textSearchNeedle = request.getSearches().getSafeSearchText().trim().toLowerCase();
         } else {
             textSearchNeedle = null;
         }
         String commentSearchNeedle;
-        if (comments != null && !request.getSearches().getSearchComment().isEmpty()) {
-            commentSearchNeedle = request.getSearches().getSearchComment().toLowerCase();
+        if (comments != null && !request.getSearches().getSafeSearchComment().isEmpty()) {
+            commentSearchNeedle = request.getSearches().getSafeSearchComment().toLowerCase();
         } else {
             commentSearchNeedle = null;
         }
