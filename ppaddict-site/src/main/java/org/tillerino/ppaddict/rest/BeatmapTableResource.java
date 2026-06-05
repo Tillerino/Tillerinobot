@@ -99,9 +99,64 @@ public class BeatmapTableResource {
         }
 
         if (!onlyRows) {
-            html.append("</tbody></table></div>");
-            html.append(formatPager(request, bundle.available));
+            html.append("</tbody>")
+                .append("<tfoot>")
+                .append(formatFilterRow(request))
+                .append("</tfoot></table></div>")
+                .append(formatPager(request, bundle.available));
         }
+        return html.toString();
+    }
+
+    record FilterField(String cssClass, boolean isDecimal, boolean isTime, MinMax range) {
+        private String formatValue(Integer value) {
+            if (value == null) {
+                return isTime ? "0:00" : (isDecimal ? "0.0" : "0");
+            }
+            if (isTime) {
+                int minutes = value / 60;
+                int seconds = value % 60;
+                return minutes + ":" + String.format("%02d", seconds);
+            }
+            if (isDecimal) {
+                return format.format(value / 100.0);
+            }
+            return String.valueOf(value);
+        }
+
+        String asCell() {
+            return String.format("""
+              <td class="%s">
+                &ge;<input type="text" class="chillinput %s" value="%s" tabindex="-1" />
+                <br />&le;<input type="text" class="chillinput %s" value="%s" tabindex="-1" />
+              </td>
+              """, cssClass, cssClass, formatValue(range.min), cssClass, formatValue(range.max));
+        }
+    }
+
+    private static String formatFilterRow(BeatmapRangeRequest request) {
+        FilterField[] fields = {
+            null, // col 0: image
+            new FilterField("threecharminmaxcell", false, false, request.expectedPP),
+            new FilterField("threecharminmaxcell", false, false, request.perfectPP),
+            null, // col 3: empty
+            null, // col 4: empty
+            null, // col 5: empty
+            new FilterField("threecharminmaxcell", true, false, request.aR),
+            new FilterField("threecharminmaxcell", true, false, request.oD),
+            new FilterField("threecharminmaxcell", true, false, request.cS),
+            new FilterField("threecharminmaxcell", true, false, request.starDiff),
+            new FilterField("threecharminmaxcell", false, false, request.bpm),
+            new FilterField("fivecharminmaxcell", false, true, request.mapLength)
+        };
+
+        StringBuilder html = new StringBuilder();
+        html.append("<tr class=\"filter-row\">\n");
+
+        for (FilterField field : fields) {
+            html.append(field == null ? "<td></td>" : field.asCell());
+        }
+        html.append("</tr>\n");
         return html.toString();
     }
 
@@ -148,8 +203,8 @@ public class BeatmapTableResource {
             new Col("", null, "30px"),
             new Col("AR", null, "75px"),
             new Col("OD", null, "75px"),
-            new Col("CS", null, "55px"),
-            new Col("diff", BeatmapRangeRequest.Sort.STAR_DIFF, "65px"),
+            new Col("CS", null, "75px"),
+            new Col("diff", BeatmapRangeRequest.Sort.STAR_DIFF, "75px"),
             new Col("BPM", BeatmapRangeRequest.Sort.BPM, "75px"),
             new Col("length", BeatmapRangeRequest.Sort.LENGTH, "90px")
         };
