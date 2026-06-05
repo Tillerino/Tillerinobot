@@ -22,16 +22,16 @@ a { color: var(--link-color); text-decoration: none; }
 
 /* Beatmaps table */
 .table-container { position: absolute; bottom: 0px; width: 1100px; }
-.table-scroll { max-height: calc(100vh - 150px); overflow-y: auto; }
+.table-scroll { max-height: calc(100vh - 100px); overflow-y: auto; }
 table.beatmaps { border-collapse: collapse; width: 100%; table-layout: fixed; }
 table.beatmaps td, table.beatmaps th { padding: 10px; }
 table.beatmaps thead th { position: sticky; top: 0; background: white; z-index: 1; white-space: nowrap; color: var(--deemph-color); }
 table.beatmaps tbody tr:hover { background-color: #ddd; }
 
 /* Pager below the table */
+.pager-row { position: sticky; bottom: 0; background: white; z-index: 9; }
 .pager { text-align: center; padding: 10px; color: var(--deemph-color); }
 .pager button { text-decoration: none; }
-
 
 /* Filter inputs */
 .threecharminmaxcell { width: 35px; text-align: right; }
@@ -60,6 +60,7 @@ table.beatmaps tbody tr:hover { background-color: #ddd; }
   background: white;
   z-index: 10;
   color: var(--deemph-color);
+  display: none;
 }
 
 .filter-row td { padding: 4px; vertical-align: top; }

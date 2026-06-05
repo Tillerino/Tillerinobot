@@ -21,6 +21,18 @@
                 return (JSON.stringify(base))
             }
         });
+
+        function modifyRule(selector, property, value) {
+          for (const sheet of document.styleSheets) {
+            for (const rule of sheet.cssRules) {
+              if (rule.selectorText === selector) {
+                rule.style.setProperty(property, value);
+                return true;
+              }
+            }
+          }
+          return false;
+        }
     </script>
 </head>
 <body>

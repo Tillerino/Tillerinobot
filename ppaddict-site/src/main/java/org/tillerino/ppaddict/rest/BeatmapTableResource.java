@@ -100,10 +100,10 @@ public class BeatmapTableResource {
 
         if (!onlyRows) {
             html.append("</tbody>")
-                .append("<tfoot>")
-                .append(formatFilterRow(request))
-                .append("</tfoot></table></div>")
-                .append(formatPager(request, bundle.available));
+                    .append("<tfoot>")
+                    .append(formatFilterRow(request))
+                    .append(formatPagerRow(request, bundle.available))
+                    .append("</tfoot></table></div>");
         }
         return html.toString();
     }
@@ -136,7 +136,6 @@ public class BeatmapTableResource {
 
     private static String formatFilterRow(BeatmapRangeRequest request) {
         FilterField[] fields = {
-            null, // col 0: image
             new FilterField("threecharminmaxcell", false, false, request.expectedPP),
             new FilterField("threecharminmaxcell", false, false, request.perfectPP),
             null, // col 3: empty
@@ -153,6 +152,8 @@ public class BeatmapTableResource {
         StringBuilder html = new StringBuilder();
         html.append("<tr class=\"filter-row\">\n");
 
+        html.append(
+                "<td><br /><button type=\"button\" onclick=\"modifyRule('.filter-row', 'display', 'none')\">hide filters</button></td>");
         for (FilterField field : fields) {
             html.append(field == null ? "<td></td>" : field.asCell());
         }
@@ -160,11 +161,15 @@ public class BeatmapTableResource {
         return html.toString();
     }
 
-    private static String formatPager(BeatmapRangeRequest request, int available) {
+    private static String formatPagerRow(BeatmapRangeRequest request, int available) {
         int length = request.length;
 
-        return "<div class=\"pager\">%s %s %d-%d of %d %s %s %s</div>"
-                .formatted(
+        return """
+            <tr class="pager-row">
+              <td><button type="button" onclick="modifyRule('.filter-row', 'display', '')">show filters</button></td>
+              <td colspan="10" class="pager">%s %s %d-%d of %d %s %s %s</td>
+              <td></td>
+            </tr>""".formatted(
                         pageButton(0, request, available, "⇤"),
                         pageButton(Math.max(0, request.start - length), request, available, "←"),
                         request.start + 1,
