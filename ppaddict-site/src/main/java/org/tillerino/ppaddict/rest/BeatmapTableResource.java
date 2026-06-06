@@ -89,7 +89,7 @@ public class BeatmapTableResource {
             html.append(String.format("""
             <tr hx-post="/htmx/beatmaps/update?onlyRows=true"
                 hx-ext="postrangerequest"
-                hx-vals='{ "start": %s }'
+                hx-vals='js:{json:rangeReq({copy: { start: %s }})}'
                 hx-trigger="intersect once"
                 hx-swap="outerHTML">
               <td colspan="12" style="text-align:center; padding: 10px; color: gray;">
@@ -186,7 +186,7 @@ public class BeatmapTableResource {
             return String.format("""
                     <button hx-post="/htmx/beatmaps/update"
                       hx-ext="postrangerequest"
-                      hx-vals='{ "start": %s }'
+                      hx-vals='js:{json: rangeReq({mod:{ start: %s }})}'
                       hx-target=".table-container">%s</button>""", pageStart, label);
         }
         return "<span>" + label + "</span>";
@@ -228,14 +228,15 @@ public class BeatmapTableResource {
         for (Col col : cols) {
             if (col.sortKey != null) {
                 boolean isActive = col.sortKey == currentSort;
-                int direction = isActive ? (ss == 1 ? -1 : 1) : 1;
-                String arrow = isActive ? (direction == 1 ? "↑" : "↓") : "";
-                html.append(String.format("""
+                String arrow = isActive ? (ss == 1 ? "↓" : "↑") : "";
+                Integer nextDirection = isActive ? (ss == 1 ? -1 : null) : (Integer) 1;
+              String nextSortKey = nextDirection != null ? "\"" +  col.sortKey.name() + "\"" : null;
+              html.append(String.format("""
                       <th class="numeric-cell">%s<button type="button"
                         hx-post="/htmx/beatmaps/update"
                         hx-ext="postrangerequest"
-                        hx-vals='{ "sortBy": "%s", "direction": %s, "start": 0 }'
-                        hx-target=".table-container">%s</button></th>""", arrow, col.sortKey.name(), direction, col.label));
+                        hx-vals='js:{json: rangeReq({mod:{ sortBy: %s, direction: %s, start: 0 }})}'
+                        hx-target=".table-container">%s</button></th>""", arrow, nextSortKey, nextDirection, col.label));
             } else if (col.label.isEmpty()) {
                 html.append("<th></th>");
             } else {

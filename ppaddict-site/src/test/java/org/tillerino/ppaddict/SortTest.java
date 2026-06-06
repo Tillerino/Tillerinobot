@@ -25,5 +25,11 @@ class SortTest extends AbstractPlaywrightTest {
         page.waitForResponse("**/htmx/beatmaps/update**", () -> {});
         PlaywrightAssertions.assertThat(page.getByText("BPM").locator("xpath=.."))
                 .hasText("↑BPM");
+
+        // Click again to turn off sorting
+        page.getByText("BPM").click();
+        page.waitForResponse("**/htmx/beatmaps/update**", () -> {});
+        PlaywrightAssertions.assertThat(page.getByText("BPM").locator("xpath=.."))
+                .hasText("BPM");
     }
 }

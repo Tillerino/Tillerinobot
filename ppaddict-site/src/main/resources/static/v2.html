@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="styles.css">
     <script src="htmx-2.0.10.min.js"></script>
     <script>
+        function rangeReq(obj) {
+            var base = window.__rangeRequest;
+            if (obj.copy) {
+                base = JSON.parse(JSON.stringify(base));
+                Object.assign(base, obj.copy)
+            } else {
+                Object.assign(base, obj.mod)
+            }
+            return JSON.stringify(base)
+        }
+
         htmx.defineExtension('postrangerequest', {
             onEvent: function (name, evt) {
                 if (name === "htmx:configRequest") {
@@ -14,11 +25,7 @@
                 }
             },
             encodeParameters: function(xhr, parameters, elt) {
-                let base = parameters.copy ? JSON.parse(JSON.stringify(window.__rangeRequest)) : window.__rangeRequest;
-                delete parameters.copy
-
-                Object.assign(base, parameters)
-                return (JSON.stringify(base))
+                return parameters.json
             }
         });
 
