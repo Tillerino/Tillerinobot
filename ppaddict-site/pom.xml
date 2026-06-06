@@ -106,6 +106,12 @@
             <artifactId>wiremock-testcontainers-module</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

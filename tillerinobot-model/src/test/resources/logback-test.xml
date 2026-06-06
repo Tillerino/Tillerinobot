@@ -11,7 +11,8 @@
     </root>
 
     <logger name="org.eclipse.jetty" level="info"/>
-    <logger name="org.springframework" level="warn"/>
+    <logger name="org.xnio" level="info"/>
+    <logger name="io.undertow" level="info"/>
     <logger name="org.jboss.logging" level="info"/>
     <logger name="com.github.dockerjava" level="info"/>
     <logger name="com.networknt" level="info"/>

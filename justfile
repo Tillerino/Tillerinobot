@@ -23,6 +23,10 @@ clean-verify-fast:
 install:
   mvn clean install -DskipTests -Dspotbugs.skip=true -T 2
 
+single-ppaddict-test name:
+  mvn clean spotless:apply -Dgwt.skipCompilation=true test-compile -pl :ppaddict-site -am
+  mvn test -Dtest={{ quote(name) }} -Dgwt.skipCompilation=true -pl :ppaddict-site -am -rf :ppaddict-site
+
 upgrade-rust module:
   cargo update --manifest-path tillerinobot-{{module}}/Cargo.toml
 
