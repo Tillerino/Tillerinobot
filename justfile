@@ -1,5 +1,6 @@
 updates-flags := "-q '-Dmaven.version.ignore=.*\\.Beta\\d*,.*\\.BETA\\d*,.*-beta-\\d*,.*\\.android\\d*,.*-M\\d' -Dversions.outputFile=updates.txt -Dversions.outputLineWidth=1000 -P release"
 mvn := "mvn"
+skipChecks := "-DskipTests -DskipIT -Dspotless.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Denforcer.skip=true -Dimpsort.skip=true -Dmdep.analyze.skip=true"
 
 # Prints a help text and exits to catch a bare "just" invocation
 help:
@@ -24,8 +25,8 @@ install:
   mvn clean install -DskipTests -Dspotbugs.skip=true -T 2
 
 single-ppaddict-test name:
-  mvn clean spotless:apply -Dgwt.skipCompilation=true test-compile -pl :ppaddict-site -am
-  mvn test -Dtest={{ quote(name) }} -Dgwt.skipCompilation=true -pl :ppaddict-site -am -rf :ppaddict-site
+  mvn -Dmaven.repo.local={{justfile_directory()}}/.m2/repository clean spotless:apply install {{skipChecks}} -Dgwt.skipCompilation=true -pl :ppaddict-site -am -T 99
+  mvn -Dmaven.repo.local={{justfile_directory()}}/.m2/repository test -Dtest={{ quote(name) }} -Dgwt.skipCompilation=true -pl :ppaddict-site
 
 upgrade-rust module:
   cargo update --manifest-path tillerinobot-{{module}}/Cargo.toml
