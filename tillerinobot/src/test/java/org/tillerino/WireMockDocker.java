@@ -12,6 +12,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.NearMiss;
 import dagger.Provides;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import javax.inject.Named;
@@ -38,20 +39,26 @@ import tillerino.tillerinobot.rest.AbstractBeatmapResource.BeatmapDownloader;
  * <p>Use with MockServerModule to inject mocked URLs.
  */
 public class WireMockDocker implements BeforeEachCallback, AfterEachCallback {
+    private static final String TILLERINOBOT_PATH = Files.exists(Paths.get("tillerinobot/src/test/wiremock/mappings"))
+            ? /* This is what IntelliJ does */ "tillerinobot"
+            : Files.exists(Paths.get("../tillerinobot/src/test/wiremock/mappings"))
+                    ? /* Maven in same repo */ "../tillerinobot"
+                    : /* Maven from sibling repo */ "../../Tillerinobot/tillerinobot";
+
     private static final WireMockContainer WIRE_MOCK = new WireMockContainer(WireMockContainer.WIREMOCK_2_LATEST)
             .withNetwork(DockerNetwork.NETWORK)
             .withNetworkAliases("mockserver")
             .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(cmd.getHostConfig()
                     .withMounts(List.of(
                             new Mount()
-                                    .withSource(Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/mappings")
+                                    .withSource(Paths.get(TILLERINOBOT_PATH + "/src/test/wiremock/mappings")
                                             .normalize()
                                             .toAbsolutePath()
                                             .toString())
                                     .withTarget("/home/wiremock/mappings")
                                     .withType(MountType.BIND),
                             new Mount()
-                                    .withSource(Paths.get("../../Tillerinobot/tillerinobot/src/test/wiremock/__files")
+                                    .withSource(Paths.get(TILLERINOBOT_PATH + "/src/test/wiremock/__files")
                                             .normalize()
                                             .toAbsolutePath()
                                             .toString())
