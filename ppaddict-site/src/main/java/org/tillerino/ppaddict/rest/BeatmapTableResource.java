@@ -108,7 +108,7 @@ public class BeatmapTableResource {
         return html.toString();
     }
 
-    record FilterField(String cssClass, boolean isDecimal, boolean isTime, MinMax range) {
+    record FilterField(String cssClass, boolean isDecimal, boolean isTime, MinMax range, String fieldName) {
         private String formatValue(Integer value) {
             if (value == null) {
                 return isTime ? "0:00" : (isDecimal ? "0.0" : "0");
@@ -119,34 +119,59 @@ public class BeatmapTableResource {
                 return minutes + ":" + String.format("%02d", seconds);
             }
             if (isDecimal) {
-                return format.format(value / 100.0);
+                return String.valueOf(value / 100.0);
             }
             return String.valueOf(value);
         }
 
+        private String toValueJs() {
+            if (isDecimal) return "Math.round(parseFloat(this.value)*100)";
+            if (isTime) return "toTime(this.value)";
+            return "parseInt(this.value,10)";
+        }
+
         String asCell() {
-            return String.format("""
+            String js = toValueJs();
+            return String.format(
+                    """
               <td class="%s">
-                &ge;<input type="text" class="chillinput %s" value="%s" tabindex="-1" />
-                <br />&le;<input type="text" class="chillinput %s" value="%s" tabindex="-1" />
+                &ge;<input type="text" hx-post="/htmx/beatmaps/update"
+                  hx-ext="postrangerequest" hx-trigger="change"
+                  hx-vals='js:{json:rangeReq({mod:{%s: {min: %s}}})}'
+                  hx-target=".table-container"
+                  class="chillinput %s" value="%s" tabindex="-1" />
+                <br />&le;<input type="text" hx-post="/htmx/beatmaps/update"
+                  hx-ext="postrangerequest" hx-trigger="change"
+                  hx-vals='js:{json:rangeReq({mod:{%s: {max: %s}}})}'
+                  hx-target=".table-container"
+                  class="chillinput %s" value="%s" tabindex="-1" />
               </td>
-              """, cssClass, cssClass, formatValue(range.min), cssClass, formatValue(range.max));
+              """,
+                    cssClass,
+                    fieldName,
+                    js,
+                    cssClass,
+                    formatValue(range.min),
+                    fieldName,
+                    js,
+                    cssClass,
+                    formatValue(range.max));
         }
     }
 
     private static String formatFilterRow(BeatmapRangeRequest request) {
         FilterField[] fields = {
-            new FilterField("threecharminmaxcell", false, false, request.expectedPP),
-            new FilterField("threecharminmaxcell", false, false, request.perfectPP),
+            new FilterField("threecharminmaxcell", false, false, request.expectedPP, "expectedPP"),
+            new FilterField("threecharminmaxcell", false, false, request.perfectPP, "perfectPP"),
             null, // col 3: empty
             null, // col 4: empty
             null, // col 5: empty
-            new FilterField("threecharminmaxcell", true, false, request.aR),
-            new FilterField("threecharminmaxcell", true, false, request.oD),
-            new FilterField("threecharminmaxcell", true, false, request.cS),
-            new FilterField("threecharminmaxcell", true, false, request.starDiff),
-            new FilterField("threecharminmaxcell", false, false, request.bpm),
-            new FilterField("fivecharminmaxcell", false, true, request.mapLength)
+            new FilterField("threecharminmaxcell", true, false, request.aR, "aR"),
+            new FilterField("threecharminmaxcell", true, false, request.oD, "oD"),
+            new FilterField("threecharminmaxcell", true, false, request.cS, "cS"),
+            new FilterField("threecharminmaxcell", true, false, request.starDiff, "starDiff"),
+            new FilterField("threecharminmaxcell", false, false, request.bpm, "bpm"),
+            new FilterField("fivecharminmaxcell", false, true, request.mapLength, "mapLength")
         };
 
         StringBuilder html = new StringBuilder();
@@ -230,8 +255,8 @@ public class BeatmapTableResource {
                 boolean isActive = col.sortKey == currentSort;
                 String arrow = isActive ? (ss == 1 ? "↓" : "↑") : "";
                 Integer nextDirection = isActive ? (ss == 1 ? -1 : null) : (Integer) 1;
-              String nextSortKey = nextDirection != null ? "\"" +  col.sortKey.name() + "\"" : null;
-              html.append(String.format("""
+                String nextSortKey = nextDirection != null ? "\"" + col.sortKey.name() + "\"" : null;
+                html.append(String.format("""
                       <th class="numeric-cell">%s<button type="button"
                         hx-post="/htmx/beatmaps/update"
                         hx-ext="postrangerequest"
