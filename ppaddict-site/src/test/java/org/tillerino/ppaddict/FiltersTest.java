@@ -19,8 +19,7 @@ class FiltersTest extends AbstractPlaywrightTest {
 
         PlaywrightAssertions.assertThat(page.locator(".filter-row")).isVisible();
 
-        PlaywrightAssertions.assertThat(
-                        page.locator(".filter-row input.chillinput").first())
+        PlaywrightAssertions.assertThat(page.locator(".filter-row input").first())
                 .isVisible();
 
         page.locator("tr.filter-row button").click();
@@ -35,9 +34,9 @@ class FiltersTest extends AbstractPlaywrightTest {
 
         page.locator(".pager-row td:first-child button").click();
 
-        // 8 filter fields x 2 inputs (min + max) = 16 inputs
-        var allInputs = page.locator(".filter-row input.chillinput");
-        PlaywrightAssertions.assertThat(allInputs).hasCount(16);
+        // 8 numeric filter fields x 2 inputs (min + max) + 1 name filter = 17 inputs
+        var allInputs = page.locator(".filter-row input");
+        PlaywrightAssertions.assertThat(allInputs).hasCount(17);
 
         // expectedPP - first .threecharminmaxcell cell, integer defaults to 0
         var threeCharCells = page.locator(".filter-row td.threecharminmaxcell");
@@ -131,6 +130,16 @@ class FiltersTest extends AbstractPlaywrightTest {
                 "3:00",
                 text -> toSeconds(text) <= 180,
                 text -> assertThat(toSeconds(text)).isLessThanOrEqualTo(180));
+    }
+
+    @Test
+    void nameFilterActuallyReducesRows() {
+        applyFilter(
+                "tbody tr td:nth-of-type(4) a",
+                ".filter-row td:nth-of-type(4) input.namefilter",
+                "Hatsune",
+                text -> text.toLowerCase().contains("hatsune"),
+                text -> assertThat(text.toLowerCase()).contains("hatsune"));
     }
 
     private static int toSeconds(String text) {

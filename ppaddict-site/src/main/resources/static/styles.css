@@ -12,7 +12,7 @@
   font-display: swap;
 }
 
-body, button, .chillinput { font-family: 'Cabin', sans-serif; font-size: 16px; }
+body, button, input { font-family: 'Cabin', sans-serif; font-size: 16px; }
 button { border: none; background: none; text-decoration: underline; cursor: pointer; color: var(--deemph-color); }
 h1 { font-size: 36pt; font-weight: 400; margin-left: .3em; margin-top: .3em; }
 a { color: var(--link-color); text-decoration: none; }
@@ -47,9 +47,10 @@ table.beatmaps tbody tr:hover { background-color: #ddd; }
   margin: 0;
 }
 
-.chillinput:focus {
+input, .chillinput:focus {
   color: black;
   text-decoration: none;
+  outline: none;
   border: solid 1px var(--deemph-color);
   cursor: text;
 }

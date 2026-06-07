@@ -8,7 +8,10 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
@@ -79,6 +82,7 @@ public class BeatmapTableResource {
         if (!onlyRows) {
             html.append("<div class=\"table-scroll\">");
             html.append(formatBeatmapsTableHeader(settings, request.sortBy, request.direction));
+            html.append("<tbody>");
         }
         for (var beatmap : bundle.beatmaps) {
             formatBeatmapTablesRow(beatmap, html);
@@ -108,7 +112,9 @@ public class BeatmapTableResource {
         return html.toString();
     }
 
-    record FilterField(String cssClass, boolean isDecimal, boolean isTime, MinMax range, String fieldName) {
+    record FilterField(String cssClass, boolean isDecimal, boolean isTime, MinMax range, String fieldName)
+            implements Supplier<String> {
+
         private String formatValue(Integer value) {
             if (value == null) {
                 return isTime ? "0:00" : (isDecimal ? "0.0" : "0");
@@ -130,7 +136,8 @@ public class BeatmapTableResource {
             return "parseInt(this.value,10)";
         }
 
-        String asCell() {
+        @Override
+        public String get() {
             String js = toValueJs();
             return String.format(
                     """
@@ -160,30 +167,42 @@ public class BeatmapTableResource {
     }
 
     private static String formatFilterRow(BeatmapRangeRequest request) {
-        FilterField[] fields = {
-            new FilterField("threecharminmaxcell", false, false, request.expectedPP, "expectedPP"),
-            new FilterField("threecharminmaxcell", false, false, request.perfectPP, "perfectPP"),
-            null, // col 3: empty
-            null, // col 4: empty
-            null, // col 5: empty
-            new FilterField("threecharminmaxcell", true, false, request.aR, "aR"),
-            new FilterField("threecharminmaxcell", true, false, request.oD, "oD"),
-            new FilterField("threecharminmaxcell", true, false, request.cS, "cS"),
-            new FilterField("threecharminmaxcell", true, false, request.starDiff, "starDiff"),
-            new FilterField("threecharminmaxcell", false, false, request.bpm, "bpm"),
-            new FilterField("fivecharminmaxcell", false, true, request.mapLength, "mapLength")
-        };
+        List<Supplier<String>> fields = Arrays.asList(
+                new FilterField("threecharminmaxcell", false, false, request.expectedPP, "expectedPP"),
+                new FilterField("threecharminmaxcell", false, false, request.perfectPP, "perfectPP"),
+                () -> formatNameFilter(request.getSearches().getSafeSearchText()),
+                () -> "<td></td>",
+                () -> "<td></td>",
+                new FilterField("threecharminmaxcell", true, false, request.aR, "aR"),
+                new FilterField("threecharminmaxcell", true, false, request.oD, "oD"),
+                new FilterField("threecharminmaxcell", true, false, request.cS, "cS"),
+                new FilterField("threecharminmaxcell", true, false, request.starDiff, "starDiff"),
+                new FilterField("threecharminmaxcell", false, false, request.bpm, "bpm"),
+                new FilterField("fivecharminmaxcell", false, true, request.mapLength, "mapLength"));
 
         StringBuilder html = new StringBuilder();
         html.append("<tr class=\"filter-row\">\n");
 
         html.append(
                 "<td><br /><button type=\"button\" onclick=\"modifyRule('.filter-row', 'display', 'none')\">hide filters</button></td>");
-        for (FilterField field : fields) {
-            html.append(field == null ? "<td></td>" : field.asCell());
+
+        for (Supplier<String> field : fields) {
+            html.append(field.get());
         }
         html.append("</tr>\n");
         return html.toString();
+    }
+
+    private static String formatNameFilter(String value) {
+        return String.format("""
+          <td class="namefiltercell">
+            <input type="text" size="25" hx-post="/htmx/beatmaps/update"
+              hx-ext="postrangerequest" hx-trigger="change"
+              hx-vals='js:{json:rangeReq({mod:{searches:{searchText:this.value}}})}'
+              hx-target=".table-container"
+              class="namefilter" value="%s" tabindex="-1" />
+          </td>
+          """, value);
     }
 
     private static String formatPagerRow(BeatmapRangeRequest request, int available) {
@@ -269,7 +288,7 @@ public class BeatmapTableResource {
             }
         }
 
-        html.append("</tr></thead><tbody");
+        html.append("</tr></thead>");
         return html;
     }
 
