@@ -24,6 +24,9 @@ a { color: var(--link-color); text-decoration: none; }
 .user-area { display: flex; align-items: center; gap: 10px; }
 .user-area .username { color: var(--deemph-color); }
 
+#settings-modal { padding: 20px; }
+#settings-modal input, #settings-modal button { margin-left: 0px; padding-left: 0px; }
+
 /* Beatmaps table */
 .table-container { position: absolute; bottom: 0px; width: 1100px; }
 .table-scroll { max-height: calc(100vh - 100px); overflow-y: auto; }

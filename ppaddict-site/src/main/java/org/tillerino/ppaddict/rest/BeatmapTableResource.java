@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.function.Supplier;
 import javax.annotation.CheckForNull;
 import javax.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.PersistentUserData;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
@@ -21,6 +22,7 @@ import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.*;
 
 @Path("/beatmaps")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BeatmapTableResource {
 
     private static final DecimalFormat format = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US));
@@ -29,12 +31,6 @@ public class BeatmapTableResource {
 
     private final BeatmapTableServiceImpl beatmapTableService;
     private final UserDataServiceImpl userDataService;
-
-    @Inject
-    public BeatmapTableResource(BeatmapTableServiceImpl beatmapTableService, UserDataServiceImpl userDataService) {
-        this.beatmapTableService = beatmapTableService;
-        this.userDataService = userDataService;
-    }
 
     @GET
     @Path("/initial")

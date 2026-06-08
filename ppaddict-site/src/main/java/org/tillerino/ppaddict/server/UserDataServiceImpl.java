@@ -234,6 +234,10 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
     @Override
     public void saveSettings(@Nonnull Settings s) throws PpaddictException {
         Credentials credentials = getCredentialsOrThrow();
+        saveSettings(s, credentials);
+    }
+
+    public void saveSettings(Settings s, Credentials credentials) throws PpaddictException {
         PersistentUserData data = getServerUserData(credentials);
         if (s.getRecommendationsParameters() != null) {
             try {

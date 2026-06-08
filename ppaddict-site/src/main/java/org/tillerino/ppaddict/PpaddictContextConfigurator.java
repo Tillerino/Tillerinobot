@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.tillerino.ppaddict.rest.BeatmapTableResource;
+import org.tillerino.ppaddict.rest.SettingsResource;
 import org.tillerino.ppaddict.rest.UserDataResource;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.PpaddictContextFilter;
@@ -26,6 +27,7 @@ public class PpaddictContextConfigurator {
 
     private final BeatmapTableResource beatmapTableResource;
     private final UserDataResource userDataResource;
+    private final SettingsResource settingsResource;
 
     private final AuthLeaveService authLeaveService;
     private final AuthArriveService authArriveService;
@@ -40,8 +42,10 @@ public class PpaddictContextConfigurator {
         addServlet(
                 deploymentInfo,
                 "/htmx/*",
-                new ServletContainer(
-                        new ResourceConfig().register(beatmapTableResource).register(userDataResource)));
+                new ServletContainer(new ResourceConfig()
+                        .register(beatmapTableResource)
+                        .register(userDataResource)
+                        .register(settingsResource)));
 
         addServlet(deploymentInfo, AuthLeaveService.PATH, authLeaveService);
         addServlet(deploymentInfo, AuthArriveService.PATH, authArriveService);

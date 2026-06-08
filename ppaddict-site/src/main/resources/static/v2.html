@@ -14,9 +14,14 @@
 <body>
     <div class="header-bar">
         <h1>ppaddict+!r</h1>
-        <div id="user-area" hx-get="/htmx/user" hx-trigger="load">Loading...</div>
+        <!-- noHeaders so that the preloaded requests can be matched. use a nested replace to avoid inheritance of hx-request. -->
+        <div id="user-area">
+            <span hx-get="/htmx/user" hx-trigger="load" hx-request='{"noHeaders": true}' hx-swap="outerHTML">Loading...</span>
+        </div>
     </div>
-    <div class="table-container" hx-get="/htmx/beatmaps/initial" hx-trigger="load">Loading beatmaps...</div>
+    <div class="table-container">
+        <span  hx-get="/htmx/beatmaps/initial" hx-trigger="load" hx-request='{"noHeaders": true}' hx-swap="outerHTML">Loading beatmaps...</span>
+    </div>
 </body>
 
 </html>
