@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.PersistentUserData;
 import org.tillerino.ppaddict.server.UserDataServiceImpl;
+import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.*;
 
 @Path("/beatmaps")
@@ -38,14 +39,16 @@ public class BeatmapTableResource {
     @GET
     @Path("/initial")
     @Produces(MediaType.TEXT_HTML)
-    public String getInitialTable(HttpServletRequest httpServletRequest)
+    public String getInitialTable(@Context HttpServletRequest httpServletRequest)
             throws PpaddictException, JsonProcessingException {
-        PersistentUserData userData = getUserData(httpServletRequest);
+        UserCredentials user = getUserDataAndCredentials(httpServletRequest);
+        PersistentUserData userData = user.userData;
+        Credentials credentials = user.credentials;
         BeatmapRangeRequest request = userData != null ? userData.getLastRequest() : null;
         if (request == null) {
             request = new BeatmapRangeRequest();
         }
-        String table = execute(false, request, userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS);
+        String table = execute(false, request, credentials, userData);
         return table
                 + "<script>window.__rangeRequest = %s</script>"
                         .formatted(new ObjectMapper().writeValueAsString(request));
@@ -60,31 +63,37 @@ public class BeatmapTableResource {
             @QueryParam("onlyRows") boolean onlyRows,
             BeatmapRangeRequest request)
             throws PpaddictException {
-        PersistentUserData userData = getUserData(httpServletRequest);
-
-        return execute(onlyRows, request, userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS);
+        UserCredentials user = getUserDataAndCredentials(httpServletRequest);
+        return execute(onlyRows, request, user.credentials, user.userData);
     }
 
-    @CheckForNull
-    private PersistentUserData getUserData(HttpServletRequest httpServletRequest) throws PpaddictException {
+    private UserCredentials getUserDataAndCredentials(HttpServletRequest httpServletRequest) throws PpaddictException {
         PersistentUserData userData = null;
-        var credentials = userDataService.getCredentials(httpServletRequest);
+        Credentials credentials = userDataService.getCredentials(httpServletRequest);
         if (credentials != null) {
             userData = userDataService.getServerUserData(credentials);
         }
-        return userData;
+        return new UserCredentials(credentials, userData);
     }
 
-    private String execute(boolean onlyRows, BeatmapRangeRequest request, Settings settings) throws PpaddictException {
-        BeatmapBundle bundle = beatmapTableService.getRange(request);
+    private String execute(
+            boolean onlyRows,
+            BeatmapRangeRequest request,
+            @CheckForNull Credentials credentials,
+            @CheckForNull PersistentUserData userData)
+            throws PpaddictException {
+        BeatmapBundle bundle = beatmapTableService.executeGetRange(request, credentials, userData);
 
         StringBuilder html = new StringBuilder();
         if (!onlyRows) {
             html.append("<div class=\"table-scroll\">");
-            html.append(formatBeatmapsTableHeader(settings, request.sortBy, request.direction));
+            html.append(formatBeatmapsTableHeader(
+                    userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS,
+                    request.sortBy,
+                    request.direction));
             html.append("<tbody>");
         }
-        for (var beatmap : bundle.beatmaps) {
+        for (Beatmap beatmap : bundle.beatmaps) {
             formatBeatmapTablesRow(beatmap, html);
         }
 
@@ -326,4 +335,8 @@ public class BeatmapTableResource {
                 .append("<td class=\"numeric-cell\">" + beatmap.getFormattedLength() + "</td>")
                 .append("</tr>");
     }
+
+    private record UserCredentials(
+            @CheckForNull Credentials credentials,
+            @CheckForNull PersistentUserData userData) {}
 }
