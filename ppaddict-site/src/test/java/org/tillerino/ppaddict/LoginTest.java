@@ -1,9 +1,7 @@
 package org.tillerino.ppaddict;
 
-import static java.nio.file.Paths.get;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.microsoft.playwright.Page;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import org.junit.jupiter.api.Test;
 
