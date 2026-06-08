@@ -16,9 +16,12 @@ body, button, input { font-family: 'Cabin', sans-serif; font-size: 16px; }
 button { border: none; background: none; text-decoration: underline; cursor: pointer; color: var(--deemph-color); }
 h1 { font-size: 36pt; font-weight: 400; margin-left: .3em; margin-top: .3em; }
 a { color: var(--link-color); text-decoration: none; }
+.chilla { color: var(--deemph-color); text-decoration: underline; }
 
-.numeric-cell { text-align: right; }
+.header-bar { width: 1100px; display: flex; justify-content: space-between; align-items: center; }
 
+.user-area { display: flex; align-items: center; gap: 10px; }
+.user-area .username { color: var(--deemph-color); }
 
 /* Beatmaps table */
 .table-container { position: absolute; bottom: 0px; width: 1100px; }
@@ -27,11 +30,7 @@ table.beatmaps { border-collapse: collapse; width: 100%; table-layout: fixed; }
 table.beatmaps td, table.beatmaps th { padding: 10px; }
 table.beatmaps thead th { position: sticky; top: 0; background: white; z-index: 1; white-space: nowrap; color: var(--deemph-color); }
 table.beatmaps tbody tr:hover { background-color: #ddd; }
-
-/* Pager below the table */
-.pager-row { position: sticky; bottom: 0; background: white; z-index: 9; }
-.pager { text-align: center; padding: 10px; color: var(--deemph-color); }
-.pager button { text-decoration: none; }
+.numeric-cell { text-align: right; }
 
 /* Filter inputs */
 .threecharminmaxcell { width: 35px; text-align: right; }
@@ -66,5 +65,11 @@ input, .chillinput:focus {
 }
 
 .filter-row td { padding: 4px; vertical-align: top; }
-
 .filter-row label { white-space: nowrap; }
+
+.pager-row { position: sticky; bottom: 0; background: white; z-index: 9; }
+.pager { text-align: center; padding: 10px; color: var(--deemph-color); }
+.pager button { text-decoration: none; }
+
+dialog { border: none; border-radius: 1px; padding: 5px; background: white; margin: 0px; position: absolute; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.5); }

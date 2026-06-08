@@ -5,66 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ppaddict v2</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preload" href="/Cabin-SemiBold.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="/htmx/user" as="fetch" crossorigin>
+    <link rel="preload" href="/htmx/beatmaps/initial" as="fetch" crossorigin>
     <script src="htmx-2.0.10.min.js"></script>
-    <script>
-        function toTime(value) {
-            var p = value.split(':');
-            var i = parseInt(p[0]);
-            var s = parseInt(p[1]);
-            return isNaN(i + s) ? null : i * 60 + s;
-        }
-
-        function rangeReq(obj) {
-            var base = window.__rangeRequest;
-            if (obj.copy) {
-                base = JSON.parse(JSON.stringify(base));
-                deepMerge(base, obj.copy)
-            } else {
-                deepMerge(base, obj.mod)
-            }
-            return JSON.stringify(base)
-        }
-
-        htmx.defineExtension('postrangerequest', {
-            onEvent: function (name, evt) {
-                if (name === "htmx:configRequest") {
-                    evt.detail.headers['Content-Type'] = "application/json"
-                }
-            },
-            encodeParameters: function(xhr, parameters, elt) {
-                return parameters.json
-            }
-        });
-
-        function deepMerge(target, source) {
-            for (const key in source) {
-                if (source[key] != null && typeof source[key] === 'object') {
-                    target[key] = target[key] || {};
-                    deepMerge(target[key], source[key]);
-                } else {
-                    target[key] = source[key];
-                }
-            }
-        }
-
-        function modifyRule(selector, property, value) {
-          for (const sheet of document.styleSheets) {
-            for (const rule of sheet.cssRules) {
-              if (rule.selectorText === selector) {
-                rule.style.setProperty(property, value);
-                return true;
-              }
-            }
-          }
-          return false;
-        }
-    </script>
+    <script src="code.js"></script>
 </head>
 <body>
-    <h1>ppaddict+!r</h1>
-    <div class="table-container" hx-get="/htmx/beatmaps/initial" hx-trigger="load">
-        Loading beatmaps...
+    <div class="header-bar">
+        <h1>ppaddict+!r</h1>
+        <div id="user-area" hx-get="/htmx/user" hx-trigger="load">Loading...</div>
     </div>
+    <div class="table-container" hx-get="/htmx/beatmaps/initial" hx-trigger="load">Loading beatmaps...</div>
 </body>
 
 </html>
