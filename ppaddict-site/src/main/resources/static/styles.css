@@ -52,8 +52,9 @@ input, .chillinput:focus {
   text-decoration: none;
   outline: none;
   border: solid 1px var(--deemph-color);
-  cursor: text;
 }
+
+.chillinput:focus { cursor: text; }
 
 .filter-row {
   position: sticky;
@@ -65,3 +66,5 @@ input, .chillinput:focus {
 }
 
 .filter-row td { padding: 4px; vertical-align: top; }
+
+.filter-row label { white-space: nowrap; }

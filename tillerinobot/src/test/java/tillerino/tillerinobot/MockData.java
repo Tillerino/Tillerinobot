@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import lombok.Getter;
 import org.tillerino.osuApiModel.Mods;
+import org.tillerino.osuApiModel.OsuApiBeatmap;
 import tillerino.tillerinobot.data.ApiBeatmap;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.diff.*;
@@ -155,6 +156,13 @@ public class MockData {
             beatmap.setCircleSize(diff + 1);
             beatmap.setBpm(50 * Math.pow(2, diff * .4 + rand.nextDouble()));
             beatmap.setMaxCombo(100);
+            if (beatmapid % 3 == 0) {
+                beatmap.setApproved(OsuApiBeatmap.APPROVED);
+            } else if (beatmapid % 3 == 1) {
+                beatmap.setApproved(OsuApiBeatmap.RANKED);
+            } else {
+                beatmap.setApproved(OsuApiBeatmap.GRAVEYARD);
+            }
         }
         return beatmap;
     }

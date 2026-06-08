@@ -34,9 +34,9 @@ class FiltersTest extends AbstractPlaywrightTest {
 
         page.locator(".pager-row td:first-child button").click();
 
-        // 8 numeric filter fields x 2 inputs (min + max) + 1 name filter = 17 inputs
+        // 8 numeric filter fields x 2 inputs (min + max) + 1 name filter + 1 checkbox = 18 inputs
         var allInputs = page.locator(".filter-row input");
-        PlaywrightAssertions.assertThat(allInputs).hasCount(17);
+        PlaywrightAssertions.assertThat(allInputs).hasCount(18);
 
         // expectedPP - first .threecharminmaxcell cell, integer defaults to 0
         var threeCharCells = page.locator(".filter-row td.threecharminmaxcell");
@@ -140,6 +140,31 @@ class FiltersTest extends AbstractPlaywrightTest {
                 "Hatsune",
                 text -> text.toLowerCase().contains("hatsune"),
                 text -> assertThat(text.toLowerCase()).contains("hatsune"));
+    }
+
+    @Test
+    void rankedOnlyFilterReducesRows() {
+        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.waitForSelector("table.beatmaps");
+
+        page.locator(".pager-row td:first-child button").click();
+
+        var rankedCheckbox = page.locator(".filter-row td:first-child input[type=checkbox]");
+        var namesBefore = page.locator("tbody tr td:nth-of-type(4) a").allTextContents();
+        assertThat(namesBefore).isNotEmpty();
+
+        rankedCheckbox.click();
+        page.waitForResponse("**/htmx/beatmaps/update**", () -> {});
+
+        var namesAfter = page.locator("tbody tr td:nth-of-type(4) a").allTextContents();
+        assertThat(namesAfter).isNotEmpty();
+        assertThat(namesAfter).isNotEqualTo(namesBefore);
+
+        rankedCheckbox.click();
+        page.waitForResponse("**/htmx/beatmaps/update**", () -> {});
+
+        var namesRestored = page.locator("tbody tr td:nth-of-type(4) a").allTextContents();
+        assertThat(namesRestored).isEqualTo(namesBefore);
     }
 
     private static int toSeconds(String text) {

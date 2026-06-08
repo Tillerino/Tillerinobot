@@ -183,8 +183,18 @@ public class BeatmapTableResource {
         StringBuilder html = new StringBuilder();
         html.append("<tr class=\"filter-row\">\n");
 
-        html.append(
-                "<td><br /><button type=\"button\" onclick=\"modifyRule('.filter-row', 'display', 'none')\">hide filters</button></td>");
+        html.append(String.format("""
+                <td>
+                  <label><input type="checkbox" %s
+                    hx-post="/htmx/beatmaps/update"
+                    hx-ext="postrangerequest"
+                    hx-trigger="change"
+                    hx-vals='js:{json:rangeReq({mod:{rankedOnly:this.checked}})}'
+                    hx-target=".table-container" class="namefilter" /> ranked only</label>
+                  <br />
+                  <button type="button" onclick="modifyRule('.filter-row', 'display', 'none')">hide filters</button>
+                </td>""",
+                request.rankedOnly ? "checked" : ""));
 
         for (Supplier<String> field : fields) {
             html.append(field.get());
