@@ -63,7 +63,8 @@ public class WireMockDocker implements BeforeEachCallback, AfterEachCallback {
                                             .toAbsolutePath()
                                             .toString())
                                     .withTarget("/home/wiremock/__files")
-                                    .withType(MountType.BIND)))));
+                                    .withType(MountType.BIND)))))
+            .withReuse(true);
     private static final WireMock CLIENT;
 
     static {
