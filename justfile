@@ -25,6 +25,7 @@ install:
   mvn clean install -DskipTests -Dspotbugs.skip=true -T 2
 
 single-ppaddict-test name:
+  mvn spotless:apply -T 99
   mvn -Dmaven.repo.local={{justfile_directory()}}/.m2/repository clean spotless:apply install {{skipChecks}} -Dgwt.skipCompilation=true -pl :ppaddict-site -am -T 99
   mvn -Dmaven.repo.local={{justfile_directory()}}/.m2/repository test -Dtest={{ quote(name) }} -Dgwt.skipCompilation=true -pl :ppaddict-site
 
