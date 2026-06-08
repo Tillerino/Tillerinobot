@@ -14,6 +14,7 @@
 
 body, button, input { font-family: 'Cabin', sans-serif; font-size: 16px; }
 button { border: none; background: none; text-decoration: underline; cursor: pointer; color: var(--deemph-color); }
+button:disabled { cursor: auto; }
 h1 { font-size: 36pt; font-weight: 400; margin-left: .3em; margin-top: .3em; }
 a { color: var(--link-color); text-decoration: none; }
 .chilla { color: var(--deemph-color); text-decoration: underline; }

@@ -193,8 +193,7 @@ public class BeatmapTableResource {
                     hx-target=".table-container" class="namefilter" /> ranked only</label>
                   <br />
                   <button type="button" onclick="modifyRule('.filter-row', 'display', 'none')">hide filters</button>
-                </td>""",
-                request.rankedOnly ? "checked" : ""));
+                </td>""", request.rankedOnly ? "checked" : ""));
 
         for (Supplier<String> field : fields) {
             html.append(field.get());
@@ -243,7 +242,7 @@ public class BeatmapTableResource {
                       hx-vals='js:{json: rangeReq({mod:{ start: %s }})}'
                       hx-target=".table-container">%s</button>""", pageStart, label);
         }
-        return "<span>" + label + "</span>";
+        return "<button disabled>" + label + "</button>";
     }
 
     private static StringBuilder formatBeatmapsTableHeader(

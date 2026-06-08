@@ -15,14 +15,12 @@ class LoginTest extends AbstractPlaywrightTest {
         page.waitForResponse("**/htmx/user**", () -> {});
         page.waitForResponse("**/htmx/beatmaps**", () -> {});
 
-        page.screenshot(new Page.ScreenshotOptions().setPath(get("screenshot1.png")));
         PlaywrightAssertions.assertThat(page.locator("#user-area button:has-text('Login')"))
                 .isVisible();
 
         page.locator("#user-area button:has-text('Login')").click();
 
         assertThat(page.locator("#login-modal").getAttribute("open")).isNotNull();
-        page.screenshot(new Page.ScreenshotOptions().setPath(get("screenshot2.png")));
 
         page.locator("#login-modal a").click();
         page.waitForLoadState();
@@ -34,7 +32,6 @@ class LoginTest extends AbstractPlaywrightTest {
         page.waitForLoadState();
         page.waitForSelector("#user-area .username");
 
-        page.screenshot(new Page.ScreenshotOptions().setPath(get("screenshot3.png")));
         PlaywrightAssertions.assertThat(page.locator("#user-area .username")).isVisible();
         assertThat(page.locator("#user-area .username").textContent()).isEqualTo("TestUser");
 
@@ -42,7 +39,6 @@ class LoginTest extends AbstractPlaywrightTest {
         page.waitForLoadState();
         page.waitForSelector("#user-area button:has-text('Login')");
 
-        page.screenshot(new Page.ScreenshotOptions().setPath(get("screenshot4.png")));
         PlaywrightAssertions.assertThat(page.locator("#user-area button:has-text('Login')"))
                 .isVisible();
     }
