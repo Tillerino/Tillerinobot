@@ -48,8 +48,12 @@ public class SettingsResource {
         settings.setOpenDirectOnMapSelect(openDirectOnMapSelect);
         settings.setApplyOtherFiltersWithTextFilter(applyOtherFiltersWithTextFilter);
 
-        if (recommendationsParameters != null && !recommendationsParameters.equals("*")) {
+        if (recommendationsParameters != null
+                && !recommendationsParameters.isEmpty()
+                && !recommendationsParameters.equals("*")) {
             settings.setRecommendationsParameters(recommendationsParameters);
+        } else {
+            settings.setRecommendationsParameters(null);
         }
 
         double lowAcc = 93;

@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 class SettingsTest extends AbstractPlaywrightTest {
 
-    @Test
-    void saveAndResetSettings() {
+    private void loginAndLink() throws Exception {
         page.navigate("http://localhost:" + getPort() + "/v2.html");
         page.waitForResponse("**/htmx/user**", () -> {});
         page.waitForResponse("**/htmx/beatmaps**", () -> {});
@@ -22,53 +21,74 @@ class SettingsTest extends AbstractPlaywrightTest {
         page.waitForLoadState();
         page.waitForSelector("#user-area .username");
 
+        String token = userDataService.getLinkString("local:TestUser", "TestUser");
+        userDataService.tryLinkToPpaddict(token, 12345);
+    }
+
+    @Test
+    void settingsSaveAndClear() throws Exception {
+        loginAndLink();
+
+        // Default values
+        openSettings();
+        PlaywrightAssertions.assertThat(page.locator("#settings-modal")).isVisible();
+        assertSetting("recommendationsParameters", "*");
+        assertSetting("lowAccuracy", "93");
+        assertSetting("highAccuracy", "100");
+        closeSettings();
+
+        // Set custom values
+        openSettings();
+        setSetting("lowAccuracy", "80");
+        setSetting("highAccuracy", "90");
+        setSetting("recommendationsParameters", "gamma AR=9");
+        saveSettings();
+        closeSettings();
+
+        openSettings();
+        assertSetting("lowAccuracy", "80");
+        assertSetting("highAccuracy", "90");
+        assertSetting("recommendationsParameters", "gamma AR=9");
+        closeSettings();
+
+        // Clear values
+        openSettings();
+        setSetting("lowAccuracy", "");
+        setSetting("highAccuracy", "");
+        setSetting("recommendationsParameters", "");
+        saveSettings();
+        closeSettings();
+
+        openSettings();
+        assertSetting("lowAccuracy", "93");
+        assertSetting("highAccuracy", "100");
+        assertSetting("recommendationsParameters", "*");
+        closeSettings();
+    }
+
+    private void openSettings() {
         page.locator("#user-area button:has-text('Settings')").click();
         page.waitForSelector("#settings-modal input[name='openDirectOnMapSelect']");
-        PlaywrightAssertions.assertThat(page.locator("#settings-modal")).isVisible();
-        assertThat(page.locator("#settings-modal input[name='recommendationsParameters']")
-                        .inputValue())
-                .isEqualTo("*");
+    }
 
-        page.locator("#settings-modal input[name='lowAccuracy']").fill("95");
+    private void closeSettings() {
+        page.locator("#settings-modal").evaluate("el => el.close()");
+    }
+
+    private void saveSettings() {
         page.locator("#settings-modal button:has-text('Save')").click();
-        page.waitForTimeout(2000);
         PlaywrightAssertions.assertThat(page.locator("#settings-save-result")).hasText("Saved.");
-        page.locator("#settings-modal").evaluate("el => el.close()");
+    }
 
-        page.locator("#user-area button:has-text('Settings')").click();
-        page.waitForSelector("#settings-modal input[name='lowAccuracy']");
-        assertThat(page.locator("#settings-modal input[name='lowAccuracy']").inputValue())
-                .isEqualTo("95");
-        page.locator("#settings-modal input[name='lowAccuracy']").fill("80");
-        page.locator("#settings-modal input[name='highAccuracy']").fill("90");
-        page.locator("#settings-modal button:has-text('Save')").click();
-        page.waitForTimeout(2000);
-        PlaywrightAssertions.assertThat(page.locator("#settings-save-result")).hasText("Saved.");
-        page.locator("#settings-modal").evaluate("el => el.close()");
+    private void setSetting(String name, String value) {
+        page.locator("#settings-modal input[name='" + name + "']").fill(value);
+    }
 
-        page.locator("#user-area button:has-text('Settings')").click();
-        page.waitForSelector("#settings-modal input[name='lowAccuracy']");
-        assertThat(page.locator("#settings-modal input[name='lowAccuracy']").inputValue())
-                .isEqualTo("80");
-        assertThat(page.locator("#settings-modal input[name='highAccuracy']").inputValue())
-                .isEqualTo("90");
-        page.locator("#settings-modal").evaluate("el => el.close()");
+    private String getSetting(String name) {
+        return page.locator("#settings-modal input[name='" + name + "']").inputValue();
+    }
 
-        page.locator("#user-area button:has-text('Settings')").click();
-        page.waitForSelector("#settings-modal input[name='lowAccuracy']");
-        page.locator("#settings-modal input[name='lowAccuracy']").fill("");
-        page.locator("#settings-modal input[name='highAccuracy']").fill("");
-        page.locator("#settings-modal button:has-text('Save')").click();
-        page.waitForTimeout(2000);
-        PlaywrightAssertions.assertThat(page.locator("#settings-save-result")).hasText("Saved.");
-        page.locator("#settings-modal").evaluate("el => el.close()");
-
-        page.locator("#user-area button:has-text('Settings')").click();
-        page.waitForSelector("#settings-modal input[name='lowAccuracy']");
-        assertThat(page.locator("#settings-modal input[name='lowAccuracy']").inputValue())
-                .isEqualTo("93");
-        assertThat(page.locator("#settings-modal input[name='highAccuracy']").inputValue())
-                .isEqualTo("100");
-        page.locator("#settings-modal").evaluate("el => el.close()");
+    private void assertSetting(String name, String expected) {
+        assertThat(getSetting(name)).isEqualTo(expected);
     }
 }

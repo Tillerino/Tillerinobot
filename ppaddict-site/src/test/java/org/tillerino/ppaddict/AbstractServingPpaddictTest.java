@@ -1,5 +1,9 @@
 package org.tillerino.ppaddict;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+
 import dagger.Component;
 import io.undertow.Undertow;
 import java.net.InetSocketAddress;
@@ -18,8 +22,11 @@ import org.tillerino.ppaddict.chat.impl.ProcessorsModule;
 import org.tillerino.ppaddict.chat.local.InMemoryQueuesModule;
 import org.tillerino.ppaddict.mockmodules.LiveActivityMockModule;
 import org.tillerino.ppaddict.server.PpaddictBackend;
+import org.tillerino.ppaddict.server.PpaddictUserDataService;
 import org.tillerino.ppaddict.util.TestClock;
 import tillerino.tillerinobot.*;
+import tillerino.tillerinobot.data.ApiUser;
+import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.recommendations.Recommender;
 
@@ -70,6 +77,18 @@ public class AbstractServingPpaddictTest extends AbstractDatabaseTest {
     @Inject
     Recommender standardRecommender;
 
+    @Inject
+    PpaddictUserDataService userDataService;
+
+    @Inject
+    BotBackend botBackend;
+
+    @Inject
+    OsuApi osuApi;
+
+    @Inject
+    PullThrough pullThrough;
+
     private Undertow server;
 
     @Getter
@@ -83,6 +102,14 @@ public class AbstractServingPpaddictTest extends AbstractDatabaseTest {
     void startUndertow() throws Exception {
         TestBase.mockBeatmapMetas(diffEstimateProvider);
         TestBase.mockRecommendations(standardRecommender);
+        ApiUser apiUser = new ApiUser();
+        apiUser.setUserId(12345);
+        apiUser.setUserName("TestUser");
+        apiUser.setRank(0);
+        apiUser.setPp(0);
+        apiUser.setCountry("XX");
+        doReturn(apiUser).when(pullThrough).getUser(eq(12345), anyLong());
+        doReturn(1).when(botBackend).getDonator(12345);
         server = Undertow.builder()
                 .addHttpListener(0, "localhost")
                 .setHandler(PpaddictModule.createFilterPathHandler(deploymentInfo -> {
