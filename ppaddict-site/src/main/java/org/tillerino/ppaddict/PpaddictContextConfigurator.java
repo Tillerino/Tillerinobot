@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.tillerino.ppaddict.rest.BeatmapTableResource;
+import org.tillerino.ppaddict.rest.RootServlet;
 import org.tillerino.ppaddict.rest.SettingsResource;
 import org.tillerino.ppaddict.rest.UserDataResource;
 import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
@@ -39,6 +40,7 @@ public class PpaddictContextConfigurator {
         addServlet(deploymentInfo, "/ppaddict/beatmaps", beatmapTableService);
         addServlet(deploymentInfo, "/ppaddict/user", userDataService);
         addServlet(deploymentInfo, "/ppaddict/recommendations", recommendationsService);
+        addServlet(deploymentInfo, "/v2.html", new RootServlet());
         addServlet(
                 deploymentInfo,
                 "/htmx/*",
