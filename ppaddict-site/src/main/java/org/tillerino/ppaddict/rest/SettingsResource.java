@@ -84,6 +84,37 @@ public class SettingsResource {
                 <div style="color: green;">Saved.</div>""";
     }
 
+    @GET
+    @Path("/apikey")
+    @Produces(MediaType.TEXT_HTML)
+    public String apiKeyDialog(@Context HttpServletRequest request) {
+        return """
+            <div id="apikey-confirm-content">
+              <p>This will revoke any existing API key. Are you sure?</p>
+              <button hx-post="/htmx/user/settings/apikey" hx-target="#apikey-confirm-content" hx-swap="innerHTML">Confirm</button>
+            </div>""";
+    }
+
+    @POST
+    @Path("/apikey")
+    @Produces(MediaType.TEXT_HTML)
+    public String createApiKey(@Context HttpServletRequest request) {
+        try {
+            String key = userDataService.createApiKey(userDataService.getCredentialsOrThrow(request));
+            return """
+                    Your new API key is:
+                    <br />
+                    <br />
+                    <code style="word-break: break-all;">%s</code>
+                    <br />
+                    <br />
+                    Make sure you save it - you won't be able to access it again.""".formatted(key);
+        } catch (PpaddictException e) {
+            return """
+                    <p style="color: red;">%s</p>""".formatted(e.getMessage());
+        }
+    }
+
     private String renderSettingsDialog(Settings settings) {
         String openDirect = settings.isOpenDirectOnMapSelect() ? "checked" : "";
         String otherFilters = settings.isApplyOtherFiltersWithTextFilter() ? "checked" : "";
@@ -97,11 +128,13 @@ public class SettingsResource {
                 <form hx-post="/htmx/user/settings" hx-target="#settings-save-result">
                   <p><input type="checkbox" name="openDirectOnMapSelect" %s> Open map in osu!direct when selected</p>
                   <p><input type="checkbox" name="applyOtherFiltersWithTextFilter" %s> Apply other filters when searching in name or notes</p>
+                  <p><button hx-get="/htmx/user/settings/apikey" hx-target="#apikey-confirm-modal" hx-on::after-request="positionRelativeTo(document.getElementById('apikey-confirm-modal'), this)" command="show-modal" commandfor="apikey-confirm-modal">Create API key</button></p>
                   <p>Recommendations settings:<br /><input type="text" name="recommendationsParameters" value="%s" /></p>
                   <p>Accuracy (%%) <input type="text" name="lowAccuracy" value="%s" style="width: 50px;" /> - <input type="text" name="highAccuracy" value="%s" style="width: 50px;" /></p>
                   <p id="settings-save-result"></p>
                   <button type="submit">Save</button>
                 </form>
+                <dialog id="apikey-confirm-modal" class="modal" closedby="any" top="bottom" left="left" />
                 """.formatted(openDirect, otherFilters, recParams, lowAcc, highAcc);
     }
 }

@@ -407,7 +407,11 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
     @Override
     public String createApiKey() throws PpaddictException {
-        int osuUserId = getServerUserData(getCredentialsOrThrow()).getLinkedOsuIdOrThrow();
+        return createApiKey(getCredentialsOrThrow());
+    }
+
+    public String createApiKey(Credentials credentialsOrThrow) throws PpaddictException {
+        int osuUserId = getServerUserData(credentialsOrThrow).getLinkedOsuIdOrThrow();
         return apiAuthenticationService.createKey(apiAuthKey, osuUserId);
     }
 }

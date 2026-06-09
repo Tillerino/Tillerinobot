@@ -66,6 +66,26 @@ class SettingsTest extends AbstractPlaywrightTest {
         closeSettings();
     }
 
+    @Test
+    void apiKeyCreation() throws Exception {
+        loginAndLink();
+
+        openSettings();
+        page.locator("#settings-modal button:has-text('Create API key')").click();
+        page.waitForSelector("#apikey-confirm-modal");
+        PlaywrightAssertions.assertThat(page.locator("#apikey-confirm-modal")).isVisible();
+
+        page.locator("#apikey-confirm-modal button:has-text('Confirm')").click();
+        page.waitForSelector("#apikey-confirm-modal code");
+        PlaywrightAssertions.assertThat(page.locator("#apikey-confirm-modal code"))
+                .isVisible();
+
+        String apiKey = page.locator("#apikey-confirm-modal code").textContent();
+        assertThat(apiKey).isNotNull();
+        assertThat(apiKey).isNotEmpty();
+        assertThat(apiKey).hasSize(40);
+    }
+
     private void openSettings() {
         page.locator("#user-area button:has-text('Settings')").click();
         page.waitForSelector("#settings-modal input[name='openDirectOnMapSelect']");

@@ -1,5 +1,8 @@
 package org.tillerino.ppaddict;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -110,6 +113,9 @@ public class AbstractServingPpaddictTest extends AbstractDatabaseTest {
         apiUser.setCountry("XX");
         doReturn(apiUser).when(pullThrough).getUser(eq(12345), anyLong());
         doReturn(1).when(botBackend).getDonator(12345);
+        WireMockDocker.mockServer()
+                .register(post(urlPathEqualTo("/auth/authentication"))
+                        .willReturn(aResponse().withBody("a".repeat(40)).withHeader("Content-Type", "text/plain")));
         server = Undertow.builder()
                 .addHttpListener(0, "localhost")
                 .setHandler(PpaddictModule.createFilterPathHandler(deploymentInfo -> {
