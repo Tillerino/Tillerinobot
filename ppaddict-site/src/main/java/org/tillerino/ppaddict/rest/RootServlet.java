@@ -10,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 public class RootServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.getOutputStream().write("""
+        String queryString = req.getQueryString();
+        String html = String.format(
+                """
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -20,7 +22,7 @@ public class RootServlet extends HttpServlet {
                 <link rel="stylesheet" href="styles.css">
                 <link rel="preload" href="/Cabin-SemiBold.ttf" as="font" type="font/ttf" crossorigin>
                 <link rel="preload" href="/htmx/user" as="fetch" crossorigin>
-                <link rel="preload" href="/htmx/beatmaps/initial" as="fetch" crossorigin>
+                <link rel="preload" href="/htmx/beatmaps/initial%s" as="fetch" crossorigin>
                 <script src="htmx-2.0.10.min.js"></script>
                 <script src="code.js"></script>
             </head>
@@ -33,10 +35,11 @@ public class RootServlet extends HttpServlet {
                     </div>
                 </div>
                 <div class="table-container">
-                    <span  hx-get="/htmx/beatmaps/initial" hx-trigger="load" hx-request='{"noHeaders": true}' hx-swap="outerHTML">Loading beatmaps...</span>
+                    <span  hx-get="/htmx/beatmaps/initial%s" hx-trigger="load" hx-request='{"noHeaders": true}' hx-swap="outerHTML">Loading beatmaps...</span>
                 </div>
             </body>
             </html>
-            """.getBytes(StandardCharsets.UTF_8));
+            """, queryString != null ? "?" + queryString : "", queryString != null ? "?" + queryString : "");
+        resp.getOutputStream().write(html.getBytes(StandardCharsets.UTF_8));
     }
 }

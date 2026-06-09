@@ -35,15 +35,17 @@ public class BeatmapTableResource {
     @GET
     @Path("/initial")
     @Produces(MediaType.TEXT_HTML)
-    public String getInitialTable(@Context HttpServletRequest httpServletRequest)
+    public String getInitialTable(
+            @Context HttpServletRequest httpServletRequest,
+            @QueryParam("s") Integer setId,
+            @QueryParam("b") Integer beatmapId)
             throws PpaddictException, JsonProcessingException {
         UserCredentials user = getUserDataAndCredentials(httpServletRequest);
         PersistentUserData userData = user.userData;
         Credentials credentials = user.credentials;
-        BeatmapRangeRequest request = userData != null ? userData.getLastRequest() : null;
-        if (request == null) {
-            request = new BeatmapRangeRequest();
-        }
+        BeatmapRangeRequest request = userData != null ? userData.getLastRequest() : new BeatmapRangeRequest();
+        request.getSearches().setSetId(setId);
+        request.getSearches().setBeatmapId(beatmapId);
         String table = execute(false, request, credentials, userData);
         return table
                 + "<script>window.__rangeRequest = %s</script>"
@@ -112,9 +114,19 @@ public class BeatmapTableResource {
                     .append("<tfoot>")
                     .append(formatFilterRow(request))
                     .append(formatPagerRow(request, bundle.available))
-                    .append("</tfoot></table></div>");
+                    .append("</tfoot></table></div>")
+                    .append(formatMoreDialog());
         }
         return html.toString();
+    }
+
+    private String formatMoreDialog() {
+        return """
+        <dialog id="more-dialog" closedby="any" top="bottom" right="right">
+          <a id="more-dialog-beatmap-link">Show all mods</a>
+          <br />
+          <a id="more-dialog-set-link">Show entire set</a>
+        </dialog>""";
     }
 
     record FilterField(String cssClass, boolean isDecimal, boolean isTime, MinMax range, String fieldName)
@@ -308,7 +320,7 @@ public class BeatmapTableResource {
 
     private static void formatBeatmapTablesRow(Beatmap beatmap, StringBuilder html) {
         // one append per column
-        html.append("<tr>")
+        html.append("<tr data-beatmapid=\"%d\" data-beatmapsetid=\"%d\">".formatted(beatmap.beatmapid, beatmap.setid))
                 .append("""
                     <td>
                       <a href="http://osu.ppy.sh/beatmapsets/%d/download"><img src="//b.ppy.sh/thumb/%d.jpg" height="60" loading="lazy" style="vertical-align:middle"></a>
@@ -317,11 +329,17 @@ public class BeatmapTableResource {
                 .append("<td class=\"numeric-cell\">" + ppFormat.format(beatmap.lowPP) + "</td>")
                 .append("<td class=\"numeric-cell\">" + ppFormat.format(beatmap.highPP) + "</td>")
                 .append("""
-                    <td>
-                      <a href="http://osu.ppy.sh/b/%s" target="_blank">%s - %s [%s]</a>
-                    </td>""".formatted(beatmap.beatmapid, beatmap.artist, beatmap.title, beatmap.version))
+                     <td>
+                       <a href="http://osu.ppy.sh/b/%s" target="_blank">%s - %s [%s]</a> %s
+                     </td>""".formatted(
+                                beatmap.beatmapid,
+                                beatmap.artist,
+                                beatmap.title,
+                                beatmap.version,
+                                beatmap.mods != null ? beatmap.mods : ""))
                 .append("<td></td>")
-                .append("<td></td>")
+                .append(
+                        "<td><button type=\"button\" command=\"show-modal\" commandfor=\"more-dialog\" onclick=\"updateMoreDialogLinks(this.closest('tr'))\">...</button></td>")
                 .append("<td class=\"numeric-cell\">AR" + format.format(beatmap.approachRate) + "</td>")
                 .append("<td class=\"numeric-cell\">OD" + format.format(beatmap.overallDiff) + "</td>")
                 .append("<td class=\"numeric-cell\">CS" + format.format(beatmap.circleSize) + "</td>")

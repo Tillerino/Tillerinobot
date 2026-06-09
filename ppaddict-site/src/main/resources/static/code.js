@@ -65,6 +65,11 @@ function positionRelativeTo(element, reference) {
     });
 }
 
+function updateMoreDialogLinks(row) {
+    document.getElementById('more-dialog-beatmap-link').href = '?b=' + row.getAttribute('data-beatmapid');
+    document.getElementById('more-dialog-set-link').href = '?s=' + row.getAttribute('data-beatmapsetid');
+}
+
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[command="show-modal"]');
     if (!btn) return;

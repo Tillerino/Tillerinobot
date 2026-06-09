@@ -36,6 +36,8 @@ table.beatmaps thead th { position: sticky; top: 0; background: white; z-index: 
 table.beatmaps tbody tr:hover { background-color: #ddd; }
 .numeric-cell { text-align: right; }
 
+#more-dialog { padding: 15px; }
+
 /* Filter inputs */
 .threecharminmaxcell { width: 35px; text-align: right; }
 .fivecharminmaxcell { width: 45px; text-align: right; }
