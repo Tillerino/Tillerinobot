@@ -43,7 +43,9 @@ public class BeatmapTableResource {
         UserCredentials user = getUserDataAndCredentials(httpServletRequest);
         PersistentUserData userData = user.userData;
         Credentials credentials = user.credentials;
-        BeatmapRangeRequest request = userData != null ? userData.getLastRequest() : new BeatmapRangeRequest();
+        BeatmapRangeRequest request = userData != null && userData.getLastRequest() != null
+                ? userData.getLastRequest()
+                : new BeatmapRangeRequest();
         request.getSearches().setSetId(setId);
         request.getSearches().setBeatmapId(beatmapId);
         String table = execute(false, request, credentials, userData);

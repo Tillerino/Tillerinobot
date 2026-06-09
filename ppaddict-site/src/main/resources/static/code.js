@@ -79,3 +79,30 @@ document.addEventListener('click', function(e) {
     dialog.showModal();
     positionRelativeTo(dialog, btn);
 });
+
+var _countdownInterval = null;
+
+function startCountdown(seconds, onComplete) {
+    if (_countdownInterval) {
+        clearInterval(_countdownInterval);
+    }
+    var resultEl = document.getElementById('settings-save-result');
+    var remaining = seconds;
+    var dialog = document.getElementById('settings-modal');
+    resultEl.textContent = 'Reloading in ' + remaining + 's...';
+    _countdownInterval = setInterval(function() {
+        if (dialog && !dialog.open) {
+            clearInterval(_countdownInterval);
+            _countdownInterval = null;
+            return;
+        }
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(_countdownInterval);
+            _countdownInterval = null;
+            onComplete();
+        } else {
+            resultEl.textContent = 'Reloading in ' + remaining + 's...';
+        }
+    }, 1000);
+}

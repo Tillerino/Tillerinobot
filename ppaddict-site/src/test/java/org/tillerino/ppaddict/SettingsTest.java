@@ -97,7 +97,7 @@ class SettingsTest extends AbstractPlaywrightTest {
 
     private void saveSettings() {
         page.locator("#settings-modal button:has-text('Save')").click();
-        PlaywrightAssertions.assertThat(page.locator("#settings-save-result")).hasText("Saved.");
+        PlaywrightAssertions.assertThat(page.locator("#settings-save-result")).hasText("Reloading in 5s...");
     }
 
     private void setSetting(String name, String value) {

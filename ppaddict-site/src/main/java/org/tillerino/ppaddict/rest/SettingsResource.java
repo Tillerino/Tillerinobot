@@ -125,7 +125,7 @@ public class SettingsResource {
 
         return """
                 <b>Settings</b>
-                <form hx-post="/htmx/user/settings" hx-target="#settings-save-result">
+                <form id="settings-form" hx-post="/htmx/user/settings" hx-target="#settings-save-result" hx-on::after-request="if (!event.detail.failed && event.detail.xhr.responseText.includes('Saved.')) { startCountdown(5, function() { window.location.reload(); }); }">
                   <p><input type="checkbox" name="openDirectOnMapSelect" %s> Open map in osu!direct when selected</p>
                   <p><input type="checkbox" name="applyOtherFiltersWithTextFilter" %s> Apply other filters when searching in name or notes</p>
                   <p><button hx-get="/htmx/user/settings/apikey" hx-target="#apikey-confirm-modal" hx-on::after-request="positionRelativeTo(document.getElementById('apikey-confirm-modal'), this)" command="show-modal" commandfor="apikey-confirm-modal">Create API key</button></p>
