@@ -45,8 +45,9 @@ public class LocalPpaddict {
         TestBase.mockRecommendations(localPpaddict.standardRecommender);
 
         MysqlContainer.MysqlDatabaseLifecycle.createSchema();
+        int port = Integer.parseInt(System.getenv().getOrDefault("PPADDICT_PORT", "8080"));
         Undertow server = Undertow.builder()
-                .addHttpListener(8080, "localhost")
+                .addHttpListener(port, "localhost")
                 .setHandler(PpaddictModule.createFilterPathHandler(deploymentInfo -> {
                     localPpaddict.configurator.configureUndertow(deploymentInfo);
                     PpaddictContextConfigurator.addServlet(deploymentInfo, "/showErrorPage", new ProducesError());
