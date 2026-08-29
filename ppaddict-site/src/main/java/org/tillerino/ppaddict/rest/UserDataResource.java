@@ -1,7 +1,10 @@
 package org.tillerino.ppaddict.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
@@ -63,5 +66,28 @@ public class UserDataResource {
                 <dialog id="settings-modal" class="modal" closedby="any" top="bottom" right="right"></dialog>
                 <a href="%s" class="chilla">Logout</a>
                 """.formatted(credentials.displayName, logoutUrl);
+    }
+
+    @POST
+    @Path("/comment")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_HTML)
+    public String saveComment(
+            @Context HttpServletRequest request,
+            @FormParam("beatmapid") int beatmapid,
+            @FormParam("mods") String mods,
+            @FormParam("comment") String comment)
+            throws PpaddictException {
+        userDataService.getCredentialsOrThrow(request);
+        userDataService.saveComment(request, beatmapid, mods, comment);
+        String m = mods == null ? "" : mods;
+        String selector = "div.comments[data-beatmapid='%d'][data-mods='%s']".formatted(beatmapid, m);
+        String text = comment.trim();
+        return "<div class=\"comments\" data-beatmapid=\"%d\" data-mods=\"%s\" hx-swap-oob=\"outerHTML:%s\">%s</div>"
+                .formatted(
+                        beatmapid,
+                        m,
+                        selector,
+                        text.isEmpty() ? "" : text + "<span class=\"commentsdate\">a moment ago</span>");
     }
 }

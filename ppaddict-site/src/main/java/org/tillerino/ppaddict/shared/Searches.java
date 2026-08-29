@@ -10,11 +10,13 @@ import org.tillerino.osuApiModel.types.BeatmapSetId;
 public class Searches implements IsSerializable {
     public Searches() {}
 
-    public Searches(Searches searches) {
-        searchText = searches.searchText;
-        searchComment = searches.searchComment;
-        beatmapId = searches.beatmapId;
-        setId = searches.setId;
+    public Searches(@CheckForNull Searches searches) {
+        if (searches != null) {
+            searchText = searches.searchText;
+            searchComment = searches.searchComment;
+            beatmapId = searches.beatmapId;
+            setId = searches.setId;
+        }
     }
 
     private String searchText = "";

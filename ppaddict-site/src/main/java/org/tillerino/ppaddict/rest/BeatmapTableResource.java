@@ -63,6 +63,9 @@ public class BeatmapTableResource {
             @QueryParam("onlyRows") boolean onlyRows,
             BeatmapRangeRequest request)
             throws PpaddictException {
+        if (request == null) {
+            request = new BeatmapRangeRequest();
+        }
         UserCredentials user = getUserDataAndCredentials(httpServletRequest);
         return execute(onlyRows, request, user.credentials, user.userData);
     }
@@ -93,8 +96,9 @@ public class BeatmapTableResource {
                     request.direction));
             html.append("<tbody>");
         }
+        boolean isLoggedIn = userData != null;
         for (Beatmap beatmap : bundle.beatmaps) {
-            formatBeatmapTablesRow(beatmap, html);
+            formatBeatmapTablesRow(beatmap, html, isLoggedIn);
         }
 
         int nextStart = request.start + request.length;
@@ -114,10 +118,13 @@ public class BeatmapTableResource {
         if (!onlyRows) {
             html.append("</tbody>")
                     .append("<tfoot>")
-                    .append(formatFilterRow(request))
+                    .append(formatFilterRow(request, isLoggedIn))
                     .append(formatPagerRow(request, bundle.available))
                     .append("</tfoot></table></div>")
                     .append(formatMoreDialog());
+            if (userData != null) {
+                html.append(formatEditDialog());
+            }
         }
         return html.toString();
     }
@@ -128,6 +135,20 @@ public class BeatmapTableResource {
           <a id="more-dialog-beatmap-link">Show all mods</a>
           <br />
           <a id="more-dialog-set-link">Show entire set</a>
+        </dialog>""";
+    }
+
+    private String formatEditDialog() {
+        return """
+        <dialog id="edit-dialog" class="modal" top="bottom" right="right">
+          <form id="edit-dialog-form" hx-post="/htmx/user/comment" hx-swap="none"
+            hx-on::after-request="this.closest('dialog').close()">
+            <input type="hidden" id="edit-dialog-beatmapid" name="beatmapid" />
+            <input type="hidden" id="edit-dialog-mods" name="mods" />
+            <label>Notes: <input type="text" id="edit-dialog-comment" maxlength="64" name="comment" /></label>
+            <br />
+            <button type="submit" id="edit-dialog-save">Save</button>
+          </form>
         </dialog>""";
     }
 
@@ -185,11 +206,11 @@ public class BeatmapTableResource {
         }
     }
 
-    private static String formatFilterRow(BeatmapRangeRequest request) {
+    private static String formatFilterRow(BeatmapRangeRequest request, boolean isLoggedIn) {
         List<Supplier<String>> fields = Arrays.asList(
                 new FilterField("threecharminmaxcell", false, false, request.expectedPP, "expectedPP"),
                 new FilterField("threecharminmaxcell", false, false, request.perfectPP, "perfectPP"),
-                () -> formatNameFilter(request.getSearches().getSafeSearchText()),
+                () -> formatNameAndNotesFilter(request, isLoggedIn),
                 () -> "<td></td>",
                 () -> "<td></td>",
                 new FilterField("threecharminmaxcell", true, false, request.aR, "aR"),
@@ -221,16 +242,29 @@ public class BeatmapTableResource {
         return html.toString();
     }
 
-    private static String formatNameFilter(String value) {
-        return String.format("""
+    private static String formatNameAndNotesFilter(BeatmapRangeRequest request, boolean isLoggedIn) {
+        return """
           <td class="namefiltercell">
-            <input type="text" size="25" hx-post="/htmx/beatmaps/update"
+            Name: <input type="text" size="20" hx-post="/htmx/beatmaps/update"
               hx-ext="postrangerequest" hx-trigger="change"
               hx-vals='js:{json:rangeReq({mod:{searches:{searchText:this.value}}})}'
-              hx-target=".table-container"
-              class="namefilter" value="%s" tabindex="-1" />
+              hx-target=".table-container" class="namefilter" value="%s" tabindex="-1" />
+            %s
           </td>
-          """, value);
+          """.formatted(
+                        request.getSearches().getSafeSearchText(),
+                        isLoggedIn ? formatNotesFilter(request.getSearches().getSafeSearchComment()) : "");
+    }
+
+    private static String formatNotesFilter(String value) {
+        return """
+          <br />
+          Notes: <input type="text" name="commentFilter" size="20" hx-post="/htmx/beatmaps/update"
+            hx-ext="postrangerequest" hx-trigger="change"
+            hx-vals='js:{json:rangeReq({mod:{searches:{searchComment:this.value}}})}'
+            hx-target=".table-container" class="commentfilter" value="%s" tabindex="-1" />
+          <button type="button" onclick="var i=this.previousElementSibling;i.value='*';i.dispatchEvent(new Event('change'))">(any)</button>
+          """.formatted(value);
     }
 
     private static String formatPagerRow(BeatmapRangeRequest request, int available) {
@@ -320,36 +354,51 @@ public class BeatmapTableResource {
         return html;
     }
 
-    private static void formatBeatmapTablesRow(Beatmap beatmap, StringBuilder html) {
-        // one append per column
-        html.append("<tr data-beatmapid=\"%d\" data-beatmapsetid=\"%d\">".formatted(beatmap.beatmapid, beatmap.setid))
-                .append("""
-                    <td>
-                      <a href="http://osu.ppy.sh/beatmapsets/%d/download"><img src="//b.ppy.sh/thumb/%d.jpg" height="60" loading="lazy" style="vertical-align:middle"></a>
-                      <a href="osu://b/%d"><img src="/osuDownloadDirect.png" height="60" width="10" style="vertical-align:middle"></a>
-                    </td>""".formatted(beatmap.setid, beatmap.setid, beatmap.beatmapid))
-                .append("<td class=\"numeric-cell\">" + ppFormat.format(beatmap.lowPP) + "</td>")
-                .append("<td class=\"numeric-cell\">" + ppFormat.format(beatmap.highPP) + "</td>")
-                .append("""
-                     <td>
-                       <a href="http://osu.ppy.sh/b/%s" target="_blank">%s - %s [%s]</a> %s
-                     </td>""".formatted(
-                                beatmap.beatmapid,
-                                beatmap.artist,
-                                beatmap.title,
-                                beatmap.version,
-                                beatmap.mods != null ? beatmap.mods : ""))
-                .append("<td></td>")
-                .append(
-                        "<td><button type=\"button\" command=\"show-modal\" commandfor=\"more-dialog\" onclick=\"updateMoreDialogLinks(this.closest('tr'))\">...</button></td>")
-                .append("<td class=\"numeric-cell\">AR" + format.format(beatmap.approachRate) + "</td>")
-                .append("<td class=\"numeric-cell\">OD" + format.format(beatmap.overallDiff) + "</td>")
-                .append("<td class=\"numeric-cell\">CS" + format.format(beatmap.circleSize) + "</td>")
-                .append("<td class=\"numeric-cell\">"
-                        + (beatmap.starDifficulty != null ? format.format(beatmap.starDifficulty) : "N/A") + "</td>")
-                .append("<td class=\"numeric-cell\">" + (int) beatmap.bpm + "</td>")
-                .append("<td class=\"numeric-cell\">" + beatmap.getFormattedLength() + "</td>")
-                .append("</tr>");
+    private static void formatBeatmapTablesRow(Beatmap beatmap, StringBuilder html, boolean isLoggedIn) {
+        String mods = beatmap.mods != null ? beatmap.mods : "";
+        html.append("<tr data-beatmapid=\"%d\" data-beatmapsetid=\"%d\" data-mods=\"%s\">"
+                .formatted(beatmap.beatmapid, beatmap.setid, mods));
+        html.append(("<td>"
+                        + "<a href=\"http://osu.ppy.sh/beatmapsets/%d/download\"><img src=\"//b.ppy.sh/thumb/%d.jpg\" height=\"60\" loading=\"lazy\" style=\"vertical-align:middle\"></a>"
+                        + "<a href=\"osu://b/%d\"><img src=\"/osuDownloadDirect.png\" height=\"60\" width=\"10\" style=\"vertical-align:middle\"></a>"
+                        + "</td>")
+                .formatted(beatmap.setid, beatmap.setid, beatmap.beatmapid));
+        html.append("<td class=\"numeric-cell\">" + ppFormat.format(beatmap.lowPP) + "</td>");
+        html.append("<td class=\"numeric-cell\">" + ppFormat.format(beatmap.highPP) + "</td>");
+        html.append(("<td>" + "<a href=\"http://osu.ppy.sh/b/%s\" target=\"_blank\">%s - %s [%s]</a> %s" + "%s"
+                        + "</td>")
+                .formatted(
+                        beatmap.beatmapid, beatmap.artist, beatmap.title, beatmap.version, mods, formatNote(beatmap)));
+        if (isLoggedIn) {
+            html.append("<td>")
+                    .append(
+                            "<button type=\"button\" command=\"show-modal\" commandfor=\"edit-dialog\" onclick=\"updateEditDialog(this.closest('tr'))\">Edit</button>")
+                    .append("</td>");
+        } else {
+            html.append("<td></td>");
+        }
+        html.append(
+                "<td><button type=\"button\" command=\"show-modal\" commandfor=\"more-dialog\" onclick=\"updateMoreDialogLinks(this.closest('tr'))\">...</button></td>");
+        html.append("<td class=\"numeric-cell\">AR" + format.format(beatmap.approachRate) + "</td>");
+        html.append("<td class=\"numeric-cell\">OD" + format.format(beatmap.overallDiff) + "</td>");
+        html.append("<td class=\"numeric-cell\">CS" + format.format(beatmap.circleSize) + "</td>");
+        html.append("<td class=\"numeric-cell\">"
+                + (beatmap.starDifficulty != null ? format.format(beatmap.starDifficulty) : "N/A") + "</td>");
+        html.append("<td class=\"numeric-cell\">" + (int) beatmap.bpm + "</td>");
+        html.append("<td class=\"numeric-cell\">" + beatmap.getFormattedLength() + "</td>");
+        html.append("</tr>");
+    }
+
+    private static String formatNote(Beatmap beatmap) {
+        String mods = beatmap.mods != null ? beatmap.mods : "";
+        String comment = beatmap.personalization != null && beatmap.personalization.comment != null
+                ? beatmap.personalization.comment.trim()
+                : "";
+        return comment.isEmpty()
+                ? "<div class=\"comments\" data-beatmapid=\"%d\" data-mods=\"%s\"></div>"
+                        .formatted(beatmap.beatmapid, mods)
+                : "<div class=\"comments\" data-beatmapid=\"%d\" data-mods=\"%s\">%s<span class=\"commentsdate\">%s</span></div>"
+                        .formatted(beatmap.beatmapid, mods, comment, beatmap.personalization.commentDate);
     }
 
     private record UserCredentials(

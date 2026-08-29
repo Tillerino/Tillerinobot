@@ -70,6 +70,14 @@ function updateMoreDialogLinks(row) {
     document.getElementById('more-dialog-set-link').href = '?s=' + row.getAttribute('data-beatmapsetid');
 }
 
+function updateEditDialog(row) {
+    var comment = row.querySelector('.comments');
+    var commentText = comment && comment.firstChild ? comment.firstChild.textContent.trim() : '';
+    document.getElementById('edit-dialog-beatmapid').value = row.getAttribute('data-beatmapid');
+    document.getElementById('edit-dialog-mods').value = row.getAttribute('data-mods');
+    document.getElementById('edit-dialog-comment').value = commentText;
+}
+
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[command="show-modal"]');
     if (!btn) return;

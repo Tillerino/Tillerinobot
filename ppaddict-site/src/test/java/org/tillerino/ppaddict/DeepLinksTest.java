@@ -25,6 +25,7 @@ class DeepLinksTest extends AbstractPlaywrightTest {
                 .anyMatch(i -> i != setIdInt);
 
         // Click more button on first row to get the set link
+        firstRow.hover();
         firstRow.locator("td:nth-of-type(6) button").click();
         PlaywrightAssertions.assertThat(page.locator("dialog#more-dialog")).isVisible();
 
@@ -60,6 +61,7 @@ class DeepLinksTest extends AbstractPlaywrightTest {
                 .anyMatch(i -> i != beatmapIdInt);
 
         // Click more button on first row to get the beatmap link
+        firstRow.hover();
         firstRow.locator("td:nth-of-type(6) button").click();
         PlaywrightAssertions.assertThat(page.locator("dialog#more-dialog")).isVisible();
 

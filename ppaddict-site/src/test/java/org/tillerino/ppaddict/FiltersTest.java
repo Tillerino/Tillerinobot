@@ -22,7 +22,7 @@ class FiltersTest extends AbstractPlaywrightTest {
         PlaywrightAssertions.assertThat(page.locator(".filter-row input").first())
                 .isVisible();
 
-        page.locator("tr.filter-row button").click();
+        page.getByText("hide filters").click();
 
         PlaywrightAssertions.assertThat(page.locator(".filter-row")).isHidden();
     }
@@ -34,7 +34,7 @@ class FiltersTest extends AbstractPlaywrightTest {
 
         page.locator(".pager-row td:first-child button").click();
 
-        // 8 numeric filter fields x 2 inputs (min + max) + 1 name filter + 1 checkbox = 18 inputs
+        // 8 numeric filter fields x 2 inputs (min + max) + name filter + 1 checkbox = 18 inputs
         var allInputs = page.locator(".filter-row input");
         PlaywrightAssertions.assertThat(allInputs).hasCount(18);
 

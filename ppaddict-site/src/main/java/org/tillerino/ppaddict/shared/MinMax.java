@@ -2,6 +2,7 @@ package org.tillerino.ppaddict.shared;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gwt.user.client.rpc.IsSerializable;
+import javax.annotation.CheckForNull;
 
 public class MinMax implements IsSerializable {
     public MinMax() {}
@@ -12,9 +13,11 @@ public class MinMax implements IsSerializable {
         this.max = max;
     }
 
-    public MinMax(MinMax o) {
-        min = o.min;
-        max = o.max;
+    public MinMax(@CheckForNull MinMax o) {
+        if (o != null) {
+            min = o.min;
+            max = o.max;
+        }
     }
 
     public Integer min;

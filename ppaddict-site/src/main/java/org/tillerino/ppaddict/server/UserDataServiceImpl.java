@@ -270,11 +270,21 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
     @Override
     public void saveComment(int beatmapid, @CheckForNull String mods, @CheckForNull String comment)
             throws PpaddictException {
+        saveComment(null, beatmapid, mods, comment);
+    }
+
+    public void saveComment(
+            @CheckForNull HttpServletRequest request,
+            int beatmapid,
+            @CheckForNull String mods,
+            @CheckForNull String comment)
+            throws PpaddictException {
+        log.info("saveComment called: beatmapid={}, mods={}, comment={}", beatmapid, mods, comment);
         if (comment == null) {
             return;
         }
         long modsAsLong;
-        if (mods != null) {
+        if (mods != null && !mods.isEmpty()) {
             if (mods.equals("?")) {
                 modsAsLong = -1l;
             } else {
@@ -286,7 +296,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
         comment = comment.trim();
 
-        Credentials credentials = getCredentialsOrThrow();
+        Credentials credentials = request != null ? getCredentialsOrThrow(request) : getCredentialsOrThrow();
 
         PersistentUserData userData = getServerUserData(credentials);
 

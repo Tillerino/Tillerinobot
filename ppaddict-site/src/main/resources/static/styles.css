@@ -38,6 +38,9 @@ table.beatmaps tbody tr:hover { background-color: #ddd; }
 
 #more-dialog { padding: 15px; }
 
+table.beatmaps tbody tr td button { display: none; }
+table.beatmaps tbody tr:hover td button { display: inline; }
+
 /* Filter inputs */
 .threecharminmaxcell { width: 35px; text-align: right; }
 .fivecharminmaxcell { width: 45px; text-align: right; }
@@ -72,6 +75,7 @@ input, .chillinput:focus {
 
 .filter-row td { padding: 4px; vertical-align: top; }
 .filter-row label { white-space: nowrap; }
+.namefiltercell { white-space: nowrap; }
 
 .pager-row { position: sticky; bottom: 0; background: white; z-index: 9; }
 .pager { text-align: center; padding: 10px; color: var(--deemph-color); }
@@ -79,3 +83,15 @@ input, .chillinput:focus {
 
 dialog { border: none; border-radius: 1px; padding: 5px; background: white; margin: 0px; position: absolute; }
 dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+
+.comments {
+    padding-top: 5px;
+    margin-left: 15px;
+    font-size: 13px;
+}
+.commentsdate {
+    margin-left: 15px;
+}
+.comments:empty {
+    display: none;
+}
