@@ -38,11 +38,30 @@ public class LocalPpaddict {
     @Inject
     Recommender standardRecommender;
 
+    @Inject
+    BotBackend botBackend;
+
+    @Inject
+    OsuApi osuApi;
+
+    @Inject
+    UserDataManager userDataManager;
+
     public static void main(String[] args) throws Exception {
         LocalPpaddict localPpaddict = new LocalPpaddict();
         DaggerLocalPpaddict_Injector.create().inject(localPpaddict);
         TestBase.mockBeatmapMetas(localPpaddict.diffEstimateProvider);
         TestBase.mockRecommendations(localPpaddict.standardRecommender);
+        MockData.mockUser(
+                "TestUser",
+                true,
+                100000,
+                1000,
+                12345,
+                localPpaddict.botBackend,
+                localPpaddict.osuApi,
+                localPpaddict.standardRecommender,
+                localPpaddict.userDataManager);
 
         MysqlContainer.MysqlDatabaseLifecycle.createSchema();
         int port = Integer.parseInt(System.getenv().getOrDefault("PPADDICT_PORT", "8080"));

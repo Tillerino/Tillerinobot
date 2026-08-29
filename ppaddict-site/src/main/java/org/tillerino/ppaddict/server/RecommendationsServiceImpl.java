@@ -41,8 +41,10 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
 
     @Override
     public List<Beatmap> getRecommendations() throws PpaddictException {
-        Credentials credentials = userDataService.getCredentialsOrThrow(getThreadLocalRequest());
+        return getRecommendations(userDataService.getCredentialsOrThrow(getThreadLocalRequest()));
+    }
 
+    public List<Beatmap> getRecommendations(Credentials credentials) throws PpaddictException {
         PersistentUserData userData = userDataService.getServerUserData(credentials);
 
         int osuId = userData.getLinkedOsuIdOrThrow();
@@ -99,9 +101,12 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
                     recommendations.push(beatmap);
                 } catch (RareUserException e) {
                     continue;
+                } catch (UserException e) {
+                    log.warn("No more recommendations available for user {}", osuId);
+                    break;
                 }
             }
-        } catch (SQLException | IOException | UserException | InterruptedException e) {
+        } catch (SQLException | IOException | InterruptedException e) {
             throw ExceptionsUtil.getLoggedWrappedException(log, e);
         }
 
@@ -110,10 +115,13 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
 
     @Override
     public Beatmap hideRecommendation(int beatmapid, String mods) throws PpaddictException {
+        return hideRecommendation(userDataService.getCredentialsOrThrow(getThreadLocalRequest()), beatmapid, mods);
+    }
+
+    public Beatmap hideRecommendation(Credentials credentials, int beatmapid, String mods) throws PpaddictException {
         try {
             Long longMods = mods != null ? (mods.equals("?") ? -1 : Mods.fromShortNamesContinuous(mods)) : (Long) 0l;
-            PersistentUserData linkedData =
-                    userDataService.getServerUserData(userDataService.getCredentialsOrThrow(getThreadLocalRequest()));
+            PersistentUserData linkedData = userDataService.getServerUserData(credentials);
             int osuId = linkedData.getLinkedOsuIdOrThrow();
             recommendationsManager.hideRecommendation(osuId, beatmapid, longMods);
             ApiUser apiUser = pullThrough.getUser(osuId, 0);

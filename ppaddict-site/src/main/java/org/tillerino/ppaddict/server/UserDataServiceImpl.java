@@ -127,6 +127,11 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
         PersistentUserData persistentUserData;
 
         @Nonnull
+        public ClientUserData getClientUserData() {
+            return userData;
+        }
+
+        @Nonnull
         public PersistentUserData getServerUserDataOrThrow() throws NotLoggedIn {
             if (persistentUserData == null) {
                 throw new NotLoggedIn();

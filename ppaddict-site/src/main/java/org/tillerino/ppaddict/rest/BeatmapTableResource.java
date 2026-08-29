@@ -25,9 +25,9 @@ import org.tillerino.ppaddict.shared.*;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BeatmapTableResource {
 
-    private static final DecimalFormat format = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US));
-    private static final DecimalFormat percentageFormat = new DecimalFormat("#.#", new DecimalFormatSymbols(Locale.US));
-    private static final DecimalFormat ppFormat = new DecimalFormat("#pp", new DecimalFormatSymbols(Locale.US));
+    static final DecimalFormat format = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US));
+    static final DecimalFormat percentageFormat = new DecimalFormat("#.#", new DecimalFormatSymbols(Locale.US));
+    static final DecimalFormat ppFormat = new DecimalFormat("#pp", new DecimalFormatSymbols(Locale.US));
 
     private final BeatmapTableServiceImpl beatmapTableService;
     private final UserDataServiceImpl userDataService;
@@ -92,13 +92,14 @@ public class BeatmapTableResource {
             html.append("<div class=\"table-scroll\">");
             html.append(formatBeatmapsTableHeader(
                     userData != null ? userData.getSettings() : Settings.DEFAULT_SETTINGS,
+                    true,
                     request.sortBy,
                     request.direction));
             html.append("<tbody>");
         }
         boolean isLoggedIn = userData != null;
         for (Beatmap beatmap : bundle.beatmaps) {
-            formatBeatmapTablesRow(beatmap, html, isLoggedIn);
+            formatBeatmapTablesRow(beatmap, html, isLoggedIn, MORE_DIALOG_BUTTON);
         }
 
         int nextStart = request.start + request.length;
@@ -138,7 +139,7 @@ public class BeatmapTableResource {
         </dialog>""";
     }
 
-    private String formatEditDialog() {
+    static String formatEditDialog() {
         return """
         <dialog id="edit-dialog" class="modal" top="bottom" right="right">
           <form id="edit-dialog-form" hx-post="/htmx/user/comment" hx-swap="none"
@@ -298,8 +299,8 @@ public class BeatmapTableResource {
         return "<button disabled>" + label + "</button>";
     }
 
-    private static StringBuilder formatBeatmapsTableHeader(
-            Settings settings, BeatmapRangeRequest.Sort currentSort, int ss) {
+    static StringBuilder formatBeatmapsTableHeader(
+            Settings settings, boolean sortable, BeatmapRangeRequest.Sort currentSort, int ss) {
         String lowAcc = percentageFormat.format(settings.getLowAccuracy()) + "%";
         String highAcc = percentageFormat.format(settings.getHighAccuracy()) + "%";
 
@@ -332,7 +333,7 @@ public class BeatmapTableResource {
         html.append("</colgroup>").append("<thead><tr>");
 
         for (Col col : cols) {
-            if (col.sortKey != null) {
+            if (sortable && col.sortKey != null) {
                 boolean isActive = col.sortKey == currentSort;
                 String arrow = isActive ? (ss == 1 ? "↓" : "↑") : "";
                 Integer nextDirection = isActive ? (ss == 1 ? -1 : null) : (Integer) 1;
@@ -354,7 +355,11 @@ public class BeatmapTableResource {
         return html;
     }
 
-    private static void formatBeatmapTablesRow(Beatmap beatmap, StringBuilder html, boolean isLoggedIn) {
+    static final String MORE_DIALOG_BUTTON =
+            "<td><button type=\"button\" command=\"show-modal\" commandfor=\"more-dialog\""
+                    + " onclick=\"updateMoreDialogLinks(this.closest('tr'))\">...</button></td>";
+
+    static void formatBeatmapTablesRow(Beatmap beatmap, StringBuilder html, boolean isLoggedIn, String actionCellHtml) {
         String mods = beatmap.mods != null ? beatmap.mods : "";
         html.append("<tr data-beatmapid=\"%d\" data-beatmapsetid=\"%d\" data-mods=\"%s\">"
                 .formatted(beatmap.beatmapid, beatmap.setid, mods));
@@ -377,8 +382,7 @@ public class BeatmapTableResource {
         } else {
             html.append("<td></td>");
         }
-        html.append(
-                "<td><button type=\"button\" command=\"show-modal\" commandfor=\"more-dialog\" onclick=\"updateMoreDialogLinks(this.closest('tr'))\">...</button></td>");
+        html.append(actionCellHtml);
         html.append("<td class=\"numeric-cell\">AR" + format.format(beatmap.approachRate) + "</td>");
         html.append("<td class=\"numeric-cell\">OD" + format.format(beatmap.overallDiff) + "</td>");
         html.append("<td class=\"numeric-cell\">CS" + format.format(beatmap.circleSize) + "</td>");

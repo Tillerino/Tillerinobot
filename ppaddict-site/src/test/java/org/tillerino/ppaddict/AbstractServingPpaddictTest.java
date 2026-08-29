@@ -3,9 +3,6 @@ package org.tillerino.ppaddict;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 
 import dagger.Component;
 import io.undertow.Undertow;
@@ -28,7 +25,6 @@ import org.tillerino.ppaddict.server.PpaddictBackend;
 import org.tillerino.ppaddict.server.PpaddictUserDataService;
 import org.tillerino.ppaddict.util.TestClock;
 import tillerino.tillerinobot.*;
-import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.diff.DiffEstimateProvider;
 import tillerino.tillerinobot.recommendations.Recommender;
@@ -92,6 +88,9 @@ public class AbstractServingPpaddictTest extends AbstractDatabaseTest {
     @Inject
     PullThrough pullThrough;
 
+    @Inject
+    UserDataManager userDataManager;
+
     private Undertow server;
 
     @Getter
@@ -105,14 +104,8 @@ public class AbstractServingPpaddictTest extends AbstractDatabaseTest {
     void startUndertow() throws Exception {
         TestBase.mockBeatmapMetas(diffEstimateProvider);
         TestBase.mockRecommendations(standardRecommender);
-        ApiUser apiUser = new ApiUser();
-        apiUser.setUserId(12345);
-        apiUser.setUserName("TestUser");
-        apiUser.setRank(0);
-        apiUser.setPp(0);
-        apiUser.setCountry("XX");
-        doReturn(apiUser).when(pullThrough).getUser(eq(12345), anyLong());
-        doReturn(1).when(botBackend).getDonator(12345);
+        MockData.mockUser(
+                "TestUser", true, 100000, 1000, 12345, botBackend, osuApi, standardRecommender, userDataManager);
         WireMockDocker.mockServer()
                 .register(post(urlPathEqualTo("/auth/authentication"))
                         .willReturn(aResponse().withBody("a".repeat(40)).withHeader("Content-Type", "text/plain")));

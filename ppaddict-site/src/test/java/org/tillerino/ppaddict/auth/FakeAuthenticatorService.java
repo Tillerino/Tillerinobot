@@ -16,6 +16,7 @@ import org.tillerino.ppaddict.server.auth.AbstractAuthenticatorService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorServices;
 import org.tillerino.ppaddict.server.auth.Credentials;
+import org.tillerino.ppaddict.server.auth.CredentialsWithOsu;
 
 public class FakeAuthenticatorService extends AbstractAuthenticatorService {
 
@@ -33,7 +34,8 @@ public class FakeAuthenticatorService extends AbstractAuthenticatorService {
     @SuppressFBWarnings(value = "TQ", justification = "Producer")
     @Override
     public Credentials createUser(HttpServletRequest req, Token requestToken) {
-        return new Credentials(getIdentifier() + ":" + req.getParameter("username"), req.getParameter("username"));
+        String username = req.getParameter("username");
+        return new CredentialsWithOsu(getIdentifier() + ":" + username, username, 12345);
     }
 
     @dagger.Module

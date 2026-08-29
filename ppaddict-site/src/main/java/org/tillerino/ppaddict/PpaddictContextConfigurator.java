@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.tillerino.ppaddict.rest.BeatmapTableResource;
+import org.tillerino.ppaddict.rest.RServlet;
+import org.tillerino.ppaddict.rest.RecommendationsResource;
 import org.tillerino.ppaddict.rest.RootServlet;
 import org.tillerino.ppaddict.rest.SettingsResource;
 import org.tillerino.ppaddict.rest.UserDataResource;
@@ -29,6 +31,8 @@ public class PpaddictContextConfigurator {
     private final BeatmapTableResource beatmapTableResource;
     private final UserDataResource userDataResource;
     private final SettingsResource settingsResource;
+    private final RecommendationsResource recommendationsResource;
+    private final RServlet rServlet;
 
     private final AuthLeaveService authLeaveService;
     private final AuthArriveService authArriveService;
@@ -41,13 +45,15 @@ public class PpaddictContextConfigurator {
         addServlet(deploymentInfo, "/ppaddict/user", userDataService);
         addServlet(deploymentInfo, "/ppaddict/recommendations", recommendationsService);
         addServlet(deploymentInfo, "/v2.html", new RootServlet());
+        addServlet(deploymentInfo, "/r.html", rServlet);
         addServlet(
                 deploymentInfo,
                 "/htmx/*",
                 new ServletContainer(new ResourceConfig()
                         .register(beatmapTableResource)
                         .register(userDataResource)
-                        .register(settingsResource)));
+                        .register(settingsResource)
+                        .register(recommendationsResource)));
 
         addServlet(deploymentInfo, AuthLeaveService.PATH, authLeaveService);
         addServlet(deploymentInfo, AuthArriveService.PATH, authArriveService);
