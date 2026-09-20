@@ -83,6 +83,8 @@ input, .chillinput:focus {
 
 dialog { border: none; border-radius: 1px; padding: 5px; background: white; margin: 0px; position: absolute; }
 dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+dialog:not(:modal), #settings-modal { border: solid 1px #000; }
+.modal { z-index: 50; }
 
 .comments {
     padding-top: 5px;
@@ -94,4 +96,35 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
 }
 .comments:empty {
     display: none;
+}
+
+.helppopup {
+  position: fixed;
+  width: 150px;
+  border: solid 1px #000;
+  font-size: small;
+  padding: 5px;
+  background: white;
+  z-index: 100;
+  white-space: pre-line;
+}
+.help-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+.helppopuptitle {
+  font-size: medium;
+}
+
+#welcome-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  z-index: 200;
+  padding: 10px;
+  border: solid 1px #000;
 }

@@ -115,6 +115,15 @@ public class SettingsResource {
         }
     }
 
+    private static final HelpEntry HELP_RECOMMENDATIONS_SETTINGS = new HelpEntry(
+            "Recommendations settings",
+            "You can customize your recommendations as if you were using Tillerinobot."
+                    + " Put anything that you would send Tillerinobot after \"!recommend\" in this box. "
+                    + "<a href=\"https://github.com/Tillerino/Tillerinobot/wiki/Recommendations\" target=\"_blank\">(more info)</a>"
+                    + " Putting \"*\" will give you default recommendations, or reuse the last settings"
+                    + " (including those from Tillerinobot), if you recently used any customizations.",
+            "right-below");
+
     private String renderSettingsDialog(Settings settings) {
         String openDirect = settings.isOpenDirectOnMapSelect() ? "checked" : "";
         String otherFilters = settings.isApplyOtherFiltersWithTextFilter() ? "checked" : "";
@@ -124,17 +133,18 @@ public class SettingsResource {
         String highAcc = String.valueOf((int) settings.getHighAccuracy());
 
         return """
-                <b>Settings</b>
+                <p style="display: flex; justify-content: space-between;"><b>Settings</b>
+                  <a href="#" class="help-trigger" onclick="showHelp()">Help</a></p>
                 <form id="settings-form" hx-post="/htmx/user/settings" hx-target="#settings-save-result" hx-on::after-request="if (!event.detail.failed && event.detail.xhr.responseText.includes('Saved.')) { startCountdown(5, function() { window.location.reload(); }); }">
-                  <p><input type="checkbox" name="openDirectOnMapSelect" %s> Open map in osu!direct when selected</p>
-                  <p><input type="checkbox" name="applyOtherFiltersWithTextFilter" %s> Apply other filters when searching in name or notes</p>
+                  <p><input type="checkbox" name="openDirectOnMapSelect" value="true" %s> Open map in osu!direct when selected</p>
+                  <p><input type="checkbox" name="applyOtherFiltersWithTextFilter" value="true" %s> Apply other filters when searching in name or notes</p>
                   <p><button hx-get="/htmx/user/settings/apikey" hx-target="#apikey-confirm-modal" hx-on::after-request="positionRelativeTo(document.getElementById('apikey-confirm-modal'), this)" command="show-modal" commandfor="apikey-confirm-modal">Create API key</button></p>
-                  <p>Recommendations settings:<br /><input type="text" name="recommendationsParameters" value="%s" /></p>
+                  <p>Recommendations settings:<br /><input type="text" name="recommendationsParameters" value="%s"%s /></p>
                   <p>Accuracy (%%) <input type="text" name="lowAccuracy" value="%s" style="width: 50px;" /> - <input type="text" name="highAccuracy" value="%s" style="width: 50px;" /></p>
                   <p id="settings-save-result"></p>
                   <button type="submit">Save</button>
                 </form>
                 <dialog id="apikey-confirm-modal" class="modal" closedby="any" top="bottom" left="left" />
-                """.formatted(openDirect, otherFilters, recParams, lowAcc, highAcc);
+                """.formatted(openDirect, otherFilters, recParams, HELP_RECOMMENDATIONS_SETTINGS, lowAcc, highAcc);
     }
 }

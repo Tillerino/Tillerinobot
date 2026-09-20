@@ -22,22 +22,46 @@ public class RootServlet extends HttpServlet {
             <script src="htmx-2.0.10.min.js"></script>
             <script src="code.js"></script>
         </head>
-        <body>
+        <body onclick="outsideClick(event)" onload="showWelcomeIfNeeded()">
             <div class="header-bar">
-                <h1><a href="v2.html">ppaddict</a> + <a href="r.html">!r</a></h1>
+                <h1><a href="v2.html">ppaddict</a> + <a href="r.html"R_LINK_HELP>!r</a></h1>
                 <!-- noHeaders so that the preloaded requests can be matched. use a nested replace to avoid inheritance of hx-request. -->
                 <div id="user-area">
+                    <a href="#" class="help-trigger" style="margin-right: 10px;" onclick="showHelp()"HELP_EXTERNAL_LINKS>Help</a>
                     <span hx-get="/htmx/user" hx-trigger="load" hx-request='{"noHeaders": true}' hx-swap="outerHTML">Loading...</span>
                 </div>
             </div>
             <div class="table-container">
                 TABLE_CONTENT
             </div>
+            <dialog id="welcome-dialog" closedby="any">
+              <b>Welcome</b>
+              <p>Welcome to ppaddict. Here's the latest:</p>
+              <p> We rebuilt the ppaddict user interface. Everything should be in its usual place.
+                If you run into any problems, please report them on
+                <a href="https://github.com/Tillerino/ppaddict/issues" target="_blank">GitHub</a>.</p>
+              <p>Click help to see what everything on the screen does or means. This changes when you
+                navigate around or log in, so do it often!</p>
+              <p>(Click anywhere outside this box to dismiss)</p>
+            </dialog>
         </body>
         </html>
         """;
 
-    static String buildHtml(String title, String endpoint, String loadingText) {
+    static final HelpEntry HELP_EXTERNAL_LINKS = new HelpEntry(
+            "<a href=\"https://github.com/Tillerino/Tillerinobot/wiki\" target=\"_blank\">Tillerinobot wiki</a>"
+                    + "<br><a href=\"https://github.com/Tillerino/ppaddict\" target=\"_blank\">ppaddict source</a>",
+            "omni");
+
+    static final HelpEntry R_LINK_HELP_MAIN_PAGE = new HelpEntry("Click r! to access recommendations.", "below-right");
+    static final HelpEntry R_LINK_HELP_RECOMMENDATIONS_PAGE = new HelpEntry(
+            "recommendations",
+            "You will always find 10 personal recommendations below."
+                    + " To get a new recommendation, hover over your least favorite one and click \"hide\"."
+                    + " You can customize your recommendations in the settings.",
+            "right-below");
+
+    static String buildHtml(String title, String endpoint, String loadingText, HelpEntry rLinkHelp) {
         return SHARED_HEAD
                 .replace("TITLE", "<title>" + title + "</title>")
                 .replace("INITIAL_PRELOAD", "<link rel=\"preload\" href=\"" + endpoint + "\" as=\"fetch\" crossorigin>")
@@ -45,7 +69,9 @@ public class RootServlet extends HttpServlet {
                         "TABLE_CONTENT",
                         "<span hx-get=\"" + endpoint
                                 + "\" hx-trigger=\"load\" hx-request='{\"noHeaders\": true}' hx-swap=\"outerHTML\">"
-                                + loadingText + "</span>");
+                                + loadingText + "</span>")
+                .replace("HELP_EXTERNAL_LINKS", HELP_EXTERNAL_LINKS.toString())
+                .replace("R_LINK_HELP", rLinkHelp.toString());
     }
 
     @Override
@@ -54,7 +80,8 @@ public class RootServlet extends HttpServlet {
         String html = buildHtml(
                 "ppaddict v2",
                 "/htmx/beatmaps/initial" + (queryString != null ? "?" + queryString : ""),
-                "Loading beatmaps...");
+                "Loading beatmaps...",
+                R_LINK_HELP_MAIN_PAGE);
         resp.getOutputStream().write(html.getBytes(StandardCharsets.UTF_8));
     }
 }

@@ -52,7 +52,7 @@ public class RecommendationsResource {
         html.append(BeatmapTableResource.formatBeatmapsTableHeader(userData.getSettings(), false, null, 0));
         html.append("<tbody>");
         for (Beatmap beatmap : recommendations) {
-            formatRecommendationsRow(beatmap, html);
+            formatRecommendationsRow(beatmap, userData, html);
         }
         html.append("</tbody></table></div>");
         html.append(BeatmapTableResource.formatEditDialog());
@@ -72,13 +72,17 @@ public class RecommendationsResource {
         Beatmap beatmap = recommendationsService.hideRecommendation(credentials, beatmapid, mods);
 
         StringBuilder html = new StringBuilder();
-        formatRecommendationsRow(beatmap, html);
+        formatRecommendationsRow(beatmap, userDataService.getServerUserData(credentials), html);
         return html.toString();
     }
 
-    private static void formatRecommendationsRow(Beatmap beatmap, StringBuilder html) {
+    private static void formatRecommendationsRow(Beatmap beatmap, PersistentUserData userData, StringBuilder html) {
         String modsEscaped = beatmap.mods != null ? beatmap.mods.replace("\"", "\\\"") : "";
         BeatmapTableResource.formatBeatmapTablesRow(
-                beatmap, html, true, HIDE_BUTTON_TEMPLATE.formatted(beatmap.beatmapid, modsEscaped));
+                beatmap,
+                html,
+                true,
+                userData.getSettings().isOpenDirectOnMapSelect(),
+                HIDE_BUTTON_TEMPLATE.formatted(beatmap.beatmapid, modsEscaped));
     }
 }

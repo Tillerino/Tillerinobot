@@ -42,6 +42,16 @@ public class UserDataResource {
         return renderLoggedIn(userData.getClientUserData().nickname, userData.getClientUserData().logoutURL);
     }
 
+    private static final HelpEntry HELP_LOGIN_BUTTON = new HelpEntry(
+            "login",
+            "You can login with your osu! account. This will enable several customizations and recommendations.",
+            "below-left");
+    private static final HelpEntry HELP_LOGIN_DIALOG = new HelpEntry(
+            "You can log in using the provider above."
+                    + " None of your data on this side should make it to the provider"
+                    + " and ppaddict will only look for a way to identify you.",
+            "below-right");
+
     private String renderNotLoggedIn(String referer) {
         String links = authServices.stream()
                 .map(s -> {
@@ -53,20 +63,20 @@ public class UserDataResource {
                 .collect(Collectors.joining(""));
 
         return """
-                <button id="login-btn" command="show-modal" commandfor="login-modal">Login</button>
-                <dialog id="login-modal" class="modal" closedby="any" top="bottom" right="right">
+                <button id="login-btn"%s command="show-modal" commandfor="login-modal">Login</button>
+                <dialog id="login-modal" class="modal" closedby="any" top="bottom" right="right"%s>
                   <b>Choose an identity provider</b>
                   <br />
                   %s
                 </dialog>
-                """.formatted(links);
+                """.formatted(HELP_LOGIN_BUTTON, HELP_LOGIN_DIALOG, links);
     }
 
     private static String renderLoggedIn(String displayName, String logoutURL) {
         return """
                 <span class="username">%s</span>
                 <button id="settings-btn" hx-get="/htmx/user/settings" hx-target="#settings-modal" hx-swap="innerHTML" hx-trigger="click" hx-on::after-request="this.nextElementSibling.showModal(); positionRelativeTo(this.nextElementSibling, this)">Settings</button>
-                <dialog id="settings-modal" class="modal" closedby="any" top="bottom" right="right"></dialog>
+                <dialog id="settings-modal" class="modal" top="bottom" right="right"></dialog>
                 <a href="%s" class="chilla">Logout</a>
                 """.formatted(displayName, logoutURL);
     }

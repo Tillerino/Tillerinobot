@@ -99,7 +99,12 @@ public class BeatmapTableResource {
         }
         boolean isLoggedIn = userData != null;
         for (Beatmap beatmap : bundle.beatmaps) {
-            formatBeatmapTablesRow(beatmap, html, isLoggedIn, MORE_DIALOG_BUTTON);
+            formatBeatmapTablesRow(
+                    beatmap,
+                    html,
+                    isLoggedIn,
+                    userData != null && userData.getSettings().isOpenDirectOnMapSelect(),
+                    MORE_DIALOG_BUTTON);
         }
 
         int nextStart = request.start + request.length;
@@ -152,6 +157,41 @@ public class BeatmapTableResource {
           </form>
         </dialog>""";
     }
+
+    private static final HelpEntry HELP_DOWNLOADS = new HelpEntry(
+            "downloads",
+            "Click the image to download the beatmap set as a .osz file."
+                    + " If you're not logged in on osu.ppy.sh, you will be asked to login there.\n"
+                    + "Click the osu!direct stripe to view this map in osu!direct."
+                    + " This feature is only available to osu! supporters.\n"
+                    + "Unfortunately, osu! direct will only navigate to the corresponding beatmap set."
+                    + " If you are a supporter, you can"
+                    + " <a href=\"https://osu.ppy.sh/forum/t/221897\" target=\"_blank\">vote here</a>"
+                    + " to get more specific osu! direct links.",
+            "below-right");
+    private static final HelpEntry HELP_PP_VALUES = new HelpEntry(
+            "pp values",
+            "These values are the amount of pp that a Full Combo play (no misses and no slider breaks)"
+                    + " with the displayed accuracies is worth before weightage. "
+                    + "<a href=\"https://osu.ppy.sh/wiki/Performance_Points#Weightage_system\" target=\"_blank\">(more info)</a>",
+            "below-right");
+    private static final HelpEntry HELP_META_INFORMATION = new HelpEntry(
+            "meta information",
+            "This is a selection of available meta information about each beatmap.\n"
+                    + "AR = approach rate\nOD = overall difficulty\nCS = circle size"
+                    + "\ndiff = star difficulty\nBPM = beats per minute."
+                    + "<a href=\"https://osu.ppy.sh/wiki/Song_Setup#Difficulty\" target=\"_blank\">(more info)</a>",
+            "below-right");
+    private static final HelpEntry HELP_NAME_FILTER = new HelpEntry(
+            "name filter",
+            "Search in the name of a beatmap. The name is formed as shown above combining artist, title and version."
+                    + " This will override any other filters. You can change this behaviour if you're logged in.",
+            "above-right");
+    private static final HelpEntry HELP_RANGE_FILTER = new HelpEntry(
+            "range filter",
+            "You can limit the range of some of the values."
+                    + " Click a boundary to change it! Leave a field empty to restore the original boundary.",
+            "above-right");
 
     record FilterField(String cssClass, boolean isDecimal, boolean isTime, MinMax range, String fieldName)
             implements Supplier<String> {
@@ -213,7 +253,7 @@ public class BeatmapTableResource {
                 new FilterField("threecharminmaxcell", false, false, request.perfectPP, "perfectPP"),
                 () -> formatNameAndNotesFilter(request, isLoggedIn),
                 () -> "<td></td>",
-                () -> "<td></td>",
+                () -> "<td" + HELP_RANGE_FILTER + "></td>",
                 new FilterField("threecharminmaxcell", true, false, request.aR, "aR"),
                 new FilterField("threecharminmaxcell", true, false, request.oD, "oD"),
                 new FilterField("threecharminmaxcell", true, false, request.cS, "cS"),
@@ -245,7 +285,7 @@ public class BeatmapTableResource {
 
     private static String formatNameAndNotesFilter(BeatmapRangeRequest request, boolean isLoggedIn) {
         return """
-          <td class="namefiltercell">
+          <td class="namefiltercell"%s>
             Name: <input type="text" size="20" hx-post="/htmx/beatmaps/update"
               hx-ext="postrangerequest" hx-trigger="change"
               hx-vals='js:{json:rangeReq({mod:{searches:{searchText:this.value}}})}'
@@ -253,6 +293,7 @@ public class BeatmapTableResource {
             %s
           </td>
           """.formatted(
+                        HELP_NAME_FILTER,
                         request.getSearches().getSafeSearchText(),
                         isLoggedIn ? formatNotesFilter(request.getSearches().getSafeSearchComment()) : "");
     }
@@ -304,21 +345,21 @@ public class BeatmapTableResource {
         String lowAcc = percentageFormat.format(settings.getLowAccuracy()) + "%";
         String highAcc = percentageFormat.format(settings.getHighAccuracy()) + "%";
 
-        record Col(String label, BeatmapRangeRequest.Sort sortKey, String width) {}
+        record Col(String label, BeatmapRangeRequest.Sort sortKey, String width, HelpEntry help) {}
 
         Col[] cols = {
-            new Col("", null, "117px"),
-            new Col(lowAcc, BeatmapRangeRequest.Sort.EXPECTED, "75px"),
-            new Col(highAcc, BeatmapRangeRequest.Sort.PERFECT, "75px"),
-            new Col("", null, null),
-            new Col("", null, "48px"),
-            new Col("", null, "30px"),
-            new Col("AR", null, "75px"),
-            new Col("OD", null, "75px"),
-            new Col("CS", null, "75px"),
-            new Col("diff", BeatmapRangeRequest.Sort.STAR_DIFF, "75px"),
-            new Col("BPM", BeatmapRangeRequest.Sort.BPM, "75px"),
-            new Col("length", BeatmapRangeRequest.Sort.LENGTH, "90px")
+            new Col("", null, "117px", HELP_DOWNLOADS),
+            new Col(lowAcc, BeatmapRangeRequest.Sort.EXPECTED, "75px", null),
+            new Col(highAcc, BeatmapRangeRequest.Sort.PERFECT, "75px", HELP_PP_VALUES),
+            new Col("", null, null, null),
+            new Col("", null, "48px", null),
+            new Col("", null, "30px", null),
+            new Col("AR", null, "75px", null),
+            new Col("OD", null, "75px", HELP_META_INFORMATION),
+            new Col("CS", null, "75px", null),
+            new Col("diff", BeatmapRangeRequest.Sort.STAR_DIFF, "75px", null),
+            new Col("BPM", BeatmapRangeRequest.Sort.BPM, "75px", null),
+            new Col("length", BeatmapRangeRequest.Sort.LENGTH, "90px", null)
         };
 
         StringBuilder html =
@@ -333,21 +374,26 @@ public class BeatmapTableResource {
         html.append("</colgroup>").append("<thead><tr>");
 
         for (Col col : cols) {
+            String help = col.help() == null ? "" : col.help().toString();
             if (sortable && col.sortKey != null) {
                 boolean isActive = col.sortKey == currentSort;
                 String arrow = isActive ? (ss == 1 ? "↓" : "↑") : "";
                 Integer nextDirection = isActive ? (ss == 1 ? -1 : null) : (Integer) 1;
                 String nextSortKey = nextDirection != null ? "\"" + col.sortKey.name() + "\"" : null;
                 html.append(String.format("""
-                      <th class="numeric-cell">%s<button type="button"
+                      <th class="numeric-cell"%s>%s<button type="button"
                         hx-post="/htmx/beatmaps/update"
                         hx-ext="postrangerequest"
                         hx-vals='js:{json: rangeReq({mod:{ sortBy: %s, direction: %s, start: 0 }})}'
-                        hx-target=".table-container">%s</button></th>""", arrow, nextSortKey, nextDirection, col.label));
+                        hx-target=".table-container">%s</button></th>""", help, arrow, nextSortKey, nextDirection, col.label));
             } else if (col.label.isEmpty()) {
-                html.append("<th></th>");
+                html.append("<th").append(help).append("></th>");
             } else {
-                html.append("<th class=\"numeric-cell\">").append(col.label).append("</th>");
+                html.append("<th class=\"numeric-cell\"")
+                        .append(help)
+                        .append(">")
+                        .append(col.label)
+                        .append("</th>");
             }
         }
 
@@ -359,10 +405,22 @@ public class BeatmapTableResource {
             "<td><button type=\"button\" command=\"show-modal\" commandfor=\"more-dialog\""
                     + " onclick=\"updateMoreDialogLinks(this.closest('tr'))\">...</button></td>";
 
-    static void formatBeatmapTablesRow(Beatmap beatmap, StringBuilder html, boolean isLoggedIn, String actionCellHtml) {
+    static void formatBeatmapTablesRow(
+            Beatmap beatmap,
+            StringBuilder html,
+            boolean isLoggedIn,
+            boolean openDirectOnMapSelect,
+            String actionCellHtml) {
         String mods = beatmap.mods != null ? beatmap.mods : "";
-        html.append("<tr data-beatmapid=\"%d\" data-beatmapsetid=\"%d\" data-mods=\"%s\">"
-                .formatted(beatmap.beatmapid, beatmap.setid, mods));
+        html.append(("<tr data-beatmapid=\"%d\" data-beatmapsetid=\"%d\" data-mods=\"%s\"%s>")
+                .formatted(
+                        beatmap.beatmapid,
+                        beatmap.setid,
+                        mods,
+                        openDirectOnMapSelect
+                                ? " onclick=\"if (!event.target.closest('a,button,input')) window.location.assign('osu://b/%d')\""
+                                        .formatted(beatmap.beatmapid)
+                                : ""));
         html.append(("<td>"
                         + "<a href=\"http://osu.ppy.sh/beatmapsets/%d/download\"><img src=\"//b.ppy.sh/thumb/%d.jpg\" height=\"60\" loading=\"lazy\" style=\"vertical-align:middle\"></a>"
                         + "<a href=\"osu://b/%d\"><img src=\"/osuDownloadDirect.png\" height=\"60\" width=\"10\" style=\"vertical-align:middle\"></a>"

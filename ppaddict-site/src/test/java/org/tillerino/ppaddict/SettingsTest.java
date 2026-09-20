@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 class SettingsTest extends AbstractPlaywrightTest {
 
     private void loginAndLink() throws Exception {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
-        page.waitForResponse("**/htmx/user**", () -> {});
-        page.waitForResponse("**/htmx/beatmaps**", () -> {});
+        // register the response waiters before navigating, or a fast response may race the registration
+        page.waitForResponse(
+                "**/htmx/user**",
+                () -> page.waitForResponse(
+                        "**/htmx/beatmaps**", () -> page.navigate("http://localhost:" + getPort() + "/v2.html")));
 
         page.locator("#user-area button:has-text('Login')").click();
         page.locator("#login-modal a").click();
