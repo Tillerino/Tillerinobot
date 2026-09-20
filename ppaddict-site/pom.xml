@@ -159,19 +159,41 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-playwright-classpath</id>
+                                <goals>
+                                    <goal>build-classpath</goal>
+                                </goals>
+                                <phase>generate-test-resources</phase>
+                                <configuration>
+                                    <includeScope>test</includeScope>
+                                    <outputProperty>ci.playwright.classpath</outputProperty>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>install-playwright-deps</id>
                                 <goals>
-                                    <goal>java</goal>
+                                    <goal>exec</goal>
                                 </goals>
                                 <phase>process-test-classes</phase>
                                 <configuration>
-                                    <mainClass>com.microsoft.playwright.CLI</mainClass>
-                                    <classpathScope>test</classpathScope>
+                                    <executable>${java.home}/bin/java</executable>
+                                    <environmentVariables>
+                                        <DEBIAN_FRONTEND>noninteractive</DEBIAN_FRONTEND>
+                                    </environmentVariables>
                                     <arguments>
+                                        <argument>-cp</argument>
+                                        <argument>${ci.playwright.classpath}</argument>
+                                        <argument>com.microsoft.playwright.CLI</argument>
                                         <argument>install-deps</argument>
                                     </arguments>
                                 </configuration>
