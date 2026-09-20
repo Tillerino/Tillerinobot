@@ -2,6 +2,7 @@ package org.tillerino.ppaddict;
 
 import dagger.Binds;
 import io.undertow.Handlers;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.servlet.Servlets;
@@ -9,6 +10,8 @@ import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
 import io.undertow.servlet.api.LoggingExceptionHandler;
+import io.undertow.util.Headers;
+import io.undertow.util.StatusCodes;
 import jakarta.servlet.ServletException;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -30,7 +33,7 @@ public interface PpaddictModule {
                 .setClassLoader(PpaddictModule.class.getClassLoader())
                 .setContextPath("/")
                 .setDeploymentName("test.war")
-                .addWelcomePage("Ppaddict.html")
+                .addWelcomePage("v2.html")
                 .addErrorPage(new ErrorPage("/error.html"))
                 .setExceptionHandler(new LoggingExceptionHandler(Map.of()))
                 .setResourceManager(new ClassPathResourceManager(PpaddictModule.class.getClassLoader(), "static"));
@@ -40,6 +43,16 @@ public interface PpaddictModule {
         DeploymentManager manager = Servlets.defaultContainer().addDeployment(servletBuilder);
         manager.deploy();
 
-        return Handlers.path(Handlers.redirect("/")).addPrefixPath("/", manager.start());
+        return Handlers.path(Handlers.redirect("/"))
+                .addExactPath("/Ppaddict.html", redirectPreservingQuery("/v1.html"))
+                .addPrefixPath("/", manager.start());
+    }
+
+    static HttpHandler redirectPreservingQuery(String target) {
+        return exchange -> {
+            String query = exchange.getQueryString();
+            exchange.setStatusCode(StatusCodes.FOUND);
+            exchange.getResponseHeaders().put(Headers.LOCATION, target + (query.isEmpty() ? "" : "?" + query));
+        };
     }
 }

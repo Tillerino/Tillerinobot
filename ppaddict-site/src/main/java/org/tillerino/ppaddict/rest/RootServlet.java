@@ -27,6 +27,7 @@ public class RootServlet extends HttpServlet {
                 <h1><a href="v2.html">ppaddict</a> + <a href="r.html"R_LINK_HELP>!r</a></h1>
                 <!-- noHeaders so that the preloaded requests can be matched. use a nested replace to avoid inheritance of hx-request. -->
                 <div id="user-area">
+                    <a href="v1.html" style="margin-right: 10px;">switch to old interface</a>
                     <a href="#" class="help-trigger" style="margin-right: 10px;" onclick="showHelp()"HELP_EXTERNAL_LINKS>Help</a>
                     <span hx-get="/htmx/user" hx-trigger="load" hx-request='{"noHeaders": true}' hx-swap="outerHTML">Loading...</span>
                 </div>
@@ -35,9 +36,10 @@ public class RootServlet extends HttpServlet {
                 TABLE_CONTENT
             </div>
             <dialog id="welcome-dialog" closedby="any">
-              <b>Welcome</b>
+              <h1>Welcome</h1>
               <p>Welcome to ppaddict. Here's the latest:</p>
               <p> We rebuilt the ppaddict user interface. Everything should be in its usual place.
+                The old interface stays available; you can switch anytime via the link in the top right.
                 If you run into any problems, please report them on
                 <a href="https://github.com/Tillerino/ppaddict/issues" target="_blank">GitHub</a>.</p>
               <p>Click help to see what everything on the screen does or means. This changes when you

@@ -16,6 +16,7 @@
 					<g:HorizontalPanel horizontalAlignment="ALIGN_RIGHT"
 						verticalAlignment="ALIGN_MIDDLE" spacing="10" width=""
 						styleName="tablealignright" ui:field="controlsPanel">
+						<g:Anchor href="v2.html">switch to new interface</g:Anchor>
 						<g:Hyperlink text="Help" ui:field="helpLink" />
 						<ppaddict:UserBox ui:field="userBox"></ppaddict:UserBox>
 					</g:HorizontalPanel>
