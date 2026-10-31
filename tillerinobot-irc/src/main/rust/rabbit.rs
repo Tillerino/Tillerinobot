@@ -103,11 +103,11 @@ impl Default for RabbitConfig {
 async fn set_up_rpc_queue(channel: &Channel, queue_name: &str, ttl: i32) -> Result<Consumer, lapin::Error> {
 	let mut queue_opts = FieldTable::default();
 	queue_opts.insert("x-message-ttl".into(), ttl.into());
-	channel.queue_declare(queue_name,
+	channel.queue_declare(queue_name.into(),
 		QueueDeclareOptions { auto_delete: false, durable: true, nowait: true, ..QueueDeclareOptions::default() },
 		queue_opts).await?;
 
-	channel.basic_consume(queue_name, "", BasicConsumeOptions::default(), FieldTable::default()).await
+	channel.basic_consume(queue_name.into(), "".into(), BasicConsumeOptions::default(), FieldTable::default()).await
 }
 
 async fn respond_to_rpc<A, O, E>(channel: &Channel, delivery: Delivery, call: RabbitRpcCall<A>, result: Result<O, E>) -> Result<(), Error> where
@@ -117,7 +117,7 @@ async fn respond_to_rpc<A, O, E>(channel: &Channel, delivery: Delivery, call: Ra
 		let response = RabbitRpcResponse { method: call.method, result: result.into(), mdc: BTreeMap::new() };
 		let response_string = serde_json::to_string(&response)?;
 		println!("sending response: {}", response_string);
-		channel.basic_publish("", reply_to.as_str(), BasicPublishOptions::default(),
+		channel.basic_publish("".into(), reply_to.as_str().into(), BasicPublishOptions::default(),
 			response_string.as_bytes(), BasicProperties::default().with_correlation_id(correlation_id.clone())).await?;
 	}
 	Ok(channel.basic_ack(delivery.delivery_tag, BasicAckOptions::default()).await?)

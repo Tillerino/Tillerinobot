@@ -5,15 +5,14 @@ use lapin::{Channel, ChannelStatus, Connection, ConnectionProperties, Consumer, 
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 use tokio::sync::mpsc::error::TrySendError;
-use tokio_amqp::LapinTokioExt;
-use warp::filters::ws::Message;
+use axum::extract::ws::Message;
 
 use urlencoding::encode;
 
 use crate::websocket::{Conn, CONNECTIONS};
 
 lazy_static! {
-    pub static ref READY: Mutex<ChannelStatus> = Mutex::default();
+    pub static ref READY: Mutex<Option<ChannelStatus>> = Mutex::new(None);
 }
 
 #[derive(Deserialize, Debug)]
@@ -119,24 +118,24 @@ async fn connect_rabbit_channel(configuration: RabbitConfiguration) -> lapin::Re
     let addr = configuration.connect_string();
 
     println!("Connecting to {}", addr);
-    let conn = Connection::connect(&addr, ConnectionProperties::default().with_tokio()).await?;
+    let conn = Connection::connect(&addr, ConnectionProperties::default()).await?;
     println!("Connected to {}", addr);
     let channel_a = conn.create_channel().await?;
     {
         let mut r = READY.lock().unwrap();
-        *r = channel_a.status().clone();
+        *r = Some(channel_a.status().clone());
     }
     Ok(channel_a)
 }
 
 async fn create_rabbit_consumer(channel_a: Channel) -> lapin::Result<Consumer> {
-    channel_a.exchange_declare("live-activity", ExchangeKind::Fanout, ExchangeDeclareOptions::default(), FieldTable::default()).await?;
+    channel_a.exchange_declare("live-activity".into(), ExchangeKind::Fanout, ExchangeDeclareOptions::default(), FieldTable::default()).await?;
 
     let options = QueueDeclareOptions { passive: false, durable: false, exclusive: true, auto_delete: true, nowait: false };
-    let q = channel_a.queue_declare("", options, FieldTable::default()).await?;
-    channel_a.queue_bind(q.name().as_str(), "live-activity", "", QueueBindOptions::default(), FieldTable::default()).await?;
+    let q = channel_a.queue_declare("".into(), options, FieldTable::default()).await?;
+    channel_a.queue_bind(q.name().clone(), "live-activity".into(), "".into(), QueueBindOptions::default(), FieldTable::default()).await?;
 
-    channel_a.basic_consume(q.name().as_str(), "live-activity", BasicConsumeOptions::default(), FieldTable::default()).await
+    channel_a.basic_consume(q.name().clone(), "live-activity".into(), BasicConsumeOptions::default(), FieldTable::default()).await
 }
 
 fn consume_single(delivery: Delivery) -> serde_json::Result<()> {
@@ -144,7 +143,7 @@ fn consume_single(delivery: Delivery) -> serde_json::Result<()> {
 
     // remove broken connections while iterating
     CONNECTIONS.lock().unwrap().retain(|c| {
-        match c.web.try_send(Ok(Message::text(serde_json::to_string(&convert_message(&c, &str)).unwrap()))) {
+        match c.web.try_send(Ok(Message::Text(serde_json::to_string(&convert_message(&c, &str)).unwrap().into()))) {
             Ok(_) => true,
             Err(TrySendError::Full(_)) => true, // keep the connection for now
             Err(TrySendError::Closed(_)) => { println!("Dropping connection {}", c.salt); false }

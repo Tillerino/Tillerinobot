@@ -25,7 +25,8 @@ import org.tillerino.ppaddict.rabbit.RabbitMqConfiguration;
 import org.tillerino.ppaddict.rabbit.RabbitMqContainerConnection;
 
 /**
- * We just want to stress the container a bit. It is supposed to run with 64MiB memory.
+ * We just want to stress the container a bit. We run it with 64MiB in production, but the test container is capped much
+ * lower on purpose: if the process can't stay under that, it gets killed and the test fails.
  *
  * <p>I think I messed up the test, because everything seems crazy efficient. After warm up, the throughput is around
  * 100k messages per second with 100 clients. There appears to be a GC pause in the tens of ms once or twice a second.

@@ -162,7 +162,7 @@ async fn killer(sender: Sender, channel: Channel, quit: Arc<AtomicBool>) -> Resu
 				println!("Received quit signal. Closing all connections.");
 				quit.store(true, Ordering::Relaxed);
 				sender.send_quit("Shutting down.")?;
-				channel.close(200, "Received quit signal").await?;
+				channel.close(200, "Received quit signal".into()).await?;
 			}
 		},
 		Err(e) => {

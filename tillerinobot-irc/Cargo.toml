@@ -6,17 +6,16 @@ authors = ["Tillerino <tillmann.gaida@gmail.com>"]
 edition = '2021'
 
 [dependencies]
-tokio-amqp = { version = "2", default-features = false }
-lapin = { version = "2", default-features = false }
-tokio = { version = "1.2", features = [ "macros", "signal" ] }
+lapin = { version = "4", default-features = false, features = [ "tokio" ] }
+tokio = { version = "1.2", features = [ "macros", "net", "signal" ] }
 tokio-stream = { version = "0.1", default-features = false }
 serde_derive = { version = "1.0" }
 serde_json = { version = "1.0" }
 serde = { version = "1.0" }
 lazy_static = "1.4"
 irc = { version = "1", default-features = false, features = [ "ctcp" ] }
-thiserror = "1"
-warp = { version = "0.3", default-features = false }
+thiserror = "2"
+axum = { version = "0.8", default-features = false, features = [ "http1", "tokio" ] }
 uuid = { version = "1", features = [ "v4" ] }
 urlencoding = "2"
 

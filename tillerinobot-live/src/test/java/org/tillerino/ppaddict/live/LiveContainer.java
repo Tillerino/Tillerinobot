@@ -27,6 +27,8 @@ public class LiveContainer {
             .withExposedPorts(8080)
             .waitingFor(Wait.forHttp("/ready").forStatusCode(200))
             .withCreateContainerCmdModifier(
+                    // Much lower than the 64MiB we give it in production. If the process can't stay under this,
+                    // it gets OOM killed and the test fails, which is the whole point.
                     cmd -> cmd.withMemory(16 * 1024 * 1024L).withMemorySwap(16 * 1024 * 1024L))
             .logging("LIVE");
 

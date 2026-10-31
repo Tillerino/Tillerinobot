@@ -81,7 +81,7 @@ impl IrcEventConverter {
 			for event in self.create_rabbit_event(message, &ponger).await {
 				let message = serde_json::to_string(&event)?;
 				println!("Sending message to rabbit: {}", message);
-				channel.basic_publish("", "irc-reader", BasicPublishOptions::default(), message.as_bytes(), BasicProperties::default()).await?;
+				channel.basic_publish("".into(), "irc-reader".into(), BasicPublishOptions::default(), message.as_bytes(), BasicProperties::default()).await?;
 			}
 		}
 		Ok(())
