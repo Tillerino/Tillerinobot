@@ -93,6 +93,12 @@ public class PlayerService {
         for (int i = 0; i < scores.size(); i++) {
             ApiScore score = scores.get(i);
 
+            if (score.getPp() == null) {
+                // This can happen when processing fails on osu side.
+                // We set a nano pp to not break DB.
+                score.setPp(1E-9);
+            }
+
             UserTop50Entry top50Entry = new UserTop50Entry();
             top50Entry.beatmapid = score.getBeatmapId();
             top50Entry.userid = score.getUserId();
@@ -102,15 +108,7 @@ public class PlayerService {
         }
 
         try (var _ = PhaseTimer.timeTask("persistTop50")) {
-            try {
-                scoreRepo.replaceAll(database, scores);
-            } catch (SQLException e) {
-                System.out.println(player);
-                for (ApiScore score : scores) {
-                    System.out.println(score);
-                }
-                throw e;
-            }
+            scoreRepo.replaceAll(database, scores);
             top50EntryRepo.replaceAll(database, top50Entries);
         }
 
