@@ -102,7 +102,15 @@ public class PlayerService {
         }
 
         try (var _ = PhaseTimer.timeTask("persistTop50")) {
-            scoreRepo.replaceAll(database, scores);
+            try {
+                scoreRepo.replaceAll(database, scores);
+            } catch (SQLException e) {
+                System.out.println(player);
+                for (ApiScore score : scores) {
+                    System.out.println(score);
+                }
+                throw e;
+            }
             top50EntryRepo.replaceAll(database, top50Entries);
         }
 
