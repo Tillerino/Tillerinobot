@@ -1,13 +1,12 @@
 package org.tillerino.ppaddict.shared;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import org.tillerino.osuApiModel.types.BeatmapId;
 import org.tillerino.osuApiModel.types.BeatmapSetId;
 
-public class Searches implements IsSerializable {
+public class Searches {
     public Searches() {}
 
     public Searches(@CheckForNull Searches searches) {

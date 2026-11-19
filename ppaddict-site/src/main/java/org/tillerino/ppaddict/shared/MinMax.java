@@ -1,10 +1,9 @@
 package org.tillerino.ppaddict.shared;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import javax.annotation.CheckForNull;
 
-public class MinMax implements IsSerializable {
+public class MinMax {
     public MinMax() {}
 
     public MinMax(Integer min, Integer max) {

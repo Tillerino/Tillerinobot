@@ -2,7 +2,6 @@ package org.tillerino.ppaddict.server;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.tillerino.osuApiModel.Mods;
 import org.tillerino.osuApiModel.OsuApiBeatmap;
-import org.tillerino.ppaddict.client.services.BeatmapTableService;
 import org.tillerino.ppaddict.server.PersistentUserData.Comment;
 import org.tillerino.ppaddict.server.PersistentUserData.Comments;
 import org.tillerino.ppaddict.server.PpaddictBackend.BeatmapData;
@@ -40,11 +38,9 @@ import tillerino.tillerinobot.BeatmapMeta;
 import tillerino.tillerinobot.UserDataManager.UserData.BeatmapWithMods;
 import tillerino.tillerinobot.diff.PercentageEstimates;
 
-/** The server-side implementation of the RPC service. */
+/** The server-side implementation of the beatmap table service. */
 @Singleton
-public class BeatmapTableServiceImpl extends RemoteServiceServlet implements BeatmapTableService {
-    private static final long serialVersionUID = 1L;
-
+public class BeatmapTableServiceImpl {
     private final UserDataServiceImpl userDataService;
 
     private final PpaddictBackend backend;
@@ -56,19 +52,6 @@ public class BeatmapTableServiceImpl extends RemoteServiceServlet implements Bea
     public BeatmapTableServiceImpl(UserDataServiceImpl userDataService, PpaddictBackend backend) {
         this.userDataService = userDataService;
         this.backend = backend;
-        userDataService.beatmapTableService = this;
-    }
-
-    @Override
-    public BeatmapBundle getRange(final BeatmapRangeRequest request) throws PpaddictException {
-        Credentials credentials = userDataService.getCredentials(getThreadLocalRequest());
-
-        PersistentUserData userData = credentials != null ? userDataService.getServerUserData(credentials) : null;
-
-        BeatmapBundle bundle = executeGetRange(request, credentials, userData);
-        bundle.loggedIn = userData != null;
-
-        return bundle;
     }
 
     public BeatmapBundle executeGetRange(

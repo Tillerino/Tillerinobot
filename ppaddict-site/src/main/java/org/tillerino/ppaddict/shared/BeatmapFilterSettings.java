@@ -1,10 +1,9 @@
 package org.tillerino.ppaddict.shared;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import javax.annotation.Nonnull;
 import org.tillerino.ppaddict.shared.PpaddictException.OutOfBoundsException;
 
-public class BeatmapFilterSettings implements IsSerializable {
+public class BeatmapFilterSettings {
     private boolean applyOtherFiltersWithTextFilter = false;
 
     private double lowAccuracy = 93, highAccuracy = 100;

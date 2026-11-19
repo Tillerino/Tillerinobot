@@ -1,8 +1,5 @@
 package org.tillerino.ppaddict.server;
 
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,12 +16,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.osuApiModel.types.UserId;
-import org.tillerino.ppaddict.client.AbstractBeatmapTable;
-import org.tillerino.ppaddict.client.services.UserDataService;
 import org.tillerino.ppaddict.rest.AuthenticationService;
 import org.tillerino.ppaddict.server.auth.AuthLeaveService;
 import org.tillerino.ppaddict.server.auth.AuthLogoutService;
@@ -32,15 +27,10 @@ import org.tillerino.ppaddict.server.auth.AuthenticatorService;
 import org.tillerino.ppaddict.server.auth.AuthenticatorServices;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.server.auth.CredentialsWithOsu;
-import org.tillerino.ppaddict.shared.BeatmapBundle;
 import org.tillerino.ppaddict.shared.BeatmapRangeRequest;
 import org.tillerino.ppaddict.shared.ClientUserData;
-import org.tillerino.ppaddict.shared.InitialData;
 import org.tillerino.ppaddict.shared.PpaddictException;
-import org.tillerino.ppaddict.shared.PpaddictException.NotLoggedIn;
 import org.tillerino.ppaddict.shared.Settings;
-import tillerino.tillerinobot.BotBackend;
-import tillerino.tillerinobot.OsuApi;
 import tillerino.tillerinobot.data.ApiUser;
 import tillerino.tillerinobot.data.PullThrough;
 import tillerino.tillerinobot.lang.Default;
@@ -48,17 +38,13 @@ import tillerino.tillerinobot.recommendations.RecommendationsManager;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
-public class UserDataServiceImpl extends RemoteServiceServlet implements UserDataService {
+public class UserDataServiceImpl {
     static final Logger log = LoggerFactory.getLogger(UserDataServiceImpl.class);
 
     private final PpaddictBackend backend;
 
-    private final BotBackend botBackend;
-
     @Setter
     private AuthLogoutService logoutService;
-
-    BeatmapTableServiceImpl beatmapTableService;
 
     private final AuthLeaveService leaveService;
 
@@ -74,50 +60,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
     private final PullThrough pullThrough;
 
-    private final OsuApi downloader;
-
     public static final String CREDENTIALS_SESSION_KEY = "ppaddict.auth.credentials";
     public static final String CREDENTIALS_COOKIE_KEY = "ppaddict.auth.cookie";
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public ClientUserData getStatus() throws PpaddictException {
-        HttpServletRequest req = getThreadLocalRequest();
-
-        Credentials credentials = getCredentials(getThreadLocalRequest());
-
-        UserData data = createUserData(req, credentials);
-
-        return data.userData;
-    }
-
-    @Override
-    public InitialData getInitialData(BeatmapRangeRequest request) throws PpaddictException {
-        Credentials credentials = getCredentials(getThreadLocalRequest());
-
-        UserData userDataWithPersistentUserData = createUserData(getThreadLocalRequest(), credentials);
-
-        ClientUserData userData = userDataWithPersistentUserData.userData;
-
-        if (request == null) {
-            request = userDataWithPersistentUserData.persistentUserData != null
-                    ? userDataWithPersistentUserData.persistentUserData.getLastRequest()
-                    : null;
-        }
-        if (request == null) {
-            request = new BeatmapRangeRequest();
-        }
-        if (request.start > 0) {
-            request.start = 0;
-            request.length = AbstractBeatmapTable.PAGE_SIZE;
-        }
-
-        BeatmapBundle beatmapBundle = beatmapTableService.executeGetRange(
-                request, credentials, userDataWithPersistentUserData.persistentUserData);
-
-        return new InitialData(userData, beatmapBundle, request);
-    }
 
     public static class UserData {
         @Nonnull
@@ -129,14 +73,6 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
         @Nonnull
         public ClientUserData getClientUserData() {
             return userData;
-        }
-
-        @Nonnull
-        public PersistentUserData getServerUserDataOrThrow() throws NotLoggedIn {
-            if (persistentUserData == null) {
-                throw new NotLoggedIn();
-            }
-            return persistentUserData;
         }
 
         public UserData(@Nonnull ClientUserData userData) {
@@ -154,11 +90,6 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
     /**
      * creates a {@link ClientUserData} object and since {@link PersistentUserData} needs to be loaded anyway, we'll
      * return it as well.
-     *
-     * @param req
-     * @param credentials
-     * @return
-     * @throws PpaddictException
      */
     @Nonnull
     public UserData createUserData(HttpServletRequest req, Credentials credentials) throws PpaddictException {
@@ -207,12 +138,8 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
             for (AuthenticatorService authService : authServices) {
                 String loginUrl = leaveService.getURL(authService.getIdentifier(), referer);
 
-                data.loginElements.add(new SafeHtmlBuilder()
-                        .appendHtmlConstant("<a href=\"" + loginUrl + "\">")
-                        .appendEscaped(authService.getDisplayName())
-                        .appendHtmlConstant("</a>")
-                        .toSafeHtml()
-                        .asString());
+                data.loginElements.add("<a href=\"" + StringEscapeUtils.escapeHtml4(loginUrl) + "\">"
+                        + StringEscapeUtils.escapeHtml4(authService.getDisplayName()) + "</a>");
             }
             return new UserData(data);
         }
@@ -221,9 +148,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
     /**
      * Retreives a user's persistend data or creates a new object
      *
-     * @param credentials
      * @return not null, always a copy
-     * @throws PpaddictException
      */
     @Nonnull
     public PersistentUserData getServerUserData(@Nonnull Credentials credentials) throws PpaddictException {
@@ -234,12 +159,6 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
             throw ExceptionsUtil.getLoggedWrappedException(log, e);
         }
         return data.map(/* creates a copy */ PersistentUserData::new).orElseGet(PersistentUserData::new);
-    }
-
-    @Override
-    public void saveSettings(@Nonnull Settings s) throws PpaddictException {
-        Credentials credentials = getCredentialsOrThrow();
-        saveSettings(s, credentials);
     }
 
     public void saveSettings(Settings s, Credentials credentials) throws PpaddictException {
@@ -272,12 +191,6 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
         }
     }
 
-    @Override
-    public void saveComment(int beatmapid, @CheckForNull String mods, @CheckForNull String comment)
-            throws PpaddictException {
-        saveComment(null, beatmapid, mods, comment);
-    }
-
     public void saveComment(
             @CheckForNull HttpServletRequest request,
             int beatmapid,
@@ -291,7 +204,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
         long modsAsLong;
         if (mods != null && !mods.isEmpty()) {
             if (mods.equals("?")) {
-                modsAsLong = -1l;
+                modsAsLong = -1L;
             } else {
                 modsAsLong = Mods.fromShortNamesContinuous(mods);
             }
@@ -301,12 +214,12 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
         comment = comment.trim();
 
-        Credentials credentials = request != null ? getCredentialsOrThrow(request) : getCredentialsOrThrow();
+        Credentials credentials = getCredentialsOrThrow(request);
 
         PersistentUserData userData = getServerUserData(credentials);
 
         if (userData.getBeatmapComments() == null) {
-            userData.setBeatmapComments(new TreeSet<String>());
+            userData.setBeatmapComments(new TreeSet<>());
         }
 
         comment = comment.substring(0, Math.min(ClientUserData.BEATMAP_COMMENT_LENGTH, comment.length()))
@@ -319,7 +232,7 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
 
     public void rememberCredentials(HttpServletRequest req, HttpServletResponse resp, Credentials credentials)
             throws PpaddictException {
-        credentials.expires = System.currentTimeMillis() + 4 * 7l * 24 * 60 * 60 * 1000;
+        credentials.expires = System.currentTimeMillis() + 4 * 7L * 24 * 60 * 60 * 1000;
 
         req.getSession().setAttribute(UserDataServiceImpl.CREDENTIALS_SESSION_KEY, credentials);
 
@@ -382,47 +295,12 @@ public class UserDataServiceImpl extends RemoteServiceServlet implements UserDat
         }
     }
 
-    @Override
-    public String getLinkString() throws PpaddictException {
-        Credentials credentials = getCredentialsOrThrow();
-        try {
-            return ppaddictUserDataService.getLinkString(credentials.identifier, credentials.displayName);
-        } catch (Exception e) {
-            throw ExceptionsUtil.getLoggedWrappedException(log, e);
-        }
-    }
-
-    private @Nonnull Credentials getCredentialsOrThrow() throws PpaddictException {
-        return getCredentialsOrThrow(getThreadLocalRequest());
-    }
-
     public Credentials getCredentialsOrThrow(HttpServletRequest threadLocalRequest) throws PpaddictException {
         Credentials credentials = getCredentials(threadLocalRequest);
         if (credentials == null) {
             throw new PpaddictException.NotLoggedIn();
         }
         return credentials;
-    }
-
-    @SuppressFBWarnings(value = "NP", justification = "checked")
-    public @UserId int getUserIdOrThrow(HttpServletRequest threadLocalRequest) throws PpaddictException {
-        PersistentUserData persistentUserData = getLinkedDataOrThrow(threadLocalRequest);
-        return persistentUserData.getLinkedOsuId();
-    }
-
-    public @Nonnull PersistentUserData getLinkedDataOrThrow(HttpServletRequest threadLocalRequest)
-            throws PpaddictException {
-        Credentials credentials = getCredentialsOrThrow(threadLocalRequest);
-        PersistentUserData persistentUserData = getServerUserData(credentials);
-        if (persistentUserData.getLinkedOsuId() == null) {
-            throw new PpaddictException.NotLinked();
-        }
-        return persistentUserData;
-    }
-
-    @Override
-    public String createApiKey() throws PpaddictException {
-        return createApiKey(getCredentialsOrThrow());
     }
 
     public String createApiKey(Credentials credentialsOrThrow) throws PpaddictException {

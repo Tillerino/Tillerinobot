@@ -1,10 +1,9 @@
 package org.tillerino.ppaddict.shared;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class BeatmapFilter implements IsSerializable {
+public class BeatmapFilter {
     @CheckForNull
     public BeatmapRangeRequest.Sort sortBy = null;
 

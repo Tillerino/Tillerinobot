@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict.server;
 
-import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -10,7 +9,6 @@ import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tillerino.osuApiModel.Mods;
-import org.tillerino.ppaddict.client.services.RecommendationsService;
 import org.tillerino.ppaddict.server.auth.Credentials;
 import org.tillerino.ppaddict.shared.Beatmap;
 import org.tillerino.ppaddict.shared.PpaddictException;
@@ -28,8 +26,7 @@ import tillerino.tillerinobot.recommendations.RecommendationsManager;
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 @Slf4j
-public class RecommendationsServiceImpl extends RemoteServiceServlet implements RecommendationsService {
-    static final long serialVersionUID = 1L;
+public class RecommendationsServiceImpl {
     private final UserDataServiceImpl userDataService;
 
     private final RecommendationsManager recommendationsManager;
@@ -38,11 +35,6 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
 
     private final DiffEstimateProvider diffEstimateProvider;
     private final PullThrough pullThrough;
-
-    @Override
-    public List<Beatmap> getRecommendations() throws PpaddictException {
-        return getRecommendations(userDataService.getCredentialsOrThrow(getThreadLocalRequest()));
-    }
 
     public List<Beatmap> getRecommendations(Credentials credentials) throws PpaddictException {
         PersistentUserData userData = userDataService.getServerUserData(credentials);
@@ -111,11 +103,6 @@ public class RecommendationsServiceImpl extends RemoteServiceServlet implements 
         }
 
         return recommendations;
-    }
-
-    @Override
-    public Beatmap hideRecommendation(int beatmapid, String mods) throws PpaddictException {
-        return hideRecommendation(userDataService.getCredentialsOrThrow(getThreadLocalRequest()), beatmapid, mods);
     }
 
     public Beatmap hideRecommendation(Credentials credentials, int beatmapid, String mods) throws PpaddictException {

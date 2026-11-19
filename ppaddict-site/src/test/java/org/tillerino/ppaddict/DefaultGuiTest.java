@@ -22,7 +22,7 @@ class DefaultGuiTest extends AbstractPlaywrightTest {
     void rootServesV2Html() throws Exception {
         HttpResponse<String> response = get("/");
         assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.body()).contains("switch to old interface");
+        assertThat(response.body()).contains("Help");
     }
 
     @Test
@@ -35,8 +35,8 @@ class DefaultGuiTest extends AbstractPlaywrightTest {
     @Test
     void redirectsPreserveQuery() throws Exception {
         assertThat(get("/Ppaddict.html?b=1234").headers().firstValue("Location"))
-                .contains("/v1.html?b=1234");
-        assertThat(get("/Ppaddict.html").headers().firstValue("Location")).contains("/v1.html");
+                .contains("/v2.html?b=1234");
+        assertThat(get("/Ppaddict.html").headers().firstValue("Location")).contains("/v2.html");
     }
 
     @Test
@@ -47,13 +47,5 @@ class DefaultGuiTest extends AbstractPlaywrightTest {
 
         PlaywrightAssertions.assertThat(page.locator(".header-bar h1")).isVisible();
         assertThat(page.url()).endsWith("/");
-    }
-
-    @Test
-    void guiSwitchLinks() {
-        page.navigate(addr() + "/v2.html");
-        page.waitForResponse("**/htmx/user**", () -> {});
-        PlaywrightAssertions.assertThat(page.locator("#user-area a[href='v1.html']"))
-                .isVisible();
     }
 }

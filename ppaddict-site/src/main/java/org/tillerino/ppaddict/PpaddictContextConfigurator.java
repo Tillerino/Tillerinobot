@@ -12,22 +12,13 @@ import org.tillerino.ppaddict.rest.RecommendationsResource;
 import org.tillerino.ppaddict.rest.RootServlet;
 import org.tillerino.ppaddict.rest.SettingsResource;
 import org.tillerino.ppaddict.rest.UserDataResource;
-import org.tillerino.ppaddict.server.BeatmapTableServiceImpl;
 import org.tillerino.ppaddict.server.PpaddictContextFilter;
-import org.tillerino.ppaddict.server.RecommendationsServiceImpl;
-import org.tillerino.ppaddict.server.UserDataServiceImpl;
 import org.tillerino.ppaddict.server.auth.AuthArriveService;
 import org.tillerino.ppaddict.server.auth.AuthLeaveService;
 import org.tillerino.ppaddict.server.auth.AuthLogoutService;
 
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class PpaddictContextConfigurator {
-    private final BeatmapTableServiceImpl beatmapTableService;
-    private final UserDataServiceImpl userDataService;
-    private final RecommendationsServiceImpl recommendationsService;
-
-    // v2
-
     private final BeatmapTableResource beatmapTableResource;
     private final UserDataResource userDataResource;
     private final SettingsResource settingsResource;
@@ -41,9 +32,6 @@ public class PpaddictContextConfigurator {
     private final PpaddictContextFilter ppaddictContextFilter;
 
     public void configureUndertow(DeploymentInfo deploymentInfo) {
-        addServlet(deploymentInfo, "/ppaddict/beatmaps", beatmapTableService);
-        addServlet(deploymentInfo, "/ppaddict/user", userDataService);
-        addServlet(deploymentInfo, "/ppaddict/recommendations", recommendationsService);
         addServlet(deploymentInfo, "/v2.html", new RootServlet());
         addServlet(deploymentInfo, "/r.html", rServlet);
         addServlet(

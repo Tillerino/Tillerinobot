@@ -13,11 +13,11 @@
     <artifactId>ppaddict-site</artifactId>
     <packaging>jar</packaging>
 
-    <properties>
-        <gwt-version>2.12.2</gwt-version>
-    </properties>
-
     <dependencies>
+        <dependency>
+            <groupId>org.tillerino.osu</groupId>
+            <artifactId>tillerinobot</artifactId>
+        </dependency>
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
@@ -30,23 +30,6 @@
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.gwtproject</groupId>
-            <artifactId>gwt-user</artifactId>
-            <version>${gwt-version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.gwtproject</groupId>
-            <artifactId>gwt-servlet-jakarta</artifactId>
-            <version>${gwt-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gwtproject</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <version>${gwt-version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -70,10 +53,6 @@
         </dependency>
 
         <!-- tests -->
-        <dependency>
-            <groupId>org.tillerino.osu</groupId>
-            <artifactId>tillerinobot</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.tillerino.osu</groupId>
             <artifactId>tillerinobot-model</artifactId>
@@ -114,35 +93,9 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-            <resource>
-                <targetPath>${build.outputDirectory}/static/ppaddict</targetPath>
-                <directory>target/${build.finalName}/ppaddict</directory>
-            </resource>
-            <resource>
-                <targetPath>${build.outputDirectory}/WEB-INF/deploy</targetPath>
-                <directory>target/gwt/deploy</directory>
-            </resource>
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>net.ltgt.gwt.maven</groupId>
-                <artifactId>gwt-maven-plugin</artifactId>
-                <version>1.2.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <moduleName>org.tillerino.ppaddict.Ppaddict</moduleName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate-module</goal>
-                            <goal>compile</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>

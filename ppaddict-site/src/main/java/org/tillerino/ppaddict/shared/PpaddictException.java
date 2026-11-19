@@ -1,15 +1,11 @@
 package org.tillerino.ppaddict.shared;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-import org.tillerino.ppaddict.client.services.AbstractAsyncCallback;
-
 /**
- * An exception that is supposed to be handled by the visitor. It's message should be displayed on the website. This is
- * done automatically by {@link AbstractAsyncCallback}.
+ * An exception that is supposed to be handled by the visitor. Its message should be displayed on the website.
  *
  * @author Tillerino
  */
-public class PpaddictException extends Exception implements IsSerializable {
+public class PpaddictException extends Exception {
     private static final long serialVersionUID = 1L;
 
     public PpaddictException(String message) {

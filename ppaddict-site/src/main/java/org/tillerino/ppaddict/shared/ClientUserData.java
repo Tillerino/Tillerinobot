@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict.shared;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -12,7 +11,7 @@ import org.tillerino.ppaddict.web.types.PpaddictId;
  *
  * @author Tillerino
  */
-public class ClientUserData implements IsSerializable {
+public class ClientUserData {
     /** null if not logged in. will change from openid to osu! name */
     @CheckForNull
     public String nickname;

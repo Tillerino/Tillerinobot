@@ -1,6 +1,5 @@
 package org.tillerino.ppaddict.shared;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import javax.annotation.Nonnull;
 
 public class BeatmapRangeRequest extends BeatmapFilter {
@@ -13,7 +12,7 @@ public class BeatmapRangeRequest extends BeatmapFilter {
         start = o.start;
     }
 
-    public enum Sort implements IsSerializable {
+    public enum Sort {
         EXPECTED,
         PERFECT,
         BPM,

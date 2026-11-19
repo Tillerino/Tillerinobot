@@ -28,15 +28,15 @@ install:
 
 single-ppaddict-test name:
   {{mvnd}} spotless:apply -T 99
-  {{mvnd}} -Dmaven.repo.local={{justfile_directory()}}/.m2/repository clean spotless:apply install {{skipChecks}} -Dgwt.skipCompilation=true -pl :ppaddict-site -am -T 99
-  {{mvnd}} -Dmaven.repo.local={{justfile_directory()}}/.m2/repository test -Dtest={{ quote(name) }} -Dgwt.skipCompilation=true -pl :ppaddict-site
+  {{mvnd}} -Dmaven.repo.local={{justfile_directory()}}/.m2/repository clean spotless:apply install {{skipChecks}} -pl :ppaddict-site -am -T 99
+  {{mvnd}} -Dmaven.repo.local={{justfile_directory()}}/.m2/repository test -Dtest={{ quote(name) }} -pl :ppaddict-site
 
 test-ppaddict:
   {{mvnd}} clean spotless:apply test -pl :ppaddict-site -am -T 99
 
 run-ppaddict port:
   {{mvnd}} spotless:apply -T 99
-  {{mvnd}} clean spotless:apply test-compile dependency:build-classpath {{skipChecks}} -Dgwt.skipCompilation=true -DincludeScope=test -Dmdep.outputFile=target/cp -pl :ppaddict-site -am -T 99
+  {{mvnd}} clean spotless:apply test-compile dependency:build-classpath {{skipChecks}} -DincludeScope=test -Dmdep.outputFile=target/cp -pl :ppaddict-site -am -T 99
   # We can't use mvnd to run, or the java process will not be a child of the just process, which we use to clean up
   cd ppaddict-site; PPADDICT_PORT={{port}} java -cp $(cat target/cp):target/classes:target/test-classes org.tillerino.ppaddict.LocalPpaddict
 

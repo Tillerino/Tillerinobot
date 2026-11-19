@@ -44,7 +44,7 @@ public interface PpaddictModule {
         manager.deploy();
 
         return Handlers.path(Handlers.redirect("/"))
-                .addExactPath("/Ppaddict.html", redirectPreservingQuery("/v1.html"))
+                .addExactPath("/Ppaddict.html", redirectPreservingQuery("/v2.html"))
                 .addPrefixPath("/", manager.start());
     }
 
