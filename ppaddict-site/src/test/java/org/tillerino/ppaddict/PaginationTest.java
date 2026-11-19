@@ -11,7 +11,7 @@ class PaginationTest extends AbstractPlaywrightTest {
 
     @Test
     void pagerRowExistsWithButtons() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         var pager = page.locator(PAGER_SELECTOR);
@@ -31,7 +31,7 @@ class PaginationTest extends AbstractPlaywrightTest {
 
     @Test
     void firstPageDisabledButtons() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         var pager = page.locator(PAGER_SELECTOR);
@@ -44,7 +44,7 @@ class PaginationTest extends AbstractPlaywrightTest {
 
     @Test
     void nextPageNavigation() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         var pager = page.locator(PAGER_SELECTOR);
@@ -65,7 +65,7 @@ class PaginationTest extends AbstractPlaywrightTest {
 
     @Test
     void previousPageNavigation() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         var pager = page.locator(PAGER_SELECTOR);
@@ -93,7 +93,7 @@ class PaginationTest extends AbstractPlaywrightTest {
 
     @Test
     void jumpForwardNavigation() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         var pager = page.locator(PAGER_SELECTOR);

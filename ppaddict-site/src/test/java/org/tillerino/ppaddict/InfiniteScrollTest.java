@@ -9,7 +9,7 @@ class InfiniteScrollTest extends AbstractPlaywrightTest {
 
     @Test
     void infiniteScrollLoadsMoreBeatmaps() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         // Initial load: 100 beatmap rows + 1 sentinel

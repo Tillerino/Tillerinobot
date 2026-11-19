@@ -9,7 +9,7 @@ class RecommendationsTest extends AbstractPlaywrightTest {
 
     @Test
     void recommendationsPageFlow() throws Exception {
-        page.navigate("http://localhost:" + getPort() + "/r.html");
+        page.navigate(addr() + "/r.html");
         page.waitForLoadState();
 
         assertThat(page.locator("h1 a").allTextContents()).containsExactly("ppaddict", "!r");
@@ -60,7 +60,7 @@ class RecommendationsTest extends AbstractPlaywrightTest {
 
     @Test
     void editNoteOnRecommendation() throws Exception {
-        page.navigate("http://localhost:" + getPort() + "/r.html");
+        page.navigate(addr() + "/r.html");
         page.waitForLoadState();
 
         page.locator("#user-area button:has-text('Login')").click();

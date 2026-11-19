@@ -10,7 +10,7 @@ class SortTest extends AbstractPlaywrightTest {
 
     @Test
     void sortToggle() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         // Initially no sort arrow on BPM

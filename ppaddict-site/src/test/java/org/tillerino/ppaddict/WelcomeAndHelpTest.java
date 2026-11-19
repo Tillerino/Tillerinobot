@@ -9,7 +9,7 @@ class WelcomeAndHelpTest extends AbstractPlaywrightTest {
 
     @Test
     void welcomeDialogShownOnce() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForLoadState();
 
         assertThat(page.locator("#welcome-dialog").getAttribute("open")).isNotNull();
@@ -23,7 +23,7 @@ class WelcomeAndHelpTest extends AbstractPlaywrightTest {
 
     @Test
     void helpPopupsShowAndClose() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForLoadState();
         page.waitForSelector("table.beatmaps");
 
@@ -50,7 +50,7 @@ class WelcomeAndHelpTest extends AbstractPlaywrightTest {
 
     @Test
     void helpPopupsOnRecommendationsPage() {
-        page.navigate("http://localhost:" + getPort() + "/r.html");
+        page.navigate(addr() + "/r.html");
         page.waitForLoadState();
 
         // login (auto-links via fake auth) so that the recommendations table renders
@@ -77,7 +77,7 @@ class WelcomeAndHelpTest extends AbstractPlaywrightTest {
 
     @Test
     void rowClickOpensOsuDirectWhenEnabled() throws Exception {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForLoadState();
 
         // login (auto-links via fake auth)
@@ -115,7 +115,7 @@ class WelcomeAndHelpTest extends AbstractPlaywrightTest {
 
     @Test
     void recommendationsSettingsHelp() throws Exception {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForLoadState();
 
         // login (auto-links via fake auth)
@@ -147,7 +147,7 @@ class WelcomeAndHelpTest extends AbstractPlaywrightTest {
 
     @Test
     void settingsDialogDismissal() throws Exception {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForLoadState();
 
         // login (auto-links via fake auth)

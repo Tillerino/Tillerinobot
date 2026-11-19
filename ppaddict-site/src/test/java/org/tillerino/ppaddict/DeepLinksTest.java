@@ -10,7 +10,7 @@ class DeepLinksTest extends AbstractPlaywrightTest {
 
     @Test
     void setIdFilterShowsOnlyThatSet() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         Locator firstRow = page.locator("tbody tr[data-beatmapsetid]").first();
@@ -46,7 +46,7 @@ class DeepLinksTest extends AbstractPlaywrightTest {
 
     @Test
     void beatmapIdFilterShowsOnlyThatBeatmap() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         Locator firstRow = page.locator("tbody tr[data-beatmapid]").first();

@@ -110,7 +110,7 @@ public class AbstractServingPpaddictTest extends AbstractDatabaseTest {
                 .register(post(urlPathEqualTo("/auth/authentication"))
                         .willReturn(aResponse().withBody("a".repeat(40)).withHeader("Content-Type", "text/plain")));
         server = Undertow.builder()
-                .addHttpListener(0, "localhost")
+                .addHttpListener(0, "127.0.0.2")
                 .setHandler(PpaddictModule.createFilterPathHandler(deploymentInfo -> {
                     configurator.configureUndertow(deploymentInfo);
                     PpaddictContextConfigurator.addServlet(deploymentInfo, "/showErrorPage", new ProducesError());
@@ -125,5 +125,9 @@ public class AbstractServingPpaddictTest extends AbstractDatabaseTest {
     @AfterEach
     void stopUndertow() throws Exception {
         server.stop();
+    }
+
+    public String addr() {
+        return "http://127.0.0.2:" + getPort();
     }
 }

@@ -10,7 +10,7 @@ class FiltersTest extends AbstractPlaywrightTest {
 
     @Test
     void filterShowHideToggle() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         PlaywrightAssertions.assertThat(page.locator(".filter-row")).isHidden();
@@ -29,7 +29,7 @@ class FiltersTest extends AbstractPlaywrightTest {
 
     @Test
     void filterInputsExistWithCorrectDefaults() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         page.locator(".pager-row td:first-child button").click();
@@ -144,7 +144,7 @@ class FiltersTest extends AbstractPlaywrightTest {
 
     @Test
     void rankedOnlyFilterReducesRows() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         page.locator(".pager-row td:first-child button").click();
@@ -179,7 +179,7 @@ class FiltersTest extends AbstractPlaywrightTest {
             String filterValue,
             java.util.function.Predicate<String> insideRange,
             java.util.function.Consumer<String> assertRow) {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
         page.locator(".pager-row td:first-child button").click();
 

@@ -7,12 +7,12 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 public class BotApiRule extends JdkServerResource {
     @Inject
     public BotApiRule(BotApiDefinition app) {
-        super(app, "localhost", 0);
+        super(app, "127.0.0.2", 0);
     }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         super.beforeEach(context);
-        RestAssured.baseURI = "http://localhost:" + getPort();
+        RestAssured.baseURI = "http://127.0.0.2:" + getPort();
     }
 }

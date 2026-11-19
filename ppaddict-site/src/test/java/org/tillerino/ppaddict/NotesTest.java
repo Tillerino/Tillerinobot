@@ -27,7 +27,7 @@ class NotesTest extends AbstractPlaywrightTest {
         }
 
         // Login
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForResponse("**/htmx/user**", () -> {});
         page.waitForResponse("**/htmx/beatmaps**", () -> {});
 
@@ -40,7 +40,7 @@ class NotesTest extends AbstractPlaywrightTest {
         page.waitForSelector("#user-area .username");
 
         // Navigate to the beatmap page
-        page.navigate("http://localhost:" + getPort() + "/v2.html?b=" + beatmapId);
+        page.navigate(addr() + "/v2.html?b=" + beatmapId);
         page.waitForSelector("table.beatmaps");
 
         // Verify the comment is displayed
@@ -65,7 +65,7 @@ class NotesTest extends AbstractPlaywrightTest {
             throw new RuntimeException(e);
         }
 
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         page.locator("#user-area button:has-text('Login')").click();
@@ -77,7 +77,7 @@ class NotesTest extends AbstractPlaywrightTest {
         page.waitForSelector("#user-area .username");
 
         // Navigate to the beatmap page
-        page.navigate("http://localhost:" + getPort() + "/v2.html?b=" + beatmapId);
+        page.navigate(addr() + "/v2.html?b=" + beatmapId);
         page.waitForSelector("table.beatmaps");
 
         // Hover over the row to reveal the edit button
@@ -128,7 +128,7 @@ class NotesTest extends AbstractPlaywrightTest {
             throw new RuntimeException(e);
         }
 
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         page.locator("#user-area button:has-text('Login')").click();
@@ -175,7 +175,7 @@ class NotesTest extends AbstractPlaywrightTest {
             throw new RuntimeException(e);
         }
 
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForSelector("table.beatmaps");
 
         page.locator("#user-area button:has-text('Login')").click();
@@ -222,7 +222,7 @@ class NotesTest extends AbstractPlaywrightTest {
             throw new RuntimeException(e);
         }
 
-        page.navigate("http://localhost:" + getPort() + "/v2.html?b=" + beatmapId);
+        page.navigate(addr() + "/v2.html?b=" + beatmapId);
         page.waitForSelector("table.beatmaps");
 
         page.locator("#user-area button:has-text('Login')").click();

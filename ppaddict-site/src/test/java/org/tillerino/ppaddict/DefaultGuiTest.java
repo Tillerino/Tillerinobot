@@ -15,9 +15,7 @@ class DefaultGuiTest extends AbstractPlaywrightTest {
 
     private HttpResponse<String> get(String path) throws Exception {
         return http.send(
-                HttpRequest.newBuilder(URI.create("http://localhost:" + getPort() + path))
-                        .build(),
-                HttpResponse.BodyHandlers.ofString());
+                HttpRequest.newBuilder(URI.create(addr() + path)).build(), HttpResponse.BodyHandlers.ofString());
     }
 
     @Test
@@ -29,8 +27,7 @@ class DefaultGuiTest extends AbstractPlaywrightTest {
 
     @Test
     void rootKeepsDeepLinkQuery() {
-        Response initial = page.waitForResponse(
-                "**/htmx/beatmaps**", () -> page.navigate("http://localhost:" + getPort() + "/?b=1234"));
+        Response initial = page.waitForResponse("**/htmx/beatmaps**", () -> page.navigate(addr() + "/?b=1234"));
         assertThat(initial.url()).contains("?b=1234");
         assertThat(page.url()).doesNotContain("v2.html");
     }
@@ -44,7 +41,7 @@ class DefaultGuiTest extends AbstractPlaywrightTest {
 
     @Test
     void rootLandsOnV2Gui() {
-        page.navigate("http://localhost:" + getPort() + "/");
+        page.navigate(addr() + "/");
         page.waitForResponse("**/htmx/user**", () -> {});
         page.waitForResponse("**/htmx/beatmaps**", () -> {});
 
@@ -54,7 +51,7 @@ class DefaultGuiTest extends AbstractPlaywrightTest {
 
     @Test
     void guiSwitchLinks() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForResponse("**/htmx/user**", () -> {});
         PlaywrightAssertions.assertThat(page.locator("#user-area a[href='v1.html']"))
                 .isVisible();

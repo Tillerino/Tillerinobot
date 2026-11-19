@@ -93,7 +93,7 @@ public class ApiTest extends TestBase {
     public void startServer() {
         // build clients
         Client client = ClientBuilder.newBuilder().register(clientRequestFilter).build();
-        WebTarget target = client.target("http://localhost:" + server.getPort());
+        WebTarget target = client.target("http://127.0.0.2:" + server.getPort());
         botStatus = WebResourceFactory.newResource(BotStatus.class, target);
         beatmapDifficulties = WebResourceFactory.newResource(BeatmapDifficulties.class, target);
         when(gameChatClient.getMetrics()).thenReturn(ok(remoteMetrics));

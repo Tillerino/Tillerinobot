@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.*;
@@ -28,7 +29,7 @@ public class AbstractPlaywrightTest extends AbstractServingPpaddictTest {
     @BeforeAll
     static void launchPlaywright() {
         if (playwright == null) {
-            playwright = Playwright.create();
+            playwright = Playwright.create(new Playwright.CreateOptions().setEnv(Map.of("DEBUG", "pw:browser")));
             browser = playwright.chromium().launch();
             Runtime.getRuntime()
                     .addShutdownHook(new Thread(

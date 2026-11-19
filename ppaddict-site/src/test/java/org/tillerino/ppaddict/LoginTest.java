@@ -9,7 +9,7 @@ class LoginTest extends AbstractPlaywrightTest {
 
     @Test
     void loginLogoutFlow() {
-        page.navigate("http://localhost:" + getPort() + "/v2.html");
+        page.navigate(addr() + "/v2.html");
         page.waitForResponse("**/htmx/user**", () -> {});
         page.waitForResponse("**/htmx/beatmaps**", () -> {});
 
