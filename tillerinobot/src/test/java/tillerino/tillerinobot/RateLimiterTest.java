@@ -57,12 +57,14 @@ public class RateLimiterTest {
         AtomicInteger low = new AtomicInteger();
 
         CyclicBarrier barrier = new CyclicBarrier(2);
+        CyclicBarrier barrier2 = new CyclicBarrier(2);
 
         exec.submit(() -> {
             limiter.setThreadPriority(RateLimiter.REQUEST);
             for (; ; ) {
                 barrier.await();
                 limiter.limitRate();
+                barrier2.await();
                 high.incrementAndGet();
             }
         });
@@ -81,6 +83,7 @@ public class RateLimiterTest {
             try {
                 barrier.await();
                 limiter.addPermit();
+                barrier2.await(); // make sure high thread actually consumed
                 limiter.addPermit();
             } catch (Exception e) {
                 e.printStackTrace();
